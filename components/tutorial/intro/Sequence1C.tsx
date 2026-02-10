@@ -9,21 +9,25 @@ interface Sequence1CProps {
   onComplete: () => void
 }
 
-const ACCENT = '#FF7733'
+const TASK_COLORS = {
+  task1: '#F5F5DC', // bone/cream
+  task2: '#D4A574', // desaturated burnt orange
+  task3: '#8B9D83', // sage green
+}
 
 const DETAIL_ITEMS = [
-  { key: 'project', text: 'OFFICE REMODEL', color: '#FFFFFF', isMohave: true, size: 16, weight: 500 },
-  { key: 'client', text: 'CHARLIE BLACKWOOD', color: 'rgba(255,255,255,0.7)', isMohave: true, size: 13, weight: 400 },
-  { key: 'address', text: '1842 SUNSET BLVD, APT 4B', color: 'rgba(255,255,255,0.7)', isMohave: true, size: 13, weight: 400 },
-  { key: 'photos', text: null, color: '#FFFFFF', isMohave: false, size: 0, weight: 0 }, // photo placeholders
-  { key: 'task1', text: '+ TASK 1: SANDING', color: ACCENT, isMohave: true, size: 14, weight: 500 },
-  { key: 'task2', text: '+ TASK 2: PRIMING', color: ACCENT, isMohave: true, size: 14, weight: 500 },
-  { key: 'task3', text: '+ TASK 3: PAINTING', color: ACCENT, isMohave: true, size: 14, weight: 500 },
+  { key: 'project', text: 'OFFICE REMODEL', color: '#FFFFFF', size: 16, weight: 500 },
+  { key: 'client', text: 'CHARLIE BLACKWOOD', color: 'rgba(255,255,255,0.7)', size: 13, weight: 400 },
+  { key: 'address', text: '1842 SUNSET BLVD, APT 4B', color: 'rgba(255,255,255,0.7)', size: 13, weight: 400 },
+  { key: 'photos', text: null, color: '#FFFFFF', size: 0, weight: 0 },
+  { key: 'task1', text: '+ TASK 1: SANDING', color: TASK_COLORS.task1, size: 14, weight: 500 },
+  { key: 'task2', text: '+ TASK 2: PRIMING', color: TASK_COLORS.task2, size: 14, weight: 500 },
+  { key: 'task3', text: '+ TASK 3: PAINTING', color: TASK_COLORS.task3, size: 14, weight: 500 },
 ]
 
 // Stagger for build (top-down) and collapse (bottom-up)
-const BUILD_STAGGER = 600  // ms between each detail appearing
-const COLLAPSE_STAGGER = 120 // ms between each detail disappearing (faster)
+const BUILD_STAGGER = 600
+const COLLAPSE_STAGGER = 120
 
 function PhotoPlaceholders() {
   return (
@@ -44,9 +48,9 @@ function PhotoPlaceholders() {
 export function Sequence1C({ onComplete }: Sequence1CProps) {
   const [showText, setShowText] = useState(false)
   const [folderSmall, setFolderSmall] = useState(false)
-  const [visibleDetails, setVisibleDetails] = useState<number>(0) // how many details are visible (build phase)
+  const [visibleDetails, setVisibleDetails] = useState<number>(0)
   const [collapsing, setCollapsing] = useState(false)
-  const [collapsedCount, setCollapsedCount] = useState(0) // how many have collapsed (from bottom)
+  const [collapsedCount, setCollapsedCount] = useState(0)
   const [labelSettled, setLabelSettled] = useState(false)
   const [showSubtitle, setShowSubtitle] = useState(false)
 
@@ -80,8 +84,7 @@ export function Sequence1C({ onComplete }: Sequence1CProps) {
     timers.push(setTimeout(() => setCollapsing(true), t))
 
     // Collapse items from bottom (tasks first, then photos, address, client)
-    // Keep project name (index 0) last — it becomes the label
-    const collapseOrder = [6, 5, 4, 3, 2, 1] // indices to collapse, bottom-up
+    const collapseOrder = [6, 5, 4, 3, 2, 1]
     for (let i = 0; i < collapseOrder.length; i++) {
       t += COLLAPSE_STAGGER
       const count = i + 1
@@ -91,7 +94,7 @@ export function Sequence1C({ onComplete }: Sequence1CProps) {
     // Project name collapses and settles as label
     t += 300
     timers.push(setTimeout(() => {
-      setCollapsedCount(7) // all collapsed
+      setCollapsedCount(7)
       setLabelSettled(true)
     }, t))
 
@@ -111,14 +114,9 @@ export function Sequence1C({ onComplete }: Sequence1CProps) {
   }, [onComplete])
 
   // Determine which details are visible during collapse
-  // During build: items 0..visibleDetails-1 are shown
-  // During collapse: items collapse from bottom up
-  // collapsedCount tells us how many from the bottom have collapsed
   const getDetailVisible = (index: number) => {
     if (index >= visibleDetails) return false
     if (!collapsing) return true
-    // During collapse, items disappear from bottom up
-    // collapseOrder: 6,5,4,3,2,1,0
     const reverseIndex = DETAIL_ITEMS.length - 1 - index
     return reverseIndex >= collapsedCount
   }
@@ -144,45 +142,53 @@ export function Sequence1C({ onComplete }: Sequence1CProps) {
 
       {/* Animation container */}
       <div className="relative flex flex-col items-center">
-        {/* Details list — positioned above the folder */}
-        <div
-          className="absolute flex flex-col gap-2 items-center"
+        {/* Details list — positioned above the folder, grows upward from bottom */}
+        <motion.div
+          className="absolute flex flex-col-reverse gap-2 items-center"
           style={{ bottom: 'calc(100% + 16px)', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap' }}
+          layout
+          transition={{ type: 'spring', stiffness: 120, damping: 18 }}
         >
-          <AnimatePresence>
-            {DETAIL_ITEMS.map((item, index) => {
-              const isVisible = getDetailVisible(index)
-              if (!isVisible) return null
+          {/* Render in reverse so flex-col-reverse puts first item at top */}
+          {[...DETAIL_ITEMS].reverse().map((item, reverseIndex) => {
+            const index = DETAIL_ITEMS.length - 1 - reverseIndex
+            const isVisible = getDetailVisible(index)
 
-              return (
-                <motion.div
-                  key={item.key}
-                  initial={{ opacity: 0, y: 10, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.9 }}
-                  transition={{ type: 'spring', stiffness: 150, damping: 18 }}
-                >
-                  {item.key === 'photos' ? (
-                    <PhotoPlaceholders />
-                  ) : (
-                    <span
-                      className={item.isMohave ? 'font-mohave' : 'font-kosugi'}
-                      style={{
-                        fontSize: item.size,
-                        fontWeight: item.weight,
-                        color: item.color,
-                        letterSpacing: '0.05em',
-                        textTransform: 'uppercase',
-                      }}
-                    >
-                      {item.text}
-                    </span>
-                  )}
-                </motion.div>
-              )
-            })}
-          </AnimatePresence>
-        </div>
+            return (
+              <motion.div
+                key={item.key}
+                layout
+                initial={false}
+                animate={{
+                  opacity: isVisible ? 1 : 0,
+                  scale: isVisible ? 1 : 0.8,
+                  height: isVisible ? 'auto' : 0,
+                  marginBottom: isVisible ? 0 : -8,
+                }}
+                transition={{ type: 'spring', stiffness: 150, damping: 20 }}
+                style={{ overflow: 'hidden' }}
+              >
+                {item.key === 'photos' ? (
+                  <PhotoPlaceholders />
+                ) : (
+                  <span
+                    className="font-mohave"
+                    style={{
+                      fontSize: item.size,
+                      fontWeight: item.weight,
+                      color: item.color,
+                      letterSpacing: '0.05em',
+                      textTransform: 'uppercase',
+                      display: 'block',
+                    }}
+                  >
+                    {item.text}
+                  </span>
+                )}
+              </motion.div>
+            )
+          })}
+        </motion.div>
 
         {/* Project folder — scales down during build, back up after collapse */}
         <motion.div

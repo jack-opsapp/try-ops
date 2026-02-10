@@ -117,8 +117,10 @@ export function Sequence3({ onComplete }: Sequence3Props) {
     t += 600
     timers.push(setTimeout(() => setShowMessage1(true), t))
 
-    // 3. Folder opens, tasks emerge
+    // 3. Hide carousel, then folder opens, tasks emerge
     t += 400
+    timers.push(setTimeout(() => setCarouselVisible(false), t))
+    t += 300
     timers.push(setTimeout(() => setFolderOpen(true), t))
     t += 300
     timers.push(setTimeout(() => setTasksVisible(true), t))
@@ -143,7 +145,9 @@ export function Sequence3({ onComplete }: Sequence3Props) {
       setFolderOpen(false)
     }, t))
 
-    // 6. Carousel rotates to COMPLETED (index 4)
+    // 6. Carousel reappears (still at In Progress), then rotates to COMPLETED
+    t += 400
+    timers.push(setTimeout(() => setCarouselVisible(true), t))
     t += 400
     timers.push(setTimeout(() => setCurrentStatusIndex(4), t))
 
@@ -178,9 +182,12 @@ export function Sequence3({ onComplete }: Sequence3Props) {
     t += 600
     timers.push(setTimeout(() => setShowInvoice(false), t))
 
-    // 13. Carousel reappears at COMPLETED, rotates to CLOSED (index 5)
+    // 13. Carousel reappears already at COMPLETED (index 4), then rotates to CLOSED
     t += 400
-    timers.push(setTimeout(() => setCarouselVisible(true), t))
+    timers.push(setTimeout(() => {
+      setCurrentStatusIndex(4) // ensure Completed before showing
+      setCarouselVisible(true)
+    }, t))
 
     t += 600
     timers.push(setTimeout(() => setCurrentStatusIndex(5), t))

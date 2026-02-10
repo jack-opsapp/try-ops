@@ -72,10 +72,11 @@ export function TutorialIntroShell() {
     router.push('/tutorial-interactive')
   }, [router])
 
-  // Breakpoint 2: "Skip" → navigate to signup (TBD)
-  const handleBreakpoint2Skip = useCallback(() => {
-    router.push('/signup/credentials')
-  }, [router])
+  // Breakpoint 2: "Back" → restart from Checkpoint 1
+  const handleBreakpoint2Back = useCallback(() => {
+    setShowBreakpoint2(false)
+    setShowBreakpoint1(true)
+  }, [])
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
@@ -129,7 +130,7 @@ export function TutorialIntroShell() {
           <BreakpointButtons
             variant="begin"
             onContinue={handleBreakpoint2Continue}
-            onBack={handleBreakpoint2Skip}
+            onBack={handleBreakpoint2Back}
           />
         )}
       </AnimatePresence>
