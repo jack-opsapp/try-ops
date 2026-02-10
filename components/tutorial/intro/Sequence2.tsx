@@ -200,96 +200,100 @@ export function Sequence2({ onComplete, initialState }: Sequence2Props) {
         )}
       </AnimatePresence>
 
-      {/* Status carousel - horizontal sliding */}
-      <AnimatePresence>
-        {!isArchiving && (
-          <motion.div
-            className="absolute flex items-center justify-center overflow-visible"
-            style={{
-              top: '35%',
-              left: 0,
-              right: 0,
-              height: '60px',
-            }}
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
+      {/* Animation container — carousel and folder positioned together */}
+      <div className="relative flex flex-col items-center">
+        {/* Status carousel — positioned above the folder */}
+        <AnimatePresence>
+          {!isArchiving && (
             <motion.div
-              className="flex items-center justify-center"
+              className="absolute flex items-center justify-center overflow-visible"
               style={{
-                position: 'relative',
-                left: '50%',
+                bottom: '100%',
+                marginBottom: 24,
+                left: '-50vw',
+                right: '-50vw',
+                height: '60px',
               }}
-              animate={{
-                x: `calc(-50% + ${carouselOffset}px)`,
-              }}
-              transition={{
-                duration: getTransitionDuration(),
-                type: isReversing ? 'tween' : 'spring',
-                stiffness: isReversing ? undefined : 180,
-                damping: isReversing ? undefined : 16,
-                ease: isReversing ? 'linear' : undefined,
-              }}
+              initial={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
             >
-              {STATUS_ORDER.map((status, index) => {
-                const isActive = index === currentStatusIndex
-                const isPrev = index === currentStatusIndex - 1
-                const isNext = index === currentStatusIndex + 1
-                const isVisible = isActive || isPrev || isNext
+              <motion.div
+                className="flex items-center justify-center"
+                style={{
+                  position: 'relative',
+                  left: '50%',
+                }}
+                animate={{
+                  x: `calc(-50% + ${carouselOffset}px)`,
+                }}
+                transition={{
+                  duration: getTransitionDuration(),
+                  type: isReversing ? 'tween' : 'spring',
+                  stiffness: isReversing ? undefined : 180,
+                  damping: isReversing ? undefined : 16,
+                  ease: isReversing ? 'linear' : undefined,
+                }}
+              >
+                {STATUS_ORDER.map((status, index) => {
+                  const isActive = index === currentStatusIndex
+                  const isPrev = index === currentStatusIndex - 1
+                  const isNext = index === currentStatusIndex + 1
+                  const isVisible = isActive || isPrev || isNext
 
-                return (
-                  <div
-                    key={status}
-                    className="flex-shrink-0 font-mohave font-medium uppercase tracking-wider text-center"
-                    style={{
-                      width: 250,
-                      fontSize: isActive ? '24px' : '16px',
-                      color: isActive ? STATUS_COLORS[status] : '#FFFFFF',
-                      opacity: isActive ? 1 : isVisible ? 0.4 : 0,
-                      transition: `color 0.1s, fontSize ${getTransitionDuration() * 0.6}s, opacity ${getTransitionDuration() * 0.8}s`,
-                    }}
-                  >
-                    {STATUS_LABELS[status]}
-                  </div>
-                )
-              })}
+                  return (
+                    <div
+                      key={status}
+                      className="flex-shrink-0 font-mohave font-medium uppercase tracking-wider text-center"
+                      style={{
+                        width: 250,
+                        fontSize: isActive ? '24px' : '16px',
+                        color: isActive ? STATUS_COLORS[status] : '#FFFFFF',
+                        opacity: isActive ? 1 : isVisible ? 0.4 : 0,
+                        transition: `color 0.1s, fontSize ${getTransitionDuration() * 0.6}s, opacity ${getTransitionDuration() * 0.8}s`,
+                      }}
+                    >
+                      {STATUS_LABELS[status]}
+                    </div>
+                  )
+                })}
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
 
-      {/* Archive label (bottom) */}
-      <AnimatePresence>
-        {showArchiveLabel && (
-          <motion.div
-            className="absolute font-mohave font-medium text-[18px] uppercase tracking-wider"
-            style={{ bottom: '25%', color: STATUS_COLORS.archived }}
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.4 }}
-          >
-            ARCHIVED
-          </motion.div>
-        )}
-      </AnimatePresence>
+        {/* Archive label — positioned below the folder */}
+        <AnimatePresence>
+          {showArchiveLabel && (
+            <motion.div
+              className="absolute font-mohave font-medium text-[18px] uppercase tracking-wider"
+              style={{ top: '100%', marginTop: 24, color: STATUS_COLORS.archived }}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.4 }}
+            >
+              ARCHIVED
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-      {/* Project folder */}
-      <motion.div
-        animate={{
-          y: isArchiving && !hasReturnedFromArchive ? 100 : 0,
-          scale: folderScalingUp ? 15 : isArchiving && !hasReturnedFromArchive ? 0.8 : 1,
-          opacity: folderScalingUp ? 0 : 1,
-        }}
-        transition={{
-          type: 'spring',
-          stiffness: 120,
-          damping: 18,
-        }}
-      >
-        <ProjectFolder color={folderColor} isOpen={false} />
-      </motion.div>
+        {/* Project folder */}
+        <motion.div
+          animate={{
+            y: isArchiving && !hasReturnedFromArchive ? 100 : 0,
+            scale: folderScalingUp ? 15 : isArchiving && !hasReturnedFromArchive ? 0.8 : 1,
+            opacity: folderScalingUp ? 0 : 1,
+          }}
+          transition={{
+            type: 'spring',
+            stiffness: 120,
+            damping: 18,
+          }}
+        >
+          <ProjectFolder color={folderColor} isOpen={false} />
+        </motion.div>
+      </div>
     </div>
   )
 }
