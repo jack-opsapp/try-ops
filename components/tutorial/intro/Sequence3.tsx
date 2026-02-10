@@ -84,7 +84,6 @@ export function Sequence3({ onComplete }: Sequence3Props) {
   // Messages
   const [showMessage1, setShowMessage1] = useState(false)
   const [showMessage2, setShowMessage2] = useState(false)
-  const [showFinalText, setShowFinalText] = useState(false)
 
   // Invoice state
   const [showInvoice, setShowInvoice] = useState(false)
@@ -145,10 +144,10 @@ export function Sequence3({ onComplete }: Sequence3Props) {
       setFolderOpen(false)
     }, t))
 
-    // 6. Carousel reappears (still at In Progress), then rotates to COMPLETED
+    // 6. Carousel fades in already at In Progress, wait, then rotate to COMPLETED
     t += 400
     timers.push(setTimeout(() => setCarouselVisible(true), t))
-    t += 400
+    t += 600
     timers.push(setTimeout(() => setCurrentStatusIndex(4), t))
 
     // 7. Message 1 fades
@@ -205,12 +204,8 @@ export function Sequence3({ onComplete }: Sequence3Props) {
     t += 300
     timers.push(setTimeout(() => setZoomThrough(true), t))
 
-    // 17. "NOW TRY IT YOURSELF"
-    t += 800
-    timers.push(setTimeout(() => setShowFinalText(true), t))
-
-    // 18. Complete
-    t += 1500
+    // 17. Complete (text now comes from checkpoint)
+    t += 1000
     timers.push(setTimeout(() => onComplete(), t))
 
     return () => timers.forEach(clearTimeout)
@@ -257,20 +252,6 @@ export function Sequence3({ onComplete }: Sequence3Props) {
             </p>
           </motion.div>
         )}
-
-        {showFinalText && (
-          <motion.div
-            key="final"
-            className="absolute inset-0 flex items-center justify-center px-4"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, type: 'spring', stiffness: 100, damping: 20 }}
-          >
-            <p className="font-mohave font-bold text-[28px] md:text-[36px] uppercase tracking-wider text-white text-center">
-              <TypewriterText text="NOW TRY IT YOURSELF" typingSpeed={40} />
-            </p>
-          </motion.div>
-        )}
       </AnimatePresence>
 
       {/* Animation container */}
@@ -295,6 +276,7 @@ export function Sequence3({ onComplete }: Sequence3Props) {
                 <motion.div
                   className="flex items-center"
                   style={{ position: 'absolute', top: 0, height: 60 }}
+                  initial={false}
                   animate={{ x: carouselX }}
                   transition={{
                     duration: 0.6,

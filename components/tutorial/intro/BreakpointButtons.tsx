@@ -3,17 +3,16 @@
 import { motion } from 'framer-motion'
 
 interface BreakpointButtonsProps {
-  variant: 'gotit' | 'begin' | 'back-only'
-  onContinue: () => void
-  onBack: () => void
   message?: string
+  largeMessage?: boolean
+  continueLabel?: string
+  onContinue?: () => void
+  onBack?: () => void
+  skipLabel?: string
+  onSkip?: () => void
 }
 
-export function BreakpointButtons({ variant, onContinue, onBack, message }: BreakpointButtonsProps) {
-  const continueLabel = variant === 'gotit' ? 'GOT IT' : 'BEGIN TUTORIAL'
-  const backLabel = variant === 'gotit' ? 'BACK' : variant === 'begin' ? 'SKIP' : 'BACK'
-  const showContinue = variant !== 'back-only'
-
+export function BreakpointButtons({ message, largeMessage, continueLabel, onContinue, onBack, skipLabel, onSkip }: BreakpointButtonsProps) {
   return (
     <motion.div
       className="absolute bottom-0 left-0 right-0 flex flex-col items-center gap-4 pb-8"
@@ -25,28 +24,45 @@ export function BreakpointButtons({ variant, onContinue, onBack, message }: Brea
     >
       {/* Message above buttons */}
       {message && (
-        <p className="font-mohave font-medium text-[20px] leading-[24px] uppercase tracking-wider text-white text-center mb-4">
+        <p className={`font-mohave uppercase tracking-wider text-white text-center mb-4 ${
+          largeMessage
+            ? 'font-bold text-[28px] md:text-[36px] leading-[36px]'
+            : 'font-medium text-[20px] leading-[24px]'
+        }`}>
           {message}
         </p>
       )}
 
-      {/* Continue button */}
-      {showContinue && (
+      {/* Button row — BACK and CONTINUE side by side */}
+      <div className="flex items-center gap-4">
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="font-mohave font-medium text-[14px] uppercase tracking-wider text-white/50 px-6 py-3 border border-white/30 rounded-[5px] transition-all hover:text-white/70 hover:border-white/50"
+          >
+            BACK
+          </button>
+        )}
+
+        {continueLabel && onContinue && (
+          <button
+            onClick={onContinue}
+            className="font-mohave font-medium text-[16px] uppercase tracking-wider text-white px-8 py-3 border-2 border-white rounded-[5px] transition-all hover:bg-white hover:text-black"
+          >
+            {continueLabel}
+          </button>
+        )}
+      </div>
+
+      {/* Skip link — smaller, below buttons */}
+      {skipLabel && onSkip && (
         <button
-          onClick={onContinue}
-          className="font-mohave font-medium text-[16px] uppercase tracking-wider text-white px-8 py-3 border-2 border-white rounded-[5px] transition-all hover:bg-white hover:text-black"
+          onClick={onSkip}
+          className="font-mohave font-medium text-[12px] uppercase tracking-wider text-white/30 px-4 py-2 transition-all hover:text-white/50 mt-2"
         >
-          {continueLabel}
+          {skipLabel}
         </button>
       )}
-
-      {/* Back/Skip button */}
-      <button
-        onClick={onBack}
-        className="font-mohave font-medium text-[14px] uppercase tracking-wider text-white/50 px-6 py-2 border border-white/30 rounded-[5px] transition-all hover:text-white/70 hover:border-white/50"
-      >
-        {backLabel}
-      </button>
     </motion.div>
   )
 }

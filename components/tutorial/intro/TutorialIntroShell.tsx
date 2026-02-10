@@ -8,129 +8,142 @@ import { Sequence1B } from './Sequence1B'
 import { Sequence1C } from './Sequence1C'
 import { Sequence2 } from './Sequence2'
 import { Sequence3 } from './Sequence3'
+import { ProjectFolder } from './ProjectFolder'
 import { BreakpointButtons } from './BreakpointButtons'
 
-type SequenceState = '1' | '1B' | '1C' | '2-setup' | '2-carousel' | '2-archive' | '3' | 'complete'
+type Phase =
+  | 'seq1'
+  | 'seq1b'
+  | 'cp1'
+  | 'seq1c'
+  | 'cp2'
+  | 'seq2'
+  | 'cp3'
+  | 'seq3'
+  | 'cp4'
 
 export function TutorialIntroShell() {
   const router = useRouter()
-  const [sequence, setSequence] = useState<SequenceState>('1')
-  const [showBreakpoint1, setShowBreakpoint1] = useState(false)
-  const [showBreakpoint2, setShowBreakpoint2] = useState(false)
-  const [showSequence2Back, setShowSequence2Back] = useState(false)
+  const [phase, setPhase] = useState<Phase>('seq1')
 
-  // Memoize all handlers so sequence useEffects (which depend on onComplete)
-  // don't re-run when the shell re-renders after state changes.
+  // Sequence completions
+  const handleSeq1Complete = useCallback(() => setPhase('seq1b'), [])
+  const handleSeq1BComplete = useCallback(() => setPhase('cp1'), [])
+  const handleSeq1CComplete = useCallback(() => setPhase('cp2'), [])
+  const handleSeq2Complete = useCallback(() => setPhase('cp3'), [])
+  const handleSeq3Complete = useCallback(() => setPhase('cp4'), [])
 
-  // Sequence 1 completion → advance to 1B
-  const handleSequence1Complete = useCallback(() => {
-    setSequence('1B')
-  }, [])
+  // Checkpoint continues
+  const handleCp1Continue = useCallback(() => setPhase('seq1c'), [])
+  const handleCp2Continue = useCallback(() => setPhase('seq2'), [])
+  const handleCp3Continue = useCallback(() => setPhase('seq3'), [])
+  const handleCp4Continue = useCallback(() => router.push('/tutorial-interactive'), [router])
 
-  // Sequence 1B completion → show breakpoint 1
-  const handleSequence1BComplete = useCallback(() => {
-    setShowBreakpoint1(true)
-  }, [])
+  // Checkpoint backs — cp1 replays, others go back to cp1
+  const handleCp1Back = useCallback(() => setPhase('seq1'), [])
+  const handleCpBackToCp1 = useCallback(() => setPhase('cp1'), [])
 
-  // Breakpoint 1: "Got it" → advance to Sequence 1C
-  const handleBreakpoint1Continue = useCallback(() => {
-    setShowBreakpoint1(false)
-    setSequence('1C')
-  }, [])
+  // Seq2 floating back button → replay from start
+  const handleSeq2Back = useCallback(() => setPhase('seq1'), [])
 
-  // Breakpoint 1: "Back" → replay from Sequence 1
-  const handleBreakpoint1Back = useCallback(() => {
-    setShowBreakpoint1(false)
-    setSequence('1')
-  }, [])
-
-  // Sequence 1C completion → advance to Sequence 2
-  const handleSequence1CComplete = useCallback(() => {
-    setSequence('2-setup')
-    setShowSequence2Back(true)
-  }, [])
-
-  // Sequence 2 completion → advance to Sequence 3
-  const handleSequence2Complete = useCallback(() => {
-    setShowSequence2Back(false)
-    setSequence('3')
-  }, [])
-
-  // Sequence 2 back button → return to Sequence 1
-  const handleSequence2Back = useCallback(() => {
-    setShowSequence2Back(false)
-    setSequence('1')
-  }, [])
-
-  // Sequence 3 completion → show breakpoint 2
-  const handleSequence3Complete = useCallback(() => {
-    setShowBreakpoint2(true)
-  }, [])
-
-  // Breakpoint 2: "Begin Tutorial" → navigate to interactive tutorial
-  const handleBreakpoint2Continue = useCallback(() => {
-    router.push('/tutorial-interactive')
-  }, [router])
-
-  // Breakpoint 2: "Back" → restart from Checkpoint 1
-  const handleBreakpoint2Back = useCallback(() => {
-    setShowBreakpoint2(false)
-    setShowBreakpoint1(true)
-  }, [])
+  // Skip at final checkpoint
+  const handleSkip = useCallback(() => router.push('/signup/credentials'), [router])
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
-      {/* Sequences */}
+      {/* Sequence / checkpoint content */}
       <div className="absolute inset-0 flex items-center justify-center">
-        {sequence === '1' && (
-          <Sequence1 onComplete={handleSequence1Complete} />
+        {phase === 'seq1' && (
+          <Sequence1 onComplete={handleSeq1Complete} />
         )}
 
-        {sequence === '1B' && (
-          <Sequence1B onComplete={handleSequence1BComplete} />
+        {phase === 'seq1b' && (
+          <Sequence1B onComplete={handleSeq1BComplete} />
         )}
 
-        {sequence === '1C' && (
-          <Sequence1C onComplete={handleSequence1CComplete} />
+        {/* CP1 static background: plain white folder (1B final state) */}
+        {phase === 'cp1' && (
+          <ProjectFolder color="#FFFFFF" />
         )}
 
-        {(sequence === '2-setup' || sequence === '2-carousel' || sequence === '2-archive') && (
+        {phase === 'seq1c' && (
+          <Sequence1C onComplete={handleSeq1CComplete} />
+        )}
+
+        {/* CP2 static background: folder with label + subtitle (1C final state) */}
+        {phase === 'cp2' && (
+          <ProjectFolder color="#FFFFFF" label="OFFICE REMODEL" subtitle="3" />
+        )}
+
+        {phase === 'seq2' && (
           <Sequence2
-            onComplete={handleSequence2Complete}
-            initialState={sequence}
+            onComplete={handleSeq2Complete}
+            initialState="2-setup"
             folderLabel="OFFICE REMODEL"
           />
         )}
 
-        {sequence === '3' && (
-          <Sequence3 onComplete={handleSequence3Complete} />
+        {/* CP3 static background: folder with label (Seq2 final state — white, centered) */}
+        {phase === 'cp3' && (
+          <ProjectFolder color="#FFFFFF" label="OFFICE REMODEL" />
         )}
+
+        {phase === 'seq3' && (
+          <Sequence3 onComplete={handleSeq3Complete} />
+        )}
+
+        {/* CP4: no static background — zoom-through cleared everything */}
       </div>
 
-      {/* Breakpoint Buttons */}
+      {/* Checkpoint / navigation buttons */}
       <AnimatePresence>
-        {showBreakpoint1 && (
+        {phase === 'cp1' && (
           <BreakpointButtons
-            variant="gotit"
-            onContinue={handleBreakpoint1Continue}
-            onBack={handleBreakpoint1Back}
+            key="cp1"
             message="GOT IT SO FAR?"
+            continueLabel="GOT IT"
+            onContinue={handleCp1Continue}
+            onBack={handleCp1Back}
           />
         )}
 
-        {showSequence2Back && (
+        {phase === 'cp2' && (
           <BreakpointButtons
-            variant="back-only"
-            onContinue={() => {}}
-            onBack={handleSequence2Back}
+            key="cp2"
+            message="THAT'S A PROJECT."
+            continueLabel="NEXT"
+            onContinue={handleCp2Continue}
+            onBack={handleCpBackToCp1}
           />
         )}
 
-        {showBreakpoint2 && (
+        {phase === 'seq2' && (
           <BreakpointButtons
-            variant="begin"
-            onContinue={handleBreakpoint2Continue}
-            onBack={handleBreakpoint2Back}
+            key="seq2-back"
+            onBack={handleSeq2Back}
+          />
+        )}
+
+        {phase === 'cp3' && (
+          <BreakpointButtons
+            key="cp3"
+            message="THAT'S THE LIFECYCLE."
+            continueLabel="KEEP GOING"
+            onContinue={handleCp3Continue}
+            onBack={handleCpBackToCp1}
+          />
+        )}
+
+        {phase === 'cp4' && (
+          <BreakpointButtons
+            key="cp4"
+            message="NOW TRY IT YOURSELF"
+            largeMessage
+            continueLabel="BEGIN TUTORIAL"
+            onContinue={handleCp4Continue}
+            onBack={handleCpBackToCp1}
+            skipLabel="I'LL FIGURE IT OUT. SKIP TUTORIAL."
+            onSkip={handleSkip}
           />
         )}
       </AnimatePresence>

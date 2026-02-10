@@ -116,7 +116,12 @@ export function ProjectFolder({ color = '#FFFFFF', isOpen = false, label, subtit
     return (
       <div className="flex flex-col items-center">
         {svg}
-        <div className="flex items-center gap-1.5 mt-1">
+        <motion.div
+          className="flex items-center gap-1.5 mt-1"
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
           {/* Small folder icon */}
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
             <rect x="1" y="4" width="10" height="6" rx="1" stroke={color} strokeWidth="1" />
@@ -128,7 +133,7 @@ export function ProjectFolder({ color = '#FFFFFF', isOpen = false, label, subtit
           >
             {subtitle}
           </span>
-        </div>
+        </motion.div>
       </div>
     )
   }
