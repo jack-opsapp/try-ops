@@ -17,6 +17,9 @@ const STATUS_COLORS = OPSStyle.Colors.status
 
 const UNIFORM_DURATION = 1200 // Same duration for all transitions
 
+// Each status item width in the carousel
+const ITEM_WIDTH = 250
+
 export function Sequence2({ onComplete, initialState }: Sequence2Props) {
   const [currentStatusIndex, setCurrentStatusIndex] = useState(0)
   const [isReversing, setIsReversing] = useState(false)
@@ -139,9 +142,9 @@ export function Sequence2({ onComplete, initialState }: Sequence2Props) {
     return () => timers.forEach(clearTimeout)
   }, [onComplete])
 
-  // Calculate carousel offset to keep selected item centered
-  // Each status is 250px wide, we want the active one centered above the folder
-  const carouselOffset = -currentStatusIndex * 250
+  // Pixel offset to center the active item at x=0
+  // Each item is ITEM_WIDTH wide, item center = index * ITEM_WIDTH + ITEM_WIDTH/2
+  const carouselX = -(currentStatusIndex * ITEM_WIDTH + ITEM_WIDTH / 2)
 
   const getTransitionDuration = () => {
     if (isReversing) return 0.15
@@ -150,12 +153,12 @@ export function Sequence2({ onComplete, initialState }: Sequence2Props) {
 
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-center" style={{ maxWidth: 600, margin: '0 auto' }}>
-      {/* Main text */}
+      {/* Text messages */}
       <AnimatePresence mode="wait">
         {showMainText && (
           <motion.div
             key="main-text"
-            className="absolute top-24 left-0 right-0 text-center px-4"
+            className="absolute top-16 left-0 right-0 text-center px-4"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
@@ -171,7 +174,7 @@ export function Sequence2({ onComplete, initialState }: Sequence2Props) {
         {showArchiveText && (
           <motion.div
             key="archive-text"
-            className="absolute top-24 left-0 right-0 text-center px-4"
+            className="absolute top-16 left-0 right-0 text-center px-4"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
@@ -202,31 +205,25 @@ export function Sequence2({ onComplete, initialState }: Sequence2Props) {
 
       {/* Animation container — carousel and folder positioned together */}
       <div className="relative flex flex-col items-center">
-        {/* Status carousel — positioned above the folder */}
+        {/* Status carousel — centered above the folder using zero-width anchor */}
         <AnimatePresence>
           {!isArchiving && (
             <motion.div
-              className="absolute flex items-center justify-center overflow-visible"
+              className="absolute"
               style={{
-                bottom: '100%',
-                marginBottom: 24,
-                left: '-50vw',
-                right: '-50vw',
-                height: '60px',
+                bottom: 'calc(100% + 24px)',
+                left: '50%',
+                width: 0,
+                height: 60,
               }}
               initial={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
             >
               <motion.div
-                className="flex items-center justify-center"
-                style={{
-                  position: 'relative',
-                  left: '50%',
-                }}
-                animate={{
-                  x: `calc(-50% + ${carouselOffset}px)`,
-                }}
+                className="flex items-center"
+                style={{ position: 'absolute', top: 0, height: 60 }}
+                animate={{ x: carouselX }}
                 transition={{
                   duration: getTransitionDuration(),
                   type: isReversing ? 'tween' : 'spring',
@@ -246,7 +243,7 @@ export function Sequence2({ onComplete, initialState }: Sequence2Props) {
                       key={status}
                       className="flex-shrink-0 font-mohave font-medium uppercase tracking-wider text-center"
                       style={{
-                        width: 250,
+                        width: ITEM_WIDTH,
                         fontSize: isActive ? '24px' : '16px',
                         color: isActive ? STATUS_COLORS[status] : '#FFFFFF',
                         opacity: isActive ? 1 : isVisible ? 0.4 : 0,
@@ -258,22 +255,6 @@ export function Sequence2({ onComplete, initialState }: Sequence2Props) {
                   )
                 })}
               </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Archive label — positioned below the folder */}
-        <AnimatePresence>
-          {showArchiveLabel && (
-            <motion.div
-              className="absolute font-mohave font-medium text-[18px] uppercase tracking-wider"
-              style={{ top: '100%', marginTop: 24, color: STATUS_COLORS.archived }}
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.4 }}
-            >
-              ARCHIVED
             </motion.div>
           )}
         </AnimatePresence>
@@ -294,6 +275,22 @@ export function Sequence2({ onComplete, initialState }: Sequence2Props) {
           <ProjectFolder color={folderColor} isOpen={false} />
         </motion.div>
       </div>
+
+      {/* Archive label — in outer container, below center */}
+      <AnimatePresence>
+        {showArchiveLabel && (
+          <motion.div
+            className="absolute font-mohave font-medium text-[18px] uppercase tracking-wider"
+            style={{ bottom: '25%', color: STATUS_COLORS.archived }}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.4 }}
+          >
+            ARCHIVED
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
