@@ -82,3 +82,63 @@ input:-webkit-autofill:focus {
   -webkit-text-fill-color: #FFFFFF;
   caret-color: #FFFFFF;
 }
+
+/* Tutorial keyframe animations */
+@keyframes sheetSlideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes statusBadgeGlow {
+  0%, 100% {
+    box-shadow: 0 0 8px currentColor, 0 0 16px currentColor;
+    opacity: 0.8;
+  }
+  50% {
+    box-shadow: 0 0 16px currentColor, 0 0 32px currentColor;
+    opacity: 1;
+  }
+}
+
+@keyframes tutorialPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes cardShimmer {
+  0% { left: -80px; }
+  100% { left: calc(100% + 80px); }
+}
+
+@keyframes leftSwipeError {
+  0% { opacity: 0; transform: scale(0.98); }
+  30% { opacity: 1; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fab-pulse-ring {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes fab-glow {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes calendarPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}

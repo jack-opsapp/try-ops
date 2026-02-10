@@ -42,7 +42,7 @@ export default function LandingPage() {
 
   const handleGetStarted = () => {
     setTutorialStartTime(Date.now())
-    router.push('/tutorial/1')
+    router.push('/tutorial-intro')
   }
 
   return (

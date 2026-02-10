@@ -27,5 +27,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/tutorial/:path*', '/signup/:path*', '/download'],
+  matcher: ['/', '/tutorial/:path*', '/tutorial-intro', '/tutorial-interactive', '/signup/:path*', '/download'],
 }
