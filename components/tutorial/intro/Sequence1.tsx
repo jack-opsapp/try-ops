@@ -12,6 +12,16 @@ interface Sequence1Props {
 
 const GRAYSCALE = '#888888'
 
+// Task y-offsets relative to the folder center (stacked above it)
+const TASK_POSITIONS = [
+  { y: -240 }, // Task 1 — furthest above
+  { y: -160 }, // Task 2 — middle
+  { y: -80 },  // Task 3 — closest to folder
+]
+
+// How far the project folder shifts down when tasks emerge
+const FOLDER_SHIFT_Y = 120
+
 export function Sequence1({ onComplete }: Sequence1Props) {
   const [step, setStep] = useState(0)
 
@@ -46,7 +56,7 @@ export function Sequence1({ onComplete }: Sequence1Props) {
       <AnimatePresence>
         {textVisible && (
           <motion.div
-            className="absolute top-24 left-0 right-0 text-center"
+            className="absolute top-16 left-0 right-0 text-center px-4"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
@@ -59,54 +69,44 @@ export function Sequence1({ onComplete }: Sequence1Props) {
         )}
       </AnimatePresence>
 
-      {/* Task folders (stacked vertically above project folder, left-aligned) */}
-      <AnimatePresence>
-        {tasksVisible && (
+      {/* Animation container — everything positioned relative to the project folder */}
+      <div className="relative flex flex-col items-center">
+        {/* Task folders — positioned absolutely, emerge from folder center */}
+        {TASK_POSITIONS.map((pos, index) => (
           <motion.div
-            className="absolute flex flex-col items-start gap-8"
-            style={{ top: '15%', left: '20%' }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
+            key={index}
+            className="absolute"
+            style={{ left: '50%', translateX: '-50%' }}
+            initial={false}
+            animate={{
+              y: tasksVisible ? pos.y : 0,
+              opacity: tasksVisible ? 1 : 0,
+              scale: tasksVisible ? 1 : 0.5,
+            }}
+            transition={{
+              delay: tasksVisible ? index * 0.15 : 0,
+              type: 'spring',
+              stiffness: 100,
+              damping: 20,
+            }}
           >
-            {/* Task 1 - emerges from project folder */}
-            <motion.div
-              initial={{ opacity: 0, y: 200, x: 60 }}
-              animate={{ opacity: 1, y: 0, x: 0 }}
-              transition={{ delay: 0, type: 'spring', stiffness: 100, damping: 20 }}
-            >
-              <TaskFolder color={GRAYSCALE} />
-            </motion.div>
-
-            {/* Task 2 */}
-            <motion.div
-              initial={{ opacity: 0, y: 200, x: 60 }}
-              animate={{ opacity: 1, y: 0, x: 0 }}
-              transition={{ delay: 0.15, type: 'spring', stiffness: 100, damping: 20 }}
-            >
-              <TaskFolder color={GRAYSCALE} />
-            </motion.div>
-
-            {/* Task 3 */}
-            <motion.div
-              initial={{ opacity: 0, y: 200, x: 60 }}
-              animate={{ opacity: 1, y: 0, x: 0 }}
-              transition={{ delay: 0.3, type: 'spring', stiffness: 100, damping: 20 }}
-            >
-              <TaskFolder color={GRAYSCALE} />
-            </motion.div>
+            <TaskFolder color={GRAYSCALE} />
           </motion.div>
-        )}
-      </AnimatePresence>
+        ))}
 
-      {/* Project folder (centered) */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6, type: 'spring', stiffness: 100, damping: 20 }}
-      >
-        <ProjectFolder color="#FFFFFF" isOpen={folderIsOpen} />
-      </motion.div>
+        {/* Project folder — shifts down when tasks emerge */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{
+            opacity: 1,
+            scale: 1,
+            y: tasksVisible ? FOLDER_SHIFT_Y : 0,
+          }}
+          transition={{ duration: 0.6, type: 'spring', stiffness: 100, damping: 20 }}
+        >
+          <ProjectFolder color="#FFFFFF" isOpen={folderIsOpen} />
+        </motion.div>
+      </div>
     </div>
   )
 }

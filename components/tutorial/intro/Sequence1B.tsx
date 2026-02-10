@@ -25,6 +25,16 @@ const SAMPLE_TASKS = [
   { label: 'PAINTING', color: TASK_COLORS.task3, crew: 'Iceman', avatar: '/avatars/tom.png', date: 'Mar 18' },
 ]
 
+// Task y-offsets relative to the folder center (stacked above it) — must match Sequence1
+const TASK_POSITIONS = [
+  { y: -240 }, // Task 1 — furthest above
+  { y: -160 }, // Task 2 — middle
+  { y: -80 },  // Task 3 — closest to folder
+]
+
+// How far the project folder shifts down when tasks are spread — must match Sequence1
+const FOLDER_SHIFT_Y = 120
+
 export function Sequence1B({ onComplete }: Sequence1BProps) {
   const [activeTask, setActiveTask] = useState<number | null>(null)
   const [showDetails, setShowDetails] = useState<number | null>(null)
@@ -78,7 +88,7 @@ export function Sequence1B({ onComplete }: Sequence1BProps) {
       <AnimatePresence>
         {textVisible && (
           <motion.div
-            className="absolute top-24 left-0 right-0 text-center px-4"
+            className="absolute top-16 left-0 right-0 text-center px-4"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
@@ -91,26 +101,27 @@ export function Sequence1B({ onComplete }: Sequence1BProps) {
         )}
       </AnimatePresence>
 
-      {/* Task folders with details */}
-      <div
-        className="absolute flex flex-col items-start gap-8"
-        style={{ top: '15%', left: '20%' }}
-      >
+      {/* Animation container — everything positioned relative to the project folder */}
+      <div className="relative flex flex-col items-center">
+        {/* Task folders — positioned absolutely, start spread above folder */}
         {SAMPLE_TASKS.map((task, index) => (
           <motion.div
             key={index}
-            className="relative flex items-center"
-            initial={{ opacity: 1, y: 0, x: 0 }}
+            className="absolute flex items-center"
+            style={{ left: '50%', translateX: '-50%' }}
+            initial={false}
             animate={{
+              y: collapsing ? 0 : TASK_POSITIONS[index].y,
               opacity: collapsing ? 0 : 1,
-              y: collapsing ? 150 : 0,
+              scale: collapsing ? 0.5 : 1,
               x: activeTask === index ? -30 : 0,
             }}
             transition={{
-              delay: collapsing ? index * 0.15 : 0,
+              // Reverse stagger on collapse: last task first
+              delay: collapsing ? (SAMPLE_TASKS.length - 1 - index) * 0.15 : 0,
               type: 'spring',
-              stiffness: 120,
-              damping: 18,
+              stiffness: 100,
+              damping: 20,
             }}
           >
             {/* Task folder */}
@@ -118,7 +129,7 @@ export function Sequence1B({ onComplete }: Sequence1BProps) {
               <TaskFolder color={getTaskColor(index)} isActive={activeTask === index} />
             </div>
 
-            {/* Task details (slide out from folder when active) - absolutely positioned with stacked layout */}
+            {/* Task details (slide out from folder when active) */}
             <AnimatePresence>
               {showDetails === index && (
                 <motion.div
@@ -177,19 +188,24 @@ export function Sequence1B({ onComplete }: Sequence1BProps) {
             </AnimatePresence>
           </motion.div>
         ))}
-      </div>
 
-      {/* Project folder (centered) */}
-      <motion.div
-        initial={{ opacity: 1 }}
-        animate={{
-          opacity: collapsing ? 1 : 1,
-          scale: collapsing ? 0.95 : 1,
-        }}
-        transition={{ delay: collapsing ? 0.6 : 0 }}
-      >
-        <ProjectFolder color="#FFFFFF" isOpen={!collapsing} />
-      </motion.div>
+        {/* Project folder — starts shifted down (from Sequence1), rises back when collapsing */}
+        <motion.div
+          initial={{ opacity: 1, y: FOLDER_SHIFT_Y }}
+          animate={{
+            opacity: 1,
+            y: collapsing ? 0 : FOLDER_SHIFT_Y,
+          }}
+          transition={{
+            delay: collapsing ? 0.3 : 0,
+            type: 'spring',
+            stiffness: 100,
+            damping: 20,
+          }}
+        >
+          <ProjectFolder color="#FFFFFF" isOpen={!collapsing} />
+        </motion.div>
+      </div>
     </div>
   )
 }
