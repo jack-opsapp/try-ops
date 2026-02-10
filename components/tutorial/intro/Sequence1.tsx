@@ -12,8 +12,6 @@ interface Sequence1Props {
 
 const GRAYSCALE = '#888888'
 
-const TASK_NAMES = ['SANDING', 'PRIMING', 'PAINTING']
-
 // Task y-offsets relative to the folder center (stacked above it)
 const TASK_POSITIONS = [
   { y: -240 }, // Task 1 — furthest above
@@ -92,20 +90,7 @@ export function Sequence1({ onComplete }: Sequence1Props) {
               damping: 20,
             }}
           >
-            <div className="relative">
-              <TaskFolder color={GRAYSCALE} />
-              {tasksVisible && (
-                <motion.span
-                  className="absolute left-full ml-3 top-1/2 -translate-y-1/2 font-mohave font-medium text-[14px] uppercase tracking-wider whitespace-nowrap"
-                  style={{ color: GRAYSCALE }}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 + index * 0.15 }}
-                >
-                  TASK {index + 1}: {TASK_NAMES[index]}
-                </motion.span>
-              )}
-            </div>
+            <TaskFolder color={GRAYSCALE} />
           </motion.div>
         ))}
 

@@ -52,7 +52,6 @@ export function Sequence1C({ onComplete }: Sequence1CProps) {
   const [collapsing, setCollapsing] = useState(false)
   const [collapsedCount, setCollapsedCount] = useState(0)
   const [labelSettled, setLabelSettled] = useState(false)
-  const [showSubtitle, setShowSubtitle] = useState(false)
 
   useEffect(() => {
     const timers: NodeJS.Timeout[] = []
@@ -102,11 +101,7 @@ export function Sequence1C({ onComplete }: Sequence1CProps) {
     t += 200
     timers.push(setTimeout(() => setFolderSmall(false), t))
 
-    // Show subtitle
-    t += 600
-    timers.push(setTimeout(() => setShowSubtitle(true), t))
-
-    // Complete — flows directly to Seq 2
+    // Complete — flows directly to checkpoint
     t += 800
     timers.push(setTimeout(() => onComplete(), t))
 
@@ -202,7 +197,7 @@ export function Sequence1C({ onComplete }: Sequence1CProps) {
             color="#FFFFFF"
             isOpen={false}
             label={labelSettled ? 'OFFICE REMODEL' : undefined}
-            subtitle={showSubtitle ? '3' : undefined}
+            subtitle={labelSettled ? '3' : undefined}
           />
         </motion.div>
       </div>

@@ -56,7 +56,7 @@ export function ProjectFolder({ color = '#FFFFFF', isOpen = false, label, subtit
       {label && (
         <text
           x="60"
-          y="68"
+          y={subtitle ? 65 : 68}
           textAnchor="middle"
           fill={color}
           fontFamily="var(--font-mohave)"
@@ -66,6 +66,28 @@ export function ProjectFolder({ color = '#FFFFFF', isOpen = false, label, subtit
         >
           {label}
         </text>
+      )}
+
+      {/* Subtitle: task count with list icon (inside folder body, below label) */}
+      {subtitle && (
+        <>
+          <g opacity="0.7">
+            <rect x="49" y="73" width="7" height="8" rx="1" stroke={color} strokeWidth="0.7" fill="none" />
+            <line x1="51" y1="75.5" x2="54.5" y2="75.5" stroke={color} strokeWidth="0.5" />
+            <line x1="51" y1="78" x2="54.5" y2="78" stroke={color} strokeWidth="0.5" />
+          </g>
+          <text
+            x="63"
+            y="80"
+            textAnchor="middle"
+            fill={color}
+            fontFamily="var(--font-kosugi)"
+            fontSize="10"
+            opacity="0.7"
+          >
+            {subtitle}
+          </text>
+        </>
       )}
 
       {/* Folder opening indicator (subtle lines inside when open) */}
@@ -111,32 +133,6 @@ export function ProjectFolder({ color = '#FFFFFF', isOpen = false, label, subtit
       )}
     </motion.svg>
   )
-
-  if (subtitle) {
-    return (
-      <div className="flex flex-col items-center">
-        {svg}
-        <motion.div
-          className="flex items-center gap-1.5 mt-1"
-          initial={{ opacity: 0, y: 5 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-        >
-          {/* Small folder icon */}
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <rect x="1" y="4" width="10" height="6" rx="1" stroke={color} strokeWidth="1" />
-            <path d="M 1 4 L 1 2.5 L 5 2.5 L 5.8 4 Z" stroke={color} strokeWidth="1" fill="none" />
-          </svg>
-          <span
-            className="font-kosugi"
-            style={{ fontSize: 11, color, opacity: 0.8 }}
-          >
-            {subtitle}
-          </span>
-        </motion.div>
-      </div>
-    )
-  }
 
   return svg
 }
