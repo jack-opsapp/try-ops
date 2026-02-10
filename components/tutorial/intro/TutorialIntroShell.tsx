@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Sequence1 } from './Sequence1'
@@ -17,50 +17,53 @@ export function TutorialIntroShell() {
   const [showBreakpoint2, setShowBreakpoint2] = useState(false)
   const [showSequence2Back, setShowSequence2Back] = useState(false)
 
+  // Memoize all handlers so sequence useEffects (which depend on onComplete)
+  // don't re-run when the shell re-renders after state changes.
+
   // Sequence 1 completion → advance to 1B
-  const handleSequence1Complete = () => {
+  const handleSequence1Complete = useCallback(() => {
     setSequence('1B')
-  }
+  }, [])
 
   // Sequence 1B completion → show breakpoint 1
-  const handleSequence1BComplete = () => {
+  const handleSequence1BComplete = useCallback(() => {
     setShowBreakpoint1(true)
-  }
+  }, [])
 
   // Breakpoint 1: "Got it" → advance to Sequence 2
-  const handleBreakpoint1Continue = () => {
+  const handleBreakpoint1Continue = useCallback(() => {
     setShowBreakpoint1(false)
     setSequence('2-setup')
     setShowSequence2Back(true)
-  }
+  }, [])
 
   // Breakpoint 1: "Back" → replay from Sequence 1
-  const handleBreakpoint1Back = () => {
+  const handleBreakpoint1Back = useCallback(() => {
     setShowBreakpoint1(false)
     setSequence('1')
-  }
+  }, [])
 
   // Sequence 2 completion → show breakpoint 2
-  const handleSequence2Complete = () => {
+  const handleSequence2Complete = useCallback(() => {
     setShowSequence2Back(false)
     setShowBreakpoint2(true)
-  }
+  }, [])
 
   // Sequence 2 back button → return to Sequence 1
-  const handleSequence2Back = () => {
+  const handleSequence2Back = useCallback(() => {
     setShowSequence2Back(false)
     setSequence('1')
-  }
+  }, [])
 
   // Breakpoint 2: "Begin Tutorial" → navigate to interactive tutorial
-  const handleBreakpoint2Continue = () => {
+  const handleBreakpoint2Continue = useCallback(() => {
     router.push('/tutorial-interactive')
-  }
+  }, [router])
 
   // Breakpoint 2: "Skip" → navigate to signup (TBD)
-  const handleBreakpoint2Skip = () => {
+  const handleBreakpoint2Skip = useCallback(() => {
     router.push('/signup/credentials')
-  }
+  }, [router])
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
