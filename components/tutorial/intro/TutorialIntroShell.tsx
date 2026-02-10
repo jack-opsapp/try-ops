@@ -2,13 +2,15 @@
 
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 import { Sequence1 } from './Sequence1'
 import { Sequence1B } from './Sequence1B'
+import { Sequence1C } from './Sequence1C'
 import { Sequence2 } from './Sequence2'
+import { Sequence3 } from './Sequence3'
 import { BreakpointButtons } from './BreakpointButtons'
 
-type SequenceState = '1' | '1B' | '2-setup' | '2-carousel' | '2-archive' | 'complete'
+type SequenceState = '1' | '1B' | '1C' | '2-setup' | '2-carousel' | '2-archive' | '3' | 'complete'
 
 export function TutorialIntroShell() {
   const router = useRouter()
@@ -30,11 +32,10 @@ export function TutorialIntroShell() {
     setShowBreakpoint1(true)
   }, [])
 
-  // Breakpoint 1: "Got it" → advance to Sequence 2
+  // Breakpoint 1: "Got it" → advance to Sequence 1C
   const handleBreakpoint1Continue = useCallback(() => {
     setShowBreakpoint1(false)
-    setSequence('2-setup')
-    setShowSequence2Back(true)
+    setSequence('1C')
   }, [])
 
   // Breakpoint 1: "Back" → replay from Sequence 1
@@ -43,16 +44,27 @@ export function TutorialIntroShell() {
     setSequence('1')
   }, [])
 
-  // Sequence 2 completion → show breakpoint 2
+  // Sequence 1C completion → advance to Sequence 2
+  const handleSequence1CComplete = useCallback(() => {
+    setSequence('2-setup')
+    setShowSequence2Back(true)
+  }, [])
+
+  // Sequence 2 completion → advance to Sequence 3
   const handleSequence2Complete = useCallback(() => {
     setShowSequence2Back(false)
-    setShowBreakpoint2(true)
+    setSequence('3')
   }, [])
 
   // Sequence 2 back button → return to Sequence 1
   const handleSequence2Back = useCallback(() => {
     setShowSequence2Back(false)
     setSequence('1')
+  }, [])
+
+  // Sequence 3 completion → show breakpoint 2
+  const handleSequence3Complete = useCallback(() => {
+    setShowBreakpoint2(true)
   }, [])
 
   // Breakpoint 2: "Begin Tutorial" → navigate to interactive tutorial
@@ -77,11 +89,20 @@ export function TutorialIntroShell() {
           <Sequence1B onComplete={handleSequence1BComplete} />
         )}
 
+        {sequence === '1C' && (
+          <Sequence1C onComplete={handleSequence1CComplete} />
+        )}
+
         {(sequence === '2-setup' || sequence === '2-carousel' || sequence === '2-archive') && (
           <Sequence2
             onComplete={handleSequence2Complete}
             initialState={sequence}
+            folderLabel="OFFICE REMODEL"
           />
+        )}
+
+        {sequence === '3' && (
+          <Sequence3 onComplete={handleSequence3Complete} />
         )}
       </div>
 
@@ -92,6 +113,7 @@ export function TutorialIntroShell() {
             variant="gotit"
             onContinue={handleBreakpoint1Continue}
             onBack={handleBreakpoint1Back}
+            message="GOT IT SO FAR?"
           />
         )}
 

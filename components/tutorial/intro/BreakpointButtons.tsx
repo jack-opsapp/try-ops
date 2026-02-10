@@ -6,9 +6,10 @@ interface BreakpointButtonsProps {
   variant: 'gotit' | 'begin' | 'back-only'
   onContinue: () => void
   onBack: () => void
+  message?: string
 }
 
-export function BreakpointButtons({ variant, onContinue, onBack }: BreakpointButtonsProps) {
+export function BreakpointButtons({ variant, onContinue, onBack, message }: BreakpointButtonsProps) {
   const continueLabel = variant === 'gotit' ? 'GOT IT' : 'BEGIN TUTORIAL'
   const backLabel = variant === 'gotit' ? 'BACK' : variant === 'begin' ? 'SKIP' : 'BACK'
   const showContinue = variant !== 'back-only'
@@ -22,6 +23,13 @@ export function BreakpointButtons({ variant, onContinue, onBack }: BreakpointBut
       transition={{ type: 'spring', stiffness: 120, damping: 18 }}
       style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}
     >
+      {/* Message above buttons */}
+      {message && (
+        <p className="font-mohave font-medium text-[20px] leading-[24px] uppercase tracking-wider text-white text-center mb-4">
+          {message}
+        </p>
+      )}
+
       {/* Continue button */}
       {showContinue && (
         <button

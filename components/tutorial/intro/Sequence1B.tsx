@@ -95,7 +95,7 @@ export function Sequence1B({ onComplete }: Sequence1BProps) {
             transition={{ duration: 0.4 }}
           >
             <p className="font-mohave font-medium text-[20px] md:text-[24px] uppercase tracking-wider text-white">
-              <TypewriterText text="ASSIGN CREW AND DATES TO A TASK" typingSpeed={30} />
+              <TypewriterText text="EACH TASK GETS A CREW AND A DATE" typingSpeed={30} />
             </p>
           </motion.div>
         )}

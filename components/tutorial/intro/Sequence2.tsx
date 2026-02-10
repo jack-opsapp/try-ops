@@ -9,6 +9,7 @@ import { TypewriterText } from '@/components/ui/TypewriterText'
 interface Sequence2Props {
   onComplete: () => void
   initialState: '2-setup' | '2-carousel' | '2-archive'
+  folderLabel?: string
 }
 
 const STATUS_ORDER = ['rfq', 'estimated', 'accepted', 'inProgress', 'completed', 'closed'] as const
@@ -20,16 +21,15 @@ const UNIFORM_DURATION = 1200 // Same duration for all transitions
 // Each status item width in the carousel
 const ITEM_WIDTH = 250
 
-export function Sequence2({ onComplete, initialState }: Sequence2Props) {
+export function Sequence2({ onComplete, initialState, folderLabel }: Sequence2Props) {
   const [currentStatusIndex, setCurrentStatusIndex] = useState(0)
   const [isReversing, setIsReversing] = useState(false)
   const [isArchiving, setIsArchiving] = useState(false)
   const [hasReturnedFromArchive, setHasReturnedFromArchive] = useState(false)
   const [showArchiveLabel, setShowArchiveLabel] = useState(false)
   const [showMainText, setShowMainText] = useState(false)
+  const [showChangeText, setShowChangeText] = useState(false)
   const [showArchiveText, setShowArchiveText] = useState(false)
-  const [showFinalText, setShowFinalText] = useState(false)
-  const [folderScalingUp, setFolderScalingUp] = useState(false)
 
   const currentStatus = STATUS_ORDER[currentStatusIndex]
   const folderColor = isArchiving && !hasReturnedFromArchive ? STATUS_COLORS.archived :
@@ -59,6 +59,7 @@ export function Sequence2({ onComplete, initialState }: Sequence2Props) {
     cumulativeTime += 1000
     timers.push(
       setTimeout(() => {
+        setShowMainText(false)
         setIsReversing(true)
       }, cumulativeTime)
     )
@@ -81,13 +82,26 @@ export function Sequence2({ onComplete, initialState }: Sequence2Props) {
       }, cumulativeTime)
     )
 
-    // Hold on Estimated
+    // Settle on Estimated, show "CHANGE IT ANYTIME"
     cumulativeTime += 1000
-
-    // Hide main text, show archive text and label
     timers.push(
       setTimeout(() => {
-        setShowMainText(false)
+        setShowChangeText(true)
+      }, cumulativeTime)
+    )
+
+    // Hold "CHANGE IT ANYTIME" for 2s then hide
+    cumulativeTime += 2000
+    timers.push(
+      setTimeout(() => {
+        setShowChangeText(false)
+      }, cumulativeTime)
+    )
+
+    // Show archive text and label
+    cumulativeTime += 600
+    timers.push(
+      setTimeout(() => {
         setShowArchiveText(true)
         setShowArchiveLabel(true)
       }, cumulativeTime)
@@ -101,7 +115,7 @@ export function Sequence2({ onComplete, initialState }: Sequence2Props) {
       }, cumulativeTime)
     )
 
-    // Hold on archive longer
+    // Hold on archive
     cumulativeTime += 2000
 
     // Return from archive
@@ -113,26 +127,8 @@ export function Sequence2({ onComplete, initialState }: Sequence2Props) {
       }, cumulativeTime)
     )
 
-    // Hold, then scale folder up big
+    // Complete — just call onComplete after brief hold
     cumulativeTime += 800
-    timers.push(
-      setTimeout(() => {
-        setFolderScalingUp(true)
-      }, cumulativeTime)
-    )
-
-    // Show final text (ensure all previous text is hidden)
-    cumulativeTime += 600
-    timers.push(
-      setTimeout(() => {
-        setShowMainText(false)
-        setShowArchiveText(false)
-        setShowFinalText(true)
-      }, cumulativeTime)
-    )
-
-    // Complete
-    cumulativeTime += 1500
     timers.push(
       setTimeout(() => {
         onComplete()
@@ -165,7 +161,22 @@ export function Sequence2({ onComplete, initialState }: Sequence2Props) {
             transition={{ duration: 0.4 }}
           >
             <p className="font-mohave font-medium text-[20px] md:text-[24px] uppercase tracking-wider text-white">
-              <TypewriterText text="PROJECT STATUS FLOWS FROM LEAD TO CLOSE" typingSpeed={30} />
+              <TypewriterText text="EVERY PROJECT HAS A STATUS" typingSpeed={30} />
+            </p>
+          </motion.div>
+        )}
+
+        {showChangeText && (
+          <motion.div
+            key="change-text"
+            className="absolute top-16 left-0 right-0 text-center px-4"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.4 }}
+          >
+            <p className="font-mohave font-medium text-[20px] md:text-[24px] uppercase tracking-wider text-white">
+              <TypewriterText text="CHANGE IT ANYTIME" typingSpeed={30} />
             </p>
           </motion.div>
         )}
@@ -182,22 +193,7 @@ export function Sequence2({ onComplete, initialState }: Sequence2Props) {
           >
             <p className="font-mohave font-medium text-[20px] md:text-[24px] uppercase tracking-wider text-white">
               <span style={{ color: STATUS_COLORS.archived }}>ARCHIVE</span>{' '}
-              <TypewriterText text="PROJECTS THAT DON'T MOVE FORWARD" typingSpeed={30} />
-            </p>
-          </motion.div>
-        )}
-
-        {/* Final text */}
-        {showFinalText && (
-          <motion.div
-            key="final-text"
-            className="absolute inset-0 flex items-center justify-center px-4"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, type: 'spring', stiffness: 100, damping: 20 }}
-          >
-            <p className="font-mohave font-bold text-[28px] md:text-[36px] uppercase tracking-wider text-white text-center">
-              <TypewriterText text="NOW TRY IT YOURSELF" typingSpeed={40} />
+              <TypewriterText text="WHAT DOESN'T MOVE FORWARD" typingSpeed={30} />
             </p>
           </motion.div>
         )}
@@ -263,8 +259,8 @@ export function Sequence2({ onComplete, initialState }: Sequence2Props) {
         <motion.div
           animate={{
             y: isArchiving && !hasReturnedFromArchive ? 100 : 0,
-            scale: folderScalingUp ? 15 : isArchiving && !hasReturnedFromArchive ? 0.8 : 1,
-            opacity: folderScalingUp ? 0 : 1,
+            scale: isArchiving && !hasReturnedFromArchive ? 0.8 : 1,
+            opacity: 1,
           }}
           transition={{
             type: 'spring',
@@ -272,7 +268,7 @@ export function Sequence2({ onComplete, initialState }: Sequence2Props) {
             damping: 18,
           }}
         >
-          <ProjectFolder color={folderColor} isOpen={false} />
+          <ProjectFolder color={folderColor} isOpen={false} label={folderLabel} />
         </motion.div>
       </div>
 
