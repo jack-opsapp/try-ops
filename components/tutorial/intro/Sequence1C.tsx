@@ -140,8 +140,9 @@ export function Sequence1C({ onComplete }: Sequence1CProps) {
         {/* Details list — positioned above the folder, grows upward from bottom */}
         <motion.div
           className="absolute flex flex-col-reverse gap-2 items-center"
-          style={{ bottom: 'calc(100% + 16px)', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap' }}
+          style={{ bottom: 'calc(100% + 8px)', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap' }}
           layout
+          animate={{ y: collapsing ? 40 : 0 }}
           transition={{ type: 'spring', stiffness: 120, damping: 18 }}
         >
           {/* Render in reverse so flex-col-reverse puts first item at top */}
@@ -189,7 +190,7 @@ export function Sequence1C({ onComplete }: Sequence1CProps) {
         <motion.div
           animate={{
             scale: folderSmall && !labelSettled ? 0.7 : 1,
-            y: folderSmall && !labelSettled ? 80 : 0,
+            y: folderSmall && !labelSettled ? 40 : 0,
           }}
           transition={{ type: 'spring', stiffness: 100, damping: 18 }}
         >
@@ -197,7 +198,6 @@ export function Sequence1C({ onComplete }: Sequence1CProps) {
             color="#FFFFFF"
             isOpen={false}
             label={labelSettled ? 'OFFICE REMODEL' : undefined}
-            subtitle={labelSettled ? '3' : undefined}
           />
         </motion.div>
       </div>

@@ -20,11 +20,11 @@ const GRAYSCALE = '#888888'
 
 const TASK_COLORS = ['#F5F5DC', '#D4A574', '#8B9D83'] // cream, burnt orange, sage
 const TASK_POSITIONS = [
-  { y: -200 },
-  { y: -130 },
-  { y: -60 },
+  { y: -120 },
+  { y: -80 },
+  { y: -40 },
 ]
-const FOLDER_SHIFT_Y = 80
+const FOLDER_SHIFT_Y = 50
 
 function InvoiceIcon({ color = '#FFFFFF' }: { color?: string }) {
   return (
@@ -51,7 +51,7 @@ function InvoiceIcon({ color = '#FFFFFF' }: { color?: string }) {
   )
 }
 
-function CheckmarkOverlay({ color }: { color: string }) {
+function CheckmarkOverlay({ color, centerY = '50%' }: { color: string; centerY?: string }) {
   return (
     <motion.svg
       width="24"
@@ -59,7 +59,7 @@ function CheckmarkOverlay({ color }: { color: string }) {
       viewBox="0 0 24 24"
       fill="none"
       className="absolute"
-      style={{ top: '50%', left: '50%', marginTop: -12, marginLeft: -12 }}
+      style={{ top: centerY, left: '50%', marginTop: -12, marginLeft: -12 }}
       initial={{ opacity: 0, scale: 0.3, rotate: -20 }}
       animate={{ opacity: 1, scale: 1, rotate: 0 }}
       transition={{ type: 'spring', stiffness: 200, damping: 15 }}
@@ -353,7 +353,7 @@ export function Sequence3({ onComplete }: Sequence3Props) {
               <div className="relative" style={{ width: 60 }}>
                 <TaskFolder color={getTaskColor(index)} />
                 {completedTasks.includes(index) && !tasksCollapsing && (
-                  <CheckmarkOverlay color={STATUS_COLORS.completed} />
+                  <CheckmarkOverlay color={STATUS_COLORS.completed} centerY="60%" />
                 )}
               </div>
             </motion.div>

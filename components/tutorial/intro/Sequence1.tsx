@@ -14,13 +14,13 @@ const GRAYSCALE = '#888888'
 
 // Task y-offsets relative to the folder center (stacked above it)
 const TASK_POSITIONS = [
-  { y: -240 }, // Task 1 — furthest above
-  { y: -160 }, // Task 2 — middle
-  { y: -80 },  // Task 3 — closest to folder
+  { y: -150 }, // Task 1 — furthest above
+  { y: -100 }, // Task 2 — middle
+  { y: -50 },  // Task 3 — closest to folder
 ]
 
 // How far the project folder shifts down when tasks emerge
-const FOLDER_SHIFT_Y = 120
+const FOLDER_SHIFT_Y = 60
 
 export function Sequence1({ onComplete }: Sequence1Props) {
   const [step, setStep] = useState(0)

@@ -39,9 +39,11 @@ export function TutorialIntroShell() {
   const handleCp3Continue = useCallback(() => setPhase('seq3'), [])
   const handleCp4Continue = useCallback(() => router.push('/tutorial-interactive'), [router])
 
-  // Checkpoint backs — cp1 replays, others go back to cp1
+  // Checkpoint backs — each replays the preceding sequence
   const handleCp1Back = useCallback(() => setPhase('seq1'), [])
-  const handleCpBackToCp1 = useCallback(() => setPhase('cp1'), [])
+  const handleCp2Back = useCallback(() => setPhase('seq1c'), [])
+  const handleCp3Back = useCallback(() => setPhase('seq2'), [])
+  const handleCp4Back = useCallback(() => setPhase('seq3'), [])
 
   // Seq2 floating back button → replay from start
   const handleSeq2Back = useCallback(() => setPhase('seq1'), [])
@@ -70,9 +72,9 @@ export function TutorialIntroShell() {
           <Sequence1C onComplete={handleSeq1CComplete} />
         )}
 
-        {/* CP2 static background: folder with label + subtitle (1C final state) */}
+        {/* CP2 static background: folder with label (1C final state) */}
         {phase === 'cp2' && (
-          <ProjectFolder color="#FFFFFF" label="OFFICE REMODEL" subtitle="3" />
+          <ProjectFolder color="#FFFFFF" label="OFFICE REMODEL" />
         )}
 
         {phase === 'seq2' && (
@@ -113,7 +115,7 @@ export function TutorialIntroShell() {
             message="THAT'S A PROJECT."
             continueLabel="NEXT"
             onContinue={handleCp2Continue}
-            onBack={handleCpBackToCp1}
+            onBack={handleCp2Back}
           />
         )}
 
@@ -130,7 +132,7 @@ export function TutorialIntroShell() {
             message="THAT'S THE LIFECYCLE."
             continueLabel="KEEP GOING"
             onContinue={handleCp3Continue}
-            onBack={handleCpBackToCp1}
+            onBack={handleCp3Back}
           />
         )}
 
@@ -141,7 +143,7 @@ export function TutorialIntroShell() {
             largeMessage
             continueLabel="BEGIN TUTORIAL"
             onContinue={handleCp4Continue}
-            onBack={handleCpBackToCp1}
+            onBack={handleCp4Back}
             skipLabel="I'LL FIGURE IT OUT. SKIP TUTORIAL."
             onSkip={handleSkip}
           />

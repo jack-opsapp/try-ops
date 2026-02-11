@@ -27,13 +27,13 @@ const SAMPLE_TASKS = [
 
 // Task y-offsets relative to the folder center (stacked above it) — must match Sequence1
 const TASK_POSITIONS = [
-  { y: -240 }, // Task 1 — furthest above
-  { y: -160 }, // Task 2 — middle
-  { y: -80 },  // Task 3 — closest to folder
+  { y: -150 }, // Task 1 — furthest above
+  { y: -100 }, // Task 2 — middle
+  { y: -50 },  // Task 3 — closest to folder
 ]
 
 // How far the project folder shifts down when tasks are spread — must match Sequence1
-const FOLDER_SHIFT_Y = 120
+const FOLDER_SHIFT_Y = 60
 
 export function Sequence1B({ onComplete }: Sequence1BProps) {
   const [activeTask, setActiveTask] = useState<number | null>(null)
@@ -122,7 +122,7 @@ export function Sequence1B({ onComplete }: Sequence1BProps) {
               damping: 20,
             }}
           >
-            <div className="flex items-center gap-4">
+            <div className="flex items-center">
               {/* Task folder */}
               <div style={{ width: 60, flexShrink: 0 }}>
                 <TaskFolder color={getTaskColor(index)} isActive={activeTask === index} />
@@ -138,7 +138,7 @@ export function Sequence1B({ onComplete }: Sequence1BProps) {
                     exit={{ opacity: 0, width: 0 }}
                     transition={{ type: 'spring', stiffness: 180, damping: 20 }}
                   >
-                    <div className="flex flex-col gap-2" style={{ color: task.color, whiteSpace: 'nowrap' }}>
+                    <div className="flex flex-col gap-2 pl-4" style={{ color: task.color, whiteSpace: 'nowrap' }}>
                       {/* Row 1: Task label with prefix */}
                       <span className="font-mohave font-medium text-[18px] uppercase tracking-wide">
                         TASK {index + 1}: {task.label}

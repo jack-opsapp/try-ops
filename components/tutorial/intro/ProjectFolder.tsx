@@ -6,12 +6,11 @@ interface ProjectFolderProps {
   color?: string
   isOpen?: boolean
   label?: string
-  subtitle?: string
   className?: string
 }
 
-export function ProjectFolder({ color = '#FFFFFF', isOpen = false, label, subtitle, className = '' }: ProjectFolderProps) {
-  const svg = (
+export function ProjectFolder({ color = '#FFFFFF', isOpen = false, label, className = '' }: ProjectFolderProps) {
+  return (
     <motion.svg
       width="120"
       height="100"
@@ -52,11 +51,11 @@ export function ProjectFolder({ color = '#FFFFFF', isOpen = false, label, subtit
         }}
       />
 
-      {/* Label text centered on folder body */}
+      {/* Label text centered vertically in folder body */}
       {label && (
         <text
           x="60"
-          y={subtitle ? 65 : 68}
+          y="63"
           textAnchor="middle"
           fill={color}
           fontFamily="var(--font-mohave)"
@@ -66,28 +65,6 @@ export function ProjectFolder({ color = '#FFFFFF', isOpen = false, label, subtit
         >
           {label}
         </text>
-      )}
-
-      {/* Subtitle: task count with list icon (inside folder body, below label) */}
-      {subtitle && (
-        <>
-          <g opacity="0.7">
-            <rect x="49" y="73" width="7" height="8" rx="1" stroke={color} strokeWidth="0.7" fill="none" />
-            <line x1="51" y1="75.5" x2="54.5" y2="75.5" stroke={color} strokeWidth="0.5" />
-            <line x1="51" y1="78" x2="54.5" y2="78" stroke={color} strokeWidth="0.5" />
-          </g>
-          <text
-            x="63"
-            y="80"
-            textAnchor="middle"
-            fill={color}
-            fontFamily="var(--font-kosugi)"
-            fontSize="10"
-            opacity="0.7"
-          >
-            {subtitle}
-          </text>
-        </>
       )}
 
       {/* Folder opening indicator (subtle lines inside when open) */}
@@ -133,6 +110,4 @@ export function ProjectFolder({ color = '#FFFFFF', isOpen = false, label, subtit
       )}
     </motion.svg>
   )
-
-  return svg
 }
