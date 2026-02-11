@@ -45,9 +45,6 @@ export function TutorialIntroShell() {
   const handleCp3Back = useCallback(() => setPhase('seq2'), [])
   const handleCp4Back = useCallback(() => setPhase('seq3'), [])
 
-  // Seq2 floating back button → replay from start
-  const handleSeq2Back = useCallback(() => setPhase('seq1'), [])
-
   // Skip at final checkpoint
   const handleSkip = useCallback(() => router.push('/signup/credentials'), [router])
 
@@ -116,13 +113,6 @@ export function TutorialIntroShell() {
             continueLabel="NEXT"
             onContinue={handleCp2Continue}
             onBack={handleCp2Back}
-          />
-        )}
-
-        {phase === 'seq2' && (
-          <BreakpointButtons
-            key="seq2-back"
-            onBack={handleSeq2Back}
           />
         )}
 

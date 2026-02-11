@@ -27,13 +27,13 @@ const SAMPLE_TASKS = [
 
 // Task y-offsets relative to the folder center (stacked above it) — must match Sequence1
 const TASK_POSITIONS = [
-  { y: -150 }, // Task 1 — furthest above
-  { y: -100 }, // Task 2 — middle
-  { y: -50 },  // Task 3 — closest to folder
+  { y: -175 }, // Task 1 — furthest above
+  { y: -110 }, // Task 2 — middle
+  { y: -45 },  // Task 3 — closest to folder
 ]
 
 // How far the project folder shifts down when tasks are spread — must match Sequence1
-const FOLDER_SHIFT_Y = 60
+const FOLDER_SHIFT_Y = 65
 
 export function Sequence1B({ onComplete }: Sequence1BProps) {
   const [activeTask, setActiveTask] = useState<number | null>(null)
@@ -125,7 +125,7 @@ export function Sequence1B({ onComplete }: Sequence1BProps) {
             <div className="flex items-center">
               {/* Task folder */}
               <div style={{ width: 60, flexShrink: 0 }}>
-                <TaskFolder color={getTaskColor(index)} isActive={activeTask === index} />
+                <TaskFolder color={getTaskColor(index)} />
               </div>
 
               {/* Task details (slide out from folder when active) */}

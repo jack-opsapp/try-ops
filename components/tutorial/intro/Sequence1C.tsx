@@ -138,9 +138,13 @@ export function Sequence1C({ onComplete }: Sequence1CProps) {
       {/* Animation container */}
       <div className="relative flex flex-col items-center">
         {/* Details list — positioned above the folder, grows upward from bottom */}
+        <div
+          className="absolute left-0 right-0 flex justify-center"
+          style={{ bottom: 'calc(100% + 8px)' }}
+        >
         <motion.div
-          className="absolute flex flex-col-reverse gap-2 items-center"
-          style={{ bottom: 'calc(100% + 8px)', left: '50%', transform: 'translateX(-50%)', whiteSpace: 'nowrap' }}
+          className="flex flex-col-reverse gap-2 items-center"
+          style={{ whiteSpace: 'nowrap' }}
           layout
           animate={{ y: collapsing ? 40 : 0 }}
           transition={{ type: 'spring', stiffness: 120, damping: 18 }}
@@ -185,6 +189,7 @@ export function Sequence1C({ onComplete }: Sequence1CProps) {
             )
           })}
         </motion.div>
+        </div>
 
         {/* Project folder — scales down during build, back up after collapse */}
         <motion.div

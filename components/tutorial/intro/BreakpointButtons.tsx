@@ -20,7 +20,7 @@ export function BreakpointButtons({ message, largeMessage, continueLabel, onCont
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
       transition={{ type: 'spring', stiffness: 120, damping: 18 }}
-      style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}
+      style={{ paddingBottom: 'max(3.5rem, env(safe-area-inset-bottom))' }}
     >
       {/* Message above buttons */}
       {message && (

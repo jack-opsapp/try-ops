@@ -20,11 +20,11 @@ const GRAYSCALE = '#888888'
 
 const TASK_COLORS = ['#F5F5DC', '#D4A574', '#8B9D83'] // cream, burnt orange, sage
 const TASK_POSITIONS = [
-  { y: -120 },
-  { y: -80 },
+  { y: -160 },
+  { y: -100 },
   { y: -40 },
 ]
-const FOLDER_SHIFT_Y = 50
+const FOLDER_SHIFT_Y = 55
 
 function InvoiceIcon({ color = '#FFFFFF' }: { color?: string }) {
   return (
@@ -101,16 +101,17 @@ export function Sequence3({ onComplete }: Sequence3Props) {
     const timers: NodeJS.Timeout[] = []
     let t = 0
 
-    // 1. Carousel appears, spins to IN PROGRESS (index 3)
+    // 1. Carousel appears, spins to IN PROGRESS (index 3) with slot-machine feel
     t += 500
     timers.push(setTimeout(() => setCarouselVisible(true), t))
 
-    // Spin through RFQ -> Estimated -> Accepted -> In Progress
-    const spinSteps = [1, 2, 3]
-    spinSteps.forEach((idx) => {
-      t += 400
-      timers.push(setTimeout(() => setCurrentStatusIndex(idx), t))
-    })
+    // Rapid spin with deceleration: fast → slower → land
+    t += 100
+    timers.push(setTimeout(() => setCurrentStatusIndex(1), t))
+    t += 130
+    timers.push(setTimeout(() => setCurrentStatusIndex(2), t))
+    t += 200
+    timers.push(setTimeout(() => setCurrentStatusIndex(3), t))
 
     // 2. Message 1 appears
     t += 600
