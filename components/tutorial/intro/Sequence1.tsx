@@ -46,7 +46,6 @@ export function Sequence1({ onComplete }: Sequence1Props) {
     return () => timers.forEach(clearTimeout)
   }, [onComplete])
 
-  const folderIsOpen = step >= 2
   const tasksVisible = step >= 3
   const textVisible = step >= 4
 
@@ -104,7 +103,7 @@ export function Sequence1({ onComplete }: Sequence1Props) {
           }}
           transition={{ duration: 0.6, type: 'spring', stiffness: 100, damping: 20 }}
         >
-          <ProjectFolder color="#FFFFFF" isOpen={folderIsOpen} />
+          <ProjectFolder color="#FFFFFF" />
         </motion.div>
       </div>
     </div>

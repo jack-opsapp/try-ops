@@ -77,7 +77,6 @@ export function Sequence3({ onComplete }: Sequence3Props) {
 
   // Task state
   const [tasksVisible, setTasksVisible] = useState(false)
-  const [folderOpen, setFolderOpen] = useState(false)
   const [completedTasks, setCompletedTasks] = useState<number[]>([])
   const [tasksCollapsing, setTasksCollapsing] = useState(false)
 
@@ -121,7 +120,6 @@ export function Sequence3({ onComplete }: Sequence3Props) {
     t += 400
     timers.push(setTimeout(() => setCarouselVisible(false), t))
     t += 300
-    timers.push(setTimeout(() => setFolderOpen(true), t))
     t += 300
     timers.push(setTimeout(() => setTasksVisible(true), t))
 
@@ -142,7 +140,6 @@ export function Sequence3({ onComplete }: Sequence3Props) {
     t += 600
     timers.push(setTimeout(() => {
       setTasksVisible(false)
-      setFolderOpen(false)
     }, t))
 
     // 6. Carousel fades in already at In Progress, wait, then rotate to COMPLETED
@@ -375,7 +372,6 @@ export function Sequence3({ onComplete }: Sequence3Props) {
           >
             <ProjectFolder
               color={folderColor}
-              isOpen={folderOpen}
               label="OFFICE REMODEL"
             />
           </motion.div>

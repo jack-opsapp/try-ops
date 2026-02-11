@@ -122,7 +122,7 @@ export function Sequence1B({ onComplete }: Sequence1BProps) {
               damping: 20,
             }}
           >
-            <div className="flex items-center">
+            <div className="flex items-center" style={{ height: 50 }}>
               {/* Task folder */}
               <div style={{ width: 60, flexShrink: 0 }}>
                 <TaskFolder color={getTaskColor(index)} />
@@ -204,7 +204,7 @@ export function Sequence1B({ onComplete }: Sequence1BProps) {
             damping: 20,
           }}
         >
-          <ProjectFolder color="#FFFFFF" isOpen={!collapsing} />
+          <ProjectFolder color="#FFFFFF" />
         </motion.div>
       </div>
     </div>

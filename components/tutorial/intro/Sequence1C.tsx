@@ -31,15 +31,13 @@ const COLLAPSE_STAGGER = 120
 
 function PhotoPlaceholders() {
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-3">
       {[0, 1, 2].map((i) => (
-        <div key={i} className="w-8 h-8 border border-white/50 rounded flex items-center justify-center">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5">
-            <rect x="3" y="3" width="18" height="18" rx="2" />
-            <circle cx="8.5" cy="8.5" r="1.5" />
-            <path d="M21 15l-5-5L5 21" />
-          </svg>
-        </div>
+        <svg key={i} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <circle cx="8.5" cy="8.5" r="1.5" />
+          <path d="M21 15l-5-5L5 21" />
+        </svg>
       ))}
     </div>
   )
@@ -201,7 +199,6 @@ export function Sequence1C({ onComplete }: Sequence1CProps) {
         >
           <ProjectFolder
             color="#FFFFFF"
-            isOpen={false}
             label={labelSettled ? 'OFFICE REMODEL' : undefined}
           />
         </motion.div>

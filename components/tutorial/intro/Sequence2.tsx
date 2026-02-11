@@ -268,7 +268,7 @@ export function Sequence2({ onComplete, initialState, folderLabel }: Sequence2Pr
             damping: 18,
           }}
         >
-          <ProjectFolder color={folderColor} isOpen={false} label={folderLabel} />
+          <ProjectFolder color={folderColor} label={folderLabel} />
         </motion.div>
       </div>
 
