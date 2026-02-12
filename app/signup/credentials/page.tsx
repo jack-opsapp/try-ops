@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { TypewriterText } from '@/components/ui/TypewriterText'
 import { OPSButton } from '@/components/ui/OPSButton'
@@ -10,22 +10,139 @@ import { OnboardingScaffold } from '@/components/layout/OnboardingScaffold'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { useAnalytics } from '@/lib/hooks/useAnalytics'
 
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: {
+          initialize: (config: Record<string, unknown>) => void
+          prompt: () => void
+          renderButton: (
+            element: HTMLElement,
+            config: Record<string, unknown>
+          ) => void
+        }
+      }
+    }
+  }
+}
+
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
+
 export default function CredentialsPage() {
   const router = useRouter()
   const { trackSignupStepView, trackSignupStepComplete } = useAnalytics()
-  const { setAuth, setSignupStep } = useOnboardingStore()
+  const { setAuth, setProfile, setSignupStep } = useOnboardingStore()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
   const [error, setError] = useState('')
   const [emailError, setEmailError] = useState('')
   const [passwordError, setPasswordError] = useState('')
+  const googleBtnRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setSignupStep(1)
     trackSignupStepView('credentials', 1)
   }, [setSignupStep, trackSignupStepView])
+
+  const handleGoogleResponse = useCallback(
+    async (response: { credential: string }) => {
+      setGoogleLoading(true)
+      setError('')
+
+      try {
+        // Decode the JWT to get user info (for display; server verifies)
+        const payload = JSON.parse(
+          atob(response.credential.split('.')[1])
+        )
+
+        const res = await fetch('/api/auth/google', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id_token: response.credential,
+            email: payload.email,
+            name: payload.name || '',
+            given_name: payload.given_name || '',
+            family_name: payload.family_name || '',
+          }),
+        })
+
+        const data = await res.json()
+
+        if (!res.ok) {
+          setError(data.error || 'Google sign-in failed. Please try again.')
+          setGoogleLoading(false)
+          return
+        }
+
+        setAuth(data.userId, 'google')
+
+        // If Bubble returned profile info, store it so we can pre-fill
+        if (data.firstName || data.lastName) {
+          setProfile({
+            firstName: data.firstName || payload.given_name || '',
+            lastName: data.lastName || payload.family_name || '',
+            phone: '',
+          })
+        }
+
+        trackSignupStepComplete('credentials', 1)
+        router.push('/signup/profile')
+      } catch {
+        setError('Connection error. Please try again.')
+      } finally {
+        setGoogleLoading(false)
+      }
+    },
+    [setAuth, setProfile, trackSignupStepComplete, router]
+  )
+
+  // Initialize Google Sign-In
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID) return
+
+    const initGoogle = () => {
+      if (!window.google?.accounts?.id) return
+
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleGoogleResponse,
+        auto_select: false,
+      })
+
+      // Render the branded button
+      if (googleBtnRef.current) {
+        window.google.accounts.id.renderButton(googleBtnRef.current, {
+          type: 'standard',
+          theme: 'filled_black',
+          size: 'large',
+          width: googleBtnRef.current.offsetWidth,
+          text: 'continue_with',
+          shape: 'rectangular',
+          logo_alignment: 'left',
+        })
+      }
+    }
+
+    // The script may already be loaded
+    if (window.google?.accounts?.id) {
+      initGoogle()
+    } else {
+      // Wait for script to load
+      const interval = setInterval(() => {
+        if (window.google?.accounts?.id) {
+          clearInterval(interval)
+          initGoogle()
+        }
+      }, 100)
+      // Give up after 5s
+      setTimeout(() => clearInterval(interval), 5000)
+    }
+  }, [handleGoogleResponse])
 
   const validateEmail = (value: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -75,15 +192,10 @@ export default function CredentialsPage() {
     }
   }
 
-  const handleGoogleSignIn = async () => {
-    // Google Sign-In will be implemented with Google Identity Services
-    // For now, show a placeholder
-    setError('Google Sign-In coming soon. Please use email/password.')
-  }
-
-  const handleAppleSignIn = async () => {
-    // Apple Sign-In will be implemented with Apple JS SDK
-    setError('Apple Sign-In coming soon. Please use email/password.')
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && email && password) {
+      handleSubmit()
+    }
   }
 
   return (
@@ -100,7 +212,7 @@ export default function CredentialsPage() {
         </PhasedContent>
 
         <PhasedContent delay={1200}>
-          <div className="space-y-4">
+          <div className="space-y-4" onKeyDown={handleKeyDown}>
             <OPSInput
               label="Email"
               type="email"
@@ -153,39 +265,17 @@ export default function CredentialsPage() {
               <div className="flex-1 h-px bg-white/10" />
             </div>
 
-            {/* Social auth */}
-            <OPSButton variant="secondary" onClick={handleGoogleSignIn}>
-              <span className="flex items-center gap-3">
-                <svg width="18" height="18" viewBox="0 0 24 24">
-                  <path
-                    fill="currentColor"
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
-                  />
-                  <path
-                    fill="currentColor"
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  />
-                  <path
-                    fill="currentColor"
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                  />
-                  <path
-                    fill="currentColor"
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                  />
-                </svg>
+            {/* Google Sign-In */}
+            {googleLoading ? (
+              <OPSButton variant="secondary" loading loadingText="SIGNING IN...">
                 CONTINUE WITH GOOGLE
-              </span>
-            </OPSButton>
-
-            <OPSButton variant="secondary" onClick={handleAppleSignIn}>
-              <span className="flex items-center gap-3">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
-                </svg>
-                CONTINUE WITH APPLE
-              </span>
-            </OPSButton>
+              </OPSButton>
+            ) : (
+              <div
+                ref={googleBtnRef}
+                className="w-full min-h-[56px] flex items-center justify-center rounded-ops overflow-hidden"
+              />
+            )}
           </div>
         </PhasedContent>
       </div>

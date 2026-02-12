@@ -13,11 +13,13 @@ import { useAnalytics } from '@/lib/hooks/useAnalytics'
 export default function ProfilePage() {
   const router = useRouter()
   const { trackSignupStepView, trackSignupStepComplete } = useAnalytics()
-  const { userId, setProfile, setSignupStep } = useOnboardingStore()
+  const store = useOnboardingStore()
+  const { userId, setProfile, setSignupStep } = store
 
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [phone, setPhone] = useState('')
+  // Pre-fill from store if Google sign-in already set these
+  const [firstName, setFirstName] = useState(store.firstName || '')
+  const [lastName, setLastName] = useState(store.lastName || '')
+  const [phone, setPhone] = useState(store.phone || '')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -44,7 +46,7 @@ export default function ProfilePage() {
           nameFirst: firstName.trim(),
           nameLast: lastName.trim(),
           phone: phone.trim() || undefined,
-          userType: 'company',
+          userType: 'Company',
         }),
       })
 

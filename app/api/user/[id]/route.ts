@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 
 const BUBBLE_BASE_URL = process.env.NEXT_PUBLIC_BUBBLE_BASE_URL
-const BUBBLE_API_TOKEN = process.env.BUBBLE_API_TOKEN
 
 export async function PATCH(
   request: Request,
@@ -18,13 +17,22 @@ export async function PATCH(
       )
     }
 
+    if (!BUBBLE_BASE_URL) {
+      console.error('Missing NEXT_PUBLIC_BUBBLE_BASE_URL')
+      return NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      )
+    }
+
+    // Bubble Data API: PATCH /api/1.1/obj/user/{id}
+    // Field names must match BubbleFields exactly (camelCase)
     const response = await fetch(
       `${BUBBLE_BASE_URL}/api/1.1/obj/user/${userId}`,
       {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${BUBBLE_API_TOKEN}`,
         },
         body: JSON.stringify(body),
       }
@@ -36,6 +44,7 @@ export async function PATCH(
         data?.body?.message ||
         data?.message ||
         'Failed to update user'
+      console.error('User update failed:', response.status, JSON.stringify(data))
       return NextResponse.json(
         { error: errorMessage },
         { status: response.status }

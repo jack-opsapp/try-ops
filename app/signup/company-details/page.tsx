@@ -61,15 +61,16 @@ export default function CompanyDetailsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: companyName,
-          email: companyEmail || undefined,
+          email: companyEmail || '',
           phone: companyPhone || undefined,
           industry: effectiveIndustry,
           size: companySize,
           age: companyAge,
+          address: '', // iOS always sends address; web doesn't collect it
           user: userId,
           name_first: firstName,
           name_last: lastName,
-          user_phone: phone || undefined,
+          user_phone: phone || '',
         }),
       })
 

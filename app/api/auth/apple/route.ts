@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 
 const BUBBLE_BASE_URL = process.env.NEXT_PUBLIC_BUBBLE_BASE_URL
-const BUBBLE_API_TOKEN = process.env.BUBBLE_API_TOKEN
 
 export async function POST(request: Request) {
   try {
@@ -20,21 +19,32 @@ export async function POST(request: Request) {
       )
     }
 
+    if (!BUBBLE_BASE_URL) {
+      console.error('Missing NEXT_PUBLIC_BUBBLE_BASE_URL')
+      return NextResponse.json(
+        { error: 'Server configuration error' },
+        { status: 500 }
+      )
+    }
+
+    // Matches iOS AuthManager.signInWithApple exactly
+    // Sends: identity_token, user_identifier, optional email, given_name, family_name
+    const payload: Record<string, string> = {
+      identity_token,
+      user_identifier,
+    }
+    if (email) payload.email = email
+    if (given_name) payload.given_name = given_name
+    if (family_name) payload.family_name = family_name
+
     const response = await fetch(
       `${BUBBLE_BASE_URL}/api/1.1/wf/login_apple`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${BUBBLE_API_TOKEN}`,
         },
-        body: JSON.stringify({
-          identity_token,
-          user_identifier,
-          email,
-          given_name,
-          family_name,
-        }),
+        body: JSON.stringify(payload),
       }
     )
 
@@ -52,17 +62,31 @@ export async function POST(request: Request) {
       )
     }
 
+    // iOS response format: { status: "success", response: { user: UserDTO } }
+    const user =
+      data?.response?.user ||
+      data?.user
+
     const userId =
-      data?.response?.user?._id ||
+      user?._id ||
+      user?.id ||
       data?.response?.user_id ||
-      data?.user?._id ||
       data?.user_id
+
+    if (!userId) {
+      console.error('No user ID in Apple login response:', JSON.stringify(data))
+      return NextResponse.json(
+        { error: 'Apple login succeeded but no user ID returned' },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json({
       success: true,
       userId,
-      user: data?.response?.user || data?.user,
-      data,
+      firstName: user?.nameFirst || given_name || '',
+      lastName: user?.nameLast || family_name || '',
+      email: user?.email || email || '',
     })
   } catch (error) {
     console.error('Apple login error:', error)

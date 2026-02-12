@@ -43,7 +43,7 @@ export default function ReadyPage() {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            hasCompletedAppOnboarding: true,
+            hasCompletedAppTutorial: true,
           }),
         })
         setMarked(true)
