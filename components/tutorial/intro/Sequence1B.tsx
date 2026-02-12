@@ -20,9 +20,9 @@ const TASK_COLORS = {
 const GRAYSCALE = '#888888'
 
 const SAMPLE_TASKS = [
-  { label: 'SANDING', color: TASK_COLORS.task1, crew: 'Maverick', avatar: '/avatars/pete.png', date: 'Mar 12' },
-  { label: 'PRIMING', color: TASK_COLORS.task2, crew: 'Goose', avatar: '/avatars/nick.png', date: 'Mar 15' },
-  { label: 'PAINTING', color: TASK_COLORS.task3, crew: 'Iceman', avatar: '/avatars/tom.png', date: 'Mar 18' },
+  { label: 'SANDING', color: TASK_COLORS.task1, crew: [{ name: 'Pete', avatar: '/avatars/pete.png' }], date: 'Mar 12' },
+  { label: 'PRIMING', color: TASK_COLORS.task2, crew: [{ name: 'Nick', avatar: '/avatars/nick.png' }, { name: 'Tom', avatar: '/avatars/tom.png' }], date: 'Mar 15' },
+  { label: 'PAINTING', color: TASK_COLORS.task3, crew: [{ name: 'Pete', avatar: '/avatars/pete.png' }, { name: 'Nick', avatar: '/avatars/nick.png' }, { name: 'Tom', avatar: '/avatars/tom.png' }], date: 'Mar 18' },
 ]
 
 // Task y-offsets relative to the folder center (stacked above it) — must match Sequence1
@@ -144,42 +144,41 @@ export function Sequence1B({ onComplete }: Sequence1BProps) {
                         TASK {index + 1}: {task.label}
                       </span>
 
-                      {/* Row 2: Avatar, Team count, Date in horizontal stack */}
+                      {/* Row 2: Avatars, Names, Date */}
                       <div className="flex items-center gap-3">
-                        {/* Crew avatar */}
-                        <div
-                          className="w-7 h-7 rounded-full overflow-hidden border-2"
-                          style={{ borderColor: task.color, flexShrink: 0 }}
-                        >
-                          <Image
-                            src={task.avatar}
-                            alt={task.crew}
-                            width={28}
-                            height={28}
-                            className="w-full h-full object-cover"
-                          />
+                        {/* Crew avatars (overlapping) */}
+                        <div className="flex" style={{ flexShrink: 0 }}>
+                          {task.crew.map((member, i) => (
+                            <div
+                              key={member.name}
+                              className="w-6 h-6 rounded-full overflow-hidden border-2"
+                              style={{ borderColor: task.color, marginLeft: i > 0 ? -8 : 0, zIndex: task.crew.length - i }}
+                            >
+                              <Image
+                                src={member.avatar}
+                                alt={member.name}
+                                width={24}
+                                height={24}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          ))}
                         </div>
 
-                        {/* Team count with icon */}
-                        <div className="flex items-center gap-1.5">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            <circle cx="9" cy="7" r="4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                          <span className="font-kosugi text-[13px]">1</span>
-                        </div>
+                        {/* Crew names */}
+                        <span className="font-kosugi text-[12px]">
+                          {task.crew.map(m => m.name).join(', ')}
+                        </span>
 
                         {/* Date */}
-                        <div className="flex items-center gap-2">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <div className="flex items-center gap-1.5">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <rect x="3" y="4" width="18" height="18" rx="2" strokeWidth="2" />
                             <line x1="16" y1="2" x2="16" y2="6" strokeWidth="2" />
                             <line x1="8" y1="2" x2="8" y2="6" strokeWidth="2" />
                             <line x1="3" y1="10" x2="21" y2="10" strokeWidth="2" />
                           </svg>
-                          <span className="font-kosugi text-[13px]">{task.date}</span>
+                          <span className="font-kosugi text-[12px]">{task.date}</span>
                         </div>
                       </div>
                     </div>
