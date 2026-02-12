@@ -5,7 +5,7 @@ import { AnalyticsProvider } from '@/components/layout/AnalyticsProvider'
 export const metadata: Metadata = {
   title: 'OPS - Job Management Your Crew Will Actually Use',
   description:
-    'Field-first job management built for trades crews. No training required. Works offline. Built by a crew lead who needed something that just works. Free for crew members.',
+    'Field-first job management built for trades crews. No training required. Works offline. Built by a crew lead who needed something that just works.',
   openGraph: {
     title: 'OPS - Job Management Your Crew Will Actually Use',
     description:
@@ -38,7 +38,7 @@ const jsonLd = {
   },
   aggregateRating: {
     '@type': 'AggregateRating',
-    ratingValue: '4.8',
+    ratingValue: '5.0',
     ratingCount: '500',
   },
 }

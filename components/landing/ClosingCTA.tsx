@@ -17,7 +17,7 @@ const fadeInUp = {
 
 export function ClosingCTA({ onDownloadClick, onTryClick }: ClosingCTAProps) {
   return (
-    <section id="closing" className="bg-ops-card border-t-2 border-ops-gray-500 py-20 lg:py-[120px]">
+    <section id="closing" className="bg-ops-card border-t-2 border-ops-gray-500 py-12 lg:py-[120px] snap-start snap-always">
       <div className="max-w-[700px] mx-auto px-4 md:px-6 lg:px-10">
         <motion.h2
           className="font-bebas text-[40px] lg:text-[56px] text-ops-gray-50 uppercase leading-[1.1] tracking-[0.05em] mb-6"
@@ -55,7 +55,7 @@ export function ClosingCTA({ onDownloadClick, onTryClick }: ClosingCTAProps) {
           {...fadeInUp}
           transition={{ ...fadeInUp.transition, delay: 0.3 }}
         >
-          Free for crew members &middot; No credit card &middot; No training required
+          Get started for free &middot; No credit card &middot; No training required
         </motion.p>
       </div>
     </section>

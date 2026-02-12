@@ -26,9 +26,9 @@ const tiers = [
       'Full access to all features',
       'Up to 10 users',
       'No credit card required',
-      'All integrations included',
-      'Unlimited projects',
+      'Unlimited projects & tasks',
       'Photo documentation',
+      'Calendar & scheduling',
     ],
     cta: 'START FREE TRIAL',
     ctaVariant: 'primary' as const,
@@ -42,10 +42,10 @@ const tiers = [
     features: [
       'Up to 3 users',
       'Job scheduling & dispatch',
-      'Time tracking with GPS',
+      'One-tap time tracking',
       'Photo documentation',
-      'Client management',
-      'Export for payroll',
+      'Client & sub-client management',
+      'Calendar views',
     ],
     cta: 'GET STARTED',
     ctaVariant: 'primary' as const,
@@ -59,10 +59,10 @@ const tiers = [
     features: [
       'Up to 5 users',
       'Everything in Starter',
-      'Team scheduling views',
-      'Advanced reporting',
+      'Team calendar & scheduling',
+      'Project notes & updates',
+      'Task assignments per crew',
       'Priority support',
-      'Custom workflows',
     ],
     cta: 'GET STARTED',
     ctaVariant: 'primary' as const,
@@ -77,9 +77,9 @@ const tiers = [
       'Up to 10 users',
       'Everything in Team',
       'Multi-crew management',
-      'Admin dashboard',
+      'Admin controls & roles',
       'Dedicated support',
-      'Custom integrations',
+      'Company-wide dashboard',
     ],
     cta: 'GET STARTED',
     ctaVariant: 'primary' as const,
@@ -136,17 +136,17 @@ function PricingCard({ tier }: { tier: typeof tiers[number] }) {
 
 export function PricingSection({ onDownloadClick }: PricingSectionProps) {
   return (
-    <section id="pricing" className="py-20 lg:py-[120px]">
+    <section id="pricing" className="py-12 lg:py-[120px] snap-start snap-always">
       <div className="max-w-[1200px] mx-auto px-4 md:px-6 lg:px-10">
         <motion.h2
-          className="font-bebas text-[32px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-4"
+          className="font-bebas text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-3"
           {...fadeInUp}
         >
           START FREE. UPGRADE WHEN YOU&apos;RE READY.
         </motion.h2>
 
         <motion.p
-          className="font-kosugi text-[16px] text-ops-gray-300 mb-16"
+          className="font-kosugi text-[14px] lg:text-[16px] text-ops-gray-300 mb-8 lg:mb-16"
           {...fadeInUp}
         >
           No credit card. No commitment. Cancel anytime.

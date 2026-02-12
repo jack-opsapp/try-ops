@@ -18,10 +18,20 @@ const fadeInUp = {
 
 export function Hero({ onDownloadClick, onTryClick }: HeroProps) {
   return (
-    <section id="hero" className="relative min-h-screen flex items-center">
-      <div className="w-full max-w-[1200px] mx-auto px-4 md:px-6 lg:px-10 py-20">
-        <div className="flex flex-col lg:flex-row items-start gap-8 lg:gap-16">
-          {/* Wireframe animation — above text on mobile, right side on desktop */}
+    <section id="hero" className="relative min-h-[100svh] flex items-center snap-start snap-always">
+      <div className="w-full max-w-[1200px] mx-auto px-4 md:px-6 lg:px-10 py-12 lg:py-20">
+        <div className="flex flex-col lg:flex-row items-start gap-6 lg:gap-16">
+          {/* Mobile: title first, then animation */}
+          <div className="lg:hidden w-full">
+            <motion.h1
+              className="font-bebas text-[40px] text-ops-gray-50 uppercase leading-[1.1] tracking-[0.05em] mb-4"
+              {...fadeInUp}
+            >
+              JOB MANAGEMENT YOUR CREW WILL ACTUALLY USE
+            </motion.h1>
+          </div>
+
+          {/* Wireframe animation — below title on mobile, right side on desktop */}
           <motion.div
             className="flex-shrink-0 w-full lg:hidden"
             {...fadeInUp}
@@ -32,7 +42,7 @@ export function Hero({ onDownloadClick, onTryClick }: HeroProps) {
           {/* Text content — left-aligned */}
           <div className="flex-1">
             <motion.h1
-              className="font-bebas text-[48px] lg:text-[64px] text-ops-gray-50 uppercase leading-[1.1] tracking-[0.05em] max-w-[600px] mb-6"
+              className="hidden lg:block font-bebas text-[64px] text-ops-gray-50 uppercase leading-[1.1] tracking-[0.05em] max-w-[600px] mb-6"
               {...fadeInUp}
             >
               JOB MANAGEMENT YOUR CREW WILL ACTUALLY USE
@@ -79,7 +89,7 @@ export function Hero({ onDownloadClick, onTryClick }: HeroProps) {
               {...fadeInUp}
               transition={{ ...fadeInUp.transition, delay: 0.3 }}
             >
-              Free for crew members &middot; Rated 4.8&#9733; &middot; No credit card needed
+              Get started for free &middot; No credit card &middot; Rated 5.0&#9733;
             </motion.p>
           </div>
 

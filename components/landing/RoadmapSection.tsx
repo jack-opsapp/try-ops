@@ -41,23 +41,17 @@ const roadmapItems: RoadmapItem[] = [
 const priorityItems = roadmapItems.filter((item) => item.priority || item.completed)
 const standardItems = roadmapItems.filter((item) => !item.priority && !item.completed)
 
-function RoadmapRow({ item, index }: { item: RoadmapItem; index: number }) {
+function RoadmapRow({ item }: { item: RoadmapItem }) {
   return (
-    <motion.div
-      className={`flex items-center gap-4 py-3 border-b border-ops-border ${
-        item.priority && !item.completed ? 'border-l-2 border-l-white/30 pl-4' : 'pl-6'
-      }`}
-      {...fadeInUp}
-      transition={{ ...fadeInUp.transition, delay: index * 0.03 }}
-    >
+    <div className="flex items-center gap-3 px-4 md:px-5 py-3">
       {/* Status indicator */}
       <span className="flex-shrink-0 w-5 text-center">
         {item.completed ? (
-          <svg className="w-5 h-5 text-ops-success" viewBox="0 0 20 20" fill="currentColor">
+          <svg className="w-4 h-4 text-ops-success" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
           </svg>
         ) : item.priority ? (
-          <span className="text-white font-mohave font-bold text-[14px]">!</span>
+          <span className="w-2 h-2 rounded-full bg-white inline-block" />
         ) : (
           <span className="w-1.5 h-1.5 rounded-full bg-ops-gray-400 inline-block" />
         )}
@@ -65,29 +59,29 @@ function RoadmapRow({ item, index }: { item: RoadmapItem; index: number }) {
 
       {/* Feature name */}
       <span
-        className={`font-kosugi text-[16px] ${
+        className={`font-kosugi text-[14px] md:text-[15px] flex-1 ${
           item.completed
             ? 'text-ops-gray-400 line-through'
             : item.priority
             ? 'text-ops-gray-100'
-            : 'text-ops-gray-200'
+            : 'text-ops-gray-300'
         }`}
       >
         {item.text}
       </span>
 
-      {/* Priority badge */}
+      {/* Badge */}
       {item.priority && !item.completed && (
-        <span className="ml-auto font-mohave text-[11px] uppercase tracking-wider text-ops-gray-200">
+        <span className="flex-shrink-0 font-mohave text-[10px] uppercase tracking-wider text-ops-gray-300 border border-white/10 rounded-[3px] px-2 py-0.5">
           PRIORITY
         </span>
       )}
       {item.completed && (
-        <span className="ml-auto font-mohave text-[11px] uppercase tracking-wider text-ops-gray-400">
+        <span className="flex-shrink-0 font-mohave text-[10px] uppercase tracking-wider text-ops-gray-400">
           DONE
         </span>
       )}
-    </motion.div>
+    </div>
   )
 }
 
@@ -95,50 +89,55 @@ export function RoadmapSection() {
   const [showAll, setShowAll] = useState(false)
 
   return (
-    <section id="roadmap" className="py-20 lg:py-[120px]">
-      <div className="max-w-[800px] mx-auto px-4 md:px-6 lg:px-10">
+    <section id="roadmap" className="py-12 lg:py-[120px] snap-start snap-always">
+      <div className="max-w-[700px] mx-auto px-4 md:px-6 lg:px-10">
         <motion.h2
-          className="font-bebas text-[32px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-4"
+          className="font-bebas text-[28px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-3"
           {...fadeInUp}
         >
           WE&apos;RE BUILDING WHAT YOU ACTUALLY NEED
         </motion.h2>
 
         <motion.p
-          className="font-kosugi text-[16px] text-ops-gray-300 mb-12 lg:mb-16"
+          className="font-kosugi text-[14px] lg:text-[16px] text-ops-gray-300 mb-8 lg:mb-12"
           {...fadeInUp}
         >
           Every feature gets built based on what real crews actually need. Not what looks good in a demo.
         </motion.p>
 
         <motion.div
-          className="space-y-0"
+          className="bg-ops-card border border-ops-border rounded-ops-card overflow-hidden"
           {...fadeInUp}
         >
           {/* Priority items — always visible */}
           {priorityItems.map((item, i) => (
-            <RoadmapRow key={item.text} item={item} index={i} />
+            <div key={item.text} className={i > 0 ? 'border-t border-white/5' : ''}>
+              <RoadmapRow item={item} />
+            </div>
           ))}
 
           {/* Standard items — always visible on desktop, collapsible on mobile */}
           <div className="hidden lg:block">
-            {standardItems.map((item, i) => (
-              <RoadmapRow key={item.text} item={item} index={priorityItems.length + i} />
+            {standardItems.map((item) => (
+              <div key={item.text} className="border-t border-white/5">
+                <RoadmapRow item={item} />
+              </div>
             ))}
           </div>
 
           {/* Standard items — mobile: collapsible */}
           <div className="lg:hidden">
             <AnimatePresence>
-              {showAll && standardItems.map((item, i) => (
+              {showAll && standardItems.map((item) => (
                 <motion.div
                   key={item.text}
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.3, delay: i * 0.03 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden border-t border-white/5"
                 >
-                  <RoadmapRow item={item} index={priorityItems.length + i} />
+                  <RoadmapRow item={item} />
                 </motion.div>
               ))}
             </AnimatePresence>
@@ -146,9 +145,9 @@ export function RoadmapSection() {
             {/* Toggle button */}
             <button
               onClick={() => setShowAll(!showAll)}
-              className="w-full py-4 font-mohave text-[14px] uppercase tracking-wider text-ops-gray-300 hover:text-ops-gray-100 transition-colors"
+              className="w-full py-3 border-t border-white/5 font-mohave text-[13px] uppercase tracking-wider text-ops-gray-300 hover:text-ops-gray-100 transition-colors"
             >
-              {showAll ? 'SHOW LESS' : `SHOW ALL FEATURES (${standardItems.length} more)`}
+              {showAll ? 'SHOW LESS' : `SHOW ALL FEATURES (+${standardItems.length})`}
             </button>
           </div>
         </motion.div>

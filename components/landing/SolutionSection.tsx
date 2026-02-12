@@ -35,39 +35,27 @@ const features = [
 
 export function SolutionSection() {
   return (
-    <section id="solution" className="py-20 lg:py-[120px]">
+    <section id="solution" className="py-12 lg:py-[120px] snap-start snap-always">
       <div className="max-w-[1200px] mx-auto px-4 md:px-6 lg:px-10">
         <motion.h2
-          className="font-bebas text-[32px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-16"
+          className="font-bebas text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-8 lg:mb-16"
           {...fadeInUp}
         >
           BUILT BY SOMEONE WHO ACTUALLY RUNS CREWS
         </motion.h2>
 
-        {/* Founder credibility block */}
+        {/* Founder quote */}
         <motion.div
-          className="flex flex-col md:flex-row items-start gap-8 mb-16"
+          className="border-l-2 border-white/20 pl-6 mb-16 max-w-[700px]"
           {...fadeInUp}
         >
-          {/* Founder photo placeholder */}
-          <div className="flex-shrink-0 w-[200px] h-[200px] rounded-[4px] border-2 border-ops-gray-500 bg-ops-card overflow-hidden grayscale contrast-[1.2] hover:grayscale-0 transition-all duration-500">
-            <div className="w-full h-full flex items-center justify-center text-ops-text-secondary font-kosugi text-sm">
-              <div className="text-center">
-                <div className="text-ops-gray-200 font-bebas text-2xl mb-1">JS</div>
-                <div className="text-xs">Founder Photo</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex-1">
-            <p className="font-kosugi text-[18px] text-ops-gray-200 leading-relaxed mb-4">
-              &ldquo;I scaled a deck and railing business to $1.6M. Tried Jobber, ServiceTitan, Housecall Pro.
-              None of them worked the way my crew actually works. So I built OPS.&rdquo;
-            </p>
-            <p className="font-kosugi text-[16px] text-ops-gray-300 italic">
-              &mdash; Jackson Sweet, Founder
-            </p>
-          </div>
+          <p className="font-kosugi text-[18px] text-ops-gray-200 leading-relaxed mb-3">
+            &ldquo;I scaled a deck and railing business to $1.6M. Tried Jobber, ServiceTitan, Housecall Pro.
+            None of them worked the way my crew actually works. So I built OPS.&rdquo;
+          </p>
+          <p className="font-kosugi text-[14px] text-ops-gray-300">
+            &mdash; Jackson Sweet, Founder
+          </p>
         </motion.div>
 
         {/* Feature carousel */}

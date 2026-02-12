@@ -63,10 +63,10 @@ export function PainSection() {
   const [activeCard, setActiveCard] = useState<string | null>(null)
 
   return (
-    <section id="pain" className="py-20 lg:py-[120px]">
+    <section id="pain" className="py-12 lg:py-[120px] snap-start snap-always">
       <div className="max-w-[1200px] mx-auto px-4 md:px-6 lg:px-10">
         <motion.h2
-          className="font-bebas text-[32px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] max-w-[800px] mb-12 lg:mb-16"
+          className="font-bebas text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] max-w-[800px] mb-8 lg:mb-16"
           {...fadeInUp}
         >
           YOU&apos;RE EITHER DROWNING IN CHAOS OR PAYING FOR SOFTWARE NOBODY USES
