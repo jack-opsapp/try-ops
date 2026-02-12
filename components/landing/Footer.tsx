@@ -20,14 +20,14 @@ export function Footer() {
               height={24}
               className="object-contain mb-3"
             />
-            <p className="font-kosugi text-[14px] text-ops-accent italic">
+            <p className="font-kosugi text-[14px] text-ops-gray-300 italic">
               Built by trades, for trades.
             </p>
           </div>
 
           {/* Product links */}
           <div>
-            <h4 className="font-mohave font-medium text-[12px] uppercase text-ops-accent tracking-wider mb-4">
+            <h4 className="font-mohave font-medium text-[12px] uppercase text-ops-gray-300 tracking-wider mb-4">
               PRODUCT
             </h4>
             <ul className="space-y-2">
@@ -62,7 +62,7 @@ export function Footer() {
 
           {/* Company links */}
           <div>
-            <h4 className="font-mohave font-medium text-[12px] uppercase text-ops-accent tracking-wider mb-4">
+            <h4 className="font-mohave font-medium text-[12px] uppercase text-ops-gray-300 tracking-wider mb-4">
               COMPANY
             </h4>
             <ul className="space-y-2">

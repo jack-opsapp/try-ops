@@ -17,17 +17,17 @@ const fadeInUp = {
 
 export function ClosingCTA({ onDownloadClick, onTryClick }: ClosingCTAProps) {
   return (
-    <section id="closing" className="bg-ops-card border-t-2 border-ops-accent py-20 lg:py-[120px]">
-      <div className="max-w-[700px] mx-auto px-4 md:px-6 lg:px-10 text-center">
+    <section id="closing" className="bg-ops-card border-t-2 border-ops-gray-500 py-20 lg:py-[120px]">
+      <div className="max-w-[700px] mx-auto px-4 md:px-6 lg:px-10">
         <motion.h2
-          className="font-bebas text-[40px] lg:text-[56px] text-white uppercase leading-[1.1] tracking-[0.05em] mb-6"
+          className="font-bebas text-[40px] lg:text-[56px] text-ops-gray-50 uppercase leading-[1.1] tracking-[0.05em] mb-6"
           {...fadeInUp}
         >
-          STOP SETTLING FOR SOFTWARE BUILT IN CONFERENCE ROOMS
+          STOP DOING MANUALLY WHAT YOUR SOFTWARE SHOULD DO FOR YOU
         </motion.h2>
 
         <motion.p
-          className="font-kosugi text-[18px] text-ops-text-secondary mb-12 max-w-[600px] mx-auto"
+          className="font-kosugi text-[18px] text-ops-gray-200 mb-12 max-w-[600px]"
           {...fadeInUp}
           transition={{ ...fadeInUp.transition, delay: 0.1 }}
         >
@@ -35,7 +35,7 @@ export function ClosingCTA({ onDownloadClick, onTryClick }: ClosingCTAProps) {
         </motion.p>
 
         <motion.div
-          className="flex flex-col sm:flex-row gap-4 justify-center mb-8"
+          className="flex flex-col sm:flex-row gap-4 mb-8"
           {...fadeInUp}
           transition={{ ...fadeInUp.transition, delay: 0.2 }}
         >
@@ -51,7 +51,7 @@ export function ClosingCTA({ onDownloadClick, onTryClick }: ClosingCTAProps) {
         </motion.div>
 
         <motion.p
-          className="font-kosugi text-[14px] text-ops-text-secondary"
+          className="font-kosugi text-[14px] text-ops-gray-300"
           {...fadeInUp}
           transition={{ ...fadeInUp.transition, delay: 0.3 }}
         >

@@ -14,8 +14,8 @@ export function PhoneMockup({ children, className = '' }: PhoneMockupProps) {
       animate={{ y: [0, -10, 0] }}
       transition={{ duration: 4, ease: 'easeInOut', repeat: Infinity }}
     >
-      {/* Blue glow behind device */}
-      <div className="absolute inset-0 rounded-[40px] blur-2xl bg-ops-accent/20 scale-105" />
+      {/* Subtle glow behind device */}
+      <div className="absolute inset-0 rounded-[40px] blur-2xl bg-ops-gray-400/20 scale-105" />
 
       {/* iPhone frame */}
       <div className="relative bg-black rounded-[40px] border-2 border-gray-700 p-3 shadow-2xl">

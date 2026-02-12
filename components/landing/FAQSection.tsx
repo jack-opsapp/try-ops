@@ -52,7 +52,7 @@ export function FAQSection({ onFAQToggle }: FAQSectionProps) {
     <section id="faq" className="py-20 lg:py-[120px]">
       <div className="max-w-[800px] mx-auto px-4 md:px-6 lg:px-10">
         <motion.h2
-          className="font-bebas text-[32px] text-white uppercase text-center tracking-[0.05em] mb-12"
+          className="font-bebas text-[32px] text-ops-gray-50 uppercase tracking-[0.05em] mb-12"
           {...fadeInUp}
         >
           QUESTIONS YOU&apos;RE PROBABLY ASKING

@@ -2,9 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { Button } from '@/components/shared/Button'
-import { PhoneMockup } from '@/components/shared/PhoneMockup'
-
-const APP_STORE_URL = 'https://apps.apple.com/app/ops-app/id6503204873'
+import { HeroAnimation } from '@/components/landing/HeroAnimation'
 
 interface HeroProps {
   onDownloadClick: () => void
@@ -22,27 +20,27 @@ export function Hero({ onDownloadClick, onTryClick }: HeroProps) {
   return (
     <section id="hero" className="relative min-h-screen flex items-center">
       <div className="w-full max-w-[1200px] mx-auto px-4 md:px-6 lg:px-10 py-20">
-        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
-          {/* Text content */}
-          <div className="flex-1 text-center lg:text-left">
+        <div className="flex flex-col lg:flex-row items-start gap-12 lg:gap-16">
+          {/* Text content — left-aligned */}
+          <div className="flex-1">
             <motion.h1
-              className="font-bebas text-[48px] lg:text-[64px] text-white uppercase leading-[1.1] tracking-[0.05em] max-w-[600px] mx-auto lg:mx-0 mb-6"
+              className="font-bebas text-[48px] lg:text-[64px] text-ops-gray-50 uppercase leading-[1.1] tracking-[0.05em] max-w-[600px] mb-6"
               {...fadeInUp}
             >
               JOB MANAGEMENT YOUR CREW WILL ACTUALLY USE
             </motion.h1>
 
             <motion.p
-              className="font-kosugi text-[18px] lg:text-[20px] text-ops-text-secondary leading-relaxed max-w-[500px] mx-auto lg:mx-0 mb-10"
+              className="font-kosugi text-[18px] lg:text-[20px] text-ops-gray-200 leading-relaxed max-w-[500px] mb-10"
               {...fadeInUp}
               transition={{ ...fadeInUp.transition, delay: 0.1 }}
             >
-              No training. No complexity. Built by a crew lead who needed something that just works.
+              No more hunting through emails. No more asking &ldquo;what&apos;s the address?&rdquo; Built by a crew lead who got tired of manual everything.
             </motion.p>
 
             {/* CTAs */}
             <motion.div
-              className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8"
+              className="flex flex-col sm:flex-row gap-4 mb-8"
               {...fadeInUp}
               transition={{ ...fadeInUp.transition, delay: 0.2 }}
             >
@@ -69,7 +67,7 @@ export function Hero({ onDownloadClick, onTryClick }: HeroProps) {
 
             {/* Trust line */}
             <motion.p
-              className="font-kosugi text-[14px] text-ops-text-secondary text-center lg:text-left"
+              className="font-kosugi text-[14px] text-ops-gray-300"
               {...fadeInUp}
               transition={{ ...fadeInUp.transition, delay: 0.3 }}
             >
@@ -77,13 +75,13 @@ export function Hero({ onDownloadClick, onTryClick }: HeroProps) {
             </motion.p>
           </div>
 
-          {/* Phone mockup */}
+          {/* Wireframe animation */}
           <motion.div
-            className="flex-shrink-0 w-[280px] lg:w-[320px]"
+            className="flex-shrink-0 w-full lg:w-[400px]"
             {...fadeInUp}
             transition={{ ...fadeInUp.transition, delay: 0.2 }}
           >
-            <PhoneMockup />
+            <HeroAnimation />
           </motion.div>
         </div>
       </div>

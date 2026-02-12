@@ -2,8 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { Button } from '@/components/shared/Button'
-
-const APP_STORE_URL = 'https://apps.apple.com/app/ops-app/id6503204873'
+import { Carousel } from '@/components/shared/Carousel'
 
 interface PricingSectionProps {
   onDownloadClick: () => void
@@ -16,143 +15,150 @@ const fadeInUp = {
   viewport: { once: true, amount: 0.2 },
 }
 
-const freeFeatures = [
-  'See your assigned jobs',
-  'Clock in/out with GPS',
-  'Take photos with markup',
-  'Navigate to job sites',
-  'Update job status',
-  'Works offline',
+const tiers = [
+  {
+    name: 'TRIAL',
+    price: 'FREE',
+    period: '30 days',
+    users: 10,
+    highlight: false,
+    features: [
+      'Full access to all features',
+      'Up to 10 users',
+      'No credit card required',
+      'All integrations included',
+      'Unlimited projects',
+      'Photo documentation',
+    ],
+    cta: 'START FREE TRIAL',
+    ctaVariant: 'primary' as const,
+  },
+  {
+    name: 'STARTER',
+    price: '$90',
+    period: '/mo or $864/yr (20% off)',
+    users: 3,
+    highlight: false,
+    features: [
+      'Up to 3 users',
+      'Job scheduling & dispatch',
+      'Time tracking with GPS',
+      'Photo documentation',
+      'Client management',
+      'Export for payroll',
+    ],
+    cta: 'GET STARTED',
+    ctaVariant: 'primary' as const,
+  },
+  {
+    name: 'TEAM',
+    price: '$140',
+    period: '/mo or $1,344/yr (20% off)',
+    users: 5,
+    highlight: true,
+    features: [
+      'Up to 5 users',
+      'Everything in Starter',
+      'Team scheduling views',
+      'Advanced reporting',
+      'Priority support',
+      'Custom workflows',
+    ],
+    cta: 'GET STARTED',
+    ctaVariant: 'primary' as const,
+  },
+  {
+    name: 'BUSINESS',
+    price: '$190',
+    period: '/mo or $1,824/yr (20% off)',
+    users: 10,
+    highlight: false,
+    features: [
+      'Up to 10 users',
+      'Everything in Team',
+      'Multi-crew management',
+      'Admin dashboard',
+      'Dedicated support',
+      'Custom integrations',
+    ],
+    cta: 'GET STARTED',
+    ctaVariant: 'primary' as const,
+  },
 ]
 
-const leadFeatures = [
-  'Everything in Free',
-  'Create and schedule jobs',
-  'Assign crew members',
-  'Manage up to 5 seats',
-  'Client management',
-  'Export time tracking',
-]
+function PricingCard({ tier }: { tier: typeof tiers[number] }) {
+  return (
+    <div
+      className={`relative bg-ops-card border rounded-ops-card p-8 h-full flex flex-col ${
+        tier.highlight ? 'border-ops-accent' : 'border-ops-border'
+      }`}
+    >
+      {tier.highlight && (
+        <div className="absolute top-4 right-4 bg-ops-accent text-white font-mohave font-medium text-[11px] uppercase px-3 py-1 rounded-[4px]">
+          POPULAR
+        </div>
+      )}
 
-const comparisonRows = [
-  { feature: 'Monthly cost', jobber: '$169-329', ops: '$90' },
-  { feature: 'Training time', jobber: '2+ days', ops: '2 minutes' },
-  { feature: 'Learning curve', jobber: 'Steep', ops: 'None' },
-  { feature: 'Talk to founder', jobber: '❌', ops: '✅' },
-  { feature: 'Full feature set', jobber: '✅ Now', ops: '✅ Q2 2026' },
-  { feature: 'Works offline', jobber: '❌', ops: '✅' },
-]
+      <p className="font-mohave font-medium text-[14px] uppercase text-ops-gray-300 mb-2">
+        {tier.name}
+      </p>
+      <p className="font-bebas text-[48px] text-ops-gray-50 leading-none mb-1">
+        {tier.price}
+      </p>
+      <p className="font-mohave text-[12px] text-ops-gray-400 mb-4">
+        {tier.period}
+      </p>
+
+      {/* User count badge */}
+      <div className="inline-flex items-center gap-1.5 bg-ops-gray-500 rounded-[4px] px-3 py-1 mb-6 w-fit">
+        <svg className="w-3.5 h-3.5 text-ops-gray-200" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+        </svg>
+        <span className="font-mohave text-[12px] text-ops-gray-200">
+          {tier.users} {tier.users === 1 ? 'user' : 'users'}
+        </span>
+      </div>
+
+      <ul className="space-y-2 mb-8 flex-1">
+        {tier.features.map((feature) => (
+          <li key={feature} className="font-kosugi text-[14px] text-ops-gray-200 leading-7">
+            &#8226; {feature}
+          </li>
+        ))}
+      </ul>
+
+      <Button variant={tier.ctaVariant} fullWidth>
+        {tier.cta}
+      </Button>
+    </div>
+  )
+}
 
 export function PricingSection({ onDownloadClick }: PricingSectionProps) {
   return (
     <section id="pricing" className="py-20 lg:py-[120px]">
       <div className="max-w-[1200px] mx-auto px-4 md:px-6 lg:px-10">
         <motion.h2
-          className="font-bebas text-[32px] lg:text-[40px] text-white uppercase text-center tracking-[0.05em] mb-16"
+          className="font-bebas text-[32px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-4"
           {...fadeInUp}
         >
           START FREE. UPGRADE WHEN YOU&apos;RE READY.
         </motion.h2>
 
-        {/* Pricing cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10 mb-16">
-          {/* Free tier */}
-          <motion.div
-            className="bg-ops-card border border-ops-border rounded-ops-card p-10 transition-all duration-300 hover:border-ops-accent"
-            {...fadeInUp}
-          >
-            <p className="font-mohave font-medium text-[14px] uppercase text-ops-accent mb-2">
-              CREW MEMBER
-            </p>
-            <p className="font-bebas text-[48px] text-white leading-none mb-6">
-              FREE FOREVER
-            </p>
-            <ul className="space-y-2 mb-8">
-              {freeFeatures.map((feature) => (
-                <li key={feature} className="font-kosugi text-[16px] text-ops-text-secondary leading-8">
-                  &#8226; {feature}
-                </li>
-              ))}
-            </ul>
-            <Button variant="primary" onClick={onDownloadClick} fullWidth>
-              DOWNLOAD NOW
-            </Button>
-            <p className="font-kosugi text-[14px] text-ops-text-secondary italic mt-4">
-              Best for: Crew members who need to know where they&apos;re going and what they&apos;re doing
-            </p>
-          </motion.div>
+        <motion.p
+          className="font-kosugi text-[16px] text-ops-gray-300 mb-16"
+          {...fadeInUp}
+        >
+          No credit card. No commitment. Cancel anytime.
+        </motion.p>
 
-          {/* Paid tier */}
-          <motion.div
-            className="relative bg-ops-card border border-ops-border rounded-ops-card p-10 transition-all duration-300 hover:border-ops-accent"
-            {...fadeInUp}
-            transition={{ ...fadeInUp.transition, delay: 0.1 }}
-          >
-            {/* Recommended badge */}
-            <div className="absolute top-4 right-4 bg-ops-accent text-white font-mohave font-medium text-[12px] uppercase px-3 py-1 rounded-[4px]">
-              RECOMMENDED
-            </div>
-            <p className="font-mohave font-medium text-[14px] uppercase text-ops-accent mb-2">
-              CREW LEAD
-            </p>
-            <p className="font-bebas text-[48px] text-white leading-none mb-1">
-              $90/MONTH
-            </p>
-            <p className="font-mohave text-[12px] text-ops-text-secondary mb-6">
-              (Coming Q2 2026)
-            </p>
-            <ul className="space-y-2 mb-8">
-              {leadFeatures.map((feature) => (
-                <li key={feature} className="font-kosugi text-[16px] text-ops-text-secondary leading-8">
-                  &#8226; {feature}
-                </li>
-              ))}
-            </ul>
-            <Button variant="outline" onClick={() => {}} fullWidth>
-              JOIN WAITLIST
-            </Button>
-            <p className="font-kosugi text-[14px] text-ops-text-secondary italic mt-4">
-              Best for: Crew leads managing 1-5 person teams
-            </p>
-          </motion.div>
-        </div>
-
-        {/* Comparison table */}
+        {/* Pricing carousel */}
         <motion.div {...fadeInUp}>
-          <h3 className="font-bebas text-[24px] text-white uppercase text-center mb-8">
-            THE HONEST COMPARISON
-          </h3>
-          <div className="overflow-x-auto">
-            <table className="w-full bg-ops-card border border-ops-border rounded-ops-card overflow-hidden">
-              <thead>
-                <tr className="bg-ops-background">
-                  <th className="text-left font-mohave font-medium text-[14px] uppercase text-ops-text-secondary p-4" />
-                  <th className="text-left font-mohave font-medium text-[14px] uppercase text-ops-text-secondary p-4">
-                    Jobber (5 users)
-                  </th>
-                  <th className="text-left font-mohave font-medium text-[14px] uppercase text-ops-accent p-4">
-                    OPS (5 users)
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {comparisonRows.map((row, i) => (
-                  <tr
-                    key={row.feature}
-                    className={i % 2 === 1 ? 'bg-white/[0.02]' : ''}
-                  >
-                    <td className="font-kosugi text-[14px] text-white p-4">{row.feature}</td>
-                    <td className="font-kosugi text-[14px] text-ops-text-secondary p-4">{row.jobber}</td>
-                    <td className="font-kosugi text-[14px] text-white p-4">{row.ops}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="font-kosugi text-[16px] text-ops-text-secondary italic text-center max-w-[700px] mx-auto mt-8">
-            Jobber is great if you need everything today and have time to learn it.
-            OPS is great if you want something your crew will actually use.
-          </p>
+          <Carousel gap={16}>
+            {tiers.map((tier) => (
+              <PricingCard key={tier.name} tier={tier} />
+            ))}
+          </Carousel>
         </motion.div>
       </div>
     </section>

@@ -191,6 +191,27 @@ export function TutorialIntroShell() {
           <Sequence3 key={seqKey} onComplete={handleSequenceComplete} />
         )}
       </div>
+
+      {/* Bottom navigation buttons */}
+      <div
+        className="absolute bottom-0 left-0 right-0 z-[60] flex items-center justify-center gap-4 pb-8"
+        style={{ paddingBottom: 'max(3.5rem, env(safe-area-inset-bottom))' }}
+      >
+        {phaseIndex > 0 && (
+          <button
+            onClick={handleTapLeft}
+            className="font-mohave font-medium text-[14px] uppercase tracking-wider text-white/50 px-6 py-3 border border-white/30 rounded-[5px] transition-all hover:text-white/70 hover:border-white/50"
+          >
+            BACK
+          </button>
+        )}
+        <button
+          onClick={handleTapRight}
+          className="font-mohave font-medium text-[16px] uppercase tracking-wider text-white px-8 py-3 border-2 border-white rounded-[5px] transition-all hover:bg-white hover:text-black"
+        >
+          {phaseIndex >= PHASES.length - 1 ? 'BEGIN TUTORIAL' : 'NEXT'}
+        </button>
+      </div>
     </div>
   )
 }

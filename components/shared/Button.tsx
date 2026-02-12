@@ -25,7 +25,7 @@ export function Button({
     primary:
       'bg-ops-accent text-white px-8 py-4 hover:brightness-110',
     outline:
-      'bg-transparent border-2 border-ops-accent text-ops-accent px-8 py-[14px] hover:bg-ops-accent hover:text-white',
+      'bg-transparent border-2 border-ops-gray-300 text-ops-gray-200 px-8 py-[14px] hover:border-white hover:text-white',
   }
 
   const classes = `${base} ${variants[variant]} ${className}`

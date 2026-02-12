@@ -32,14 +32,14 @@ export function DesktopDownload() {
         className="max-w-[800px] mx-auto px-4 md:px-6 lg:px-10"
         {...fadeInUp}
       >
-        <h2 className="font-bebas text-[32px] text-white uppercase text-center tracking-[0.05em] mb-10">
+        <h2 className="font-bebas text-[32px] text-ops-gray-50 uppercase tracking-[0.05em] mb-10">
           GET OPS ON YOUR PHONE
         </h2>
 
         <div className="flex items-start justify-center gap-12">
           {/* QR Code placeholder */}
           <div className="text-center">
-            <div className="w-[200px] h-[200px] border-2 border-ops-accent rounded-ops-card bg-white flex items-center justify-center">
+            <div className="w-[200px] h-[200px] border-2 border-ops-gray-500 rounded-ops-card bg-white flex items-center justify-center">
               <div className="text-black font-kosugi text-sm text-center p-4">
                 <div className="text-2xl mb-2">📱</div>
                 QR Code
@@ -69,7 +69,7 @@ export function DesktopDownload() {
                 placeholder="(555) 123-4567"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="bg-ops-card border border-ops-border rounded-[4px] px-4 py-3 font-kosugi text-[16px] text-white w-[240px] focus:border-ops-accent focus:outline-none transition-colors placeholder:text-ops-text-tertiary"
+                className="bg-ops-card border border-ops-border rounded-[4px] px-4 py-3 font-kosugi text-[16px] text-ops-gray-50 w-[240px] focus:border-ops-gray-300 focus:outline-none transition-colors placeholder:text-ops-text-tertiary"
               />
               <button
                 onClick={handleSend}
@@ -80,7 +80,7 @@ export function DesktopDownload() {
               </button>
             </div>
             {status === 'sent' && (
-              <p className="font-kosugi text-[14px] text-ops-accent mt-2">
+              <p className="font-kosugi text-[14px] text-ops-gray-200 mt-2">
                 Check your phone for the download link!
               </p>
             )}

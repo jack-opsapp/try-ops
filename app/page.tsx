@@ -6,7 +6,7 @@ import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { useAnalytics } from '@/lib/hooks/useAnalytics'
 import { isMobile } from '@/lib/utils/device-detection'
 
-import { StickyHeader } from '@/components/landing/StickyHeader'
+import { HamburgerMenu } from '@/components/landing/HamburgerMenu'
 import { Hero } from '@/components/landing/Hero'
 import { DesktopDownload } from '@/components/landing/DesktopDownload'
 import { PainSection } from '@/components/landing/PainSection'
@@ -212,7 +212,7 @@ export default function LandingPage() {
 
   return (
     <main className="bg-ops-background min-h-screen">
-      <StickyHeader
+      <HamburgerMenu
         onDownloadClick={handleDownloadClick}
         onTryClick={handleTryClick}
       />

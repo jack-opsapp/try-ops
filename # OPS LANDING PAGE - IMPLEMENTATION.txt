@@ -1,0 +1,223 @@
+# OPS LANDING PAGE - IMPLEMENTATION SPEC (v2)
+
+**Version:** Defense-Tech Overhaul — Monochrome Aesthetic + Carousel Treatment
+**Updated:** February 2026
+**Target:** Mobile-first responsive, <2 second load, 6-10% conversion
+**Design System:** Defense-tech monochrome with accent used sparingly (borders/CTAs only)
+
+---
+
+## DESIGN SYSTEM
+
+### Color Palette — Defense Tech Monochrome
+
+```
+Primary Background:    #0A0A0A  (near-black)
+Card Background:       #1A1A1A  (elevated sections)
+Card Background Dark:  #111111  (darker card variant)
+Accent:                #597794  (tactical blue — CTAs and priority markers ONLY)
+
+Gray Scale (defense-tech palette):
+  ops-gray-50:         #F5F5F5  (near-white, headlines)
+  ops-gray-100:        #E5E5E5  (body text)
+  ops-gray-200:        #C0C0C0  (secondary text, icons)
+  ops-gray-300:        #8A8A8A  (tertiary, hover borders)
+  ops-gray-400:        #555555  (muted elements)
+  ops-gray-500:        #333333  (card borders, dividers)
+
+Primary Text:          #F5F5F5  (slightly off-white, NOT pure white)
+Secondary Text:        #A0A0A0  (body copy)
+Tertiary Text:         #777777  (labels)
+Border:                #2A2A2A  (subtle separators)
+Success:               #A5B368
+Error:                 #93321A
+```
+
+### Typography
+
+```
+Headings:   'Bebas Neue', sans-serif (40-64px desktop, 32-48px mobile)
+Subheads:   'Mohave', sans-serif (16-22px, medium weight, uppercase)
+Body:       'Kosugi', sans-serif (14-18px)
+```
+
+### Key Design Rules
+- ALL text left-aligned (no centered text anywhere)
+- Accent color used ONLY for: CTA buttons, priority markers in roadmap, "POPULAR" badge
+- Borders, hovers, section dividers → gray scale only
+- Cards hover → gray-300 border (not accent)
+- Accordion active → gray-300 border (not accent)
+- Phone mockup glow → gray (not accent blue)
+
+---
+
+## NAVIGATION
+
+### HamburgerMenu (replaces StickyHeader)
+- Floating button: fixed top-4 right-4, z-1100, round, dark bg + backdrop-blur, border
+- Three bars animate to X via Framer Motion (rotate ±45°, middle fades)
+- Backdrop: gradient from right (rgba(0,0,0,0.9) → transparent)
+- Panel: slides in from right, 280px wide, spring physics
+- Section links: TOP, THE PROBLEM, FEATURES, ROADMAP, PRICING, FAQ
+- Staggered entrance animation (delay 0.05s per item)
+- Bottom CTAs: DOWNLOAD FREE + TRY IT FIRST
+- ESC closes, body scroll locked, tap-outside-to-close
+
+---
+
+## SECTIONS (top to bottom)
+
+### 1. Hero
+- Left-aligned text, no centering
+- Headline: "JOB MANAGEMENT YOUR CREW WILL ACTUALLY USE"
+- Subtitle: "No more hunting through emails. No more asking 'what's the address?' Built by a crew lead who got tired of manual everything."
+- CTAs: DOWNLOAD FREE - iOS (primary) + TRY IT FIRST (outline, gray border)
+- Trust line: "Free for crew members · Rated 4.8★ · No credit card needed"
+- Right side: HeroAnimation (replaces PhoneMockup)
+
+### 2. HeroAnimation (above the fold)
+- Looping wireframe animation (~7s cycle)
+- Phase 1: ProjectFolder fades in
+- Phase 2: 3 TaskFolders spring-emerge (stagger 150ms)
+- Phase 3: Labels appear ("DEMO", "FRAME", "FINISH")
+- Phase 4: Hold for reading
+- Phase 5: Collapse back, fade out, restart
+- All monochrome (white/gray strokes)
+- Reuses ProjectFolder + TaskFolder from tutorial-intro
+
+### 3. DesktopDownload (desktop only)
+- QR code + SMS form, left-aligned
+
+### 4. PainSection — "The Problem"
+**Mobile (<768px):** Compact 3-column grid
+- Each card: animated icon (48px) + title (11px uppercase)
+- Tap to select → icon plays animation, card expands below with bullets
+- Only one expanded at a time (accordion behavior)
+
+**Desktop (>=768px):** Full 3-column FeatureCard grid
+
+Cards:
+1. GROUP TEXT HELL — AnimatedTangledMessages (shake)
+2. ENTERPRISE OVERKILL — AnimatedDashboardOverload (cascade)
+3. TOOL SPRAWL — AnimatedScatteredApps (scatter)
+
+Solution callout: gray-500 top border (not accent)
+
+### 5. SolutionSection — "Features"
+- Founder quote block (left-aligned, gray-500 photo border)
+- 4 feature cards in Carousel (swipeable):
+  1. NO TRAINING REQUIRED — eliminates manual data entry
+  2. PHOTO DOCUMENTATION — no hunting through text chains
+  3. TIME TRACKING — eliminates manual hour calculations
+  4. DIRECT LINE TO THE BUILDER — no support tickets
+
+### 6. RoadmapSection
+- Single list with priority markers
+- Priority items: left accent border + "!" marker + "PRIORITY" badge
+- Completed items: checkmark + muted text + strikethrough + "DONE" badge
+- No card blocks — clean list format
+
+Priority features: Auto Time Tracking, Team Locations, Expense Tracking,
+Client Portal, Multiple Project Tasks (COMPLETED), Estimating & Invoices,
+Request for Google Review, Client Booking Portal
+
+Standard features: Calendar Request System, Weather Integration, Apple Watch,
+Work Analytics, Project Analytics, Team Member Notes, In-App Messaging,
+Project Note Notifications, AI Quoting System, Apple CarPlay, QuickBooks Integration
+
+### 7. PricingSection — 4-Tier Carousel
+No more Jobber comparison table. 4 pricing cards in Carousel:
+
+| Tier     | Price     | Users | Yearly           |
+|----------|-----------|-------|------------------|
+| TRIAL    | FREE      | 10    | 30 days          |
+| STARTER  | $90/mo    | 3     | $864/yr (20% off)|
+| TEAM     | $140/mo   | 5     | $1,344/yr        |
+| BUSINESS | $190/mo   | 10    | $1,824/yr        |
+
+Each card: tier name, price (Bebas Neue), period, user count badge, 6 features, CTA
+TEAM tier has "POPULAR" badge (accent background)
+
+### 8. FAQSection
+- Left-aligned heading
+- Same 6 questions, accordion with gray borders
+
+### 9. ClosingCTA
+- Headline: "STOP DOING MANUALLY WHAT YOUR SOFTWARE SHOULD DO FOR YOU"
+- Subtitle: "Your crew works in the field. Your software should too."
+- Border: gray-500 (not accent)
+- Left-aligned
+
+### 10. Footer
+- Gray category headers (not accent)
+- Otherwise unchanged
+
+### 11. StickyCTA (mobile only)
+- Shadow changed from accent to black for monochrome feel
+
+---
+
+## SHARED COMPONENTS
+
+### Carousel (NEW)
+- Framer Motion drag="x" with dragElastic={0.1}
+- Velocity-based swipe (>500px/s = fast flick)
+- Spring snap: stiffness 300, damping 30
+- Dot indicators: white active, gray-400 inactive
+- Card width: container width - 48px on mobile
+
+### AnimatedWireframeIcon (NEW)
+- AnimatedTangledMessages: message rects shake/vibrate
+- AnimatedDashboardOverload: content rects cascade in
+- AnimatedScatteredApps: app squares scatter then snap back
+- Props: isActive: boolean, size?: number
+- Color: ops-gray-200
+
+### Button
+- Primary: unchanged (accent bg)
+- Outline: gray-300 border + gray-200 text → hover white
+
+### FeatureCard
+- Hover border: gray-300 (was accent)
+- Title color: gray-50 (was white)
+- ForLine color: gray-200 (was accent)
+
+### AccordionItem
+- Active/hover border: gray-300 (was accent)
+- Arrow color: gray-300 (was accent)
+- Question text: gray-50
+
+### PhoneMockup (kept but not used in Hero anymore)
+- Glow: gray-400/20 (was accent/20)
+
+---
+
+## FILE STRUCTURE
+
+### New Files (4)
+- components/shared/Carousel.tsx
+- components/shared/AnimatedWireframeIcon.tsx
+- components/landing/HamburgerMenu.tsx
+- components/landing/HeroAnimation.tsx
+
+### Modified Files (17)
+- tailwind.config.ts
+- components/shared/Button.tsx
+- components/shared/FeatureCard.tsx
+- components/shared/AccordionItem.tsx
+- components/shared/PhoneMockup.tsx
+- components/landing/Hero.tsx
+- components/landing/PainSection.tsx
+- components/landing/SolutionSection.tsx
+- components/landing/RoadmapSection.tsx
+- components/landing/PricingSection.tsx
+- components/landing/FAQSection.tsx
+- components/landing/ClosingCTA.tsx
+- components/landing/Footer.tsx
+- components/landing/DesktopDownload.tsx
+- components/landing/StickyCTA.tsx
+- app/page.tsx
+- # OPS LANDING PAGE - IMPLEMENTATION.txt
+
+### Removed from page flow (1)
+- components/landing/StickyHeader.tsx (replaced by HamburgerMenu)
