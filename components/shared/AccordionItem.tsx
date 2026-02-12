@@ -41,9 +41,11 @@ export function AccordionItem({ question, answer, onToggle }: AccordionItemProps
         <motion.span
           animate={{ rotate: isOpen ? 90 : 0 }}
           transition={{ duration: 0.3 }}
-          className="text-ops-gray-300 text-[16px] flex-shrink-0"
+          className="text-ops-gray-300 flex-shrink-0"
         >
-          &#9654;
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4.5 2L8.5 6L4.5 10" />
+          </svg>
         </motion.span>
       </div>
       <AnimatePresence>

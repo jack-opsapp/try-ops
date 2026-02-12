@@ -90,11 +90,11 @@ function PricingCard({ tier }: { tier: typeof tiers[number] }) {
   return (
     <div
       className={`relative bg-ops-card border rounded-ops-card p-8 h-full flex flex-col ${
-        tier.highlight ? 'border-ops-accent' : 'border-ops-border'
+        tier.highlight ? 'border-white/30' : 'border-ops-border'
       }`}
     >
       {tier.highlight && (
-        <div className="absolute top-4 right-4 bg-ops-accent text-white font-mohave font-medium text-[11px] uppercase px-3 py-1 rounded-[4px]">
+        <div className="absolute top-4 right-4 bg-white/10 text-white border border-white/20 font-mohave font-medium text-[11px] uppercase px-3 py-1 rounded-[4px]">
           POPULAR
         </div>
       )}

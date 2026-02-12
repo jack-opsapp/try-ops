@@ -8,10 +8,6 @@ interface AnimatedIconProps {
 }
 
 export function AnimatedTangledMessages({ isActive, size = 48 }: AnimatedIconProps) {
-  const shake = isActive
-    ? { x: [0, -3, 3, -2, 2, 0], transition: { duration: 0.6, ease: 'easeInOut' as const } }
-    : { x: 0 }
-
   return (
     <motion.svg
       width={size}
@@ -24,37 +20,76 @@ export function AnimatedTangledMessages({ isActive, size = 48 }: AnimatedIconPro
       strokeLinejoin="round"
       className="text-ops-gray-200"
     >
-      <motion.g animate={shake}>
-        <rect x="4" y="8" width="28" height="18" rx="4" />
-        <circle cx="14" cy="17" r="1.5" fill="currentColor" />
-        <circle cx="18" cy="17" r="1.5" fill="currentColor" />
-        <circle cx="22" cy="17" r="1.5" fill="currentColor" />
+      {/* Bubble 1 — top-left, tilted slightly */}
+      <motion.g
+        animate={
+          isActive
+            ? { x: [0, -2, 3, -1, 2, 0], y: [0, 1, -2, 2, -1, 0], transition: { duration: 0.5, ease: 'easeInOut' } }
+            : { x: 0, y: 0 }
+        }
+      >
+        <rect x="4" y="6" width="26" height="16" rx="3" transform="rotate(-3 17 14)" />
+        <line x1="12" y1="12" x2="24" y2="12" opacity="0.5" />
+        <line x1="12" y1="16" x2="20" y2="16" opacity="0.5" />
       </motion.g>
-      <motion.g animate={isActive ? { x: [0, 3, -3, 2, -2, 0], transition: { duration: 0.6, delay: 0.1 } } : { x: 0 }}>
-        <rect x="32" y="24" width="28" height="18" rx="4" />
-        <circle cx="42" cy="33" r="1.5" fill="currentColor" />
-        <circle cx="46" cy="33" r="1.5" fill="currentColor" />
-        <circle cx="50" cy="33" r="1.5" fill="currentColor" />
+
+      {/* Bubble 2 — middle-right, tilted opposite */}
+      <motion.g
+        animate={
+          isActive
+            ? { x: [0, 3, -2, 1, -3, 0], y: [0, -1, 2, -2, 1, 0], transition: { duration: 0.5, delay: 0.08, ease: 'easeInOut' } }
+            : { x: 0, y: 0 }
+        }
+      >
+        <rect x="30" y="20" width="28" height="16" rx="3" transform="rotate(2 44 28)" />
+        <line x1="38" y1="26" x2="52" y2="26" opacity="0.5" />
+        <line x1="38" y1="30" x2="48" y2="30" opacity="0.5" />
       </motion.g>
-      <motion.g animate={isActive ? { x: [0, -2, 2, -3, 3, 0], transition: { duration: 0.6, delay: 0.2 } } : { x: 0 }}>
-        <rect x="8" y="38" width="28" height="18" rx="4" />
-        <circle cx="18" cy="47" r="1.5" fill="currentColor" />
-        <circle cx="22" cy="47" r="1.5" fill="currentColor" />
-        <circle cx="26" cy="47" r="1.5" fill="currentColor" />
+
+      {/* Bubble 3 — bottom-left, tilted */}
+      <motion.g
+        animate={
+          isActive
+            ? { x: [0, -3, 2, -2, 3, 0], y: [0, 2, -1, 1, -2, 0], transition: { duration: 0.5, delay: 0.15, ease: 'easeInOut' } }
+            : { x: 0, y: 0 }
+        }
+      >
+        <rect x="6" y="38" width="24" height="16" rx="3" transform="rotate(4 18 46)" />
+        <line x1="14" y1="44" x2="24" y2="44" opacity="0.5" />
+        <line x1="14" y1="48" x2="22" y2="48" opacity="0.5" />
       </motion.g>
-      <line x1="32" y1="17" x2="32" y2="24" />
-      <line x1="28" y1="38" x2="36" y2="33" />
     </motion.svg>
   )
 }
 
 export function AnimatedDashboardOverload({ isActive, size = 48 }: AnimatedIconProps) {
-  const rects = [
-    { x: 28, y: 20, w: 12, h: 8, delay: 0 },
-    { x: 44, y: 20, w: 12, h: 8, delay: 0.05 },
-    { x: 28, y: 32, w: 28, h: 6, delay: 0.1 },
-    { x: 28, y: 42, w: 28, h: 6, delay: 0.15 },
-    { x: 28, y: 52, w: 12, h: 4, delay: 0.2 },
+  // Base grid of tiny rects
+  const baseRects = [
+    { x: 6, y: 6, w: 10, h: 6 },
+    { x: 19, y: 6, w: 10, h: 6 },
+    { x: 32, y: 6, w: 10, h: 6 },
+    { x: 45, y: 6, w: 13, h: 6 },
+    { x: 6, y: 15, w: 16, h: 6 },
+    { x: 25, y: 15, w: 10, h: 6 },
+    { x: 38, y: 15, w: 20, h: 6 },
+    { x: 6, y: 24, w: 10, h: 6 },
+    { x: 19, y: 24, w: 14, h: 6 },
+    { x: 36, y: 24, w: 10, h: 6 },
+    { x: 49, y: 24, w: 9, h: 6 },
+    { x: 6, y: 33, w: 20, h: 6 },
+    { x: 29, y: 33, w: 10, h: 6 },
+  ]
+
+  // Extra rects that pile in on activate
+  const extraRects = [
+    { x: 42, y: 33, w: 16, h: 6 },
+    { x: 6, y: 42, w: 12, h: 6 },
+    { x: 21, y: 42, w: 10, h: 6 },
+    { x: 34, y: 42, w: 12, h: 6 },
+    { x: 49, y: 42, w: 9, h: 6 },
+    { x: 6, y: 51, w: 16, h: 6 },
+    { x: 25, y: 51, w: 10, h: 6 },
+    { x: 38, y: 51, w: 20, h: 6 },
   ]
 
   return (
@@ -64,26 +99,23 @@ export function AnimatedDashboardOverload({ isActive, size = 48 }: AnimatedIconP
       viewBox="0 0 64 64"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
       className="text-ops-gray-200"
     >
-      <rect x="4" y="4" width="56" height="56" rx="4" />
-      <line x1="4" y1="16" x2="60" y2="16" />
-      <line x1="24" y1="16" x2="24" y2="60" />
-      <circle cx="10" cy="10" r="2" fill="currentColor" />
-      <circle cx="16" cy="10" r="2" fill="currentColor" />
+      {/* Frame */}
+      <rect x="2" y="2" width="60" height="60" rx="3" />
 
-      {/* Sidebar items */}
-      {[20, 28, 36, 44, 52].map((y, i) => (
-        <rect key={`sidebar-${i}`} x="8" y={y} width="12" height="4" rx="1" />
+      {/* Base grid — always visible */}
+      {baseRects.map((r, i) => (
+        <rect key={`base-${i}`} x={r.x} y={r.y} width={r.w} height={r.h} rx="1" opacity="0.6" />
       ))}
 
-      {/* Content rects that cascade in */}
-      {rects.map((r, i) => (
+      {/* Extra rects — cascade in on activate */}
+      {extraRects.map((r, i) => (
         <motion.rect
-          key={`content-${i}`}
+          key={`extra-${i}`}
           x={r.x}
           y={r.y}
           width={r.w}
@@ -91,12 +123,8 @@ export function AnimatedDashboardOverload({ isActive, size = 48 }: AnimatedIconP
           rx="1"
           animate={
             isActive
-              ? {
-                  opacity: [0, 1],
-                  y: [r.y - 8, r.y],
-                  transition: { duration: 0.4, delay: r.delay, ease: 'easeOut' as const },
-                }
-              : { opacity: 1, y: r.y }
+              ? { opacity: [0, 0.7], y: [r.y - 6, r.y], transition: { duration: 0.3, delay: i * 0.06, ease: 'easeOut' } }
+              : { opacity: 0 }
           }
         />
       ))}
@@ -106,11 +134,11 @@ export function AnimatedDashboardOverload({ isActive, size = 48 }: AnimatedIconP
 
 export function AnimatedScatteredApps({ isActive, size = 48 }: AnimatedIconProps) {
   const apps = [
-    { x: 4, y: 4, sx: -6, sy: -6 },
-    { x: 24, y: 8, sx: 0, sy: -8 },
-    { x: 44, y: 4, sx: 6, sy: -6 },
-    { x: 8, y: 28, sx: -8, sy: 4 },
-    { x: 40, y: 32, sx: 8, sy: 4 },
+    { x: 2, y: 4, dx: -4, dy: -4 },
+    { x: 24, y: 2, dx: 0, dy: -5 },
+    { x: 44, y: 6, dx: 5, dy: -3 },
+    { x: 6, y: 30, dx: -5, dy: 3 },
+    { x: 38, y: 34, dx: 6, dy: 4 },
   ]
 
   return (
@@ -126,32 +154,25 @@ export function AnimatedScatteredApps({ isActive, size = 48 }: AnimatedIconProps
       className="text-ops-gray-200"
     >
       {apps.map((app, i) => (
-        <motion.rect
+        <motion.g
           key={i}
-          x={app.x}
-          y={app.y}
-          width="16"
-          height="16"
-          rx="4"
           animate={
             isActive
-              ? {
-                  x: [app.x, app.x + app.sx, app.x],
-                  y: [app.y, app.y + app.sy, app.y],
-                  transition: { duration: 0.6, delay: i * 0.05, ease: 'easeInOut' as const },
-                }
-              : { x: app.x, y: app.y }
+              ? { x: [0, app.dx], y: [0, app.dy], transition: { duration: 0.6, delay: i * 0.05, ease: 'easeInOut' } }
+              : { x: 0, y: 0 }
           }
-        />
+        >
+          <rect x={app.x} y={app.y} width="16" height="16" rx="3" />
+          {/* App icon line inside */}
+          <line x1={app.x + 4} y1={app.y + 8} x2={app.x + 12} y2={app.y + 8} opacity="0.4" />
+        </motion.g>
       ))}
 
-      {/* Dashed connections */}
-      <path d="M20 12 L24 16" strokeDasharray="3 3" />
-      <path d="M40 16 L44 12" strokeDasharray="3 3" />
-      <path d="M16 28 L20 24" strokeDasharray="3 3" />
-      <path d="M48 32 L44 24" strokeDasharray="3 3" />
-      <path d="M24 36 L40 40" strokeDasharray="3 3" />
-      <text x="8" y="56" fontSize="10" fill="currentColor" fontFamily="monospace">$$$</text>
+      {/* $ signs scattered between apps */}
+      <text x="18" y="22" fontSize="9" fill="currentColor" fontFamily="monospace" opacity="0.5">$</text>
+      <text x="36" y="18" fontSize="9" fill="currentColor" fontFamily="monospace" opacity="0.5">$</text>
+      <text x="28" y="48" fontSize="9" fill="currentColor" fontFamily="monospace" opacity="0.5">$</text>
+      <text x="50" y="30" fontSize="9" fill="currentColor" fontFamily="monospace" opacity="0.5">$</text>
     </motion.svg>
   )
 }

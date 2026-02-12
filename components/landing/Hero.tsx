@@ -20,7 +20,15 @@ export function Hero({ onDownloadClick, onTryClick }: HeroProps) {
   return (
     <section id="hero" className="relative min-h-screen flex items-center">
       <div className="w-full max-w-[1200px] mx-auto px-4 md:px-6 lg:px-10 py-20">
-        <div className="flex flex-col lg:flex-row items-start gap-12 lg:gap-16">
+        <div className="flex flex-col lg:flex-row items-start gap-8 lg:gap-16">
+          {/* Wireframe animation — above text on mobile, right side on desktop */}
+          <motion.div
+            className="flex-shrink-0 w-full lg:hidden"
+            {...fadeInUp}
+          >
+            <HeroAnimation />
+          </motion.div>
+
           {/* Text content — left-aligned */}
           <div className="flex-1">
             <motion.h1
@@ -75,9 +83,9 @@ export function Hero({ onDownloadClick, onTryClick }: HeroProps) {
             </motion.p>
           </div>
 
-          {/* Wireframe animation */}
+          {/* Wireframe animation — desktop only (mobile is above) */}
           <motion.div
-            className="flex-shrink-0 w-full lg:w-[400px]"
+            className="hidden lg:block flex-shrink-0 w-[400px]"
             {...fadeInUp}
             transition={{ ...fadeInUp.transition, delay: 0.2 }}
           >

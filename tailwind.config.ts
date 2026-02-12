@@ -11,7 +11,7 @@ const config: Config = {
       colors: {
         ops: {
           background: '#0A0A0A',
-          card: '#1A1A1A',
+          card: '#0D0D0D',
           'card-dark': '#111111',
           accent: '#597794',
           success: '#A5B368',
@@ -53,7 +53,7 @@ const config: Config = {
       },
       borderRadius: {
         'ops': '5px',
-        'ops-card': '8px',
+        'ops-card': '5px',
         'ops-lg': '12px',
         'ops-sm': '2.5px',
       },
