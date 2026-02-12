@@ -22,12 +22,14 @@ export function OPSButton({
   type = 'button',
 }: OPSButtonProps) {
   const baseStyles =
-    'h-14 px-8 rounded-ops font-mohave font-semibold text-ops-body tracking-wide transition-all duration-200 flex items-center justify-center w-full disabled:opacity-40 disabled:cursor-not-allowed'
+    'h-14 px-8 rounded-ops font-mohave font-semibold text-ops-body tracking-wide transition-all duration-200 flex items-center justify-center w-full disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]'
 
   const variantStyles = {
+    // iOS OPSButtonStyle.Primary: white bg, black text, buttonRadius 5
     primary: 'bg-white text-black hover:bg-gray-200 active:bg-gray-300',
+    // iOS OPSButtonStyle.Secondary: cardBackgroundDark@0.6 bg, accent text, accent 1px border
     secondary:
-      'bg-transparent text-ops-accent border border-ops-accent hover:bg-ops-accent/10 active:bg-ops-accent/20',
+      'bg-[#0D0D0D]/60 text-ops-accent border border-ops-accent hover:bg-[#0D0D0D]/80 active:bg-[#0D0D0D]',
     ghost:
       'bg-transparent text-ops-text-secondary hover:text-ops-text-primary',
   }

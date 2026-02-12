@@ -11,8 +11,8 @@ export const OPSStyle = {
   // =====================================================================
   Colors: {
     // Brand
-    primaryAccent: '#FF7733',        // Orange — AccentPrimary
-    secondaryAccent: '#417394',      // Blue   — AccentSecondary (tutorial accent)
+    primaryAccent: '#59779F',        // Blue — web primary accent (per CLAUDE.md brand guide)
+    secondaryAccent: '#417394',      // Blue   — AccentSecondary
 
     // Backgrounds
     background: '#000000',           // Main background (black)

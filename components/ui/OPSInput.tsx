@@ -1,7 +1,5 @@
 'use client'
 
-import { useState } from 'react'
-
 interface OPSInputProps {
   label: string
   value: string
@@ -30,8 +28,6 @@ export function OPSInput({
   autoComplete,
   rightAction,
 }: OPSInputProps) {
-  const [focused, setFocused] = useState(false)
-
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-2">
@@ -56,19 +52,11 @@ export function OPSInput({
         placeholder={placeholder}
         disabled={disabled}
         autoComplete={autoComplete}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
         className={`
-          w-full h-12 px-4 rounded-ops bg-ops-card font-mohave text-ops-body text-white
+          w-full h-12 px-4 rounded-ops bg-[#0D0D0D]/60 font-mohave text-ops-body text-white
           border transition-colors duration-200 outline-none
           placeholder:text-ops-text-tertiary
-          ${
-            error
-              ? 'border-ops-error'
-              : focused
-              ? 'border-ops-accent'
-              : 'border-white/10'
-          }
+          ${error ? 'border-ops-error' : 'border-ops-accent'}
           ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
         `}
       />

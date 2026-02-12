@@ -25,12 +25,12 @@ export function PillSelector({
             type="button"
             onClick={() => onChange(option)}
             className={`
-              px-5 py-2.5 rounded-full font-mohave text-ops-body
+              px-5 py-2.5 rounded-ops font-mohave text-ops-body
               border transition-all duration-200
               ${
                 value === option
                   ? 'bg-ops-accent text-white border-ops-accent'
-                  : 'bg-transparent text-ops-text-secondary border-white/10 hover:border-white/30'
+                  : 'bg-[#0D0D0D]/60 text-ops-text-secondary border-white/20 hover:border-ops-accent/50'
               }
             `}
           >

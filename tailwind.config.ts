@@ -35,7 +35,10 @@ const config: Config = {
         'ops-large-title': ['32px', { lineHeight: '1.1', fontWeight: '700' }],
       },
       borderRadius: {
-        'ops': '12px',
+        'ops': '5px',           // iOS cornerRadius / buttonRadius
+        'ops-card': '8px',      // iOS cardCornerRadius
+        'ops-lg': '12px',       // iOS largeCornerRadius (modals, sheets)
+        'ops-sm': '2.5px',      // iOS smallCornerRadius (badges)
       },
       animation: {
         'cursor-blink': 'blink 1s step-end infinite',

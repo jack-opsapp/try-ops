@@ -261,11 +261,11 @@ export default function CredentialsPage() {
 
             {/* Divider */}
             <div className="flex items-center gap-4 py-2">
-              <div className="flex-1 h-px bg-white/10" />
+              <div className="flex-1 h-px bg-white/15" />
               <span className="font-kosugi text-ops-small text-ops-text-tertiary">
                 OR
               </span>
-              <div className="flex-1 h-px bg-white/10" />
+              <div className="flex-1 h-px bg-white/15" />
             </div>
 
             {/* Google Sign-In */}

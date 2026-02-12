@@ -37,8 +37,8 @@ export function IndustryPicker({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={`
-          w-full h-12 px-4 rounded-ops bg-ops-card font-mohave text-ops-body text-left
-          border border-white/10 hover:border-ops-accent/50 transition-colors
+          w-full h-12 px-4 rounded-ops bg-[#0D0D0D]/60 font-mohave text-ops-body text-left
+          border border-ops-accent transition-colors
           flex items-center justify-between
           ${value ? 'text-white' : 'text-ops-text-tertiary'}
         `}
@@ -61,7 +61,7 @@ export function IndustryPicker({
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="mt-2 rounded-ops bg-ops-card border border-white/10 overflow-hidden">
+        <div className="mt-2 rounded-ops bg-[#0D0D0D] border border-ops-accent overflow-hidden">
           {/* Search */}
           <div className="p-3 border-b border-white/10">
             <input
@@ -69,7 +69,7 @@ export function IndustryPicker({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search trades..."
-              className="w-full h-10 px-3 rounded-lg bg-ops-background font-mohave text-ops-body text-white border border-white/10 outline-none focus:border-ops-accent placeholder:text-ops-text-tertiary"
+              className="w-full h-10 px-3 rounded-ops bg-[#0D0D0D]/60 font-mohave text-ops-body text-white border border-ops-accent outline-none placeholder:text-ops-text-tertiary"
               autoFocus
             />
           </div>

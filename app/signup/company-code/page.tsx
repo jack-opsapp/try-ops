@@ -88,7 +88,7 @@ export default function CompanyCodePage() {
           <div className="space-y-6">
             {/* Crew code display */}
             {companyCode && (
-              <div className="bg-ops-card rounded-ops border border-white/10 p-6 text-center">
+              <div className="bg-[#0D0D0D]/60 rounded-ops-card border border-white/20 p-6 text-center">
                 <p className="font-kosugi text-ops-caption text-ops-text-secondary uppercase tracking-wider mb-3">
                   YOUR CREW CODE
                 </p>
@@ -116,13 +116,13 @@ export default function CompanyCodePage() {
 
             {/* Invite modal */}
             {showInvite && (
-              <div className="bg-ops-card rounded-ops border border-white/10 p-4 space-y-3">
+              <div className="bg-[#0D0D0D]/60 rounded-ops-card border border-white/20 p-4 space-y-3">
                 <input
                   type="email"
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   placeholder="crew@email.com"
-                  className="w-full h-12 px-4 rounded-ops bg-ops-background font-mohave text-ops-body text-white border border-white/10 outline-none focus:border-ops-accent placeholder:text-ops-text-tertiary"
+                  className="w-full h-12 px-4 rounded-ops bg-[#0D0D0D]/60 font-mohave text-ops-body text-white border border-ops-accent outline-none placeholder:text-ops-text-tertiary"
                 />
                 <OPSButton
                   onClick={handleInvite}
