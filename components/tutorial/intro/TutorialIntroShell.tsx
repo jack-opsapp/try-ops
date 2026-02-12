@@ -1,144 +1,196 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { AnimatePresence } from 'framer-motion'
 import { Sequence1 } from './Sequence1'
 import { Sequence1B } from './Sequence1B'
 import { Sequence1C } from './Sequence1C'
 import { Sequence2 } from './Sequence2'
 import { Sequence3 } from './Sequence3'
-import { ProjectFolder } from './ProjectFolder'
-import { BreakpointButtons } from './BreakpointButtons'
 
-type Phase =
-  | 'seq1'
-  | 'seq1b'
-  | 'cp1'
-  | 'seq1c'
-  | 'cp2'
-  | 'seq2'
-  | 'cp3'
-  | 'seq3'
-  | 'cp4'
+const PHASES = ['seq1', 'seq1b', 'seq1c', 'seq2', 'seq3'] as const
+type Phase = (typeof PHASES)[number]
 
+// Estimated durations per phase (ms) — for progress bar fill animation
+const PHASE_DURATIONS: Record<Phase, number> = {
+  seq1: 5300,
+  seq1b: 9500,
+  seq1c: 8800,
+  seq2: 15600,
+  seq3: 16000,
+}
+
+// ── Story Progress Bar ───────────────────────────────────────────
+function StoryProgressBar({
+  currentIndex,
+  phaseStartTime,
+  durations,
+}: {
+  currentIndex: number
+  phaseStartTime: number
+  durations: number[]
+}) {
+  const [now, setNow] = useState(Date.now())
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60)
+    return () => clearInterval(id)
+  }, [])
+
+  return (
+    <div
+      className="absolute top-0 left-0 right-0 z-[60] flex gap-1 px-3"
+      style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top))' }}
+    >
+      {durations.map((dur, i) => {
+        let fill = 0
+        if (i < currentIndex) fill = 100
+        else if (i === currentIndex) {
+          fill = Math.min(100, ((now - phaseStartTime) / dur) * 100)
+        }
+        return (
+          <div key={i} className="flex-1 h-[2px] rounded-full bg-white/20 overflow-hidden">
+            <div
+              className="h-full bg-white rounded-full"
+              style={{
+                width: `${fill}%`,
+                transition: i === currentIndex ? 'width 0.1s linear' : 'none',
+              }}
+            />
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+// ── Main Shell ───────────────────────────────────────────────────
 export function TutorialIntroShell() {
   const router = useRouter()
-  const [phase, setPhase] = useState<Phase>('seq1')
+  const [phaseIndex, setPhaseIndex] = useState(0)
+  const [seqKey, setSeqKey] = useState(0) // increment to force-remount sequence
+  const [phaseStartTime, setPhaseStartTime] = useState(Date.now())
 
-  // Sequence completions
-  const handleSeq1Complete = useCallback(() => setPhase('seq1b'), [])
-  const handleSeq1BComplete = useCallback(() => setPhase('cp1'), [])
-  const handleSeq1CComplete = useCallback(() => setPhase('cp2'), [])
-  const handleSeq2Complete = useCallback(() => setPhase('cp3'), [])
-  const handleSeq3Complete = useCallback(() => setPhase('cp4'), [])
+  // Step duration tracking
+  const [stepDurations, setStepDurations] = useState<string[]>([])
+  const phaseStartRef = useRef(Date.now())
+  const totalStartRef = useRef(Date.now())
 
-  // Checkpoint continues
-  const handleCp1Continue = useCallback(() => setPhase('seq1c'), [])
-  const handleCp2Continue = useCallback(() => setPhase('seq2'), [])
-  const handleCp3Continue = useCallback(() => setPhase('seq3'), [])
-  const handleCp4Continue = useCallback(() => router.push('/tutorial-interactive'), [router])
+  const phase = PHASES[phaseIndex]
 
-  // Checkpoint backs — each replays the preceding sequence
-  const handleCp1Back = useCallback(() => setPhase('seq1'), [])
-  const handleCp2Back = useCallback(() => setPhase('seq1c'), [])
-  const handleCp3Back = useCallback(() => setPhase('seq2'), [])
-  const handleCp4Back = useCallback(() => setPhase('seq3'), [])
+  const postTutorialLog = useCallback((durations: string[]) => {
+    const totalTime = Date.now() - totalStartRef.current
+    fetch('/api/tutorial-log', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stepDuration: durations, totalTime }),
+    }).catch(() => {}) // fire-and-forget
+  }, [])
 
-  // Skip at final checkpoint
-  const handleSkip = useCallback(() => router.push('/signup/credentials'), [router])
+  const finishTutorial = useCallback(
+    (durations: string[]) => {
+      postTutorialLog(durations)
+      router.push('/tutorial-interactive')
+    },
+    [postTutorialLog, router]
+  )
+
+  // Auto-advance when a sequence calls onComplete
+  const handleSequenceComplete = useCallback(() => {
+    const currentPhase = PHASES[phaseIndex]
+    const ms = Date.now() - phaseStartRef.current
+
+    if (phaseIndex >= PHASES.length - 1) {
+      finishTutorial([...stepDurations, `${currentPhase}:${ms}`])
+      return
+    }
+
+    setStepDurations(prev => [...prev, `${currentPhase}:${ms}`])
+    phaseStartRef.current = Date.now()
+    setPhaseIndex(prev => prev + 1)
+    setSeqKey(prev => prev + 1)
+    setPhaseStartTime(Date.now())
+  }, [phaseIndex, stepDurations, finishTutorial])
+
+  // Tap right — skip to next phase
+  const handleTapRight = useCallback(() => {
+    const currentPhase = PHASES[phaseIndex]
+    const ms = Date.now() - phaseStartRef.current
+
+    if (phaseIndex >= PHASES.length - 1) {
+      // At seq3 — finish
+      finishTutorial([...stepDurations, `${currentPhase}:${ms}`])
+      return
+    }
+
+    setStepDurations(prev => [...prev, `${currentPhase}:${ms}`])
+    phaseStartRef.current = Date.now()
+    setPhaseIndex(prev => prev + 1)
+    setSeqKey(prev => prev + 1)
+    setPhaseStartTime(Date.now())
+  }, [phaseIndex, stepDurations, finishTutorial])
+
+  // Tap left — go to previous phase
+  const handleTapLeft = useCallback(() => {
+    if (phaseIndex <= 0) return
+
+    // Don't record duration when going back — discard current phase time
+    phaseStartRef.current = Date.now()
+    // Remove last recorded duration (we're going back)
+    setStepDurations(prev => prev.slice(0, -1))
+    setPhaseIndex(prev => prev - 1)
+    setSeqKey(prev => prev + 1)
+    setPhaseStartTime(Date.now())
+  }, [phaseIndex])
+
+  const durations = PHASES.map(p => PHASE_DURATIONS[p])
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
-      {/* Sequence / checkpoint content */}
+      {/* Progress bar */}
+      <StoryProgressBar
+        currentIndex={phaseIndex}
+        phaseStartTime={phaseStartTime}
+        durations={durations}
+      />
+
+      {/* Tap zones */}
+      <div
+        className="absolute top-0 left-0 w-1/2 h-full z-50 cursor-pointer"
+        onClick={handleTapLeft}
+      />
+      <div
+        className="absolute top-0 right-0 w-1/2 h-full z-50 cursor-pointer"
+        onClick={handleTapRight}
+      />
+
+      {/* Sequence content */}
       <div className="absolute inset-0 flex items-center justify-center">
         {phase === 'seq1' && (
-          <Sequence1 onComplete={handleSeq1Complete} />
+          <Sequence1 key={seqKey} onComplete={handleSequenceComplete} />
         )}
 
         {phase === 'seq1b' && (
-          <Sequence1B onComplete={handleSeq1BComplete} />
-        )}
-
-        {/* CP1 static background: plain white folder (1B final state) */}
-        {phase === 'cp1' && (
-          <ProjectFolder color="#FFFFFF" />
+          <Sequence1B key={seqKey} onComplete={handleSequenceComplete} />
         )}
 
         {phase === 'seq1c' && (
-          <Sequence1C onComplete={handleSeq1CComplete} />
-        )}
-
-        {/* CP2 static background: folder with label (1C final state) */}
-        {phase === 'cp2' && (
-          <ProjectFolder color="#FFFFFF" label="OFFICE REMODEL" />
+          <Sequence1C key={seqKey} onComplete={handleSequenceComplete} />
         )}
 
         {phase === 'seq2' && (
           <Sequence2
-            onComplete={handleSeq2Complete}
+            key={seqKey}
+            onComplete={handleSequenceComplete}
             initialState="2-setup"
             folderLabel="OFFICE REMODEL"
           />
         )}
 
-        {/* CP3 static background: folder with label (Seq2 final state — white, centered) */}
-        {phase === 'cp3' && (
-          <ProjectFolder color="#FFFFFF" label="OFFICE REMODEL" />
-        )}
-
         {phase === 'seq3' && (
-          <Sequence3 onComplete={handleSeq3Complete} />
+          <Sequence3 key={seqKey} onComplete={handleSequenceComplete} />
         )}
-
-        {/* CP4: no static background — zoom-through cleared everything */}
       </div>
-
-      {/* Checkpoint / navigation buttons */}
-      <AnimatePresence>
-        {phase === 'cp1' && (
-          <BreakpointButtons
-            key="cp1"
-            message="GOT IT SO FAR?"
-            continueLabel="GOT IT"
-            onContinue={handleCp1Continue}
-            onBack={handleCp1Back}
-          />
-        )}
-
-        {phase === 'cp2' && (
-          <BreakpointButtons
-            key="cp2"
-            message="THAT'S A PROJECT."
-            continueLabel="NEXT"
-            onContinue={handleCp2Continue}
-            onBack={handleCp2Back}
-          />
-        )}
-
-        {phase === 'cp3' && (
-          <BreakpointButtons
-            key="cp3"
-            message="THAT'S THE LIFECYCLE."
-            continueLabel="KEEP GOING"
-            onContinue={handleCp3Continue}
-            onBack={handleCp3Back}
-          />
-        )}
-
-        {phase === 'cp4' && (
-          <BreakpointButtons
-            key="cp4"
-            message="NOW TRY IT YOURSELF"
-            largeMessage
-            continueLabel="BEGIN TUTORIAL"
-            onContinue={handleCp4Continue}
-            onBack={handleCp4Back}
-            skipLabel="I'LL FIGURE IT OUT. SKIP TUTORIAL."
-            onSkip={handleSkip}
-          />
-        )}
-      </AnimatePresence>
     </div>
   )
 }

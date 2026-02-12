@@ -1,126 +1,249 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
-import { TypewriterText } from '@/components/ui/TypewriterText'
-import { OPSButton } from '@/components/ui/OPSButton'
-import { PhasedContent } from '@/components/ui/PhasedContent'
-import { useVariant } from '@/lib/hooks/useVariant'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { useAnalytics } from '@/lib/hooks/useAnalytics'
+import { isMobile } from '@/lib/utils/device-detection'
 
-const HERO_IMAGES = [
-  '/images/hero_1.png',
-  '/images/hero_2.png',
-  '/images/hero_3.png',
-  '/images/hero_4.png',
-  '/images/hero_5.png',
-  '/images/hero_6.png',
-]
+import { StickyHeader } from '@/components/landing/StickyHeader'
+import { Hero } from '@/components/landing/Hero'
+import { DesktopDownload } from '@/components/landing/DesktopDownload'
+import { PainSection } from '@/components/landing/PainSection'
+import { SolutionSection } from '@/components/landing/SolutionSection'
+import { RoadmapSection } from '@/components/landing/RoadmapSection'
+import { PricingSection } from '@/components/landing/PricingSection'
+import { FAQSection } from '@/components/landing/FAQSection'
+import { ClosingCTA } from '@/components/landing/ClosingCTA'
+import { Footer } from '@/components/landing/Footer'
+import { StickyCTA } from '@/components/landing/StickyCTA'
+
+const APP_STORE_URL = 'https://apps.apple.com/app/ops-app/id6503204873'
 
 export default function LandingPage() {
   const router = useRouter()
-  const variant = useVariant()
-  const { track } = useAnalytics()
+  const {
+    trackLandingPageView,
+    trackLandingCTAClick,
+    trackScrollDepth,
+    trackSectionView,
+    trackFAQInteraction,
+  } = useAnalytics()
   const setTutorialStartTime = useOnboardingStore((s) => s.setTutorialStartTime)
-  const [currentImage, setCurrentImage] = useState(0)
-  const [titleDone, setTitleDone] = useState(false)
+  const setUTMData = useOnboardingStore((s) => s.setUTMData)
 
-  // Rotate hero images
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImage((prev) => (prev + 1) % HERO_IMAGES.length)
-    }, 5000)
-    return () => clearInterval(interval)
+  const pageLoadTime = useRef(Date.now())
+  const trackedDepths = useRef(new Set<number>())
+  const trackedSections = useRef(new Set<string>())
+
+  const getTimeOnPage = useCallback(() => {
+    return Math.round((Date.now() - pageLoadTime.current) / 1000)
   }, [])
 
-  // Track page view
-  useEffect(() => {
-    track('page_view', { page: 'landing' })
-  }, [track])
+  const getScrollDepth = useCallback(() => {
+    if (typeof window === 'undefined') return 0
+    const scrollTop = window.scrollY
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight
+    return docHeight > 0 ? Math.round((scrollTop / docHeight) * 100) : 0
+  }, [])
 
-  const handleGetStarted = () => {
+  // Capture UTM params and fire page view
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const utmData = {
+      source: params.get('utm_source'),
+      medium: params.get('utm_medium'),
+      campaign: params.get('utm_campaign'),
+      content: params.get('utm_content'),
+      term: params.get('utm_term'),
+      referrer: document.referrer || null,
+      landingPage: window.location.pathname,
+    }
+    setUTMData(utmData)
+
+    trackLandingPageView({
+      utm_source: utmData.source,
+      utm_medium: utmData.medium,
+      utm_campaign: utmData.campaign,
+      utm_term: utmData.term,
+      utm_content: utmData.content,
+    })
+  }, [setUTMData, trackLandingPageView])
+
+  // Scroll depth tracking
+  useEffect(() => {
+    const milestones = [25, 50, 75, 100]
+    const sectionMap: Record<string, string> = {
+      hero: 'hero',
+      pain: 'pain',
+      solution: 'solution',
+      roadmap: 'roadmap',
+      pricing: 'pricing',
+      faq: 'faq',
+      closing: 'closing',
+    }
+
+    const handleScroll = () => {
+      const depth = getScrollDepth()
+      const time = getTimeOnPage()
+
+      // Track milestones
+      for (const m of milestones) {
+        if (depth >= m && !trackedDepths.current.has(m)) {
+          trackedDepths.current.add(m)
+          let currentSection = 'hero'
+          for (const id of Object.keys(sectionMap)) {
+            const el = document.getElementById(id)
+            if (el) {
+              const rect = el.getBoundingClientRect()
+              if (rect.top < window.innerHeight / 2) {
+                currentSection = sectionMap[id]
+              }
+            }
+          }
+          trackScrollDepth(m, currentSection, time)
+        }
+      }
+
+      // Track section views
+      for (const [id, name] of Object.entries(sectionMap)) {
+        if (trackedSections.current.has(id)) continue
+        const el = document.getElementById(id)
+        if (el) {
+          const rect = el.getBoundingClientRect()
+          if (rect.top < window.innerHeight * 0.8) {
+            trackedSections.current.add(id)
+            trackSectionView(name, time)
+          }
+        }
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [getScrollDepth, getTimeOnPage, trackScrollDepth, trackSectionView])
+
+  const handleDownloadClick = useCallback(() => {
+    trackLandingCTAClick(
+      'primary',
+      'DOWNLOAD FREE - iOS',
+      'hero',
+      getScrollDepth(),
+      getTimeOnPage()
+    )
+    if (isMobile()) {
+      window.location.href = APP_STORE_URL
+    } else {
+      document.getElementById('desktop-download')?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [trackLandingCTAClick, getScrollDepth, getTimeOnPage])
+
+  const handleTryClick = useCallback(() => {
+    trackLandingCTAClick(
+      'secondary',
+      'TRY IT FIRST',
+      'hero',
+      getScrollDepth(),
+      getTimeOnPage()
+    )
     setTutorialStartTime(Date.now())
     router.push('/tutorial-intro')
-  }
+  }, [trackLandingCTAClick, getScrollDepth, getTimeOnPage, setTutorialStartTime, router])
+
+  const handleStickyDownloadClick = useCallback(() => {
+    trackLandingCTAClick(
+      'primary',
+      'DOWNLOAD FREE - iOS',
+      'sticky',
+      getScrollDepth(),
+      getTimeOnPage()
+    )
+    window.location.href = APP_STORE_URL
+  }, [trackLandingCTAClick, getScrollDepth, getTimeOnPage])
+
+  const handleClosingDownloadClick = useCallback(() => {
+    trackLandingCTAClick(
+      'primary',
+      'DOWNLOAD FREE',
+      'closing',
+      getScrollDepth(),
+      getTimeOnPage()
+    )
+    if (isMobile()) {
+      window.location.href = APP_STORE_URL
+    } else {
+      document.getElementById('desktop-download')?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [trackLandingCTAClick, getScrollDepth, getTimeOnPage])
+
+  const handleClosingTryClick = useCallback(() => {
+    trackLandingCTAClick(
+      'secondary',
+      'TRY IT FIRST',
+      'closing',
+      getScrollDepth(),
+      getTimeOnPage()
+    )
+    setTutorialStartTime(Date.now())
+    router.push('/tutorial-intro')
+  }, [trackLandingCTAClick, getScrollDepth, getTimeOnPage, setTutorialStartTime, router])
+
+  const handlePricingDownloadClick = useCallback(() => {
+    trackLandingCTAClick(
+      'primary',
+      'DOWNLOAD NOW',
+      'pricing',
+      getScrollDepth(),
+      getTimeOnPage()
+    )
+    if (isMobile()) {
+      window.location.href = APP_STORE_URL
+    } else {
+      document.getElementById('desktop-download')?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [trackLandingCTAClick, getScrollDepth, getTimeOnPage])
+
+  const handleFAQToggle = useCallback(
+    (question: string, expanded: boolean) => {
+      trackFAQInteraction(question, expanded ? 'expand' : 'collapse')
+    },
+    [trackFAQInteraction]
+  )
 
   return (
-    <div className="relative min-h-screen flex flex-col overflow-hidden">
-      {/* Hero image slideshow */}
-      {HERO_IMAGES.map((src, i) => (
-        <div
-          key={src}
-          className={`absolute inset-0 transition-opacity duration-1000 ${
-            i === currentImage ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          <Image
-            src={src}
-            alt=""
-            fill
-            className="object-cover"
-            priority={i === 0}
-          />
-        </div>
-      ))}
+    <main className="bg-ops-background min-h-screen">
+      <StickyHeader
+        onDownloadClick={handleDownloadClick}
+        onTryClick={handleTryClick}
+      />
 
-      {/* Dark gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-black/40" />
+      <Hero
+        onDownloadClick={handleDownloadClick}
+        onTryClick={handleTryClick}
+      />
 
-      {/* Content */}
-      <div className="relative z-10 flex flex-col min-h-screen">
-        {/* Logo */}
-        <div className="px-6 pt-8">
-          <Image
-            src="/images/ops-logo-white.png"
-            alt="OPS"
-            width={80}
-            height={32}
-            className="object-contain"
-          />
-        </div>
+      <DesktopDownload />
 
-        {/* Spacer */}
-        <div className="flex-1" />
+      <PainSection />
 
-        {/* Bottom content */}
-        <div className="px-6 pb-10 max-w-lg mx-auto w-full">
-          {/* Title */}
-          <h1 className="text-ops-large-title font-mohave font-bold tracking-wide mb-3">
-            <TypewriterText
-              text="BUILT BY TRADES. FOR TRADES."
-              typingSpeed={35}
-              onComplete={() => setTitleDone(true)}
-            />
-          </h1>
+      <SolutionSection />
 
-          {/* Subtitle */}
-          <PhasedContent delay={1400}>
-            <p className="font-kosugi text-ops-body text-ops-text-secondary mb-10">
-              Job management your crew will actually use.
-            </p>
-          </PhasedContent>
+      <RoadmapSection />
 
-          {/* CTAs */}
-          <PhasedContent delay={1800}>
-            <div className="space-y-3">
-              <OPSButton onClick={handleGetStarted}>
-                GET STARTED
-              </OPSButton>
-              <OPSButton
-                variant="ghost"
-                onClick={() => {
-                  // Redirect to app for sign in
-                  window.location.href = 'https://apps.apple.com/app/ops-app/id6503204873'
-                }}
-              >
-                SIGN IN
-              </OPSButton>
-            </div>
-          </PhasedContent>
-        </div>
-      </div>
-    </div>
+      <PricingSection
+        onDownloadClick={handlePricingDownloadClick}
+      />
+
+      <FAQSection onFAQToggle={handleFAQToggle} />
+
+      <ClosingCTA
+        onDownloadClick={handleClosingDownloadClick}
+        onTryClick={handleClosingTryClick}
+      />
+
+      <Footer />
+
+      <StickyCTA onDownloadClick={handleStickyDownloadClick} />
+    </main>
   )
 }

@@ -2,6 +2,7 @@
 
 import { useCallback } from 'react'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
+import { getDeviceType } from '@/lib/utils/device-detection'
 
 declare global {
   interface Window {
@@ -107,6 +108,68 @@ export function useAnalytics() {
     [track]
   )
 
+  // Landing page tracking
+
+  const trackLandingPageView = useCallback(
+    (utmData: Record<string, unknown>) => {
+      track('landing_page_view', {
+        page: 'home',
+        device_type: getDeviceType(),
+        viewport_width: typeof window !== 'undefined' ? window.innerWidth : 0,
+        viewport_height: typeof window !== 'undefined' ? window.innerHeight : 0,
+        ...utmData,
+      })
+    },
+    [track]
+  )
+
+  const trackLandingCTAClick = useCallback(
+    (ctaType: string, ctaText: string, ctaLocation: string, scrollDepth: number, timeOnPage: number) => {
+      track('landing_cta_click', {
+        cta_type: ctaType,
+        cta_text: ctaText,
+        cta_location: ctaLocation,
+        device_type: getDeviceType(),
+        scroll_depth: scrollDepth,
+        time_on_page: timeOnPage,
+      })
+    },
+    [track]
+  )
+
+  const trackScrollDepth = useCallback(
+    (depth: number, sectionReached: string, timeToDepth: number) => {
+      track('scroll_depth_milestone', {
+        depth,
+        section_reached: sectionReached,
+        time_to_depth: timeToDepth,
+      })
+    },
+    [track]
+  )
+
+  const trackSectionView = useCallback(
+    (section: string, timeOnPage: number) => {
+      track('section_view', {
+        section,
+        time_on_page: timeOnPage,
+        device_type: getDeviceType(),
+      })
+    },
+    [track]
+  )
+
+  const trackFAQInteraction = useCallback(
+    (question: string, action: 'expand' | 'collapse') => {
+      track('faq_interaction', {
+        question,
+        action,
+        time_on_page: typeof window !== 'undefined' ? Math.round((Date.now() - performance.timeOrigin) / 1000) : 0,
+      })
+    },
+    [track]
+  )
+
   return {
     track,
     trackTutorialStepView,
@@ -117,5 +180,10 @@ export function useAnalytics() {
     trackSignupStepComplete,
     trackSignupComplete,
     trackAppDownload,
+    trackLandingPageView,
+    trackLandingCTAClick,
+    trackScrollDepth,
+    trackSectionView,
+    trackFAQInteraction,
   }
 }

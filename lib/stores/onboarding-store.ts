@@ -43,6 +43,26 @@ export interface OnboardingState {
   setCompanyDetails: (data: { industry: string; size: string; age: string }) => void
   setCompanyCode: (code: string) => void
 
+  // UTM tracking
+  utmParams: {
+    source: string | null
+    medium: string | null
+    campaign: string | null
+    content: string | null
+    term: string | null
+    referrer: string | null
+    landingPage: string | null
+  } | null
+  setUTMData: (data: {
+    source: string | null
+    medium: string | null
+    campaign: string | null
+    content: string | null
+    term: string | null
+    referrer: string | null
+    landingPage: string | null
+  }) => void
+
   // Signup progress
   signupStep: number
   setSignupStep: (s: number) => void
@@ -73,6 +93,7 @@ const initialState = {
   companySize: '',
   companyAge: '',
   companyCode: null as string | null,
+  utmParams: null as OnboardingState['utmParams'],
   signupStep: 0,
   signupCompleted: false,
 }
@@ -118,6 +139,8 @@ export const useOnboardingStore = create<OnboardingState>()(
         }),
 
       setCompanyCode: (code) => set({ companyCode: code }),
+
+      setUTMData: (data) => set({ utmParams: data }),
 
       setSignupStep: (s) => set({ signupStep: s }),
       setSignupCompleted: () => set({ signupCompleted: true }),

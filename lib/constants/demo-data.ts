@@ -32,10 +32,6 @@ export interface DemoProject {
 
 export const DEMO_CLIENTS: DemoClient[] = [
   { id: 'client-1', name: 'Miramar Flight Academy' },
-  { id: 'client-2', name: 'Charlie Blackwood' },
-  { id: 'client-3', name: "O'Club Bar & Grill" },
-  { id: 'client-4', name: 'Fightertown Hangars LLC' },
-  { id: 'client-5', name: 'Miramar Officer Housing' },
 ]
 
 export const DEMO_CREW: DemoCrew[] = [
