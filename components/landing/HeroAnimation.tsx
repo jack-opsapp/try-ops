@@ -2,27 +2,49 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { TypewriterText } from '@/components/ui/TypewriterText'
 
-const LOOP_DURATION = 7500
+const LOOP_DURATION = 12500
 
 const spring = { type: 'spring' as const, stiffness: 120, damping: 18 }
 
+// Success/completed color for folder + invoice accents
+const COMPLETED_COLOR = '#A5B368'
+
 export function HeroAnimation() {
   const [phase, setPhase] = useState(0)
+  const [loopKey, setLoopKey] = useState(0)
 
   useEffect(() => {
     let timeouts: NodeJS.Timeout[] = []
 
     const runLoop = () => {
       setPhase(0)
+      setLoopKey((k) => k + 1)
+
+      // === CARD BUILDING ===
       timeouts.push(setTimeout(() => setPhase(1), 100))    // Card 1 outline draws
-      timeouts.push(setTimeout(() => setPhase(2), 800))    // Card 1 content springs in
-      timeouts.push(setTimeout(() => setPhase(3), 1900))   // Card 2 outline draws
-      timeouts.push(setTimeout(() => setPhase(4), 2600))   // Card 2 content springs in
-      timeouts.push(setTimeout(() => setPhase(5), 3600))   // Card 3 outline draws
-      timeouts.push(setTimeout(() => setPhase(6), 4200))   // Card 3 content + checkmarks cascade
-      timeouts.push(setTimeout(() => setPhase(7), 6200))   // Hold complete
-      timeouts.push(setTimeout(() => setPhase(8), 6800))   // Fade out
+      timeouts.push(setTimeout(() => setPhase(2), 600))    // Card 1 content springs in
+      timeouts.push(setTimeout(() => setPhase(3), 1200))   // Card 2 outline draws
+      timeouts.push(setTimeout(() => setPhase(4), 1700))   // Card 2 content springs in
+      timeouts.push(setTimeout(() => setPhase(5), 2300))   // Card 3 outline draws
+      timeouts.push(setTimeout(() => setPhase(6), 2800))   // Card 3 content + checkmarks cascade
+
+      // === FOLDER TRANSITION ===
+      timeouts.push(setTimeout(() => setPhase(7), 4300))   // Cards shrink + folder appears
+      timeouts.push(setTimeout(() => setPhase(8), 5100))   // Cards fully absorbed
+
+      // === COMPLETION ===
+      timeouts.push(setTimeout(() => setPhase(9), 5800))   // Folder spins + color change
+
+      // === INVOICE ===
+      timeouts.push(setTimeout(() => setPhase(10), 7000))  // Invoice rises from folder
+      timeouts.push(setTimeout(() => setPhase(11), 7700))  // Checkmark stamps on invoice
+      timeouts.push(setTimeout(() => setPhase(12), 8500))  // Invoice returns to folder
+
+      // === CLOSE ===
+      timeouts.push(setTimeout(() => setPhase(13), 9500))  // Hold complete
+      timeouts.push(setTimeout(() => setPhase(14), 11500)) // Fade out
     }
 
     runLoop()
@@ -34,172 +56,390 @@ export function HeroAnimation() {
     }
   }, [])
 
-  // Card geometry
-  const cardW = 130
-  const cardH = 52
-  const cardR = 4
-  const cardX = 35
-  const gap = 8
+  // ── Card geometry ──
+  const cardW = 120
+  const cardH = 38
+  const cardR = 3
+  const cardX = 40
+  const gap = 5
   const cardPerimeter = 2 * (cardW + cardH)
 
   const cards = [
-    { y: 8, titleW: 55, addrW: 40, crewCount: 3, dateW: 22 },
-    { y: 8 + cardH + gap, titleW: 48, addrW: 35, crewCount: 2, dateW: 26 },
-    { y: 8 + 2 * (cardH + gap), titleW: 60, addrW: 44, crewCount: 3, dateW: 20 },
+    { y: 4, titleW: 50, addrW: 36, crewCount: 3, dateW: 20 },
+    { y: 4 + cardH + gap, titleW: 42, addrW: 30, crewCount: 2, dateW: 24 },
+    { y: 4 + 2 * (cardH + gap), titleW: 55, addrW: 40, crewCount: 3, dateW: 18 },
   ]
 
-  const shouldShowCard = (cardIndex: number) => {
-    if (cardIndex === 0) return phase >= 1
-    if (cardIndex === 1) return phase >= 3
-    if (cardIndex === 2) return phase >= 5
+  // ── Folder geometry ──
+  const folderX = 62
+  const folderY = 148
+  const folderW = 76
+  const folderH = 36
+  const folderCenterX = folderX + folderW / 2   // 100
+  const folderCenterY = folderY + folderH / 2   // 166
+
+  // ── Invoice geometry (relative to folder) ──
+  const invoiceX = folderCenterX - 18            // 82
+  const invoiceTopY = folderY - 8                // 140
+  const invoiceW = 36
+  const invoiceFoldSize = 6
+
+  // ── Phase helpers ──
+  const shouldShowCard = (ci: number) => {
+    if (phase >= 9) return false  // fully absorbed into folder
+    if (ci === 0) return phase >= 1
+    if (ci === 1) return phase >= 3
+    if (ci === 2) return phase >= 5
     return false
   }
 
-  const shouldShowContent = (cardIndex: number) => {
-    if (cardIndex === 0) return phase >= 2
-    if (cardIndex === 1) return phase >= 4
-    if (cardIndex === 2) return phase >= 6
+  const shouldShowContent = (ci: number) => {
+    if (ci === 0) return phase >= 2
+    if (ci === 1) return phase >= 4
+    if (ci === 2) return phase >= 6
     return false
   }
 
-  const viewH = 8 + 3 * cardH + 2 * gap + 8
+  const folderStroke = phase >= 9 ? COMPLETED_COLOR : 'white'
+
+  // ── Typewriter text ──
+  const getTextInfo = () => {
+    if (phase >= 10 && phase < 14) return { key: 'paid', text: 'Close out. Get paid.' }
+    if (phase >= 9 && phase < 10) return { key: 'complete', text: 'Project complete.' }
+    if (phase >= 7 && phase < 9) return { key: 'organize', text: 'Organize everything.' }
+    if (phase >= 1 && phase < 7) return { key: 'schedule', text: 'Schedule your crew.' }
+    return null
+  }
+
+  const textInfo = getTextInfo()
 
   return (
-    <div className="relative w-full h-[200px] lg:h-[350px] flex items-center justify-center">
+    <div className="relative w-full h-[240px] lg:h-[380px] flex flex-col items-center justify-center">
       <AnimatePresence mode="wait">
-        {phase >= 1 && phase < 8 && (
-          <motion.svg
-            viewBox={`0 0 200 ${viewH}`}
-            fill="none"
-            className="w-full h-full max-w-[260px] lg:max-w-[380px]"
+        {phase >= 1 && phase < 14 && (
+          <motion.div
+            key="hero-anim"
+            className="flex flex-col items-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
           >
-            {cards.map((card, ci) => {
-              const cx = cardX
-              const cy = card.y
+            <motion.svg
+              viewBox="0 0 200 200"
+              fill="none"
+              className="w-[200px] lg:w-[300px]"
+            >
+              {/* ═══════════════ JOB CARDS ═══════════════ */}
+              {cards.map((card, ci) => {
+                const cx = cardX
+                const cy = card.y
+                const cardCenterX = cx + cardW / 2
+                const cardCenterY = cy + cardH / 2
 
-              return shouldShowCard(ci) ? (
-                <g key={ci}>
-                  {/* Card outline — stroke draw-in */}
-                  <motion.rect
-                    x={cx}
-                    y={cy}
-                    width={cardW}
-                    height={cardH}
-                    rx={cardR}
-                    stroke="white"
-                    strokeWidth="1.5"
-                    fill="none"
-                    strokeDasharray={cardPerimeter}
-                    initial={{ strokeDashoffset: cardPerimeter }}
-                    animate={{ strokeDashoffset: 0 }}
-                    transition={{ duration: 0.6, ease: 'easeInOut' }}
-                  />
+                return shouldShowCard(ci) ? (
+                  <motion.g
+                    key={`card-${ci}`}
+                    style={{ transformOrigin: `${cardCenterX}px ${cardCenterY}px` }}
+                    animate={
+                      phase >= 7
+                        ? {
+                            scale: 0.12,
+                            y: folderCenterY - cardCenterY,
+                            opacity: 0,
+                          }
+                        : { scale: 1, y: 0, opacity: 1 }
+                    }
+                    transition={{
+                      duration: 0.7,
+                      ease: [0.22, 1, 0.36, 1],
+                      delay: ci * 0.08,
+                    }}
+                  >
+                    {/* Card outline — stroke draw-in */}
+                    <motion.rect
+                      x={cx}
+                      y={cy}
+                      width={cardW}
+                      height={cardH}
+                      rx={cardR}
+                      stroke="white"
+                      strokeWidth="1.5"
+                      fill="none"
+                      strokeDasharray={cardPerimeter}
+                      initial={{ strokeDashoffset: cardPerimeter }}
+                      animate={{ strokeDashoffset: 0 }}
+                      transition={{ duration: 0.5, ease: 'easeInOut' }}
+                    />
 
-                  {/* Content rows — spring in from left */}
-                  {shouldShowContent(ci) && (
-                    <>
-                      {/* Title line */}
-                      <motion.line
-                        x1={cx + 12}
-                        y1={cy + 16}
-                        x2={cx + 12 + card.titleW}
-                        y2={cy + 16}
-                        stroke="white"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        initial={{ opacity: 0, x1: cx + 12 - 20, x2: cx + 12 - 20 }}
-                        animate={{ opacity: 0.8, x1: cx + 12, x2: cx + 12 + card.titleW }}
-                        transition={{ ...spring, delay: 0 }}
-                      />
+                    {/* Content rows — spring in */}
+                    {shouldShowContent(ci) && (
+                      <>
+                        {/* Title line */}
+                        <motion.line
+                          x1={cx + 10}
+                          y1={cy + 12}
+                          x2={cx + 10 + card.titleW}
+                          y2={cy + 12}
+                          stroke="white"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          initial={{ opacity: 0, x1: cx + 10 - 15, x2: cx + 10 - 15 }}
+                          animate={{ opacity: 0.8, x1: cx + 10, x2: cx + 10 + card.titleW }}
+                          transition={{ ...spring, delay: 0 }}
+                        />
 
-                      {/* Address line */}
-                      <motion.line
-                        x1={cx + 12}
-                        y1={cy + 27}
-                        x2={cx + 12 + card.addrW}
-                        y2={cy + 27}
-                        stroke="white"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        initial={{ opacity: 0, x1: cx + 12 - 20, x2: cx + 12 - 20 }}
-                        animate={{ opacity: 0.35, x1: cx + 12, x2: cx + 12 + card.addrW }}
-                        transition={{ ...spring, delay: 0.08 }}
-                      />
+                        {/* Address line */}
+                        <motion.line
+                          x1={cx + 10}
+                          y1={cy + 21}
+                          x2={cx + 10 + card.addrW}
+                          y2={cy + 21}
+                          stroke="white"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 0.35 }}
+                          transition={{ ...spring, delay: 0.06 }}
+                        />
 
-                      {/* Crew dots */}
-                      {Array.from({ length: card.crewCount }).map((_, di) => (
-                        <motion.circle
-                          key={di}
-                          cx={cx + 16 + di * 11}
-                          cy={cy + 40}
-                          r="4"
+                        {/* Crew dots */}
+                        {Array.from({ length: card.crewCount }).map((_, di) => (
+                          <motion.circle
+                            key={di}
+                            cx={cx + 14 + di * 9}
+                            cy={cy + 31}
+                            r="3"
+                            stroke="white"
+                            strokeWidth="1"
+                            fill="none"
+                            initial={{ opacity: 0, scale: 0 }}
+                            animate={{ opacity: 0.5, scale: 1 }}
+                            transition={{ ...spring, delay: 0.12 + di * 0.05 }}
+                          />
+                        ))}
+
+                        {/* Date line */}
+                        <motion.line
+                          x1={cx + 14 + card.crewCount * 9 + 4}
+                          y1={cy + 31}
+                          x2={cx + 14 + card.crewCount * 9 + 4 + card.dateW}
+                          y2={cy + 31}
                           stroke="white"
                           strokeWidth="1"
-                          fill="none"
-                          initial={{ opacity: 0, scale: 0 }}
-                          animate={{ opacity: 0.5, scale: 1 }}
-                          transition={{ ...spring, delay: 0.15 + di * 0.06 }}
+                          strokeLinecap="round"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 0.25 }}
+                          transition={{ ...spring, delay: 0.2 }}
                         />
-                      ))}
+                      </>
+                    )}
 
-                      {/* Date line after crew dots */}
-                      <motion.line
-                        x1={cx + 16 + card.crewCount * 11 + 6}
-                        y1={cy + 40}
-                        x2={cx + 16 + card.crewCount * 11 + 6 + card.dateW}
-                        y2={cy + 40}
-                        stroke="white"
-                        strokeWidth="1"
-                        strokeLinecap="round"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 0.25 }}
-                        transition={{ ...spring, delay: 0.25 }}
-                      />
-                    </>
-                  )}
+                    {/* Checkmark — appears after all 3 cards built */}
+                    {phase >= 6 && (
+                      <motion.g
+                        initial={{ opacity: 0, scale: 0.3 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{
+                          type: 'spring',
+                          stiffness: 200,
+                          damping: 15,
+                          delay: ci * 0.2,
+                        }}
+                      >
+                        <circle
+                          cx={cx + cardW - 14}
+                          cy={cy + cardH / 2}
+                          r="7"
+                          stroke="white"
+                          strokeWidth="1.5"
+                          fill="none"
+                          opacity="0.6"
+                        />
+                        <motion.path
+                          d={`M${cx + cardW - 18} ${cy + cardH / 2} l2.5 3 l5 -6`}
+                          stroke="white"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          fill="none"
+                          initial={{ pathLength: 0 }}
+                          animate={{ pathLength: 1 }}
+                          transition={{ duration: 0.3, ease: 'easeOut', delay: ci * 0.2 + 0.12 }}
+                        />
+                      </motion.g>
+                    )}
+                  </motion.g>
+                ) : null
+              })}
 
-                  {/* Checkmark — appears after all cards built */}
-                  {phase >= 6 && (
+              {/* ═══════════════ FOLDER ═══════════════ */}
+              {phase >= 7 && (
+                <motion.g
+                  initial={{ opacity: 0, scale: 0.6 }}
+                  animate={{
+                    opacity: 1,
+                    scale: 1,
+                    rotate: phase >= 9 ? 360 : 0,
+                  }}
+                  style={{ transformOrigin: `${folderCenterX}px ${folderCenterY}px` }}
+                  transition={{
+                    opacity: { duration: 0.3 },
+                    scale: { type: 'spring', stiffness: 150, damping: 15 },
+                    rotate: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
+                  }}
+                >
+                  {/* Folder body */}
+                  <motion.rect
+                    x={folderX}
+                    y={folderY}
+                    width={folderW}
+                    height={folderH}
+                    rx={3}
+                    strokeWidth="1.5"
+                    fill="none"
+                    animate={{ stroke: folderStroke }}
+                    transition={{ duration: 0.4 }}
+                  />
+
+                  {/* Folder tab */}
+                  <motion.path
+                    d={`M${folderX} ${folderY} L${folderX} ${folderY - 7} L${folderX + 28} ${folderY - 7} L${folderX + 33} ${folderY}`}
+                    strokeWidth="1.5"
+                    fill="none"
+                    animate={{ stroke: folderStroke }}
+                    transition={{ duration: 0.4 }}
+                  />
+
+                  {/* Folder label */}
+                  <motion.text
+                    x={folderCenterX}
+                    y={folderY + folderH / 2 + 3}
+                    textAnchor="middle"
+                    fontFamily="var(--font-mohave)"
+                    fontWeight="500"
+                    fontSize="9"
+                    letterSpacing="0.05em"
+                    stroke="none"
+                    animate={{ fill: folderStroke }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    PROJECT
+                  </motion.text>
+                </motion.g>
+              )}
+
+              {/* ═══════════════ INVOICE ═══════════════ */}
+              {phase >= 10 && (
+                <motion.g
+                  initial={{ opacity: 0, y: 0 }}
+                  animate={{
+                    opacity: phase >= 12 ? 0 : 1,
+                    y: phase >= 12 ? 0 : -65,
+                    scale: phase >= 12 ? 0.3 : 1,
+                  }}
+                  style={{ transformOrigin: `${folderCenterX}px ${folderY}px` }}
+                  transition={{ type: 'spring', stiffness: 120, damping: 16 }}
+                >
+                  {/* Document body with dog-ear */}
+                  <path
+                    d={`M${invoiceX} ${invoiceTopY} H${invoiceX + invoiceW - invoiceFoldSize} L${invoiceX + invoiceW} ${invoiceTopY + invoiceFoldSize} V${invoiceTopY + 42} H${invoiceX} Z`}
+                    stroke={COMPLETED_COLOR}
+                    strokeWidth="1.5"
+                    fill="none"
+                  />
+
+                  {/* Dog-ear fold */}
+                  <path
+                    d={`M${invoiceX + invoiceW - invoiceFoldSize} ${invoiceTopY} V${invoiceTopY + invoiceFoldSize} H${invoiceX + invoiceW}`}
+                    stroke={COMPLETED_COLOR}
+                    strokeWidth="1.5"
+                    fill="none"
+                  />
+
+                  {/* Detail lines */}
+                  <line
+                    x1={invoiceX + 8}
+                    y1={invoiceTopY + 16}
+                    x2={invoiceX + invoiceW - 8}
+                    y2={invoiceTopY + 16}
+                    stroke={COMPLETED_COLOR}
+                    strokeWidth="1"
+                    opacity="0.5"
+                  />
+                  <line
+                    x1={invoiceX + 8}
+                    y1={invoiceTopY + 23}
+                    x2={invoiceX + invoiceW - 8}
+                    y2={invoiceTopY + 23}
+                    stroke={COMPLETED_COLOR}
+                    strokeWidth="1"
+                    opacity="0.5"
+                  />
+                  <line
+                    x1={invoiceX + 8}
+                    y1={invoiceTopY + 30}
+                    x2={invoiceX + invoiceW - 14}
+                    y2={invoiceTopY + 30}
+                    stroke={COMPLETED_COLOR}
+                    strokeWidth="1"
+                    opacity="0.5"
+                  />
+
+                  {/* Checkmark — stamps on invoice */}
+                  {phase >= 11 && (
                     <motion.g
                       initial={{ opacity: 0, scale: 0.3 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      transition={{
-                        type: 'spring',
-                        stiffness: 200,
-                        damping: 15,
-                        delay: ci * 0.25,
-                      }}
+                      style={{ transformOrigin: `${folderCenterX}px ${invoiceTopY + 23}px` }}
+                      transition={{ type: 'spring', stiffness: 200, damping: 15 }}
                     >
                       <circle
-                        cx={cx + cardW - 16}
-                        cy={cy + cardH / 2}
+                        cx={folderCenterX}
+                        cy={invoiceTopY + 23}
                         r="8"
-                        stroke="white"
+                        stroke={COMPLETED_COLOR}
                         strokeWidth="1.5"
                         fill="none"
-                        opacity="0.6"
                       />
                       <motion.path
-                        d={`M${cx + cardW - 21} ${cy + cardH / 2} l3 3.5 l6 -7`}
-                        stroke="white"
+                        d={`M${folderCenterX - 4} ${invoiceTopY + 23} l2.5 3 l5.5 -6.5`}
+                        stroke={COMPLETED_COLOR}
                         strokeWidth="1.5"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         fill="none"
                         initial={{ pathLength: 0 }}
                         animate={{ pathLength: 1 }}
-                        transition={{ duration: 0.35, ease: 'easeOut', delay: ci * 0.25 + 0.15 }}
+                        transition={{ duration: 0.3, ease: 'easeOut', delay: 0.1 }}
                       />
                     </motion.g>
                   )}
-                </g>
-              ) : null
-            })}
-          </motion.svg>
+                </motion.g>
+              )}
+            </motion.svg>
+
+            {/* ═══════════════ TYPEWRITER TEXT ═══════════════ */}
+            <div className="h-6 mt-3 flex items-center justify-center">
+              <AnimatePresence mode="wait">
+                {textInfo && (
+                  <motion.div
+                    key={`${textInfo.key}-${loopKey}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <TypewriterText
+                      text={textInfo.text}
+                      className="font-mohave text-[13px] lg:text-[15px] uppercase tracking-[0.08em] text-white/50"
+                      typingSpeed={30}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

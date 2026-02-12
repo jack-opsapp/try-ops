@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 
 interface AnimatedIconProps {
@@ -8,11 +9,52 @@ interface AnimatedIconProps {
 }
 
 // ─── Group Text Hell ────────────────────────────────────────────
-// 3 speech bubbles with tails and text lines.
-// On activate: independent jitter — chaotic messaging.
+// 3 speech bubbles appear sequentially. Before each new bubble,
+// a "..." typing indicator pulses, then "?" confusion pops in,
+// then the next message springs into view. After all 3: chaotic jitter.
 export function AnimatedTangledMessages({ isActive, size = 48 }: AnimatedIconProps) {
+  const [phase, setPhase] = useState(0)
+
+  useEffect(() => {
+    if (!isActive) {
+      setPhase(0)
+      return
+    }
+
+    let timeouts: NodeJS.Timeout[] = []
+    let interval: ReturnType<typeof setInterval>
+
+    const runSequence = () => {
+      timeouts.forEach(clearTimeout)
+      timeouts = []
+
+      setPhase(1)                                               // Bubble 1 appears
+      timeouts.push(setTimeout(() => setPhase(2), 500))         // "..." typing for bubble 2
+      timeouts.push(setTimeout(() => setPhase(3), 900))         // "?" confusion
+      timeouts.push(setTimeout(() => setPhase(4), 1300))        // Bubble 2 appears
+      timeouts.push(setTimeout(() => setPhase(5), 1800))        // "..." typing for bubble 3
+      timeouts.push(setTimeout(() => setPhase(6), 2200))        // "?" confusion
+      timeouts.push(setTimeout(() => setPhase(7), 2600))        // Bubble 3 appears
+      timeouts.push(setTimeout(() => setPhase(8), 3000))        // Chaos jitter + "?" everywhere
+    }
+
+    runSequence()
+    interval = setInterval(runSequence, 4500)
+
+    return () => {
+      clearInterval(interval)
+      timeouts.forEach(clearTimeout)
+    }
+  }, [isActive])
+
+  // When inactive, show all bubbles. When active, reveal sequentially.
+  const showBubble1 = !isActive || phase >= 1
+  const showBubble2 = !isActive || phase >= 4
+  const showBubble3 = !isActive || phase >= 7
+  const jittering = isActive && phase >= 8
+
   const jitter = (seed: number) =>
-    isActive
+    jittering
       ? {
           x: [0, -2 * seed, 3 * seed, -1 * seed, 2 * seed, 0],
           y: [0, 1 * seed, -2 * seed, 2 * seed, -1 * seed, 0],
@@ -34,49 +76,147 @@ export function AnimatedTangledMessages({ isActive, size = 48 }: AnimatedIconPro
       className="text-ops-gray-200"
     >
       {/* Bubble 1 — top-left */}
-      <motion.g animate={jitter(1)}>
-        <path d="M6 6 h24 a3 3 0 0 1 3 3 v10 a3 3 0 0 1 -3 3 h-18 l-4 4 v-4 h-2 a3 3 0 0 1 -3 -3 v-10 a3 3 0 0 1 3 -3 z" />
-        <line x1="10" y1="13" x2="26" y2="13" opacity="0.5" />
-        <line x1="10" y1="17" x2="22" y2="17" opacity="0.4" />
+      <motion.g
+        style={{ transformOrigin: '18px 14px' }}
+        animate={{ opacity: showBubble1 ? 1 : 0, scale: showBubble1 ? 1 : 0.5 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+      >
+        <motion.g animate={jitter(1)}>
+          <path d="M6 6 h24 a3 3 0 0 1 3 3 v10 a3 3 0 0 1 -3 3 h-18 l-4 4 v-4 h-2 a3 3 0 0 1 -3 -3 v-10 a3 3 0 0 1 3 -3 z" />
+          <line x1="10" y1="13" x2="26" y2="13" opacity="0.5" />
+          <line x1="10" y1="17" x2="22" y2="17" opacity="0.4" />
+        </motion.g>
       </motion.g>
+
+      {/* "..." typing indicator before bubble 2 */}
+      {isActive && phase === 2 && (
+        <g>
+          {[0, 1, 2].map((i) => (
+            <motion.circle
+              key={i}
+              cx={37 + i * 6}
+              cy={28}
+              r="2"
+              fill="currentColor"
+              stroke="none"
+              animate={{ opacity: [0.2, 0.8, 0.2] }}
+              transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
+            />
+          ))}
+        </g>
+      )}
+
+      {/* "?" before bubble 2 */}
+      {isActive && phase === 3 && (
+        <motion.text
+          x="42"
+          y="31"
+          fontSize="11"
+          fill="currentColor"
+          stroke="none"
+          fontFamily="monospace"
+          fontWeight="bold"
+          textAnchor="middle"
+          initial={{ opacity: 0, scale: 0.3 }}
+          animate={{ opacity: 0.7, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 12 }}
+        >
+          ?
+        </motion.text>
+      )}
 
       {/* Bubble 2 — right, overlapping */}
-      <motion.g animate={jitter(-1.2)}>
-        <path d="M28 20 h26 a3 3 0 0 1 3 3 v10 a3 3 0 0 1 -3 3 h-2 v4 l-4 -4 h-20 a3 3 0 0 1 -3 -3 v-10 a3 3 0 0 1 3 -3 z" />
-        <line x1="33" y1="27" x2="51" y2="27" opacity="0.5" />
-        <line x1="33" y1="31" x2="46" y2="31" opacity="0.4" />
+      <motion.g
+        style={{ transformOrigin: '42px 28px' }}
+        animate={{ opacity: showBubble2 ? 1 : 0, scale: showBubble2 ? 1 : 0.5 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+      >
+        <motion.g animate={jitter(-1.2)}>
+          <path d="M28 20 h26 a3 3 0 0 1 3 3 v10 a3 3 0 0 1 -3 3 h-2 v4 l-4 -4 h-20 a3 3 0 0 1 -3 -3 v-10 a3 3 0 0 1 3 -3 z" />
+          <line x1="33" y1="27" x2="51" y2="27" opacity="0.5" />
+          <line x1="33" y1="31" x2="46" y2="31" opacity="0.4" />
+        </motion.g>
       </motion.g>
+
+      {/* "..." typing indicator before bubble 3 */}
+      {isActive && phase === 5 && (
+        <g>
+          {[0, 1, 2].map((i) => (
+            <motion.circle
+              key={i}
+              cx={10 + i * 6}
+              cy={48}
+              r="2"
+              fill="currentColor"
+              stroke="none"
+              animate={{ opacity: [0.2, 0.8, 0.2] }}
+              transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
+            />
+          ))}
+        </g>
+      )}
+
+      {/* "?" before bubble 3 */}
+      {isActive && phase === 6 && (
+        <motion.text
+          x="16"
+          y="51"
+          fontSize="11"
+          fill="currentColor"
+          stroke="none"
+          fontFamily="monospace"
+          fontWeight="bold"
+          textAnchor="middle"
+          initial={{ opacity: 0, scale: 0.3 }}
+          animate={{ opacity: 0.7, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 12 }}
+        >
+          ?
+        </motion.text>
+      )}
 
       {/* Bubble 3 — bottom-left, overlapping */}
-      <motion.g animate={jitter(0.8)}>
-        <path d="M4 38 h22 a3 3 0 0 1 3 3 v10 a3 3 0 0 1 -3 3 h-16 l-4 4 v-4 h-2 a3 3 0 0 1 -3 -3 v-10 a3 3 0 0 1 3 -3 z" />
-        <line x1="9" y1="45" x2="23" y2="45" opacity="0.5" />
-        <line x1="9" y1="49" x2="19" y2="49" opacity="0.4" />
+      <motion.g
+        style={{ transformOrigin: '15px 46px' }}
+        animate={{ opacity: showBubble3 ? 1 : 0, scale: showBubble3 ? 1 : 0.5 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+      >
+        <motion.g animate={jitter(0.8)}>
+          <path d="M4 38 h22 a3 3 0 0 1 3 3 v10 a3 3 0 0 1 -3 3 h-16 l-4 4 v-4 h-2 a3 3 0 0 1 -3 -3 v-10 a3 3 0 0 1 3 -3 z" />
+          <line x1="9" y1="45" x2="23" y2="45" opacity="0.5" />
+          <line x1="9" y1="49" x2="19" y2="49" opacity="0.4" />
+        </motion.g>
       </motion.g>
 
-      {/* "?" marks that appear on activate — confusion */}
-      <motion.text
-        x="38"
-        y="48"
-        fontSize="11"
-        fill="currentColor"
-        fontFamily="monospace"
-        fontWeight="bold"
-        animate={isActive ? { opacity: [0, 0.7, 0.7, 0], transition: { duration: 1.2, repeat: Infinity } } : { opacity: 0 }}
-      >
-        ?
-      </motion.text>
-      <motion.text
-        x="50"
-        y="56"
-        fontSize="9"
-        fill="currentColor"
-        fontFamily="monospace"
-        fontWeight="bold"
-        animate={isActive ? { opacity: [0, 0, 0.6, 0.6, 0], transition: { duration: 1.4, repeat: Infinity, delay: 0.2 } } : { opacity: 0 }}
-      >
-        ?
-      </motion.text>
+      {/* Chaos "?" marks — scattered during jitter phase */}
+      {isActive && phase >= 8 && (
+        <>
+          <motion.text
+            x="38"
+            y="48"
+            fontSize="11"
+            fill="currentColor"
+            stroke="none"
+            fontFamily="monospace"
+            fontWeight="bold"
+            animate={{ opacity: [0, 0.7, 0.7, 0], transition: { duration: 1.2, repeat: Infinity } }}
+          >
+            ?
+          </motion.text>
+          <motion.text
+            x="50"
+            y="56"
+            fontSize="9"
+            fill="currentColor"
+            stroke="none"
+            fontFamily="monospace"
+            fontWeight="bold"
+            animate={{ opacity: [0, 0, 0.6, 0.6, 0], transition: { duration: 1.4, repeat: Infinity, delay: 0.2 } }}
+          >
+            ?
+          </motion.text>
+        </>
+      )}
     </motion.svg>
   )
 }
@@ -231,6 +371,7 @@ export function AnimatedScatteredApps({ isActive, size = 48 }: AnimatedIconProps
       width={size}
       height={size}
       viewBox="0 0 64 64"
+      overflow="visible"
       fill="none"
       stroke="currentColor"
       strokeWidth="1.5"
