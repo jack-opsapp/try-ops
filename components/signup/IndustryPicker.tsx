@@ -38,7 +38,7 @@ export function IndustryPicker({
         onClick={() => setIsOpen(!isOpen)}
         className={`
           w-full h-12 px-4 rounded-ops bg-[#0D0D0D]/60 font-mohave text-ops-body text-left
-          border border-ops-accent transition-colors
+          border border-white/20 transition-colors
           flex items-center justify-between
           ${value ? 'text-white' : 'text-ops-text-tertiary'}
         `}
@@ -61,7 +61,7 @@ export function IndustryPicker({
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="mt-2 rounded-ops bg-[#0D0D0D] border border-ops-accent overflow-hidden">
+        <div className="mt-2 rounded-ops bg-[#0D0D0D] border border-white/20 overflow-hidden">
           {/* Search */}
           <div className="p-3 border-b border-white/10">
             <input
@@ -69,7 +69,7 @@ export function IndustryPicker({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search trades..."
-              className="w-full h-10 px-3 rounded-ops bg-[#0D0D0D]/60 font-mohave text-ops-body text-white border border-ops-accent outline-none placeholder:text-ops-text-tertiary"
+              className="w-full h-10 px-3 rounded-ops bg-[#0D0D0D]/60 font-mohave text-ops-body text-white border border-white/20 outline-none focus:border-white/40 placeholder:text-ops-text-tertiary"
               autoFocus
             />
           </div>

@@ -56,7 +56,7 @@ export function OPSInput({
           w-full h-12 px-4 rounded-ops bg-[#0D0D0D]/60 font-mohave text-ops-body text-white
           border transition-colors duration-200 outline-none
           placeholder:text-ops-text-tertiary
-          ${error ? 'border-ops-error' : 'border-ops-accent'}
+          ${error ? 'border-ops-error' : 'border-white/20'}
           ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
         `}
       />

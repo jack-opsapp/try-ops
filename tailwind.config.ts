@@ -10,21 +10,22 @@ const config: Config = {
     extend: {
       colors: {
         ops: {
-          background: '#000000',
-          card: '#0D0D0D',
-          accent: '#59779F',
+          background: '#0A0A0A',
+          card: '#1A1A1A',
+          accent: '#597794',
           success: '#A5B368',
           warning: '#C4A868',
-          error: '#931A32',
+          error: '#93321A',
           'text-primary': '#FFFFFF',
-          'text-secondary': '#AAAAAA',
+          'text-secondary': '#A0A0A0',
           'text-tertiary': '#777777',
-          border: 'rgba(255,255,255,0.1)',
+          border: '#2A2A2A',
         },
       },
       fontFamily: {
         mohave: ['Mohave', 'sans-serif'],
         kosugi: ['Kosugi', 'sans-serif'],
+        bebas: ['Bebas Neue', 'sans-serif'],
       },
       fontSize: {
         'ops-title': ['28px', { lineHeight: '1.2', fontWeight: '600' }],
@@ -34,16 +35,28 @@ const config: Config = {
         'ops-small': ['12px', { lineHeight: '1.4' }],
         'ops-large-title': ['32px', { lineHeight: '1.1', fontWeight: '700' }],
       },
+      spacing: {
+        'ops-xs': '4px',
+        'ops-sm': '8px',
+        'ops-md': '16px',
+        'ops-lg': '24px',
+        'ops-xl': '40px',
+        'ops-2xl': '64px',
+        'ops-3xl': '96px',
+      },
       borderRadius: {
-        'ops': '5px',           // iOS cornerRadius / buttonRadius
-        'ops-card': '8px',      // iOS cardCornerRadius
-        'ops-lg': '12px',       // iOS largeCornerRadius (modals, sheets)
-        'ops-sm': '2.5px',      // iOS smallCornerRadius (badges)
+        'ops': '5px',
+        'ops-card': '8px',
+        'ops-lg': '12px',
+        'ops-sm': '2.5px',
       },
       animation: {
         'cursor-blink': 'blink 1s step-end infinite',
         'fade-up': 'fadeUp 0.5s ease-out forwards',
         'fade-in': 'fadeIn 0.3s ease-out forwards',
+        'float': 'float 4s ease-in-out infinite',
+        'slide-down': 'slideDown 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
+        'slide-up': 'slideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
       },
       keyframes: {
         blink: {
@@ -57,6 +70,18 @@ const config: Config = {
         fadeIn: {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+        slideDown: {
+          '0%': { transform: 'translateY(-100%)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        slideUp: {
+          '0%': { transform: 'translateY(100px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
         },
       },
     },

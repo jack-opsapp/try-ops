@@ -46,9 +46,9 @@ export const OPSStyle = {
     } as Record<string, string>,
 
     // Semantic status
-    successStatus: '#A5B368',        // Muted green (app-specific)
+    successStatus: '#A5B368',        // Muted green
     warningStatus: '#C4A868',        // Amber
-    errorStatus: '#931A32',          // Deep red
+    errorStatus: '#93321A',          // Deep brick red
 
     // Overlays
     modalOverlay: 'rgba(0,0,0,0.5)',

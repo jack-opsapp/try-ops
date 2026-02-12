@@ -122,7 +122,7 @@ export default function CompanyCodePage() {
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   placeholder="crew@email.com"
-                  className="w-full h-12 px-4 rounded-ops bg-[#0D0D0D]/60 font-mohave text-ops-body text-white border border-ops-accent outline-none placeholder:text-ops-text-tertiary"
+                  className="w-full h-12 px-4 rounded-ops bg-[#0D0D0D]/60 font-mohave text-ops-body text-white border border-white/20 outline-none focus:border-white/40 placeholder:text-ops-text-tertiary"
                 />
                 <OPSButton
                   onClick={handleInvite}
