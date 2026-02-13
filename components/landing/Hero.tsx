@@ -19,7 +19,7 @@ const fadeInUp = {
 export function Hero({ onDownloadClick, onTryClick }: HeroProps) {
   return (
     <section id="hero" className="relative min-h-[100svh] flex items-center snap-start snap-always">
-      <div className="w-full max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10 py-4 lg:py-20">
+      <div className="w-full max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10 py-10 lg:py-20">
         <div className="flex flex-col lg:flex-row items-start gap-6 lg:gap-16">
           {/* Mobile: title first, then animation */}
           <div className="lg:hidden w-full">
@@ -49,7 +49,7 @@ export function Hero({ onDownloadClick, onTryClick }: HeroProps) {
             </motion.h1>
 
             <motion.p
-              className="font-kosugi text-[18px] lg:text-[20px] text-ops-gray-200 leading-relaxed max-w-[500px] mb-10"
+              className="font-kosugi text-[14px] lg:text-[20px] text-ops-gray-200 leading-relaxed max-w-[500px] mb-10"
               {...fadeInUp}
               transition={{ ...fadeInUp.transition, delay: 0.1 }}
             >

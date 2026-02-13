@@ -145,7 +145,7 @@ function PricingCard({ tier, onCTAClick }: { tier: typeof tiers[number]; onCTACl
 
 export function PricingSection({ onDownloadClick }: PricingSectionProps) {
   return (
-    <section id="pricing" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always overflow-hidden">
+    <section id="pricing" className="py-6 lg:py-[120px] snap-start snap-always overflow-hidden">
       <div className="max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10">
         <motion.h2
           className="font-bebas text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-2 lg:mb-3"
