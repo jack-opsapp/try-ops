@@ -18,10 +18,20 @@ export function DesktopDownload() {
   const handleSend = async () => {
     if (!phone.trim()) return
     setStatus('sending')
-    // Placeholder - wire up to actual SMS API later
-    setTimeout(() => {
-      setStatus('sent')
-    }, 1000)
+    try {
+      const res = await fetch('/api/send-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone }),
+      })
+      if (res.ok) {
+        setStatus('sent')
+      } else {
+        setStatus('error')
+      }
+    } catch {
+      setStatus('error')
+    }
   }
 
   return (
