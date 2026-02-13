@@ -25,17 +25,20 @@ function StoryProgressBar({
   currentIndex,
   phaseStartTime,
   durations,
+  paused = false,
 }: {
   currentIndex: number
   phaseStartTime: number
   durations: number[]
+  paused?: boolean
 }) {
   const [now, setNow] = useState(Date.now())
 
   useEffect(() => {
+    if (paused) return
     const id = setInterval(() => setNow(Date.now()), 60)
     return () => clearInterval(id)
-  }, [])
+  }, [paused])
 
   return (
     <div
@@ -46,7 +49,7 @@ function StoryProgressBar({
         let fill = 0
         if (i < currentIndex) fill = 100
         else if (i === currentIndex) {
-          fill = Math.min(100, ((now - phaseStartTime) / dur) * 100)
+          fill = paused ? 100 : Math.min(100, ((now - phaseStartTime) / dur) * 100)
         }
         return (
           <div key={i} className="flex-1 h-[2px] rounded-full bg-white/20 overflow-hidden">
@@ -70,6 +73,9 @@ export function TutorialIntroShell() {
   const [phaseIndex, setPhaseIndex] = useState(0)
   const [seqKey, setSeqKey] = useState(0) // increment to force-remount sequence
   const [phaseStartTime, setPhaseStartTime] = useState(Date.now())
+  // 'playing' = sequence animating, 'complete' = sequence finished (last frame visible),
+  // 'checkpoint' = navigated here via BACK (no sequence rendered)
+  const [sequenceState, setSequenceState] = useState<'playing' | 'complete' | 'checkpoint'>('playing')
 
   // Step duration tracking
   const [stepDurations, setStepDurations] = useState<string[]>([])
@@ -95,8 +101,13 @@ export function TutorialIntroShell() {
     [postTutorialLog, router]
   )
 
-  // Auto-advance when a sequence calls onComplete
+  // Sequence finished — pause here, show buttons (no auto-advance)
   const handleSequenceComplete = useCallback(() => {
+    setSequenceState('complete')
+  }, [])
+
+  // NEXT button — advance to next phase and play it
+  const handleNext = useCallback(() => {
     const currentPhase = PHASES[phaseIndex]
     const ms = Date.now() - phaseStartRef.current
 
@@ -110,15 +121,26 @@ export function TutorialIntroShell() {
     setPhaseIndex(prev => prev + 1)
     setSeqKey(prev => prev + 1)
     setPhaseStartTime(Date.now())
+    setSequenceState('playing')
   }, [phaseIndex, stepDurations, finishTutorial])
 
-  // Tap right — skip to next phase
+  // BACK button — go to previous checkpoint (no replay)
+  const handleBack = useCallback(() => {
+    if (phaseIndex <= 0) return
+    phaseStartRef.current = Date.now()
+    setStepDurations(prev => prev.slice(0, -1))
+    setPhaseIndex(prev => prev - 1)
+    setSeqKey(prev => prev + 1)
+    setPhaseStartTime(Date.now())
+    setSequenceState('checkpoint')
+  }, [phaseIndex])
+
+  // Tap right — skip to next phase (always plays)
   const handleTapRight = useCallback(() => {
     const currentPhase = PHASES[phaseIndex]
     const ms = Date.now() - phaseStartRef.current
 
     if (phaseIndex >= PHASES.length - 1) {
-      // At seq3 — finish
       finishTutorial([...stepDurations, `${currentPhase}:${ms}`])
       return
     }
@@ -128,22 +150,23 @@ export function TutorialIntroShell() {
     setPhaseIndex(prev => prev + 1)
     setSeqKey(prev => prev + 1)
     setPhaseStartTime(Date.now())
+    setSequenceState('playing')
   }, [phaseIndex, stepDurations, finishTutorial])
 
-  // Tap left — go to previous phase
+  // Tap left — go to previous phase and replay it
   const handleTapLeft = useCallback(() => {
     if (phaseIndex <= 0) return
-
-    // Don't record duration when going back — discard current phase time
     phaseStartRef.current = Date.now()
-    // Remove last recorded duration (we're going back)
     setStepDurations(prev => prev.slice(0, -1))
     setPhaseIndex(prev => prev - 1)
     setSeqKey(prev => prev + 1)
     setPhaseStartTime(Date.now())
+    setSequenceState('playing')
   }, [phaseIndex])
 
   const durations = PHASES.map(p => PHASE_DURATIONS[p])
+  const showButtons = sequenceState === 'complete' || sequenceState === 'checkpoint'
+  const showSequence = sequenceState === 'playing' || sequenceState === 'complete'
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
@@ -152,6 +175,7 @@ export function TutorialIntroShell() {
         currentIndex={phaseIndex}
         phaseStartTime={phaseStartTime}
         durations={durations}
+        paused={showButtons}
       />
 
       {/* Tap zones */}
@@ -164,54 +188,58 @@ export function TutorialIntroShell() {
         onClick={handleTapRight}
       />
 
-      {/* Sequence content */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        {phase === 'seq1' && (
-          <Sequence1 key={seqKey} onComplete={handleSequenceComplete} />
-        )}
+      {/* Sequence content — visible while playing and when just completed (shows last frame) */}
+      {showSequence && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          {phase === 'seq1' && (
+            <Sequence1 key={seqKey} onComplete={handleSequenceComplete} />
+          )}
 
-        {phase === 'seq1b' && (
-          <Sequence1B key={seqKey} onComplete={handleSequenceComplete} />
-        )}
+          {phase === 'seq1b' && (
+            <Sequence1B key={seqKey} onComplete={handleSequenceComplete} />
+          )}
 
-        {phase === 'seq1c' && (
-          <Sequence1C key={seqKey} onComplete={handleSequenceComplete} />
-        )}
+          {phase === 'seq1c' && (
+            <Sequence1C key={seqKey} onComplete={handleSequenceComplete} />
+          )}
 
-        {phase === 'seq2' && (
-          <Sequence2
-            key={seqKey}
-            onComplete={handleSequenceComplete}
-            initialState="2-setup"
-            folderLabel="OFFICE REMODEL"
-          />
-        )}
+          {phase === 'seq2' && (
+            <Sequence2
+              key={seqKey}
+              onComplete={handleSequenceComplete}
+              initialState="2-setup"
+              folderLabel="OFFICE REMODEL"
+            />
+          )}
 
-        {phase === 'seq3' && (
-          <Sequence3 key={seqKey} onComplete={handleSequenceComplete} />
-        )}
-      </div>
+          {phase === 'seq3' && (
+            <Sequence3 key={seqKey} onComplete={handleSequenceComplete} />
+          )}
+        </div>
+      )}
 
-      {/* Bottom navigation buttons */}
-      <div
-        className="absolute bottom-0 left-0 right-0 z-[60] flex items-center justify-center gap-4 pb-8"
-        style={{ paddingBottom: 'max(3.5rem, env(safe-area-inset-bottom))' }}
-      >
-        {phaseIndex > 0 && (
-          <button
-            onClick={handleTapLeft}
-            className="font-mohave font-medium text-[14px] uppercase tracking-wider text-white/50 px-6 py-3 border border-white/30 rounded-[5px] transition-all hover:text-white/70 hover:border-white/50"
-          >
-            BACK
-          </button>
-        )}
-        <button
-          onClick={handleTapRight}
-          className="font-mohave font-medium text-[16px] uppercase tracking-wider text-white px-8 py-3 border-2 border-white rounded-[5px] transition-all hover:bg-white hover:text-black"
+      {/* Bottom navigation — only visible after sequence completes or at a checkpoint */}
+      {showButtons && (
+        <div
+          className="absolute bottom-0 left-0 right-0 z-[60] flex items-center justify-center gap-4 pb-8"
+          style={{ paddingBottom: 'max(3.5rem, env(safe-area-inset-bottom))' }}
         >
-          {phaseIndex >= PHASES.length - 1 ? 'BEGIN TUTORIAL' : 'NEXT'}
-        </button>
-      </div>
+          {phaseIndex > 0 && (
+            <button
+              onClick={handleBack}
+              className="font-mohave font-medium text-[14px] uppercase tracking-wider text-white/50 px-6 py-3 border border-white/30 rounded-[5px] transition-all hover:text-white/70 hover:border-white/50"
+            >
+              BACK
+            </button>
+          )}
+          <button
+            onClick={handleNext}
+            className="font-mohave font-medium text-[16px] uppercase tracking-wider text-white px-8 py-3 border-2 border-white rounded-[5px] transition-all hover:bg-white hover:text-black"
+          >
+            {phaseIndex >= PHASES.length - 1 ? 'BEGIN TUTORIAL' : 'NEXT'}
+          </button>
+        </div>
+      )}
     </div>
   )
 }
