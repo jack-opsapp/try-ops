@@ -216,7 +216,7 @@ export default function LandingPage() {
   )
 
   return (
-    <main className="bg-ops-background min-h-screen snap-y snap-mandatory overflow-y-auto h-screen md:h-auto md:overflow-visible md:snap-none">
+    <main className="bg-ops-background min-h-screen snap-y snap-mandatory overflow-y-auto overflow-x-hidden h-screen md:h-auto md:overflow-visible md:snap-none">
       <HamburgerMenu
         onDownloadClick={handleDownloadClick}
         onTryClick={handleTryClick}

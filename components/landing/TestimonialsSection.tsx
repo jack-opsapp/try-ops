@@ -56,7 +56,12 @@ export function TestimonialsSection() {
   }, [])
 
   return (
-    <section id="testimonials" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
+    <section id="testimonials" className="relative min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always overflow-hidden">
+      {/* Viewport-edge gradients that blend section edges into the background */}
+      <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-12 z-10 bg-gradient-to-r from-[#0A0A0A] to-transparent" />
+      <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-12 z-10 bg-gradient-to-l from-[#0A0A0A] to-transparent" />
+      <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-16 z-10 bg-gradient-to-t from-[#0A0A0A] to-transparent" />
+
       <div className="max-w-[1200px] mx-auto px-4 md:px-6 lg:px-10">
         <motion.h2
           className="font-bebas text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-8 lg:mb-16"
@@ -65,14 +70,7 @@ export function TestimonialsSection() {
           CREWS THAT SWITCHED AREN&apos;T GOING BACK
         </motion.h2>
 
-        <motion.div {...fadeInUp} className="relative">
-          {/* Left gradient edge */}
-          <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-8 z-10 bg-gradient-to-r from-black to-transparent" />
-          {/* Right gradient edge */}
-          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 z-10 bg-gradient-to-l from-black to-transparent" />
-          {/* Bottom gradient edge */}
-          <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-12 z-10 bg-gradient-to-t from-black to-transparent" />
-
+        <motion.div {...fadeInUp}>
           <Carousel gap={16}>
             {cards.map((t) => (
               <div

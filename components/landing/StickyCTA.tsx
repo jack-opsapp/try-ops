@@ -55,8 +55,13 @@ export function StickyCTA({ onDownloadClick }: StickyCTAProps) {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 60, opacity: 0 }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] as const }}
-          className="fixed z-[999] ultra-thin-material border border-white/10 flex items-center justify-center gap-2.5 left-4 right-4 rounded-ops-card px-6 py-3 md:left-auto md:right-auto md:left-1/2 md:-translate-x-1/2 md:rounded-full md:px-8 md:py-3.5"
-          style={{ bottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))' }}
+          className="fixed z-[999] border border-white/10 flex items-center justify-center gap-2.5 left-4 right-4 rounded-ops-card px-6 py-3 md:left-auto md:right-auto md:left-1/2 md:-translate-x-1/2 md:rounded-full md:px-8 md:py-3.5"
+          style={{
+            bottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))',
+            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+            backdropFilter: 'blur(24px) saturate(180%)',
+            backgroundColor: 'rgba(89, 119, 148, 0.2)',
+          }}
           onClick={onDownloadClick}
         >
           <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
