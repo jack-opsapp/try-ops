@@ -49,7 +49,7 @@ const faqs = [
 
 export function FAQSection({ onFAQToggle }: FAQSectionProps) {
   return (
-    <section id="faq" className="py-8 lg:py-[120px] snap-start snap-always">
+    <section id="faq" className="py-6 lg:py-[120px] snap-start snap-always">
       <div className="max-w-[800px] mx-auto px-4 md:px-6 lg:px-10">
         <motion.h2
           className="font-bebas text-[32px] text-ops-gray-50 uppercase tracking-[0.05em] mb-12"

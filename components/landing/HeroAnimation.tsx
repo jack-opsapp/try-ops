@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { TypewriterText } from '@/components/ui/TypewriterText'
 
-const LOOP_DURATION = 13500
-
 const spring = { type: 'spring' as const, stiffness: 120, damping: 18 }
 
 // Completed status color from OPSStyle.Colors.status.completed
@@ -13,51 +11,35 @@ const COMPLETED_COLOR = '#B58289'
 
 export function HeroAnimation() {
   const [phase, setPhase] = useState(0)
-  const [loopKey, setLoopKey] = useState(0)
-
   useEffect(() => {
-    let timeouts: NodeJS.Timeout[] = []
+    const timeouts: NodeJS.Timeout[] = []
 
-    const runLoop = () => {
-      setPhase(0)
-      setLoopKey((k) => k + 1)
+    // === CARD BUILDING ===
+    timeouts.push(setTimeout(() => setPhase(1), 100))    // Card 1 outline draws
+    timeouts.push(setTimeout(() => setPhase(2), 600))    // Card 1 content springs in
+    timeouts.push(setTimeout(() => setPhase(3), 1200))   // Card 2 outline draws
+    timeouts.push(setTimeout(() => setPhase(4), 1700))   // Card 2 content springs in
+    timeouts.push(setTimeout(() => setPhase(5), 2300))   // Card 3 outline draws
+    timeouts.push(setTimeout(() => setPhase(6), 2800))   // Card 3 content + checkmarks cascade
 
-      // === CARD BUILDING ===
-      timeouts.push(setTimeout(() => setPhase(1), 100))    // Card 1 outline draws
-      timeouts.push(setTimeout(() => setPhase(2), 600))    // Card 1 content springs in
-      timeouts.push(setTimeout(() => setPhase(3), 1200))   // Card 2 outline draws
-      timeouts.push(setTimeout(() => setPhase(4), 1700))   // Card 2 content springs in
-      timeouts.push(setTimeout(() => setPhase(5), 2300))   // Card 3 outline draws
-      timeouts.push(setTimeout(() => setPhase(6), 2800))   // Card 3 content + checkmarks cascade
+    // === FOLDER TRANSITION ===
+    timeouts.push(setTimeout(() => setPhase(7), 4300))   // Cards shrink + folder appears
+    timeouts.push(setTimeout(() => setPhase(8), 5100))   // Cards fully absorbed
 
-      // === FOLDER TRANSITION ===
-      timeouts.push(setTimeout(() => setPhase(7), 4300))   // Cards shrink + folder appears
-      timeouts.push(setTimeout(() => setPhase(8), 5100))   // Cards fully absorbed
+    // === COMPLETION — folder spins, turns completed color ===
+    timeouts.push(setTimeout(() => setPhase(9), 5800))
 
-      // === COMPLETION — folder spins, turns completed color ===
-      timeouts.push(setTimeout(() => setPhase(9), 5800))
+    // === INVOICE — emerges right, folder shifts left ===
+    timeouts.push(setTimeout(() => setPhase(10), 7000))  // Invoice emerges right, folder shifts left
+    timeouts.push(setTimeout(() => setPhase(11), 7700))  // Checkmark stamps on invoice
 
-      // === INVOICE — emerges right, folder shifts left ===
-      timeouts.push(setTimeout(() => setPhase(10), 7000))  // Invoice emerges right, folder shifts left
-      timeouts.push(setTimeout(() => setPhase(11), 7700))  // Checkmark stamps on invoice
+    // === RETURN — both return to center ===
+    timeouts.push(setTimeout(() => setPhase(12), 8800))  // Invoice returns + fades
 
-      // === RETURN — both return to center ===
-      timeouts.push(setTimeout(() => setPhase(12), 8800))  // Invoice returns + fades
+    // === CLOSE OUT — folder spins back to white, stays here ===
+    timeouts.push(setTimeout(() => setPhase(13), 9800))
 
-      // === CLOSE OUT — folder spins back to white ===
-      timeouts.push(setTimeout(() => setPhase(13), 9800))
-
-      // === FADE OUT ===
-      timeouts.push(setTimeout(() => setPhase(14), 12000))
-    }
-
-    runLoop()
-    const interval = setInterval(runLoop, LOOP_DURATION)
-
-    return () => {
-      clearInterval(interval)
-      timeouts.forEach(clearTimeout)
-    }
+    return () => timeouts.forEach(clearTimeout)
   }, [])
 
   // ── Card geometry ──
@@ -120,7 +102,7 @@ export function HeroAnimation() {
 
   // ── Typewriter text ──
   const getTextInfo = () => {
-    if (phase >= 13 && phase < 14) return { key: 'closeout', text: 'CLOSE IT OUT.', isCloseOut: true }
+    if (phase >= 13) return { key: 'closeout', text: 'CLOSE IT OUT.', isCloseOut: true }
     if (phase >= 10 && phase < 13) return { key: 'paid', text: 'GET PAID.', isCloseOut: false }
     if (phase >= 9 && phase < 10) return { key: 'complete', text: 'COMPLETE THE PROJECT.', isCloseOut: false }
     if (phase >= 7 && phase < 9) return { key: 'organize', text: 'ORGANIZE EVERYTHING.', isCloseOut: false }
@@ -133,13 +115,12 @@ export function HeroAnimation() {
   return (
     <div className="relative w-full h-[260px] lg:h-[400px] flex flex-col items-center justify-center">
       <AnimatePresence mode="wait">
-        {phase >= 1 && phase < 14 && (
+        {phase >= 1 && (
           <motion.div
             key="hero-anim"
             className="flex flex-col items-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
           >
             <motion.svg
@@ -454,7 +435,7 @@ export function HeroAnimation() {
               <AnimatePresence mode="wait">
                 {textInfo && (
                   <motion.div
-                    key={`${textInfo.key}-${loopKey}`}
+                    key={textInfo.key}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
