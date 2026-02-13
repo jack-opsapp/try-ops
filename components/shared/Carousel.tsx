@@ -59,13 +59,10 @@ export function Carousel({ children, gap = 16, className = '', startIndex = 0 }:
     const velocity = info.velocity.x
 
     if (Math.abs(velocity) > 500) {
-      // Fast flick
       snapTo(velocity < 0 ? activeIndex + 1 : activeIndex - 1)
     } else if (Math.abs(offset) > cardWidth * 0.3) {
-      // Dragged past threshold
       snapTo(offset < 0 ? activeIndex + 1 : activeIndex - 1)
     } else {
-      // Snap back
       snapTo(activeIndex)
     }
   }
@@ -75,60 +72,66 @@ export function Carousel({ children, gap = 16, className = '', startIndex = 0 }:
   }
 
   return (
-    <div
-      ref={containerRef}
-      className={`relative overflow-hidden max-w-[100vw] ${className}`}
-      style={{ overscrollBehaviorX: 'contain' }}
-    >
-      <motion.div
-        className="flex cursor-grab active:cursor-grabbing"
-        style={{ x, gap, touchAction: 'pan-y' }}
-        drag="x"
-        dragElastic={0.1}
-        dragDirectionLock
-        dragConstraints={{
-          left: -(count - 1) * (cardWidth + gap),
-          right: 0,
-        }}
-        animate={controls}
-        onDragEnd={handleDragEnd}
-      >
-        {items.map((child, i) => (
-          <div
-            key={i}
-            className="flex-shrink-0"
-            style={{ width: cardWidth }}
-          >
-            {child}
-          </div>
-        ))}
-      </motion.div>
+    <div className={className}>
+      {/* Outer wrapper for arrows positioned outside */}
+      <div className="relative md:px-14">
+        {/* Arrow buttons — desktop only, positioned outside carousel */}
+        {count > 1 && (
+          <>
+            <button
+              onClick={() => snapTo(activeIndex - 1)}
+              className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-200"
+              aria-label="Previous slide"
+            >
+              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+            <button
+              onClick={() => snapTo(activeIndex + 1)}
+              className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-200"
+              aria-label="Next slide"
+            >
+              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 6 15 12 9 18" />
+              </svg>
+            </button>
+          </>
+        )}
 
-      {/* Arrow buttons — desktop only */}
-      {count > 1 && (
-        <>
-          <button
-            onClick={() => snapTo(activeIndex - 1)}
-            className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-200"
-            aria-label="Previous slide"
+        {/* Carousel track */}
+        <div
+          ref={containerRef}
+          className="overflow-hidden max-w-[100vw]"
+          style={{ overscrollBehaviorX: 'contain' }}
+        >
+          <motion.div
+            className="flex cursor-grab active:cursor-grabbing"
+            style={{ x, gap, touchAction: 'pan-y' }}
+            drag="x"
+            dragElastic={0.1}
+            dragDirectionLock
+            dragConstraints={{
+              left: -(count - 1) * (cardWidth + gap),
+              right: 0,
+            }}
+            animate={controls}
+            onDragEnd={handleDragEnd}
           >
-            <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          </button>
-          <button
-            onClick={() => snapTo(activeIndex + 1)}
-            className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-200"
-            aria-label="Next slide"
-          >
-            <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="9 6 15 12 9 18" />
-            </svg>
-          </button>
-        </>
-      )}
+            {items.map((child, i) => (
+              <div
+                key={i}
+                className="flex-shrink-0"
+                style={{ width: cardWidth }}
+              >
+                {child}
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </div>
 
-      {/* Dot indicators */}
+      {/* Dot indicators — outside overflow container for proper centering */}
       {count > 1 && (
         <div className="flex justify-center gap-2 mt-6">
           {items.map((_, i) => (

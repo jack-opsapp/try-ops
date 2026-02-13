@@ -38,7 +38,7 @@ export function SolutionSection() {
     <section id="solution" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
       <div className="max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10">
         <motion.h2
-          className="font-bebas text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-8 lg:mb-16"
+          className="font-bebas text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-4 lg:mb-16"
           {...fadeInUp}
         >
           BUILT BY SOMEONE WHO ACTUALLY RUNS CREWS
@@ -50,7 +50,7 @@ export function SolutionSection() {
             {features.map((feature) => (
               <div
                 key={feature.title}
-                className="bg-ops-card border border-ops-border rounded-ops-card p-8 transition-all duration-300 hover:border-ops-gray-300 h-full"
+                className="bg-ops-card border border-ops-border rounded-ops-card p-6 md:p-8 transition-all duration-300 hover:border-ops-gray-300 h-full"
               >
                 <h3 className="font-mohave font-medium text-[20px] uppercase text-ops-gray-50 mb-4">
                   {feature.title}

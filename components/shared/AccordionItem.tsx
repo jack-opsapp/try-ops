@@ -20,7 +20,7 @@ export function AccordionItem({ question, answer, onToggle }: AccordionItemProps
 
   return (
     <div
-      className={`bg-ops-card border rounded-ops-card mb-4 cursor-pointer transition-colors duration-300 ${
+      className={`bg-ops-card border rounded-ops-card mb-2 lg:mb-4 cursor-pointer transition-colors duration-300 ${
         isOpen ? 'border-ops-gray-300' : 'border-ops-border hover:border-ops-gray-300'
       }`}
       onClick={toggle}
@@ -34,8 +34,8 @@ export function AccordionItem({ question, answer, onToggle }: AccordionItemProps
         }
       }}
     >
-      <div className="flex items-center justify-between px-6 py-5">
-        <span className="font-mohave font-medium text-[16px] text-ops-gray-50 pr-4">
+      <div className="flex items-center justify-between px-4 py-3 lg:px-6 lg:py-5">
+        <span className="font-mohave font-medium text-[14px] lg:text-[16px] text-ops-gray-50 pr-4">
           {question}
         </span>
         <motion.span
@@ -57,7 +57,7 @@ export function AccordionItem({ question, answer, onToggle }: AccordionItemProps
             transition={{ duration: 0.3, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <p className="font-kosugi text-[16px] text-ops-text-secondary leading-relaxed px-6 pb-6">
+            <p className="font-kosugi text-[13px] lg:text-[16px] text-ops-text-secondary leading-relaxed px-4 pb-4 lg:px-6 lg:pb-6">
               {answer}
             </p>
           </motion.div>

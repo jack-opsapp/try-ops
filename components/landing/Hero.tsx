@@ -19,7 +19,7 @@ const fadeInUp = {
 export function Hero({ onDownloadClick, onTryClick }: HeroProps) {
   return (
     <section id="hero" className="relative min-h-[100svh] flex items-center snap-start snap-always">
-      <div className="w-full max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10 py-12 lg:py-20">
+      <div className="w-full max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10 py-4 lg:py-20">
         <div className="flex flex-col lg:flex-row items-start gap-6 lg:gap-16">
           {/* Mobile: title first, then animation */}
           <div className="lg:hidden w-full">
@@ -99,7 +99,7 @@ export function Hero({ onDownloadClick, onTryClick }: HeroProps) {
               transition={{ ...fadeInUp.transition, delay: 0.4 }}
             >
               <p className="font-kosugi text-[16px] text-ops-gray-200 leading-relaxed mb-2 max-w-[500px]">
-                &ldquo;I scaled a deck and railing business to $1.6M. Tried Jobber, ServiceTitan, Housecall Pro.
+                &ldquo;I scaled a deck and railing business from 0 to $1.6M in 4 years. Tried Jobber, ServiceTitan, Housecall Pro.
                 None of them worked the way my crew actually works. So I built OPS.&rdquo;
               </p>
               <p className="font-mohave font-medium text-[13px] text-ops-gray-400 uppercase tracking-wider">

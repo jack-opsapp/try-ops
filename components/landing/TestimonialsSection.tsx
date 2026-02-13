@@ -40,7 +40,7 @@ const testimonials = [
 
 // Founder quote shown only on mobile (desktop shows it in Hero)
 const founderQuote = {
-  quote: 'I scaled a deck and railing business to $1.6M. Tried Jobber, ServiceTitan, Housecall Pro. None of them worked the way my crew actually works. So I built OPS.',
+  quote: 'I scaled a deck and railing business from 0 to $1.6M in 4 years. Tried Jobber, ServiceTitan, Housecall Pro. None of them worked the way my crew actually works. So I built OPS.',
   name: 'Jack',
   trade: 'Founder',
   location: '',
@@ -56,12 +56,7 @@ export function TestimonialsSection() {
   }, [])
 
   return (
-    <section id="testimonials" className="relative min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always overflow-hidden">
-      {/* Viewport-edge gradients that blend section edges into the background */}
-      <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-12 z-10 bg-gradient-to-r from-[#0A0A0A] to-transparent" />
-      <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-12 z-10 bg-gradient-to-l from-[#0A0A0A] to-transparent" />
-      <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-16 z-10 bg-gradient-to-t from-[#0A0A0A] to-transparent" />
-
+    <section id="testimonials" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
       <div className="max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10">
         <motion.h2
           className="font-bebas text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-8 lg:mb-16"

@@ -52,13 +52,13 @@ export function FAQSection({ onFAQToggle }: FAQSectionProps) {
     <section id="faq" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
       <div className="w-full max-w-[900px] mx-auto px-6 md:px-6 lg:px-10">
         <motion.h2
-          className="font-bebas text-[32px] text-ops-gray-50 uppercase tracking-[0.05em] mb-12"
+          className="font-bebas text-[26px] lg:text-[32px] text-ops-gray-50 uppercase tracking-[0.05em] mb-4 lg:mb-12"
           {...fadeInUp}
         >
           QUESTIONS YOU&apos;RE PROBABLY ASKING
         </motion.h2>
 
-        <motion.div {...fadeInUp} className="w-full">
+        <motion.div {...fadeInUp} className="w-full lg:max-h-none" style={{ maxHeight: '70svh', overflowY: 'auto' }}>
           {faqs.map((faq) => (
             <AccordionItem
               key={faq.question}

@@ -37,19 +37,6 @@ const roadmapItems = [
   'QuickBooks Integration',
 ]
 
-function CategoryHeader({ label, description }: { label: string; description: string }) {
-  return (
-    <div className="px-4 md:px-5 py-2 md:py-2.5 bg-white/[0.03]">
-      <span className="font-mohave font-medium text-[10px] md:text-[11px] uppercase tracking-wider text-ops-gray-300">
-        {label}
-      </span>
-      <span className="font-kosugi text-[10px] md:text-[11px] text-ops-gray-400 ml-2">
-        &mdash; {description}
-      </span>
-    </div>
-  )
-}
-
 function RoadmapRow({ text, variant }: { text: string; variant: 'built' | 'indev' | 'planned' }) {
   return (
     <div className="flex items-center gap-3 px-4 md:px-5 py-2 md:py-3">
@@ -91,8 +78,67 @@ function RoadmapRow({ text, variant }: { text: string; variant: 'built' | 'indev
   )
 }
 
+// Mobile accordion section header
+function AccordionHeader({
+  label,
+  description,
+  count,
+  isOpen,
+  onToggle,
+}: {
+  label: string
+  description: string
+  count: number
+  isOpen: boolean
+  onToggle: () => void
+}) {
+  return (
+    <button
+      onClick={onToggle}
+      className="w-full flex items-center justify-between px-4 py-2.5 bg-white/[0.03] text-left"
+    >
+      <div className="flex-1 min-w-0">
+        <span className="font-mohave font-medium text-[10px] uppercase tracking-wider text-ops-gray-300">
+          {label}
+        </span>
+        <span className="font-kosugi text-[10px] text-ops-gray-400 ml-2">
+          &mdash; {description}
+        </span>
+      </div>
+      <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+        <span className="font-mohave text-[10px] text-ops-gray-400">{count}</span>
+        <svg
+          className={`w-3.5 h-3.5 text-ops-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+        </svg>
+      </div>
+    </button>
+  )
+}
+
+// Desktop category header (non-interactive)
+function CategoryHeader({ label, description }: { label: string; description: string }) {
+  return (
+    <div className="px-4 md:px-5 py-2 md:py-2.5 bg-white/[0.03]">
+      <span className="font-mohave font-medium text-[10px] md:text-[11px] uppercase tracking-wider text-ops-gray-300">
+        {label}
+      </span>
+      <span className="font-kosugi text-[10px] md:text-[11px] text-ops-gray-400 ml-2">
+        &mdash; {description}
+      </span>
+    </div>
+  )
+}
+
 export function RoadmapSection() {
-  const [showAll, setShowAll] = useState(false)
+  const [openSection, setOpenSection] = useState<string | null>('indev')
+
+  const toggleSection = (section: string) => {
+    setOpenSection(openSection === section ? null : section)
+  }
 
   return (
     <section id="roadmap" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
@@ -111,11 +157,91 @@ export function RoadmapSection() {
           Every feature gets built based on what real crews actually need. Not what looks good in a demo.
         </motion.p>
 
+        {/* Mobile: accordion sections inside a scrollable container */}
         <motion.div
-          className="bg-ops-card border border-ops-border rounded-ops-card overflow-hidden"
+          className="lg:hidden bg-ops-card border border-ops-border rounded-ops-card overflow-hidden"
+          style={{ maxHeight: '60svh', overflowY: 'auto' }}
           {...fadeInUp}
         >
           {/* Built */}
+          <AccordionHeader
+            label="Built"
+            description="Shipped"
+            count={builtItems.length}
+            isOpen={openSection === 'built'}
+            onToggle={() => toggleSection('built')}
+          />
+          <AnimatePresence>
+            {openSection === 'built' && builtItems.map((item, i) => (
+              <motion.div
+                key={item}
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className={`overflow-hidden ${i > 0 ? 'border-t border-white/5' : ''}`}
+              >
+                <RoadmapRow text={item} variant="built" />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+
+          {/* In Development */}
+          <div className="border-t border-white/10">
+            <AccordionHeader
+              label="In Development"
+              description="Building now"
+              count={inDevItems.length}
+              isOpen={openSection === 'indev'}
+              onToggle={() => toggleSection('indev')}
+            />
+          </div>
+          <AnimatePresence>
+            {openSection === 'indev' && inDevItems.map((item, i) => (
+              <motion.div
+                key={item}
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className={`overflow-hidden ${i > 0 ? 'border-t border-white/5' : ''}`}
+              >
+                <RoadmapRow text={item} variant="indev" />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+
+          {/* On the Roadmap */}
+          <div className="border-t border-white/10">
+            <AccordionHeader
+              label="Roadmap"
+              description="Planned features"
+              count={roadmapItems.length}
+              isOpen={openSection === 'roadmap'}
+              onToggle={() => toggleSection('roadmap')}
+            />
+          </div>
+          <AnimatePresence>
+            {openSection === 'roadmap' && roadmapItems.map((item, i) => (
+              <motion.div
+                key={item}
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className={`overflow-hidden ${i > 0 ? 'border-t border-white/5' : ''}`}
+              >
+                <RoadmapRow text={item} variant="planned" />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
+
+        {/* Desktop: full layout */}
+        <motion.div
+          className="hidden lg:block bg-ops-card border border-ops-border rounded-ops-card overflow-hidden"
+          {...fadeInUp}
+        >
           <CategoryHeader label="Customer Requested (Built)" description="Features you asked for that we shipped" />
           {builtItems.map((item, i) => (
             <div key={item} className={i > 0 ? 'border-t border-white/5' : ''}>
@@ -123,7 +249,6 @@ export function RoadmapSection() {
             </div>
           ))}
 
-          {/* In Development */}
           <div className="border-t border-white/10">
             <CategoryHeader label="Customer Requested (In Development)" description="Features you asked for that we're building now" />
           </div>
@@ -133,43 +258,14 @@ export function RoadmapSection() {
             </div>
           ))}
 
-          {/* On the Roadmap — always visible on desktop, collapsible on mobile */}
           <div className="border-t border-white/10">
             <CategoryHeader label="On the Roadmap" description="Planned features based on crew needs" />
           </div>
-
-          <div className="hidden lg:block">
-            {roadmapItems.map((item, i) => (
-              <div key={item} className={i > 0 ? 'border-t border-white/5' : ''}>
-                <RoadmapRow text={item} variant="planned" />
-              </div>
-            ))}
-          </div>
-
-          {/* Mobile: collapsible */}
-          <div className="lg:hidden">
-            <AnimatePresence>
-              {showAll && roadmapItems.map((item, i) => (
-                <motion.div
-                  key={item}
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className={`overflow-hidden ${i > 0 ? 'border-t border-white/5' : ''}`}
-                >
-                  <RoadmapRow text={item} variant="planned" />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-
-            <button
-              onClick={() => setShowAll(!showAll)}
-              className="w-full py-3 border-t border-white/5 font-mohave text-[13px] uppercase tracking-wider text-ops-gray-300 hover:text-ops-gray-100 transition-colors"
-            >
-              {showAll ? 'SHOW LESS' : `SHOW ALL FEATURES (+${roadmapItems.length})`}
-            </button>
-          </div>
+          {roadmapItems.map((item, i) => (
+            <div key={item} className={i > 0 ? 'border-t border-white/5' : ''}>
+              <RoadmapRow text={item} variant="planned" />
+            </div>
+          ))}
         </motion.div>
       </div>
     </section>
