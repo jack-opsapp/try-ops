@@ -414,15 +414,26 @@ function DashboardView({
                         style={{
                           opacity: isLifted ? 0.3 : 1,
                           transform: isLifted ? 'scale(0.95)' : 'scale(1)',
-                          transition: 'opacity 0.2s ease, transform 0.2s ease',
+                          transition: 'opacity 0.2s ease, transform 0.2s ease, box-shadow 0.3s ease',
                           position: 'relative',
                           zIndex: isLandedUserCard ? 5 : 0, // punch through dark overlay
+                          borderRadius: 5,
+                          border: isLandedUserCard && showStatusGlow
+                            ? '2px solid rgba(157, 181, 130, 0.6)'
+                            : undefined,
+                          boxShadow: isLandedUserCard && showStatusGlow
+                            ? '0 0 12px rgba(157, 181, 130, 0.3), 0 0 24px rgba(157, 181, 130, 0.15)'
+                            : undefined,
+                          color: isLandedUserCard && showStatusGlow ? '#9DB582' : undefined,
+                          animation: isLandedUserCard && showStatusGlow
+                            ? 'statusBadgeGlow 1.5s ease-in-out infinite'
+                            : undefined,
                         }}
                       >
                         <MockProjectCard
                           project={project}
                           variant="dashboard"
-                          isHighlighted={!!isUserCard && phase === 'dragToAccepted' && !cardLifted}
+                          isHighlighted={!!isUserCard && phase === 'dragToAccepted' && !cardLifted && dragAnimPhase !== 'landed'}
                           showStatusGlow={!!isLandedUserCard && showStatusGlow}
                           statusOverride={
                             isUserCard && (dragAnimPhase === 'sliding' || dragAnimPhase === 'landed')
@@ -799,6 +810,7 @@ function ListView({
 
     // Set initial status immediately (no dim for first)
     setAnimatingStatus(steps[0])
+    setFinalStatus(steps[0])
     setCardDimmed(false)
 
     // Schedule subsequent transitions at 1.8s intervals
@@ -813,6 +825,7 @@ function ListView({
       // T+300ms: Change status (while dimmed)
       timers.push(setTimeout(() => {
         setAnimatingStatus(steps[i])
+        setFinalStatus(steps[i]) // Keep in sync to prevent glitch on phase transition
       }, baseDelay + 300))
 
       // T+600ms: Restore opacity (0.3s transition back to 1.0)

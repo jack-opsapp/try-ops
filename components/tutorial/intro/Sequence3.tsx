@@ -90,8 +90,8 @@ export function Sequence3({ onComplete }: Sequence3Props) {
   const [invoiceCollapsing, setInvoiceCollapsing] = useState(false)
 
   // Finale
-  const [zoomThrough, setZoomThrough] = useState(false)
-  const [everythingCleared, setEverythingCleared] = useState(false)
+  const [folderDissolving, setFolderDissolving] = useState(false)
+  const [showFinalMessage, setShowFinalMessage] = useState(false)
 
   const currentStatus = STATUS_ORDER[currentStatusIndex]
   const folderColor = STATUS_COLORS[currentStatus] ?? '#FFFFFF'
@@ -192,18 +192,18 @@ export function Sequence3({ onComplete }: Sequence3Props) {
     // 14. Hold on closed
     t += 1200
 
-    // 15. Everything clears
+    // 15. Carousel fades, folder dissolve begins
     timers.push(setTimeout(() => {
       setCarouselVisible(false)
-      setEverythingCleared(true)
+      setFolderDissolving(true)
     }, t))
 
-    // 16. Zoom-through
-    t += 300
-    timers.push(setTimeout(() => setZoomThrough(true), t))
+    // 16. "Now try it yourself" message after dissolve completes
+    t += 1400
+    timers.push(setTimeout(() => setShowFinalMessage(true), t))
 
-    // 17. Complete (text now comes from checkpoint)
-    t += 1000
+    // 17. Complete
+    t += 2000
     timers.push(setTimeout(() => onComplete(), t))
 
     return () => timers.forEach(clearTimeout)
@@ -236,7 +236,7 @@ export function Sequence3({ onComplete }: Sequence3Props) {
           </motion.div>
         )}
 
-        {showMessage2 && (
+        {showMessage2 && !showFinalMessage && (
           <motion.div
             key="msg2"
             className="absolute top-16 left-0 right-0 text-center px-4"
@@ -250,11 +250,25 @@ export function Sequence3({ onComplete }: Sequence3Props) {
             </p>
           </motion.div>
         )}
+
+        {showFinalMessage && (
+          <motion.div
+            key="msgFinal"
+            className="absolute top-16 left-0 right-0 text-center px-4"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.6 }}
+          >
+            <p className="font-mohave font-medium text-[24px] md:text-[28px] uppercase tracking-wider text-white">
+              <TypewriterText text="NOW TRY IT YOURSELF." typingSpeed={40} />
+            </p>
+          </motion.div>
+        )}
       </AnimatePresence>
 
       {/* Animation container */}
-      {!everythingCleared && (
-        <div className="relative flex flex-col items-center">
+      <div className="relative flex flex-col items-center">
           {/* Status carousel */}
           <AnimatePresence>
             {carouselVisible && (
@@ -361,8 +375,6 @@ export function Sequence3({ onComplete }: Sequence3Props) {
           <motion.div
             animate={{
               y: tasksVisible && !tasksCollapsing ? FOLDER_SHIFT_Y : 0,
-              scale: zoomThrough ? 15 : 1,
-              opacity: zoomThrough ? 0 : 1,
             }}
             transition={{
               type: 'spring',
@@ -373,10 +385,10 @@ export function Sequence3({ onComplete }: Sequence3Props) {
             <ProjectFolder
               color={folderColor}
               label="OFFICE REMODEL"
+              dissolve={folderDissolving}
             />
           </motion.div>
         </div>
-      )}
     </div>
   )
 }

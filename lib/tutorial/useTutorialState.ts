@@ -23,6 +23,8 @@ export interface TutorialState {
 
   // Actions
   advance: () => void
+  goBack: () => void
+  skip: () => void
   setSelectedClient: (client: string) => void
   setProjectName: (name: string) => void
   setSelectedTaskType: (type: string) => void
@@ -81,6 +83,15 @@ export function useTutorialState(): TutorialState {
     if (next) setPhase(next)
   }, [phase])
 
+  const goBack = useCallback(() => {
+    const idx = PHASE_ORDER.indexOf(phase)
+    if (idx > 0) setPhase(PHASE_ORDER[idx - 1])
+  }, [phase])
+
+  const skip = useCallback(() => {
+    setPhase('completed')
+  }, [])
+
   const phaseIndex = PHASE_ORDER.indexOf(phase)
 
   return {
@@ -96,6 +107,8 @@ export function useTutorialState(): TutorialState {
     selectedDate,
 
     advance,
+    goBack,
+    skip,
     setSelectedClient,
     setProjectName,
     setSelectedTaskType,

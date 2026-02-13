@@ -32,6 +32,8 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
     phase,
     phaseConfig,
     advance,
+    goBack,
+    skip,
     selectedClient,
     projectName,
     selectedTaskType,
@@ -43,6 +45,7 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
     setSelectedCrew,
     setSelectedDate,
     elapsedSeconds,
+    phaseIndex,
   } = tutorial
 
   // Task form close animation state
@@ -366,6 +369,56 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
           description={phaseConfig.tooltipDescription}
           phase={phase}
         />
+      </div>
+
+      {/* Layer 6b: Back + Skip nav buttons (z-55) */}
+      <div className="absolute top-0 left-0 right-0 flex items-start justify-between pointer-events-none" style={{ zIndex: 55, padding: '14px 16px' }}>
+        {/* Back button — hidden on first phase */}
+        {phaseIndex > 0 ? (
+          <button
+            onClick={() => {
+              // Reset transient states when going back
+              setDragAnimStarted(false)
+              setDragAnimLanded(false)
+              setClosedSheetOpen(false)
+              setClosedSheetReady(false)
+              goBack()
+            }}
+            className="pointer-events-auto flex items-center justify-center"
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 18,
+              background: 'rgba(0, 0, 0, 0.6)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              border: '1px solid rgba(255,255,255,0.1)',
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-white">
+              <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        ) : (
+          <div style={{ width: 36 }} />
+        )}
+
+        {/* Skip button */}
+        <button
+          onClick={() => skip()}
+          className="pointer-events-auto font-mohave font-medium text-[13px] uppercase tracking-wider"
+          style={{
+            color: 'rgba(255,255,255,0.5)',
+            padding: '8px 12px',
+            borderRadius: 18,
+            background: 'rgba(0, 0, 0, 0.6)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+          }}
+        >
+          SKIP
+        </button>
       </div>
 
       {/* Layer 7: Continue/Done button (z-60) — hide during drag animation */}

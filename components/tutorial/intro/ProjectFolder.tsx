@@ -6,9 +6,12 @@ interface ProjectFolderProps {
   color?: string
   label?: string
   className?: string
+  dissolve?: boolean
 }
 
-export function ProjectFolder({ color = '#FFFFFF', label, className = '' }: ProjectFolderProps) {
+export function ProjectFolder({ color = '#FFFFFF', label, className = '', dissolve = false }: ProjectFolderProps) {
+  const dissolveTransition = { duration: 1.2, ease: [0.4, 0, 0.2, 1] as const }
+
   return (
     <motion.svg
       width="120"
@@ -19,7 +22,7 @@ export function ProjectFolder({ color = '#FFFFFF', label, className = '' }: Proj
       initial={false}
     >
       {/* Folder body */}
-      <rect
+      <motion.rect
         x="10"
         y="30"
         width="100"
@@ -28,19 +31,25 @@ export function ProjectFolder({ color = '#FFFFFF', label, className = '' }: Proj
         stroke={color}
         strokeWidth="2"
         fill="none"
+        initial={false}
+        animate={{ pathLength: dissolve ? 0 : 1 }}
+        transition={dissolveTransition}
       />
 
       {/* Folder tab */}
-      <path
+      <motion.path
         d="M 10 30 L 10 20 L 50 20 L 55 30 Z"
         stroke={color}
         strokeWidth="2"
         fill="none"
+        initial={false}
+        animate={{ pathLength: dissolve ? 0 : 1 }}
+        transition={{ ...dissolveTransition, delay: dissolve ? 0.15 : 0 }}
       />
 
       {/* Label text centered vertically in folder body */}
       {label && (
-        <text
+        <motion.text
           x="60"
           y="63"
           textAnchor="middle"
@@ -49,9 +58,12 @@ export function ProjectFolder({ color = '#FFFFFF', label, className = '' }: Proj
           fontWeight="500"
           fontSize="11"
           letterSpacing="0.05em"
+          initial={false}
+          animate={{ opacity: dissolve ? 0 : 1 }}
+          transition={{ duration: 0.6, delay: dissolve ? 0.3 : 0 }}
         >
           {label}
-        </text>
+        </motion.text>
       )}
     </motion.svg>
   )
