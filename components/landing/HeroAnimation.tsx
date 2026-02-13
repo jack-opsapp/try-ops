@@ -8,8 +8,8 @@ const LOOP_DURATION = 12500
 
 const spring = { type: 'spring' as const, stiffness: 120, damping: 18 }
 
-// Success/completed color for folder + invoice accents
-const COMPLETED_COLOR = '#A5B368'
+// Completed status color from OPSStyle.Colors.status.completed
+const COMPLETED_COLOR = '#B58289'
 
 export function HeroAnimation() {
   const [phase, setPhase] = useState(0)
@@ -42,8 +42,8 @@ export function HeroAnimation() {
       timeouts.push(setTimeout(() => setPhase(11), 7700))  // Checkmark stamps on invoice
       timeouts.push(setTimeout(() => setPhase(12), 8500))  // Invoice returns to folder
 
-      // === CLOSE ===
-      timeouts.push(setTimeout(() => setPhase(13), 9500))  // Hold complete
+      // === CLOSE OUT ===
+      timeouts.push(setTimeout(() => setPhase(13), 9500))  // Folder reverts to white, hold
       timeouts.push(setTimeout(() => setPhase(14), 11500)) // Fade out
     }
 
@@ -70,23 +70,25 @@ export function HeroAnimation() {
     { y: 4 + 2 * (cardH + gap), titleW: 55, addrW: 40, crewCount: 3, dateW: 18 },
   ]
 
-  // ── Folder geometry ──
-  const folderX = 62
-  const folderY = 148
-  const folderW = 76
-  const folderH = 36
+  // ── Folder geometry (taller) ──
+  const folderX = 59
+  const folderY = 142
+  const folderW = 82
+  const folderH = 48
+  const folderTabH = 8
   const folderCenterX = folderX + folderW / 2   // 100
   const folderCenterY = folderY + folderH / 2   // 166
 
-  // ── Invoice geometry (relative to folder) ──
-  const invoiceX = folderCenterX - 18            // 82
-  const invoiceTopY = folderY - 8                // 140
-  const invoiceW = 36
-  const invoiceFoldSize = 6
+  // ── Invoice geometry (taller) ──
+  const invoiceX = folderCenterX - 20            // 80
+  const invoiceTopY = folderY - 12               // 130
+  const invoiceW = 40
+  const invoiceH = 56
+  const invoiceFoldSize = 7
 
   // ── Phase helpers ──
   const shouldShowCard = (ci: number) => {
-    if (phase >= 9) return false  // fully absorbed into folder
+    if (phase >= 9) return false
     if (ci === 0) return phase >= 1
     if (ci === 1) return phase >= 3
     if (ci === 2) return phase >= 5
@@ -100,21 +102,22 @@ export function HeroAnimation() {
     return false
   }
 
-  const folderStroke = phase >= 9 ? COMPLETED_COLOR : 'white'
+  // Folder is completed color during the invoice cycle, then reverts to white
+  const folderStroke = phase >= 9 && phase < 13 ? COMPLETED_COLOR : 'white'
 
   // ── Typewriter text ──
   const getTextInfo = () => {
-    if (phase >= 10 && phase < 14) return { key: 'paid', text: 'Close out. Get paid.' }
-    if (phase >= 9 && phase < 10) return { key: 'complete', text: 'Project complete.' }
-    if (phase >= 7 && phase < 9) return { key: 'organize', text: 'Organize everything.' }
-    if (phase >= 1 && phase < 7) return { key: 'schedule', text: 'Schedule your crew.' }
+    if (phase >= 10 && phase < 14) return { key: 'paid', text: 'GET PAID. CLOSE IT OUT.' }
+    if (phase >= 9 && phase < 10) return { key: 'complete', text: 'COMPLETE THE PROJECT.' }
+    if (phase >= 7 && phase < 9) return { key: 'organize', text: 'ORGANIZE EVERYTHING.' }
+    if (phase >= 1 && phase < 7) return { key: 'schedule', text: 'SCHEDULE YOUR CREW.' }
     return null
   }
 
   const textInfo = getTextInfo()
 
   return (
-    <div className="relative w-full h-[240px] lg:h-[380px] flex flex-col items-center justify-center">
+    <div className="relative w-full h-[260px] lg:h-[400px] flex flex-col items-center justify-center">
       <AnimatePresence mode="wait">
         {phase >= 1 && phase < 14 && (
           <motion.div
@@ -126,9 +129,9 @@ export function HeroAnimation() {
             transition={{ duration: 0.4 }}
           >
             <motion.svg
-              viewBox="0 0 200 200"
+              viewBox="0 0 200 210"
               fill="none"
-              className="w-[200px] lg:w-[300px]"
+              className="w-[210px] lg:w-[320px]"
             >
               {/* ═══════════════ JOB CARDS ═══════════════ */}
               {cards.map((card, ci) => {
@@ -235,7 +238,7 @@ export function HeroAnimation() {
                       </>
                     )}
 
-                    {/* Checkmark — appears after all 3 cards built */}
+                    {/* Checkmark */}
                     {phase >= 6 && (
                       <motion.g
                         initial={{ opacity: 0, scale: 0.3 }}
@@ -304,7 +307,7 @@ export function HeroAnimation() {
 
                   {/* Folder tab */}
                   <motion.path
-                    d={`M${folderX} ${folderY} L${folderX} ${folderY - 7} L${folderX + 28} ${folderY - 7} L${folderX + 33} ${folderY}`}
+                    d={`M${folderX} ${folderY} L${folderX} ${folderY - folderTabH} L${folderX + 30} ${folderY - folderTabH} L${folderX + 36} ${folderY}`}
                     strokeWidth="1.5"
                     fill="none"
                     animate={{ stroke: folderStroke }}
@@ -314,11 +317,11 @@ export function HeroAnimation() {
                   {/* Folder label */}
                   <motion.text
                     x={folderCenterX}
-                    y={folderY + folderH / 2 + 3}
+                    y={folderY + folderH / 2 + 4}
                     textAnchor="middle"
                     fontFamily="var(--font-mohave)"
                     fontWeight="500"
-                    fontSize="9"
+                    fontSize="10"
                     letterSpacing="0.05em"
                     stroke="none"
                     animate={{ fill: folderStroke }}
@@ -335,7 +338,7 @@ export function HeroAnimation() {
                   initial={{ opacity: 0, y: 0 }}
                   animate={{
                     opacity: phase >= 12 ? 0 : 1,
-                    y: phase >= 12 ? 0 : -65,
+                    y: phase >= 12 ? 0 : -80,
                     scale: phase >= 12 ? 0.3 : 1,
                   }}
                   style={{ transformOrigin: `${folderCenterX}px ${folderY}px` }}
@@ -343,7 +346,7 @@ export function HeroAnimation() {
                 >
                   {/* Document body with dog-ear */}
                   <path
-                    d={`M${invoiceX} ${invoiceTopY} H${invoiceX + invoiceW - invoiceFoldSize} L${invoiceX + invoiceW} ${invoiceTopY + invoiceFoldSize} V${invoiceTopY + 42} H${invoiceX} Z`}
+                    d={`M${invoiceX} ${invoiceTopY} H${invoiceX + invoiceW - invoiceFoldSize} L${invoiceX + invoiceW} ${invoiceTopY + invoiceFoldSize} V${invoiceTopY + invoiceH} H${invoiceX} Z`}
                     stroke={COMPLETED_COLOR}
                     strokeWidth="1.5"
                     fill="none"
@@ -360,30 +363,40 @@ export function HeroAnimation() {
                   {/* Detail lines */}
                   <line
                     x1={invoiceX + 8}
-                    y1={invoiceTopY + 16}
+                    y1={invoiceTopY + 18}
                     x2={invoiceX + invoiceW - 8}
-                    y2={invoiceTopY + 16}
+                    y2={invoiceTopY + 18}
                     stroke={COMPLETED_COLOR}
                     strokeWidth="1"
                     opacity="0.5"
                   />
                   <line
                     x1={invoiceX + 8}
-                    y1={invoiceTopY + 23}
+                    y1={invoiceTopY + 26}
                     x2={invoiceX + invoiceW - 8}
-                    y2={invoiceTopY + 23}
+                    y2={invoiceTopY + 26}
                     stroke={COMPLETED_COLOR}
                     strokeWidth="1"
                     opacity="0.5"
                   />
                   <line
                     x1={invoiceX + 8}
-                    y1={invoiceTopY + 30}
+                    y1={invoiceTopY + 34}
                     x2={invoiceX + invoiceW - 14}
-                    y2={invoiceTopY + 30}
+                    y2={invoiceTopY + 34}
                     stroke={COMPLETED_COLOR}
                     strokeWidth="1"
                     opacity="0.5"
+                  />
+                  {/* $ amount line */}
+                  <line
+                    x1={invoiceX + invoiceW - 18}
+                    y1={invoiceTopY + invoiceH - 10}
+                    x2={invoiceX + invoiceW - 8}
+                    y2={invoiceTopY + invoiceH - 10}
+                    stroke={COMPLETED_COLOR}
+                    strokeWidth="1.5"
+                    opacity="0.7"
                   />
 
                   {/* Checkmark — stamps on invoice */}
@@ -391,19 +404,19 @@ export function HeroAnimation() {
                     <motion.g
                       initial={{ opacity: 0, scale: 0.3 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      style={{ transformOrigin: `${folderCenterX}px ${invoiceTopY + 23}px` }}
+                      style={{ transformOrigin: `${folderCenterX}px ${invoiceTopY + 28}px` }}
                       transition={{ type: 'spring', stiffness: 200, damping: 15 }}
                     >
                       <circle
                         cx={folderCenterX}
-                        cy={invoiceTopY + 23}
-                        r="8"
+                        cy={invoiceTopY + 28}
+                        r="9"
                         stroke={COMPLETED_COLOR}
                         strokeWidth="1.5"
                         fill="none"
                       />
                       <motion.path
-                        d={`M${folderCenterX - 4} ${invoiceTopY + 23} l2.5 3 l5.5 -6.5`}
+                        d={`M${folderCenterX - 4} ${invoiceTopY + 28} l3 3.5 l6 -7`}
                         stroke={COMPLETED_COLOR}
                         strokeWidth="1.5"
                         strokeLinecap="round"

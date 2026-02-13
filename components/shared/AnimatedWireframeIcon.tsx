@@ -225,36 +225,36 @@ export function AnimatedTangledMessages({ isActive, size = 48 }: AnimatedIconPro
 // Starts as a clean card with 2 lines. On activate: panels, sidebars,
 // headers, toggles, and charts cascade in — overwhelming the UI.
 export function AnimatedDashboardOverload({ isActive, size = 48 }: AnimatedIconProps) {
-  const spring = { type: 'spring' as const, stiffness: 180, damping: 15 }
+  const spring = { type: 'spring' as const, stiffness: 120, damping: 12 }
 
-  // Elements that overwhelm the simple UI on activate
+  // Elements that overwhelm the simple UI on activate — slower cascade
   const clutter = [
     // Sidebar
     { d: 'M3 14 v44', delay: 0 },
-    { d: 'M3 14 h12', delay: 0 },
-    { d: 'M15 14 v44', delay: 0.04 },
+    { d: 'M3 14 h12', delay: 0.05 },
+    { d: 'M15 14 v44', delay: 0.1 },
     // Sidebar items
-    { d: 'M6 20 h6', delay: 0.08 },
-    { d: 'M6 26 h6', delay: 0.1 },
-    { d: 'M6 32 h6', delay: 0.12 },
-    { d: 'M6 38 h6', delay: 0.14 },
-    { d: 'M6 44 h6', delay: 0.16 },
-    { d: 'M6 50 h6', delay: 0.18 },
+    { d: 'M6 20 h6', delay: 0.18 },
+    { d: 'M6 26 h6', delay: 0.24 },
+    { d: 'M6 32 h6', delay: 0.3 },
+    { d: 'M6 38 h6', delay: 0.36 },
+    { d: 'M6 44 h6', delay: 0.42 },
+    { d: 'M6 50 h6', delay: 0.48 },
     // Top header
-    { d: 'M3 14 h58', delay: 0.05 },
+    { d: 'M3 14 h58', delay: 0.12 },
     // Sub-header tabs
-    { d: 'M19 18 h10', delay: 0.2 },
-    { d: 'M32 18 h10', delay: 0.22 },
-    { d: 'M45 18 h10', delay: 0.24 },
+    { d: 'M19 18 h10', delay: 0.5 },
+    { d: 'M32 18 h10', delay: 0.56 },
+    { d: 'M45 18 h10', delay: 0.62 },
     // Content panels filling main area
-    { d: 'M19 24 h18 v12 h-18 z', delay: 0.26 },
-    { d: 'M40 24 h18 v12 h-18 z', delay: 0.28 },
-    { d: 'M19 40 h18 v8 h-18 z', delay: 0.3 },
-    { d: 'M40 40 h18 v8 h-18 z', delay: 0.32 },
-    { d: 'M19 52 h39 v4 h-39 z', delay: 0.34 },
+    { d: 'M19 24 h18 v12 h-18 z', delay: 0.68 },
+    { d: 'M40 24 h18 v12 h-18 z', delay: 0.76 },
+    { d: 'M19 40 h18 v8 h-18 z', delay: 0.84 },
+    { d: 'M40 40 h18 v8 h-18 z', delay: 0.92 },
+    { d: 'M19 52 h39 v4 h-39 z', delay: 1.0 },
     // Tiny toggle dots
-    { d: 'M56 8 a2 2 0 1 0 0.01 0', delay: 0.36 },
-    { d: 'M50 8 a2 2 0 1 0 0.01 0', delay: 0.38 },
+    { d: 'M56 8 a2 2 0 1 0 0.01 0', delay: 1.08 },
+    { d: 'M50 8 a2 2 0 1 0 0.01 0', delay: 1.14 },
   ]
 
   return (
@@ -301,7 +301,7 @@ export function AnimatedDashboardOverload({ isActive, size = 48 }: AnimatedIconP
 // 4 distinct tool icons clustered tight. On activate: they spring
 // apart in different directions, $ signs fade into the gaps.
 export function AnimatedScatteredApps({ isActive, size = 48 }: AnimatedIconProps) {
-  const spring = { type: 'spring' as const, stiffness: 100, damping: 14 }
+  const spring = { type: 'spring' as const, stiffness: 80, damping: 12 }
 
   const tools = [
     {
@@ -357,13 +357,13 @@ export function AnimatedScatteredApps({ isActive, size = 48 }: AnimatedIconProps
     },
   ]
 
-  // $ signs that appear in the gaps between scattered tools
+  // $ signs — each with unique offset, scale, and rotation for organic feel
   const dollars = [
-    { x: 30, y: 16, delay: 0.3 },
-    { x: 30, y: 48, delay: 0.4 },
-    { x: 14, y: 32, delay: 0.35 },
-    { x: 46, y: 32, delay: 0.45 },
-    { x: 30, y: 32, delay: 0.5 },
+    { x: 31, y: 14, delay: 0.5, finalOpacity: 0.55, finalScale: 0.9, rotate: -8 },
+    { x: 29, y: 50, delay: 0.7, finalOpacity: 0.65, finalScale: 1.15, rotate: 6 },
+    { x: 12, y: 31, delay: 0.6, finalOpacity: 0.5, finalScale: 0.8, rotate: -12 },
+    { x: 48, y: 33, delay: 0.8, finalOpacity: 0.6, finalScale: 1.05, rotate: 10 },
+    { x: 30, y: 33, delay: 0.9, finalOpacity: 0.7, finalScale: 0.95, rotate: -5 },
   ]
 
   return (
@@ -388,7 +388,7 @@ export function AnimatedScatteredApps({ isActive, size = 48 }: AnimatedIconProps
               ? {
                   x: tool.dx,
                   y: tool.dy,
-                  transition: { ...spring, delay: i * 0.06 },
+                  transition: { ...spring, delay: i * 0.12 },
                 }
               : { x: 0, y: 0, transition: spring }
           }
@@ -413,16 +413,17 @@ export function AnimatedScatteredApps({ isActive, size = 48 }: AnimatedIconProps
           animate={
             isActive
               ? {
-                  opacity: [0, 0.6],
-                  scale: [0.5, 1],
+                  opacity: [0, d.finalOpacity],
+                  scale: [0.3, d.finalScale],
+                  rotate: [0, d.rotate],
                   transition: {
                     type: 'spring' as const,
-                    stiffness: 150,
-                    damping: 12,
+                    stiffness: 120,
+                    damping: 10,
                     delay: d.delay,
                   },
                 }
-              : { opacity: 0, scale: 0.5 }
+              : { opacity: 0, scale: 0.3, rotate: 0 }
           }
         >
           $

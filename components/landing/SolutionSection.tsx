@@ -44,20 +44,6 @@ export function SolutionSection() {
           BUILT BY SOMEONE WHO ACTUALLY RUNS CREWS
         </motion.h2>
 
-        {/* Founder quote */}
-        <motion.div
-          className="border-l-2 border-white/20 pl-6 mb-16 max-w-[700px]"
-          {...fadeInUp}
-        >
-          <p className="font-kosugi text-[18px] text-ops-gray-200 leading-relaxed mb-3">
-            &ldquo;I scaled a deck and railing business to $1.6M. Tried Jobber, ServiceTitan, Housecall Pro.
-            None of them worked the way my crew actually works. So I built OPS.&rdquo;
-          </p>
-          <p className="font-kosugi text-[14px] text-ops-gray-300">
-            &mdash; Jackson Sweet, Founder
-          </p>
-        </motion.div>
-
         {/* Feature carousel */}
         <motion.div {...fadeInUp}>
           <Carousel gap={16}>
