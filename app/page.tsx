@@ -220,8 +220,8 @@ export default function LandingPage() {
   return (
     <main className="relative bg-ops-background min-h-screen snap-y snap-mandatory overflow-y-auto overflow-x-hidden h-screen md:h-auto md:overflow-visible md:snap-none">
       {/* Page-level edge gradients */}
-      <div className="pointer-events-none fixed left-0 top-0 bottom-0 w-12 z-[990] bg-gradient-to-r from-[#0A0A0A] to-transparent" />
-      <div className="pointer-events-none fixed right-0 top-0 bottom-0 w-12 z-[990] bg-gradient-to-l from-[#0A0A0A] to-transparent" />
+      <div className="pointer-events-none fixed left-0 top-0 bottom-0 w-6 z-[990] bg-gradient-to-r from-[#0A0A0A] to-transparent" />
+      <div className="pointer-events-none fixed right-0 top-0 bottom-0 w-6 z-[990] bg-gradient-to-l from-[#0A0A0A] to-transparent" />
       <div className="pointer-events-none fixed left-0 right-0 bottom-0 h-16 z-[990] bg-gradient-to-t from-[#0A0A0A] to-transparent" />
 
       <HamburgerMenu
