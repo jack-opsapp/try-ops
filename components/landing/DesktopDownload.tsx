@@ -71,37 +71,53 @@ export function DesktopDownload() {
             <div className="w-px h-16 bg-ops-border" />
           </div>
 
-          {/* SMS form */}
-          <div>
-            <h3 className="font-mohave font-medium text-[16px] uppercase text-white mb-4">
-              TEXT ME THE LINK
-            </h3>
-            <div className="flex gap-3">
-              <input
-                type="tel"
-                placeholder="(555) 123-4567"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="bg-ops-card border border-ops-border rounded-[4px] px-4 py-3 font-kosugi text-[16px] text-ops-gray-50 w-[240px] focus:border-ops-gray-300 focus:outline-none transition-colors placeholder:text-ops-text-tertiary"
-              />
-              <button
-                onClick={handleSend}
-                disabled={status === 'sending' || status === 'sent'}
-                className="bg-ops-accent text-white font-mohave font-medium text-[14px] uppercase px-6 py-3 rounded-[4px] hover:brightness-110 transition-all disabled:opacity-50"
-              >
-                {status === 'sending' ? 'SENDING...' : status === 'sent' ? 'SENT!' : 'SEND LINK →'}
-              </button>
+          {/* SMS form + Direct link */}
+          <div className="space-y-8">
+            <div>
+              <h3 className="font-mohave font-medium text-[16px] uppercase text-white mb-4">
+                TEXT ME THE LINK
+              </h3>
+              <div className="flex gap-3">
+                <input
+                  type="tel"
+                  placeholder="(555) 123-4567"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="bg-ops-card border border-ops-border rounded-[4px] px-4 py-3 font-kosugi text-[16px] text-ops-gray-50 w-[240px] focus:border-ops-gray-300 focus:outline-none transition-colors placeholder:text-ops-text-tertiary"
+                />
+                <button
+                  onClick={handleSend}
+                  disabled={status === 'sending' || status === 'sent'}
+                  className="bg-ops-accent text-white font-mohave font-medium text-[14px] uppercase px-6 py-3 rounded-[4px] hover:brightness-110 transition-all disabled:opacity-50"
+                >
+                  {status === 'sending' ? 'SENDING...' : status === 'sent' ? 'SENT!' : 'SEND LINK →'}
+                </button>
+              </div>
+              {status === 'sent' && (
+                <p className="font-kosugi text-[14px] text-ops-gray-200 mt-2">
+                  Check your phone for the download link!
+                </p>
+              )}
+              {status === 'error' && (
+                <p className="font-kosugi text-[14px] text-ops-error mt-2">
+                  Something went wrong. Try again.
+                </p>
+              )}
             </div>
-            {status === 'sent' && (
-              <p className="font-kosugi text-[14px] text-ops-gray-200 mt-2">
-                Check your phone for the download link!
-              </p>
-            )}
-            {status === 'error' && (
-              <p className="font-kosugi text-[14px] text-ops-error mt-2">
-                Something went wrong. Try again.
-              </p>
-            )}
+
+            <div>
+              <h3 className="font-mohave font-medium text-[16px] uppercase text-white mb-4">
+                DIRECT LINK
+              </h3>
+              <a
+                href="https://apps.apple.com/app/ops-app/id6503204873"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block bg-ops-accent text-white font-mohave font-medium text-[14px] uppercase px-6 py-3 rounded-[4px] hover:brightness-110 transition-all"
+              >
+                TAKE ME TO THE APP STORE →
+              </a>
+            </div>
           </div>
         </div>
       </motion.div>
