@@ -56,13 +56,13 @@ export function StickyCTA({ onDownloadClick, onTryClick }: StickyCTAProps) {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 60, opacity: 0 }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] as const }}
-          className="fixed z-[999] left-4 right-4 flex gap-2 md:left-auto md:right-auto md:left-1/2 md:-translate-x-1/2 md:gap-3"
+          className="fixed z-[999] left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-[500px] flex gap-2"
           style={{ bottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))' }}
         >
           {/* Download button */}
           <button
             onClick={onDownloadClick}
-            className="flex-1 border border-white/10 rounded-ops-card px-4 py-3 flex items-center justify-center gap-2 md:rounded-full md:px-6"
+            className="flex-1 border border-white/10 rounded-ops-card px-4 py-3 flex items-center justify-center gap-2"
             style={{
               WebkitBackdropFilter: 'blur(24px) saturate(180%)',
               backdropFilter: 'blur(24px) saturate(180%)',
@@ -80,7 +80,7 @@ export function StickyCTA({ onDownloadClick, onTryClick }: StickyCTAProps) {
           {/* Try it online button */}
           <button
             onClick={onTryClick}
-            className="flex-1 border border-white/10 rounded-ops-card px-4 py-3 flex items-center justify-center gap-2 md:rounded-full md:px-6"
+            className="flex-1 border border-white/10 rounded-ops-card px-4 py-3 flex items-center justify-center gap-2"
             style={{
               WebkitBackdropFilter: 'blur(24px) saturate(180%)',
               backdropFilter: 'blur(24px) saturate(180%)',
