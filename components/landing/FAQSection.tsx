@@ -43,7 +43,7 @@ const faqs = [
   {
     question: 'Why should I try the tutorial first?',
     answer:
-      "Two reasons: (1) You see exactly how OPS works before downloading anything. (2) You stay warm through the download - when you open the app, you already know what you're doing. Users who complete the tutorial activate 3x more than cold downloads.",
+      "Two reasons: (1) You see exactly how OPS works before downloading anything. (2) You stay warm through the download - when you open the app, you already know what you're doing. Users who complete the tutorial are significantly more likely to become active users.",
   },
 ]
 

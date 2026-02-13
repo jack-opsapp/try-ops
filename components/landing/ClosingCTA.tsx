@@ -23,7 +23,7 @@ export function ClosingCTA({ onDownloadClick, onTryClick }: ClosingCTAProps) {
           className="font-bebas text-[40px] lg:text-[56px] text-ops-gray-50 uppercase leading-[1.1] tracking-[0.05em] mb-6"
           {...fadeInUp}
         >
-          STOP DOING MANUALLY WHAT YOUR SOFTWARE SHOULD DO FOR YOU
+          YOUR CREW DESERVES SOFTWARE THAT WORKS AS HARD AS YOU DO
         </motion.h2>
 
         <motion.p
@@ -31,7 +31,7 @@ export function ClosingCTA({ onDownloadClick, onTryClick }: ClosingCTAProps) {
           {...fadeInUp}
           transition={{ ...fadeInUp.transition, delay: 0.1 }}
         >
-          Your crew works in the field. Your software should too.
+          Stop coordinating through chaos. Get OPS.
         </motion.p>
 
         <motion.div

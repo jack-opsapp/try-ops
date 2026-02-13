@@ -17,7 +17,7 @@ const fadeInUp = {
 
 const tiers = [
   {
-    name: 'TRIAL',
+    name: 'FREE TRIAL',
     price: 'FREE',
     period: '30 days',
     users: 10,
@@ -32,6 +32,7 @@ const tiers = [
     ],
     cta: 'START FREE TRIAL',
     ctaVariant: 'primary' as const,
+    bestFor: 'Try everything before you commit',
   },
   {
     name: 'STARTER',
@@ -40,15 +41,14 @@ const tiers = [
     users: 3,
     highlight: false,
     features: [
+      'Everything in Free Trial',
       'Up to 3 users',
-      'Job scheduling & dispatch',
-      'One-tap time tracking',
-      'Photo documentation',
-      'Client & sub-client management',
-      'Calendar views',
+      'Unlimited projects',
+      'Priority support',
     ],
     cta: 'GET STARTED',
     ctaVariant: 'primary' as const,
+    bestFor: 'Small crews (1-3 people)',
   },
   {
     name: 'TEAM',
@@ -57,15 +57,14 @@ const tiers = [
     users: 5,
     highlight: true,
     features: [
-      'Up to 5 users',
       'Everything in Starter',
-      'Team calendar & scheduling',
-      'Project notes & updates',
-      'Task assignments per crew',
+      'Up to 5 users',
+      'Unlimited projects',
       'Priority support',
     ],
     cta: 'GET STARTED',
     ctaVariant: 'primary' as const,
+    bestFor: 'Growing teams (4-5 people)',
   },
   {
     name: 'BUSINESS',
@@ -74,15 +73,14 @@ const tiers = [
     users: 10,
     highlight: false,
     features: [
-      'Up to 10 users',
       'Everything in Team',
-      'Multi-crew management',
-      'Admin controls & roles',
+      'Up to 10 users',
+      'Unlimited projects',
       'Dedicated support',
-      'Company-wide dashboard',
     ],
     cta: 'GET STARTED',
     ctaVariant: 'primary' as const,
+    bestFor: 'Established operations (6-10 people)',
   },
 ]
 
@@ -95,7 +93,7 @@ function PricingCard({ tier }: { tier: typeof tiers[number] }) {
     >
       {tier.highlight && (
         <div className="absolute top-4 right-4 bg-white/10 text-white border border-white/20 font-mohave font-medium text-[11px] uppercase px-3 py-1 rounded-[4px]">
-          POPULAR
+          MOST POPULAR
         </div>
       )}
 
@@ -110,7 +108,7 @@ function PricingCard({ tier }: { tier: typeof tiers[number] }) {
       </p>
 
       {/* User count badge */}
-      <div className="inline-flex items-center gap-1.5 bg-ops-gray-500 rounded-[4px] px-3 py-1 mb-6 w-fit">
+      <div className="inline-flex items-center gap-1.5 bg-ops-gray-500 rounded-[4px] px-3 py-1 mb-4 w-fit">
         <svg className="w-3.5 h-3.5 text-ops-gray-200" viewBox="0 0 20 20" fill="currentColor">
           <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
         </svg>
@@ -118,6 +116,11 @@ function PricingCard({ tier }: { tier: typeof tiers[number] }) {
           {tier.users} {tier.users === 1 ? 'user' : 'users'}
         </span>
       </div>
+
+      {/* Best for */}
+      <p className="font-kosugi text-[12px] text-ops-gray-400 italic mb-6">
+        Best for: {tier.bestFor}
+      </p>
 
       <ul className="space-y-2 mb-8 flex-1">
         {tier.features.map((feature) => (
@@ -160,6 +163,14 @@ export function PricingSection({ onDownloadClick }: PricingSectionProps) {
             ))}
           </Carousel>
         </motion.div>
+
+        {/* Callout */}
+        <motion.p
+          className="font-kosugi text-[14px] text-ops-gray-300 text-center mt-8 lg:mt-12 max-w-[700px] mx-auto"
+          {...fadeInUp}
+        >
+          After your free trial, pick the plan that fits your crew size. All plans include the same features &mdash; you only pay based on how many people you&apos;re managing.
+        </motion.p>
       </div>
     </section>
   )

@@ -14,7 +14,7 @@ const features = [
   {
     title: 'NO TRAINING REQUIRED',
     copy: 'Your crew opens it once. They see their jobs. They know what to do. That\'s it.',
-    why: 'Eliminates manual data entry. Every other tool requires days of training. OPS is obvious from the first tap.',
+    why: 'Every other tool requires days of training. Your guys won\'t use software they don\'t understand. OPS is obvious from the first tap.',
   },
   {
     title: 'PHOTO DOCUMENTATION THAT WORKS',

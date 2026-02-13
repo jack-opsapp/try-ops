@@ -53,7 +53,7 @@ export function Hero({ onDownloadClick, onTryClick }: HeroProps) {
               {...fadeInUp}
               transition={{ ...fadeInUp.transition, delay: 0.1 }}
             >
-              No more hunting through emails. No more asking &ldquo;what&apos;s the address?&rdquo; Built by a crew lead who got tired of manual everything.
+              Built by trades, for trades. Your software should handle the chaos so you don&apos;t have to.
             </motion.p>
 
             {/* CTAs */}

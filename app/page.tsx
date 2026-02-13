@@ -18,6 +18,7 @@ import { FounderQuote } from '@/components/landing/FounderQuote'
 import { ClosingCTA } from '@/components/landing/ClosingCTA'
 import { Footer } from '@/components/landing/Footer'
 import { StickyCTA } from '@/components/landing/StickyCTA'
+import { TestimonialsSection } from '@/components/landing/TestimonialsSection'
 
 const APP_STORE_URL = 'https://apps.apple.com/app/ops-app/id6503204873'
 
@@ -226,6 +227,10 @@ export default function LandingPage() {
       <div className="border-t border-white/10 mx-4 md:mx-6 lg:mx-10" />
 
       <DesktopDownload />
+
+      <div className="border-t border-white/10 mx-4 md:mx-6 lg:mx-10" />
+
+      <TestimonialsSection />
 
       <div className="border-t border-white/10 mx-4 md:mx-6 lg:mx-10" />
 

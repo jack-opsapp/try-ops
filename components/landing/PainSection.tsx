@@ -50,12 +50,12 @@ const painCards = [
     animatedIcon: AnimatedScatteredApps,
     title: 'TOOL SPRAWL',
     bullets: [
-      'Jobber for scheduling',
-      'Something else for photos',
-      'Another tool for time tracking',
-      'Paying for 3+ subscriptions',
+      'Spreadsheets for scheduling',
+      'Whiteboard for crew assignments',
+      'Group texts for updates',
+      'Sticky notes for everything else',
     ],
-    forLine: 'For operations duct-taping solutions together',
+    forLine: 'For operations duct-taping manual solutions together',
   },
 ]
 

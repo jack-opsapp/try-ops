@@ -10,7 +10,6 @@ interface HamburgerMenuProps {
 
 const sections = [
   { label: 'TOP', id: 'hero' },
-  { label: 'THE PROBLEM', id: 'pain' },
   { label: 'FEATURES', id: 'solution' },
   { label: 'ROADMAP', id: 'roadmap' },
   { label: 'PRICING', id: 'pricing' },
