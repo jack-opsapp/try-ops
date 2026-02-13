@@ -26,7 +26,7 @@ const testimonials = [
   },
   {
     quote: 'It\'s an absolute game changer.',
-    name: 'Brandon K.',
+    name: 'Harrison S.',
     trade: 'Landscaping',
     location: 'Victoria',
   },
@@ -46,6 +46,30 @@ const founderQuote = {
   location: '',
 }
 
+function TestimonialCard({ testimonial: t }: { testimonial: typeof testimonials[number] }) {
+  return (
+    <div className="bg-ops-card rounded-ops-card p-8 h-full flex flex-col">
+      <p className="font-kosugi text-[16px] text-ops-gray-200 leading-relaxed flex-1 mb-6">
+        &ldquo;{t.quote}&rdquo;
+      </p>
+      <div>
+        <p className="font-mohave font-medium text-[14px] text-ops-gray-100 uppercase">
+          {t.name}
+        </p>
+        {t.location ? (
+          <p className="font-kosugi text-[12px] text-ops-gray-400">
+            {t.trade}, {t.location}
+          </p>
+        ) : (
+          <p className="font-kosugi text-[12px] text-ops-gray-400">
+            {t.trade}
+          </p>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export function TestimonialsSection() {
   // Include founder quote first on mobile/tablet (desktop shows it in Hero)
   const [cards, setCards] = useState(testimonials)
@@ -56,7 +80,7 @@ export function TestimonialsSection() {
   }, [])
 
   return (
-    <section id="testimonials" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always overflow-hidden">
+    <section id="testimonials" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
       <div className="max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10">
         <motion.h2
           className="font-bebas text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-8 lg:mb-16"
@@ -68,32 +92,19 @@ export function TestimonialsSection() {
 
       <div className="max-w-[1200px] mx-auto w-full px-6 md:px-6 lg:px-10">
         <motion.div {...fadeInUp}>
-          <Carousel gap={16}>
+          {/* Grid on desktop, carousel on mobile */}
+          <div className="hidden lg:grid lg:grid-cols-2 lg:gap-4">
             {cards.map((t) => (
-              <div
-                key={t.name}
-                className="bg-ops-card rounded-ops-card p-8 h-full flex flex-col"
-              >
-                <p className="font-kosugi text-[16px] text-ops-gray-200 leading-relaxed flex-1 mb-6">
-                  &ldquo;{t.quote}&rdquo;
-                </p>
-                <div>
-                  <p className="font-mohave font-medium text-[14px] text-ops-gray-100 uppercase">
-                    {t.name}
-                  </p>
-                  {t.location ? (
-                    <p className="font-kosugi text-[12px] text-ops-gray-400">
-                      {t.trade}, {t.location}
-                    </p>
-                  ) : (
-                    <p className="font-kosugi text-[12px] text-ops-gray-400">
-                      {t.trade}
-                    </p>
-                  )}
-                </div>
-              </div>
+              <TestimonialCard key={t.name} testimonial={t} />
             ))}
-          </Carousel>
+          </div>
+          <div className="lg:hidden">
+            <Carousel gap={16}>
+              {cards.map((t) => (
+                <TestimonialCard key={t.name} testimonial={t} />
+              ))}
+            </Carousel>
+          </div>
         </motion.div>
       </div>
     </section>

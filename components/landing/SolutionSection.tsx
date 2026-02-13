@@ -33,6 +33,22 @@ const features = [
   },
 ]
 
+function FeatureCard({ feature }: { feature: typeof features[number] }) {
+  return (
+    <div className="bg-ops-card border border-ops-border rounded-ops-card p-6 md:p-8 transition-all duration-300 hover:border-ops-gray-300 h-full">
+      <h3 className="font-mohave font-medium text-[20px] uppercase text-ops-gray-50 mb-4">
+        {feature.title}
+      </h3>
+      <p className="font-kosugi text-[16px] text-ops-gray-200 leading-relaxed mb-3">
+        {feature.copy}
+      </p>
+      <p className="font-kosugi text-[16px] text-ops-text-secondary leading-relaxed">
+        <span className="text-ops-gray-100 font-medium">Why it matters:</span> {feature.why}
+      </p>
+    </div>
+  )
+}
+
 export function SolutionSection() {
   return (
     <section id="solution" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
@@ -44,26 +60,20 @@ export function SolutionSection() {
           BUILT BY SOMEONE WHO ACTUALLY RUNS CREWS
         </motion.h2>
 
-        {/* Feature carousel */}
+        {/* Feature grid (desktop) / carousel (mobile) */}
         <motion.div {...fadeInUp}>
-          <Carousel gap={16}>
+          <div className="hidden lg:grid lg:grid-cols-2 lg:gap-4">
             {features.map((feature) => (
-              <div
-                key={feature.title}
-                className="bg-ops-card border border-ops-border rounded-ops-card p-6 md:p-8 transition-all duration-300 hover:border-ops-gray-300 h-full"
-              >
-                <h3 className="font-mohave font-medium text-[20px] uppercase text-ops-gray-50 mb-4">
-                  {feature.title}
-                </h3>
-                <p className="font-kosugi text-[16px] text-ops-gray-200 leading-relaxed mb-3">
-                  {feature.copy}
-                </p>
-                <p className="font-kosugi text-[16px] text-ops-text-secondary leading-relaxed">
-                  <span className="text-ops-gray-100 font-medium">Why it matters:</span> {feature.why}
-                </p>
-              </div>
+              <FeatureCard key={feature.title} feature={feature} />
             ))}
-          </Carousel>
+          </div>
+          <div className="lg:hidden">
+            <Carousel gap={16}>
+              {features.map((feature) => (
+                <FeatureCard key={feature.title} feature={feature} />
+              ))}
+            </Carousel>
+          </div>
         </motion.div>
       </div>
     </section>

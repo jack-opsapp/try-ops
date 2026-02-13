@@ -163,13 +163,20 @@ export function PricingSection({ onDownloadClick }: PricingSectionProps) {
       </div>
 
       <div className="max-w-[1200px] mx-auto w-full px-6 md:px-6 lg:px-10">
-        {/* Pricing carousel */}
+        {/* Pricing grid (desktop) / carousel (mobile) */}
         <motion.div {...fadeInUp}>
-          <Carousel gap={16}>
+          <div className="hidden lg:grid lg:grid-cols-4 lg:gap-4">
             {tiers.map((tier) => (
               <PricingCard key={tier.name} tier={tier} onCTAClick={onDownloadClick} />
             ))}
-          </Carousel>
+          </div>
+          <div className="lg:hidden">
+            <Carousel gap={16}>
+              {tiers.map((tier) => (
+                <PricingCard key={tier.name} tier={tier} onCTAClick={onDownloadClick} />
+              ))}
+            </Carousel>
+          </div>
         </motion.div>
 
         {/* Callout */}
