@@ -72,6 +72,13 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Desktop scroll-snap on the document (mobile snap lives on <main>) */
+@media (min-width: 768px) {
+  html {
+    scroll-snap-type: y proximity;
+  }
+}
+
 body {
   font-family: 'Mohave', sans-serif;
   background-color: #0A0A0A;

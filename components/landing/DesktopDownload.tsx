@@ -26,7 +26,7 @@ export function DesktopDownload() {
   return (
     <section
       id="desktop-download"
-      className="hidden lg:block py-16 lg:py-20"
+      className="hidden lg:flex lg:flex-col lg:justify-center lg:min-h-[100svh] snap-start snap-always"
     >
       <motion.div
         className="max-w-[800px] mx-auto px-4 md:px-6 lg:px-10"
