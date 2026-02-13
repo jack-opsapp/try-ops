@@ -118,7 +118,7 @@ export function MockTaskForm({
                 ? '2px solid #417394'
                 : '2px solid transparent',
               animation: isFieldActive('done')
-                ? 'tutorialPulse 2.4s ease-in-out infinite'
+                ? 'tutorial-pulse-ring 2s ease-in-out infinite'
                 : 'none',
               transition: 'border 0.3s ease',
             }}
@@ -240,9 +240,6 @@ export function MockTaskForm({
                   className={`font-kosugi font-normal text-[14px] uppercase tracking-wider transition-colors duration-300 ${
                     isFieldActive('type') ? 'text-[#417394]' : 'text-[#AAAAAA]'
                   }`}
-                  style={isFieldActive('type') ? {
-                    animation: 'tutorialPulse 2.4s ease-in-out infinite',
-                  } : undefined}
                 >
                   TASK TYPE
                 </span>
@@ -271,7 +268,7 @@ export function MockTaskForm({
                       ? '2px solid #417394'
                       : '1px solid rgba(255,255,255,0.1)',
                     ...(isFieldActive('type') ? {
-                      animation: 'tutorialPulse 2.4s ease-in-out infinite',
+                      animation: 'tutorial-pulse-ring 2s ease-in-out infinite',
                     } : {}),
                   }}
                 >
@@ -361,9 +358,6 @@ export function MockTaskForm({
                 className={`font-kosugi font-normal text-[14px] uppercase tracking-wider mb-2 block transition-colors duration-300 ${
                   isFieldActive('crew') ? 'text-[#417394]' : 'text-[#AAAAAA]'
                 }`}
-                style={isFieldActive('crew') ? {
-                  animation: 'tutorialPulse 2.4s ease-in-out infinite',
-                } : undefined}
               >
                 ASSIGN TEAM
               </span>
@@ -381,7 +375,7 @@ export function MockTaskForm({
                       ? '2px solid #417394'
                       : '1px solid rgba(255,255,255,0.1)',
                     ...(isFieldActive('crew') ? {
-                      animation: 'tutorialPulse 2.4s ease-in-out infinite',
+                      animation: 'tutorial-pulse-ring 2s ease-in-out infinite',
                     } : {}),
                   }}
                 >
@@ -484,9 +478,6 @@ export function MockTaskForm({
                 className={`font-kosugi font-normal text-[14px] uppercase tracking-wider mb-2 block transition-colors duration-300 ${
                   isFieldActive('date') ? 'text-[#417394]' : 'text-[#AAAAAA]'
                 }`}
-                style={isFieldActive('date') ? {
-                  animation: 'tutorialPulse 2.4s ease-in-out infinite',
-                } : undefined}
               >
                 DATES
               </span>
@@ -505,7 +496,7 @@ export function MockTaskForm({
                       ? '2px solid #417394'
                       : '1px solid rgba(255,255,255,0.1)',
                     ...(isFieldActive('date') ? {
-                      animation: 'tutorialPulse 2.4s ease-in-out infinite',
+                      animation: 'tutorial-pulse-ring 2s ease-in-out infinite',
                     } : {}),
                   }}
                 >

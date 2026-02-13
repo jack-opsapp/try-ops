@@ -6,9 +6,9 @@ import {
   isProjectFormPhase,
   isTaskFormPhase,
   isCalendarPhase,
-  isBlockingOverlayPhase,
   isFABVisiblePhase,
   isJobBoardAnimationPhase,
+  PHASE_CONFIGS,
 } from '@/lib/tutorial/TutorialPhase'
 import type { DemoProject } from '@/lib/constants/demo-data'
 import { DEMO_TASK_TYPES, DEMO_PROJECTS } from '@/lib/constants/demo-data'
@@ -23,7 +23,7 @@ import { CollapsibleTooltip } from './CollapsibleTooltip'
 import { ContinueButton } from './ContinueButton'
 
 interface TutorialShellProps {
-  onComplete: (elapsedSeconds: number) => void
+  onComplete: (elapsedSeconds: number, stepDurations: string[]) => void
 }
 
 export function TutorialShell({ onComplete }: TutorialShellProps) {
@@ -46,6 +46,7 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
     setSelectedDate,
     elapsedSeconds,
     phaseIndex,
+    stepDurations,
   } = tutorial
 
   // Task form close animation state
@@ -93,7 +94,7 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
   // Determine visibility of each layer
   const showJobBoard = !isCalendarPhase(phase) && phase !== 'completed'
   const showCalendar = isCalendarPhase(phase)
-  const showBlockingOverlay = isBlockingOverlayPhase(phase)
+  const spotlightConfig = phaseConfig.spotlight
   const showFAB = isFABVisiblePhase(phase)
   const showProjectForm = isProjectFormPhase(phase)
   const showTaskForm = isTaskFormPhase(phase)
@@ -131,7 +132,7 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
 
   // Handle phase completion
   if (showCompleted) {
-    onComplete(elapsedSeconds)
+    onComplete(elapsedSeconds, stepDurations)
     return null
   }
 
@@ -289,11 +290,16 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
         <MockTabBar activeTab={activeTab} />
       </div>
 
-      {/* Layer 3: Blocking overlay (z-20) - only during jobBoardIntro */}
-      {showBlockingOverlay && (
+      {/* Layer 3: Spotlight overlay (z-20) - dims everything except the action target */}
+      {spotlightConfig && (
         <div
-          className="absolute inset-0 bg-black/60 transition-opacity duration-300"
-          style={{ zIndex: 20 }}
+          className="absolute inset-0 transition-opacity duration-300"
+          style={{
+            zIndex: 20,
+            background: 'rgba(0, 0, 0, 0.6)',
+            WebkitMaskImage: `radial-gradient(circle ${spotlightConfig.radius}px at ${spotlightConfig.x} ${spotlightConfig.y}, transparent 100%, black 100%)`,
+            maskImage: `radial-gradient(circle ${spotlightConfig.radius}px at ${spotlightConfig.x} ${spotlightConfig.y}, transparent 100%, black 100%)`,
+          }}
         />
       )}
 
@@ -363,7 +369,14 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
       )}
 
       {/* Layer 6: Tooltip (z-50, always on top of content) */}
-      <div className="absolute top-0 left-0 right-0" style={{ zIndex: 50 }}>
+      <div
+        className={`absolute left-0 right-0 ${
+          phaseConfig.tooltipPosition === 'bottom'
+            ? 'bottom-[70px]'
+            : 'top-0'
+        }`}
+        style={{ zIndex: 50 }}
+      >
         <CollapsibleTooltip
           text={phaseConfig.tooltipText}
           description={phaseConfig.tooltipDescription}

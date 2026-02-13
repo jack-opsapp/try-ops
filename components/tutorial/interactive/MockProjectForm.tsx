@@ -137,7 +137,7 @@ export function MockProjectForm({
                   ? '0 0 12px rgba(65, 115, 148, 0.4)'
                   : 'none',
                 animation: isFieldActive('create')
-                  ? 'tutorialPulse 2.4s ease-in-out infinite'
+                  ? 'tutorial-pulse-ring 2s ease-in-out infinite'
                   : 'none',
                 transition: 'border 0.3s ease, box-shadow 0.3s ease',
               }}
@@ -216,9 +216,6 @@ export function MockProjectForm({
                       color: isFieldActive('client') ? '#417394' : '#AAAAAA',
                       marginBottom: 12,
                       transition: 'color 0.3s ease',
-                      ...(isFieldActive('client') ? {
-                        animation: 'tutorialPulse 2.4s ease-in-out infinite',
-                      } : {}),
                     }}
                   >
                     CLIENT
@@ -256,8 +253,7 @@ export function MockProjectForm({
                             : '1px solid rgba(255,255,255,0.15)',
                           transition: 'border 0.3s ease, box-shadow 0.3s ease',
                           ...(isFieldActive('client') ? {
-                            boxShadow: '0 0 8px rgba(65, 115, 148, 0.2)',
-                            animation: 'tutorialPulse 2.4s ease-in-out infinite',
+                            animation: 'tutorial-pulse-ring 2s ease-in-out infinite',
                           } : {}),
                         }}
                       >
@@ -327,8 +323,7 @@ export function MockProjectForm({
                         : '1px solid rgba(255,255,255,0.15)',
                       transition: 'border 0.3s ease, box-shadow 0.3s ease',
                       ...(isFieldActive('name') ? {
-                        boxShadow: '0 0 8px rgba(65, 115, 148, 0.2)',
-                        animation: 'tutorialPulse 2.4s ease-in-out infinite',
+                        animation: 'tutorial-pulse-ring 2s ease-in-out infinite',
                       } : {}),
                     }}
                   >
@@ -419,8 +414,7 @@ export function MockProjectForm({
                   cursor: isFieldActive('addTask') ? 'pointer' : 'default',
                   transition: 'all 0.3s ease',
                   ...(isFieldActive('addTask') ? {
-                    boxShadow: '0 0 8px rgba(65, 115, 148, 0.2)',
-                    animation: 'tutorialPulse 2.4s ease-in-out infinite',
+                    animation: 'tutorial-pulse-ring 2s ease-in-out infinite',
                   } : {}),
                 }}
               >
@@ -518,8 +512,7 @@ export function MockProjectForm({
                       opacity: isFieldActive('addTask') ? 1 : 0.5,
                       transition: 'all 0.3s ease',
                       ...(isFieldActive('addTask') ? {
-                        boxShadow: '0 0 8px rgba(65, 115, 148, 0.2)',
-                        animation: 'tutorialPulse 2.4s ease-in-out infinite',
+                        animation: 'tutorial-pulse-ring 2s ease-in-out infinite',
                       } : {}),
                     }}
                   >

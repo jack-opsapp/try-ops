@@ -32,7 +32,7 @@ export default function InteractiveTutorialPage() {
   }, [tutorialStartTime, setTutorialStartTime, track])
 
   const handleComplete = useCallback(
-    (elapsedSeconds: number) => {
+    (elapsedSeconds: number, stepDurations: string[]) => {
       setCompletionTime(elapsedSeconds)
 
       const totalTime = tutorialStartTime
@@ -41,6 +41,17 @@ export default function InteractiveTutorialPage() {
 
       trackTutorialComplete(totalTime)
       setTutorialCompleted()
+
+      // Post per-phase timing data
+      fetch('/api/tutorial-log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          stepDuration: stepDurations,
+          totalTime,
+          variant: 'interactive',
+        }),
+      }).catch(() => {}) // fire-and-forget
     },
     [tutorialStartTime, trackTutorialComplete, setTutorialCompleted]
   )

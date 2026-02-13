@@ -34,6 +34,7 @@ export interface TutorialState {
   // Timing
   startTime: number
   elapsedSeconds: number
+  stepDurations: string[]
 }
 
 export function useTutorialState(): TutorialState {
@@ -44,8 +45,10 @@ export function useTutorialState(): TutorialState {
   const [selectedCrew, setSelectedCrew] = useState<string | null>(null)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
+  const [stepDurations, setStepDurations] = useState<string[]>([])
 
   const startTimeRef = useRef(Date.now())
+  const phaseStartRef = useRef(Date.now())
   const autoAdvanceTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   // Track elapsed time
@@ -80,17 +83,26 @@ export function useTutorialState(): TutorialState {
 
   const advance = useCallback(() => {
     const next = getNextPhase(phase)
-    if (next) setPhase(next)
+    if (next) {
+      setStepDurations(prev => [...prev, `${phase}:${Date.now() - phaseStartRef.current}`])
+      phaseStartRef.current = Date.now()
+      setPhase(next)
+    }
   }, [phase])
 
   const goBack = useCallback(() => {
     const idx = PHASE_ORDER.indexOf(phase)
-    if (idx > 0) setPhase(PHASE_ORDER[idx - 1])
+    if (idx > 0) {
+      setStepDurations(prev => prev.slice(0, -1))
+      phaseStartRef.current = Date.now()
+      setPhase(PHASE_ORDER[idx - 1])
+    }
   }, [phase])
 
   const skip = useCallback(() => {
+    setStepDurations(prev => [...prev, `${phase}:${Date.now() - phaseStartRef.current}`])
     setPhase('completed')
-  }, [])
+  }, [phase])
 
   const phaseIndex = PHASE_ORDER.indexOf(phase)
 
@@ -117,5 +129,6 @@ export function useTutorialState(): TutorialState {
 
     startTime: startTimeRef.current,
     elapsedSeconds,
+    stepDurations,
   }
 }

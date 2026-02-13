@@ -106,35 +106,6 @@ export function TutorialIntroShell() {
     setSequenceState('complete')
   }, [])
 
-  // NEXT button — advance to next phase and play it
-  const handleNext = useCallback(() => {
-    const currentPhase = PHASES[phaseIndex]
-    const ms = Date.now() - phaseStartRef.current
-
-    if (phaseIndex >= PHASES.length - 1) {
-      finishTutorial([...stepDurations, `${currentPhase}:${ms}`])
-      return
-    }
-
-    setStepDurations(prev => [...prev, `${currentPhase}:${ms}`])
-    phaseStartRef.current = Date.now()
-    setPhaseIndex(prev => prev + 1)
-    setSeqKey(prev => prev + 1)
-    setPhaseStartTime(Date.now())
-    setSequenceState('playing')
-  }, [phaseIndex, stepDurations, finishTutorial])
-
-  // BACK button — go to previous checkpoint (no replay)
-  const handleBack = useCallback(() => {
-    if (phaseIndex <= 0) return
-    phaseStartRef.current = Date.now()
-    setStepDurations(prev => prev.slice(0, -1))
-    setPhaseIndex(prev => prev - 1)
-    setSeqKey(prev => prev + 1)
-    setPhaseStartTime(Date.now())
-    setSequenceState('checkpoint')
-  }, [phaseIndex])
-
   // Tap right — skip to next phase (always plays)
   const handleTapRight = useCallback(() => {
     const currentPhase = PHASES[phaseIndex]
@@ -218,28 +189,6 @@ export function TutorialIntroShell() {
         </div>
       )}
 
-      {/* Bottom navigation — only visible after sequence completes or at a checkpoint */}
-      {showButtons && (
-        <div
-          className="absolute bottom-0 left-0 right-0 z-[60] flex items-center justify-center gap-4 pb-8"
-          style={{ paddingBottom: 'max(3.5rem, env(safe-area-inset-bottom))' }}
-        >
-          {phaseIndex > 0 && (
-            <button
-              onClick={handleBack}
-              className="font-mohave font-medium text-[14px] uppercase tracking-wider text-white/50 px-6 py-3 border border-white/30 rounded-[5px] transition-all hover:text-white/70 hover:border-white/50"
-            >
-              BACK
-            </button>
-          )}
-          <button
-            onClick={handleNext}
-            className="font-mohave font-medium text-[16px] uppercase tracking-wider text-white px-8 py-3 border-2 border-white rounded-[5px] transition-all hover:bg-white hover:text-black"
-          >
-            {phaseIndex >= PHASES.length - 1 ? 'BEGIN TUTORIAL' : 'NEXT'}
-          </button>
-        </div>
-      )}
     </div>
   )
 }
