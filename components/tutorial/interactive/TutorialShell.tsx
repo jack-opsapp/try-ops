@@ -20,7 +20,6 @@ import { MockProjectForm } from './MockProjectForm'
 import { MockTaskForm } from './MockTaskForm'
 import { MockTabBar } from './MockTabBar'
 import { CollapsibleTooltip } from './CollapsibleTooltip'
-import { ContinueButton } from './ContinueButton'
 
 interface TutorialShellProps {
   onComplete: (elapsedSeconds: number, stepDurations: string[]) => void
@@ -33,7 +32,6 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
     phaseConfig,
     advance,
     goBack,
-    skip,
     selectedClient,
     projectName,
     selectedTaskType,
@@ -227,8 +225,17 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
   }
 
 
-  // Continue button always uses inline variant now (no more tutorialSummary fullWidth)
-  const continueVariant = 'inline' as const
+  // Whether continue button is the primary action (user just taps continue to advance)
+  const isContinuePhase =
+    (phaseConfig.showContinueButton && !dragAnimStarted) ||
+    dragAnimLanded ||
+    closedSheetReady
+
+  const continueLabel = dragAnimLanded ? 'CONTINUE' : phaseConfig.continueLabel || 'CONTINUE'
+
+  // Progress fraction (exclude 'completed' from total)
+  const totalPhases = tutorial.totalPhases
+  const progressFraction = totalPhases > 0 ? phaseIndex / totalPhases : 0
 
   return (
     <div
@@ -370,12 +377,8 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
 
       {/* Layer 6: Tooltip (z-50, always on top of content) */}
       <div
-        className={`absolute left-0 right-0 ${
-          phaseConfig.tooltipPosition === 'bottom'
-            ? 'bottom-[70px]'
-            : 'top-0'
-        }`}
-        style={{ zIndex: 50 }}
+        className="absolute left-0 right-0"
+        style={{ zIndex: 50, top: phaseConfig.tooltipTop || '0' }}
       >
         <CollapsibleTooltip
           text={phaseConfig.tooltipText}
@@ -384,68 +387,105 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
         />
       </div>
 
-      {/* Layer 6b: Back + Skip nav buttons (z-55) */}
-      <div className="absolute top-0 left-0 right-0 flex items-start justify-between pointer-events-none" style={{ zIndex: 55, padding: '14px 16px' }}>
-        {/* Back button — hidden on first phase */}
-        {phaseIndex > 0 ? (
+      {/* Layer 6b: Progress bar (z-55) */}
+      <div className="absolute top-0 left-0 right-0" style={{ zIndex: 55 }}>
+        <div className="h-[3px] bg-white/10">
+          <div
+            className="h-full bg-[#417394] transition-all duration-500 ease-out"
+            style={{ width: `${progressFraction * 100}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Layer 7: Bottom action bar (z-60) */}
+      <div
+        className="absolute bottom-0 left-0 right-0 flex items-center gap-3 px-4 pb-4"
+        style={{ zIndex: 60 }}
+      >
+        {isContinuePhase ? (
+          /* Continue/Done phase — single wide button, centered */
           <button
-            onClick={() => {
-              // Reset transient states when going back
-              setDragAnimStarted(false)
-              setDragAnimLanded(false)
-              setClosedSheetOpen(false)
-              setClosedSheetReady(false)
-              goBack()
-            }}
-            className="pointer-events-auto flex items-center justify-center"
+            onClick={handleContinue}
+            className="mx-auto flex items-center justify-center gap-2 bg-white text-black font-mohave font-medium text-[16px] tracking-wide
+                       hover:bg-gray-100 active:bg-gray-200 transition-colors duration-150"
             style={{
-              width: 36,
-              height: 36,
-              borderRadius: 18,
-              background: 'rgba(0, 0, 0, 0.6)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              border: '1px solid rgba(255,255,255,0.1)',
+              width: '70%',
+              paddingTop: 14,
+              paddingBottom: 14,
+              borderRadius: 5,
+              boxShadow: '0 0 20px rgba(0,0,0,0.8), 0 8px 40px rgba(0,0,0,0.6)',
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-white">
-              <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <span>{continueLabel}</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-black">
+              <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
         ) : (
-          <div style={{ width: 36 }} />
+          /* Action phase — back + disabled continue + skip */
+          <>
+            {/* Back button */}
+            <button
+              onClick={() => {
+                setDragAnimStarted(false)
+                setDragAnimLanded(false)
+                setClosedSheetOpen(false)
+                setClosedSheetReady(false)
+                goBack()
+              }}
+              disabled={phaseIndex <= 0}
+              className="font-mohave font-medium text-[14px] uppercase tracking-wider transition-colors duration-150"
+              style={{
+                flex: 3,
+                paddingTop: 14,
+                paddingBottom: 14,
+                borderRadius: 5,
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                color: phaseIndex > 0 ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.15)',
+                cursor: phaseIndex > 0 ? 'pointer' : 'default',
+              }}
+            >
+              BACK
+            </button>
+
+            {/* Continue button — greyed out / disabled */}
+            <button
+              disabled
+              className="font-mohave font-medium text-[16px] tracking-wide"
+              style={{
+                flex: 4,
+                paddingTop: 14,
+                paddingBottom: 14,
+                borderRadius: 5,
+                background: 'rgba(255,255,255,0.08)',
+                color: 'rgba(255,255,255,0.2)',
+                cursor: 'default',
+              }}
+            >
+              CONTINUE
+            </button>
+
+            {/* Skip step button */}
+            <button
+              onClick={() => advance()}
+              className="font-mohave font-medium text-[14px] uppercase tracking-wider transition-colors duration-150
+                         hover:bg-white/10 active:bg-white/15"
+              style={{
+                flex: 3,
+                paddingTop: 14,
+                paddingBottom: 14,
+                borderRadius: 5,
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                color: 'rgba(255,255,255,0.6)',
+              }}
+            >
+              SKIP
+            </button>
+          </>
         )}
-
-        {/* Skip button */}
-        <button
-          onClick={() => skip()}
-          className="pointer-events-auto font-mohave font-medium text-[13px] uppercase tracking-wider"
-          style={{
-            color: 'rgba(255,255,255,0.5)',
-            padding: '8px 12px',
-            borderRadius: 18,
-            background: 'rgba(0, 0, 0, 0.6)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            border: '1px solid rgba(255,255,255,0.1)',
-          }}
-        >
-          SKIP
-        </button>
       </div>
-
-      {/* Layer 7: Continue/Done button (z-60) — hide during drag animation */}
-      {(
-        (phaseConfig.showContinueButton && !dragAnimStarted) ||
-        dragAnimLanded ||
-        closedSheetReady
-      ) && (
-        <ContinueButton
-          label={dragAnimLanded ? 'CONTINUE' : phaseConfig.continueLabel || 'CONTINUE'}
-          onClick={handleContinue}
-          variant={continueVariant}
-        />
-      )}
     </div>
   )
 }

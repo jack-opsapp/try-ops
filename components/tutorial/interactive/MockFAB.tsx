@@ -172,8 +172,12 @@ export function MockFAB({ phase, onFABTap, onCreateProject }: MockFABProps) {
                 >
                   {/* Label */}
                   <span
-                    className="font-mohave font-bold text-white whitespace-nowrap"
-                    style={{ fontSize: '16px', letterSpacing: '0.5px' }}
+                    className="font-mohave font-bold whitespace-nowrap"
+                    style={{
+                      fontSize: '16px',
+                      letterSpacing: '0.5px',
+                      color: isCreateProject ? '#417394' : '#FFFFFF',
+                    }}
                   >
                     {item.label}
                   </span>
@@ -184,9 +188,12 @@ export function MockFAB({ phase, onFABTap, onCreateProject }: MockFABProps) {
                     style={{
                       width: '48px',
                       height: '48px',
-                      color: '#AAAAAA',
-                      border: '1px solid #AAAAAA',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+                      color: isCreateProject ? '#417394' : '#AAAAAA',
+                      border: isCreateProject ? '2px solid #417394' : '1px solid #AAAAAA',
+                      boxShadow: isCreateProject
+                        ? '0 0 12px rgba(65,115,148,0.4)'
+                        : '0 2px 4px rgba(0,0,0,0.15)',
+                      animation: isCreateProject ? 'tutorial-pulse-ring 2s ease-in-out infinite' : 'none',
                     }}
                   >
                     {item.icon}

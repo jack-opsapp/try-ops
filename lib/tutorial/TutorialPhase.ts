@@ -26,7 +26,7 @@ export interface PhaseConfig {
   showContinueButton: boolean
   continueLabel?: string
   autoAdvanceMs?: number // auto-advance after N ms
-  tooltipPosition?: 'top' | 'bottom' // default: 'top'
+  tooltipTop?: string // CSS top value, default '0' (top of screen)
   spotlight?: { x: string; y: string; radius: number }
 }
 
@@ -56,14 +56,14 @@ export const PHASE_CONFIGS: Record<TutorialPhase, PhaseConfig> = {
     tooltipText: 'TAP THE + BUTTON',
     tooltipDescription: 'This is how you create projects, tasks, clients, and more.',
     showContinueButton: false,
-    tooltipPosition: 'bottom',
+    tooltipTop: '55%',
     spotlight: { x: '85%', y: '85%', radius: 40 },
   },
   fabTap: {
     tooltipText: 'TAP "CREATE PROJECT"',
     tooltipDescription: 'Every job starts here.',
     showContinueButton: false,
-    tooltipPosition: 'bottom',
+    tooltipTop: '25%',
     spotlight: { x: '80%', y: '68%', radius: 70 },
   },
   projectFormClient: {
