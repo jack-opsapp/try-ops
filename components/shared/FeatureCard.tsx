@@ -21,7 +21,7 @@ const fadeInUp = {
 export function FeatureCard({ icon, title, description, forLine, bullets, children }: FeatureCardProps) {
   return (
     <motion.div
-      className="bg-ops-card border border-ops-border rounded-ops-card p-8 transition-all duration-300 hover:border-ops-gray-300 hover:-translate-y-1"
+      className="bg-ops-card border border-ops-border rounded-ops-card p-8 transition-all duration-300 hover:border-ops-gray-300 hover:-translate-y-1 h-full"
       {...fadeInUp}
     >
       {icon && <div className="mb-4">{icon}</div>}

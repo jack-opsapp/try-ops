@@ -15,25 +15,25 @@ const testimonials = [
     quote: 'I came to OPS from Jobber. We went from our crew ignoring the app, to being excited to use it.',
     name: 'Ryan M.',
     trade: 'HVAC',
-    location: 'Red Deer',
+    location: 'Fraser Valley',
   },
   {
     quote: 'OPS is saving me likely 2 hours daily of coordination and back & forth, which has impressed me, but more surprising is how much more efficient my crew is. Can\'t explain it, but they are getting jobs done faster, and we are getting less callbacks. No complaints here.',
     name: 'Jorge R.',
     trade: 'Painting Contractor',
-    location: 'Tucson',
+    location: 'Kelowna',
   },
   {
     quote: 'It\'s an absolute game changer.',
     name: 'Brandon K.',
-    trade: 'Pool Service',
-    location: 'Phoenix',
+    trade: 'Landscaping',
+    location: 'Victoria',
   },
   {
     quote: 'I was quite literally on the verge of firing my foreman on one of my crews; we might\'ve been less organized than we could, but his complaining was getting deafening. At a team meeting we decided to adopt a new software and Jack set us up with OPS, since then he\'s happy as a dog with two tails - if that\'s not proof I don\'t know what is.',
     name: 'Bobby L.',
     trade: 'Plumbing',
-    location: 'Saskatoon',
+    location: 'Kamloops',
   },
 ]
 
@@ -48,12 +48,19 @@ export function TestimonialsSection() {
           CREWS THAT SWITCHED AREN&apos;T GOING BACK
         </motion.h2>
 
-        <motion.div {...fadeInUp}>
+        <motion.div {...fadeInUp} className="relative">
+          {/* Left gradient edge */}
+          <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-8 z-10 bg-gradient-to-r from-black to-transparent" />
+          {/* Right gradient edge */}
+          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 z-10 bg-gradient-to-l from-black to-transparent" />
+          {/* Bottom gradient edge */}
+          <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-12 z-10 bg-gradient-to-t from-black to-transparent" />
+
           <Carousel gap={16}>
             {testimonials.map((t) => (
               <div
                 key={t.name}
-                className="bg-ops-card border border-ops-border rounded-ops-card p-8 h-full flex flex-col"
+                className="bg-ops-card rounded-ops-card p-8 h-full flex flex-col"
               >
                 <p className="font-kosugi text-[16px] text-ops-gray-200 leading-relaxed flex-1 mb-6">
                   &ldquo;{t.quote}&rdquo;

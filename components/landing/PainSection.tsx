@@ -8,7 +8,6 @@ import {
   AnimatedDashboardOverload,
   AnimatedScatteredApps,
 } from '@/components/shared/AnimatedWireframeIcon'
-import { TangledMessagesIcon, DashboardOverloadIcon, ScatteredAppsIcon } from '@/components/shared/WireframeIcon'
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -20,7 +19,6 @@ const fadeInUp = {
 const painCards = [
   {
     id: 'messages',
-    icon: <TangledMessagesIcon />,
     animatedIcon: AnimatedTangledMessages,
     title: 'GROUP TEXT HELL',
     bullets: [
@@ -33,7 +31,6 @@ const painCards = [
   },
   {
     id: 'dashboard',
-    icon: <DashboardOverloadIcon />,
     animatedIcon: AnimatedDashboardOverload,
     title: 'ENTERPRISE OVERKILL',
     bullets: [
@@ -46,7 +43,6 @@ const painCards = [
   },
   {
     id: 'scattered',
-    icon: <ScatteredAppsIcon />,
     animatedIcon: AnimatedScatteredApps,
     title: 'TOOL SPRAWL',
     bullets: [
@@ -131,22 +127,26 @@ export function PainSection() {
         </div>
 
         {/* Desktop full grid */}
-        <div className="hidden md:grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-          {painCards.map((card, i) => (
-            <motion.div
-              key={card.title}
-              {...fadeInUp}
-              transition={{ ...fadeInUp.transition, delay: i * 0.1 }}
-            >
-              <FeatureCard
-                icon={card.icon}
-                title={card.title}
-                description=""
-                bullets={card.bullets}
-                forLine={card.forLine}
-              />
-            </motion.div>
-          ))}
+        <div className="hidden md:grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-stretch">
+          {painCards.map((card, i) => {
+            const AnimIcon = card.animatedIcon
+            return (
+              <motion.div
+                key={card.title}
+                className="h-full"
+                {...fadeInUp}
+                transition={{ ...fadeInUp.transition, delay: i * 0.1 }}
+              >
+                <FeatureCard
+                  icon={<AnimIcon isActive={true} size={56} />}
+                  title={card.title}
+                  description=""
+                  bullets={card.bullets}
+                  forLine={card.forLine}
+                />
+              </motion.div>
+            )
+          })}
         </div>
 
         {/* Solution callout */}
@@ -155,7 +155,10 @@ export function PainSection() {
           {...fadeInUp}
         >
           <p className="font-kosugi text-[18px] text-ops-gray-100 max-w-[700px]">
-            One app. Your crew opens it and knows what to do. No manual. No training. No IT department.
+            One app. Your crew opens it and knows what to do.{' '}
+            <span className="inline-block">No manual.</span>{' '}
+            <span className="inline-block">No training.</span>{' '}
+            <span className="inline-block">No dedicated IT guy necessary.</span>
           </p>
         </motion.div>
       </div>

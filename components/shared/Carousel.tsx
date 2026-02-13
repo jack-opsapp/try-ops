@@ -30,10 +30,14 @@ export function Carousel({ children, gap = 16, className = '' }: CarouselProps) 
   }, [])
 
   const snapTo = (index: number) => {
-    const clamped = Math.max(0, Math.min(index, count - 1))
-    setActiveIndex(clamped)
+    // Wrap around
+    let wrapped = index
+    if (wrapped > count - 1) wrapped = 0
+    if (wrapped < 0) wrapped = count - 1
+
+    setActiveIndex(wrapped)
     controls.start({
-      x: -clamped * (cardWidth + gap),
+      x: -wrapped * (cardWidth + gap),
       transition: { type: 'spring', stiffness: 300, damping: 30 },
     })
   }
@@ -59,10 +63,14 @@ export function Carousel({ children, gap = 16, className = '' }: CarouselProps) 
   }
 
   return (
-    <div ref={containerRef} className={`overflow-hidden ${className}`}>
+    <div
+      ref={containerRef}
+      className={`relative overflow-hidden max-w-[100vw] ${className}`}
+      style={{ overscrollBehaviorX: 'contain' }}
+    >
       <motion.div
         className="flex cursor-grab active:cursor-grabbing"
-        style={{ x, gap }}
+        style={{ x, gap, touchAction: 'pan-y' }}
         drag="x"
         dragElastic={0.1}
         dragDirectionLock
@@ -83,6 +91,30 @@ export function Carousel({ children, gap = 16, className = '' }: CarouselProps) 
           </div>
         ))}
       </motion.div>
+
+      {/* Arrow buttons — desktop only */}
+      {count > 1 && (
+        <>
+          <button
+            onClick={() => snapTo(activeIndex - 1)}
+            className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-200"
+            aria-label="Previous slide"
+          >
+            <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+          <button
+            onClick={() => snapTo(activeIndex + 1)}
+            className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-200"
+            aria-label="Next slide"
+          >
+            <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 6 15 12 9 18" />
+            </svg>
+          </button>
+        </>
+      )}
 
       {/* Dot indicators */}
       {count > 1 && (

@@ -14,30 +14,30 @@ export function HeroAnimation() {
   useEffect(() => {
     const timeouts: NodeJS.Timeout[] = []
 
-    // === CARD BUILDING ===
+    // === CARD BUILDING (compressed ~40%) ===
     timeouts.push(setTimeout(() => setPhase(1), 100))    // Card 1 outline draws
-    timeouts.push(setTimeout(() => setPhase(2), 600))    // Card 1 content springs in
-    timeouts.push(setTimeout(() => setPhase(3), 1200))   // Card 2 outline draws
-    timeouts.push(setTimeout(() => setPhase(4), 1700))   // Card 2 content springs in
-    timeouts.push(setTimeout(() => setPhase(5), 2300))   // Card 3 outline draws
-    timeouts.push(setTimeout(() => setPhase(6), 2800))   // Card 3 content + checkmarks cascade
+    timeouts.push(setTimeout(() => setPhase(2), 400))    // Card 1 content springs in
+    timeouts.push(setTimeout(() => setPhase(3), 700))    // Card 2 outline draws
+    timeouts.push(setTimeout(() => setPhase(4), 1000))   // Card 2 content springs in
+    timeouts.push(setTimeout(() => setPhase(5), 1300))   // Card 3 outline draws
+    timeouts.push(setTimeout(() => setPhase(6), 1600))   // Card 3 content + checkmarks cascade
 
     // === FOLDER TRANSITION ===
-    timeouts.push(setTimeout(() => setPhase(7), 4300))   // Cards shrink + folder appears
-    timeouts.push(setTimeout(() => setPhase(8), 5100))   // Cards fully absorbed
+    timeouts.push(setTimeout(() => setPhase(7), 3100))   // Cards shrink + folder appears
+    timeouts.push(setTimeout(() => setPhase(8), 3900))   // Cards fully absorbed
 
     // === COMPLETION — folder spins, turns completed color ===
-    timeouts.push(setTimeout(() => setPhase(9), 5800))
+    timeouts.push(setTimeout(() => setPhase(9), 4600))
 
     // === INVOICE — emerges right, folder shifts left ===
-    timeouts.push(setTimeout(() => setPhase(10), 7000))  // Invoice emerges right, folder shifts left
-    timeouts.push(setTimeout(() => setPhase(11), 7700))  // Checkmark stamps on invoice
+    timeouts.push(setTimeout(() => setPhase(10), 5800))  // Invoice emerges right, folder shifts left
+    timeouts.push(setTimeout(() => setPhase(11), 6500))  // Checkmark stamps on invoice
 
     // === RETURN — both return to center ===
-    timeouts.push(setTimeout(() => setPhase(12), 8800))  // Invoice returns + fades
+    timeouts.push(setTimeout(() => setPhase(12), 7600))  // Invoice returns + fades
 
     // === CLOSE OUT — folder spins back to white, stays here ===
-    timeouts.push(setTimeout(() => setPhase(13), 9800))
+    timeouts.push(setTimeout(() => setPhase(13), 8600))
 
     return () => timeouts.forEach(clearTimeout)
   }, [])
