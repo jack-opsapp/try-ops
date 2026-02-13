@@ -166,6 +166,18 @@ export default function LandingPage() {
     }
   }, [trackLandingCTAClick, getScrollDepth, getTimeOnPage])
 
+  const handleStickyTryClick = useCallback(() => {
+    trackLandingCTAClick(
+      'secondary',
+      'TRY IT ONLINE',
+      'sticky',
+      getScrollDepth(),
+      getTimeOnPage()
+    )
+    setTutorialStartTime(Date.now())
+    router.push('/tutorial-intro')
+  }, [trackLandingCTAClick, getScrollDepth, getTimeOnPage, setTutorialStartTime, router])
+
   const handleClosingDownloadClick = useCallback(() => {
     trackLandingCTAClick(
       'primary',
@@ -266,7 +278,7 @@ export default function LandingPage() {
 
       <Footer />
 
-      <StickyCTA onDownloadClick={handleStickyDownloadClick} />
+      <StickyCTA onDownloadClick={handleStickyDownloadClick} onTryClick={handleStickyTryClick} />
     </main>
   )
 }
