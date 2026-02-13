@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { TypewriterText } from '@/components/ui/TypewriterText'
 
-const LOOP_DURATION = 12500
+const LOOP_DURATION = 13500
 
 const spring = { type: 'spring' as const, stiffness: 120, damping: 18 }
 
@@ -34,17 +34,21 @@ export function HeroAnimation() {
       timeouts.push(setTimeout(() => setPhase(7), 4300))   // Cards shrink + folder appears
       timeouts.push(setTimeout(() => setPhase(8), 5100))   // Cards fully absorbed
 
-      // === COMPLETION ===
-      timeouts.push(setTimeout(() => setPhase(9), 5800))   // Folder spins + color change
+      // === COMPLETION — folder spins, turns completed color ===
+      timeouts.push(setTimeout(() => setPhase(9), 5800))
 
-      // === INVOICE ===
-      timeouts.push(setTimeout(() => setPhase(10), 7000))  // Invoice rises from folder
+      // === INVOICE — emerges right, folder shifts left ===
+      timeouts.push(setTimeout(() => setPhase(10), 7000))  // Invoice emerges right, folder shifts left
       timeouts.push(setTimeout(() => setPhase(11), 7700))  // Checkmark stamps on invoice
-      timeouts.push(setTimeout(() => setPhase(12), 8500))  // Invoice returns to folder
 
-      // === CLOSE OUT ===
-      timeouts.push(setTimeout(() => setPhase(13), 9500))  // Folder reverts to white, hold
-      timeouts.push(setTimeout(() => setPhase(14), 11500)) // Fade out
+      // === RETURN — both return to center ===
+      timeouts.push(setTimeout(() => setPhase(12), 8800))  // Invoice returns + fades
+
+      // === CLOSE OUT — folder spins back to white ===
+      timeouts.push(setTimeout(() => setPhase(13), 9800))
+
+      // === FADE OUT ===
+      timeouts.push(setTimeout(() => setPhase(14), 12000))
     }
 
     runLoop()
@@ -70,21 +74,21 @@ export function HeroAnimation() {
     { y: 4 + 2 * (cardH + gap), titleW: 55, addrW: 40, crewCount: 3, dateW: 18 },
   ]
 
-  // ── Folder geometry (taller) ──
-  const folderX = 59
-  const folderY = 142
-  const folderW = 82
-  const folderH = 48
-  const folderTabH = 8
+  // ── Folder geometry — MUCH bigger ──
+  const folderW = 120
+  const folderH = 70
+  const folderX = 40
+  const folderY = 85
+  const folderTabH = 12
   const folderCenterX = folderX + folderW / 2   // 100
-  const folderCenterY = folderY + folderH / 2   // 166
+  const folderCenterY = folderY + folderH / 2   // 120
 
-  // ── Invoice geometry (taller) ──
-  const invoiceX = folderCenterX - 20            // 80
-  const invoiceTopY = folderY - 12               // 130
-  const invoiceW = 40
-  const invoiceH = 56
-  const invoiceFoldSize = 7
+  // ── Invoice geometry ──
+  const invoiceW = 48
+  const invoiceH = 62
+  const invoiceFoldSize = 8
+  const invoiceBaseX = folderCenterX - invoiceW / 2   // 76
+  const invoiceBaseY = folderCenterY - invoiceH / 2   // 89
 
   // ── Phase helpers ──
   const shouldShowCard = (ci: number) => {
@@ -102,15 +106,25 @@ export function HeroAnimation() {
     return false
   }
 
-  // Folder is completed color during the invoice cycle, then reverts to white
+  // Folder is completed color during invoice cycle, reverts to white on close-out
   const folderStroke = phase >= 9 && phase < 13 ? COMPLETED_COLOR : 'white'
+
+  // Folder shifts left when invoice is out
+  const folderXOffset = phase >= 10 && phase < 12 ? -35 : 0
+
+  // Folder rotation: first spin at phase 9, second spin at phase 13
+  const folderRotation = phase >= 13 ? 720 : phase >= 9 ? 360 : 0
+
+  // Invoice shifts right when emerging
+  const invoiceXOffset = phase >= 10 && phase < 12 ? 60 : 0
 
   // ── Typewriter text ──
   const getTextInfo = () => {
-    if (phase >= 10 && phase < 14) return { key: 'paid', text: 'GET PAID. CLOSE IT OUT.' }
-    if (phase >= 9 && phase < 10) return { key: 'complete', text: 'COMPLETE THE PROJECT.' }
-    if (phase >= 7 && phase < 9) return { key: 'organize', text: 'ORGANIZE EVERYTHING.' }
-    if (phase >= 1 && phase < 7) return { key: 'schedule', text: 'SCHEDULE YOUR CREW.' }
+    if (phase >= 13 && phase < 14) return { key: 'closeout', text: 'CLOSE IT OUT.', isCloseOut: true }
+    if (phase >= 10 && phase < 13) return { key: 'paid', text: 'GET PAID.', isCloseOut: false }
+    if (phase >= 9 && phase < 10) return { key: 'complete', text: 'COMPLETE THE PROJECT.', isCloseOut: false }
+    if (phase >= 7 && phase < 9) return { key: 'organize', text: 'ORGANIZE EVERYTHING.', isCloseOut: false }
+    if (phase >= 1 && phase < 7) return { key: 'schedule', text: 'SCHEDULE YOUR CREW.', isCloseOut: false }
     return null
   }
 
@@ -132,6 +146,7 @@ export function HeroAnimation() {
               viewBox="0 0 200 210"
               fill="none"
               className="w-[210px] lg:w-[320px]"
+              overflow="visible"
             >
               {/* ═══════════════ JOB CARDS ═══════════════ */}
               {cards.map((card, ci) => {
@@ -283,13 +298,15 @@ export function HeroAnimation() {
                   animate={{
                     opacity: 1,
                     scale: 1,
-                    rotate: phase >= 9 ? 360 : 0,
+                    rotate: folderRotation,
+                    x: folderXOffset,
                   }}
                   style={{ transformOrigin: `${folderCenterX}px ${folderCenterY}px` }}
                   transition={{
                     opacity: { duration: 0.3 },
                     scale: { type: 'spring', stiffness: 150, damping: 15 },
                     rotate: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
+                    x: { type: 'spring', stiffness: 100, damping: 16 },
                   }}
                 >
                   {/* Folder body */}
@@ -298,7 +315,7 @@ export function HeroAnimation() {
                     y={folderY}
                     width={folderW}
                     height={folderH}
-                    rx={3}
+                    rx={4}
                     strokeWidth="1.5"
                     fill="none"
                     animate={{ stroke: folderStroke }}
@@ -307,7 +324,7 @@ export function HeroAnimation() {
 
                   {/* Folder tab */}
                   <motion.path
-                    d={`M${folderX} ${folderY} L${folderX} ${folderY - folderTabH} L${folderX + 30} ${folderY - folderTabH} L${folderX + 36} ${folderY}`}
+                    d={`M${folderX} ${folderY} L${folderX} ${folderY - folderTabH} L${folderX + 40} ${folderY - folderTabH} L${folderX + 48} ${folderY}`}
                     strokeWidth="1.5"
                     fill="none"
                     animate={{ stroke: folderStroke }}
@@ -317,11 +334,11 @@ export function HeroAnimation() {
                   {/* Folder label */}
                   <motion.text
                     x={folderCenterX}
-                    y={folderY + folderH / 2 + 4}
+                    y={folderCenterY + 5}
                     textAnchor="middle"
                     fontFamily="var(--font-mohave)"
                     fontWeight="500"
-                    fontSize="10"
+                    fontSize="13"
                     letterSpacing="0.05em"
                     stroke="none"
                     animate={{ fill: folderStroke }}
@@ -333,20 +350,20 @@ export function HeroAnimation() {
               )}
 
               {/* ═══════════════ INVOICE ═══════════════ */}
-              {phase >= 10 && (
+              {phase >= 10 && phase < 13 && (
                 <motion.g
-                  initial={{ opacity: 0, y: 0 }}
+                  initial={{ opacity: 0, x: 0, scale: 0.5 }}
                   animate={{
                     opacity: phase >= 12 ? 0 : 1,
-                    y: phase >= 12 ? 0 : -80,
-                    scale: phase >= 12 ? 0.3 : 1,
+                    x: invoiceXOffset,
+                    scale: phase >= 12 ? 0.4 : 1,
                   }}
-                  style={{ transformOrigin: `${folderCenterX}px ${folderY}px` }}
+                  style={{ transformOrigin: `${invoiceBaseX + invoiceW / 2}px ${invoiceBaseY + invoiceH / 2}px` }}
                   transition={{ type: 'spring', stiffness: 120, damping: 16 }}
                 >
                   {/* Document body with dog-ear */}
                   <path
-                    d={`M${invoiceX} ${invoiceTopY} H${invoiceX + invoiceW - invoiceFoldSize} L${invoiceX + invoiceW} ${invoiceTopY + invoiceFoldSize} V${invoiceTopY + invoiceH} H${invoiceX} Z`}
+                    d={`M${invoiceBaseX} ${invoiceBaseY} H${invoiceBaseX + invoiceW - invoiceFoldSize} L${invoiceBaseX + invoiceW} ${invoiceBaseY + invoiceFoldSize} V${invoiceBaseY + invoiceH} H${invoiceBaseX} Z`}
                     stroke={COMPLETED_COLOR}
                     strokeWidth="1.5"
                     fill="none"
@@ -354,7 +371,7 @@ export function HeroAnimation() {
 
                   {/* Dog-ear fold */}
                   <path
-                    d={`M${invoiceX + invoiceW - invoiceFoldSize} ${invoiceTopY} V${invoiceTopY + invoiceFoldSize} H${invoiceX + invoiceW}`}
+                    d={`M${invoiceBaseX + invoiceW - invoiceFoldSize} ${invoiceBaseY} V${invoiceBaseY + invoiceFoldSize} H${invoiceBaseX + invoiceW}`}
                     stroke={COMPLETED_COLOR}
                     strokeWidth="1.5"
                     fill="none"
@@ -362,38 +379,38 @@ export function HeroAnimation() {
 
                   {/* Detail lines */}
                   <line
-                    x1={invoiceX + 8}
-                    y1={invoiceTopY + 18}
-                    x2={invoiceX + invoiceW - 8}
-                    y2={invoiceTopY + 18}
+                    x1={invoiceBaseX + 8}
+                    y1={invoiceBaseY + 18}
+                    x2={invoiceBaseX + invoiceW - 8}
+                    y2={invoiceBaseY + 18}
                     stroke={COMPLETED_COLOR}
                     strokeWidth="1"
                     opacity="0.5"
                   />
                   <line
-                    x1={invoiceX + 8}
-                    y1={invoiceTopY + 26}
-                    x2={invoiceX + invoiceW - 8}
-                    y2={invoiceTopY + 26}
+                    x1={invoiceBaseX + 8}
+                    y1={invoiceBaseY + 26}
+                    x2={invoiceBaseX + invoiceW - 8}
+                    y2={invoiceBaseY + 26}
                     stroke={COMPLETED_COLOR}
                     strokeWidth="1"
                     opacity="0.5"
                   />
                   <line
-                    x1={invoiceX + 8}
-                    y1={invoiceTopY + 34}
-                    x2={invoiceX + invoiceW - 14}
-                    y2={invoiceTopY + 34}
+                    x1={invoiceBaseX + 8}
+                    y1={invoiceBaseY + 34}
+                    x2={invoiceBaseX + invoiceW - 14}
+                    y2={invoiceBaseY + 34}
                     stroke={COMPLETED_COLOR}
                     strokeWidth="1"
                     opacity="0.5"
                   />
                   {/* $ amount line */}
                   <line
-                    x1={invoiceX + invoiceW - 18}
-                    y1={invoiceTopY + invoiceH - 10}
-                    x2={invoiceX + invoiceW - 8}
-                    y2={invoiceTopY + invoiceH - 10}
+                    x1={invoiceBaseX + invoiceW - 18}
+                    y1={invoiceBaseY + invoiceH - 12}
+                    x2={invoiceBaseX + invoiceW - 8}
+                    y2={invoiceBaseY + invoiceH - 12}
                     stroke={COMPLETED_COLOR}
                     strokeWidth="1.5"
                     opacity="0.7"
@@ -404,19 +421,19 @@ export function HeroAnimation() {
                     <motion.g
                       initial={{ opacity: 0, scale: 0.3 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      style={{ transformOrigin: `${folderCenterX}px ${invoiceTopY + 28}px` }}
+                      style={{ transformOrigin: `${invoiceBaseX + invoiceW / 2}px ${invoiceBaseY + invoiceH / 2 - 4}px` }}
                       transition={{ type: 'spring', stiffness: 200, damping: 15 }}
                     >
                       <circle
-                        cx={folderCenterX}
-                        cy={invoiceTopY + 28}
-                        r="9"
+                        cx={invoiceBaseX + invoiceW / 2}
+                        cy={invoiceBaseY + invoiceH / 2 - 4}
+                        r="10"
                         stroke={COMPLETED_COLOR}
                         strokeWidth="1.5"
                         fill="none"
                       />
                       <motion.path
-                        d={`M${folderCenterX - 4} ${invoiceTopY + 28} l3 3.5 l6 -7`}
+                        d={`M${invoiceBaseX + invoiceW / 2 - 5} ${invoiceBaseY + invoiceH / 2 - 4} l3.5 4 l7 -8`}
                         stroke={COMPLETED_COLOR}
                         strokeWidth="1.5"
                         strokeLinecap="round"
@@ -432,8 +449,8 @@ export function HeroAnimation() {
               )}
             </motion.svg>
 
-            {/* ═══════════════ TYPEWRITER TEXT ═══════════════ */}
-            <div className="h-6 mt-3 flex items-center justify-center">
+            {/* ═══════════════ TEXT ═══════════════ */}
+            <div className="h-8 mt-3 flex items-center justify-center">
               <AnimatePresence mode="wait">
                 {textInfo && (
                   <motion.div
@@ -442,12 +459,24 @@ export function HeroAnimation() {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
+                    className="flex items-center justify-center"
                   >
-                    <TypewriterText
-                      text={textInfo.text}
-                      className="font-mohave text-[13px] lg:text-[15px] uppercase tracking-[0.08em] text-white/50"
-                      typingSpeed={30}
-                    />
+                    {textInfo.isCloseOut ? (
+                      <motion.span
+                        className="font-mohave text-[15px] lg:text-[18px] uppercase tracking-[0.08em] text-white font-medium"
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1.25, opacity: 1 }}
+                        transition={{ type: 'spring', stiffness: 150, damping: 12 }}
+                      >
+                        {textInfo.text}
+                      </motion.span>
+                    ) : (
+                      <TypewriterText
+                        text={textInfo.text}
+                        className="font-mohave text-[13px] lg:text-[15px] uppercase tracking-[0.08em] text-white/50"
+                        typingSpeed={30}
+                      />
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>

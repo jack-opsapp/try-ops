@@ -58,8 +58,7 @@ export function StickyCTA({ onDownloadClick }: StickyCTAProps) {
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] as const }}
           className="fixed bottom-0 left-0 right-0 z-[999] md:hidden"
         >
-          {/* Ultra-thin material background */}
-          <div className="backdrop-blur-xl bg-black/30 border-t border-white/10 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0.75rem))]">
+          <div className="ultra-thin-material border-t px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0.75rem))]">
             <Button
               variant="primary"
               onClick={onDownloadClick}

@@ -301,7 +301,20 @@ export function AnimatedDashboardOverload({ isActive, size = 48 }: AnimatedIconP
 // 4 distinct tool icons clustered tight. On activate: they spring
 // apart in different directions, $ signs fade into the gaps.
 export function AnimatedScatteredApps({ isActive, size = 48 }: AnimatedIconProps) {
+  const [driftPhase, setDriftPhase] = useState(0)
   const spring = { type: 'spring' as const, stiffness: 80, damping: 12 }
+
+  useEffect(() => {
+    if (!isActive) {
+      setDriftPhase(0)
+      return
+    }
+    // After dollars appear, tools drift further apart
+    const timeout = setTimeout(() => setDriftPhase(1), 2000)
+    return () => clearTimeout(timeout)
+  }, [isActive])
+
+  const driftMult = driftPhase >= 1 ? 1.8 : 1
 
   const tools = [
     {
@@ -379,16 +392,18 @@ export function AnimatedScatteredApps({ isActive, size = 48 }: AnimatedIconProps
       strokeLinejoin="round"
       className="text-ops-gray-200"
     >
-      {/* Tool icons that drift apart */}
+      {/* Tool icons that drift apart — second phase drifts further */}
       {tools.map((tool, i) => (
         <motion.g
           key={i}
           animate={
             isActive
               ? {
-                  x: tool.dx,
-                  y: tool.dy,
-                  transition: { ...spring, delay: i * 0.12 },
+                  x: tool.dx * driftMult,
+                  y: tool.dy * driftMult,
+                  transition: driftPhase >= 1
+                    ? { type: 'spring' as const, stiffness: 30, damping: 14 }
+                    : { ...spring, delay: i * 0.12 },
                 }
               : { x: 0, y: 0, transition: spring }
           }

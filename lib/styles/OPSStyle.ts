@@ -54,6 +54,15 @@ export const OPSStyle = {
     modalOverlay: 'rgba(0,0,0,0.5)',
     imageOverlay: 'rgba(0,0,0,0.7)',
 
+    // Materials (iOS UIBlurEffect equivalents)
+    materials: {
+      ultraThin: {
+        background: 'rgba(0, 0, 0, 0.25)',
+        blur: 24,           // px — maps to backdrop-blur-xl
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+      },
+    },
+
     // Calendar
     todayHighlight: 'rgba(255,119,51,0.5)', // primaryAccent at 0.5
   },

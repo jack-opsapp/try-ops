@@ -11,7 +11,7 @@ const fadeInUp = {
 
 export function FounderQuote() {
   return (
-    <section className="py-20 lg:py-[160px] snap-start snap-always">
+    <section className="py-8 lg:py-[160px] snap-start snap-always">
       <div className="max-w-[700px] mx-auto px-4 md:px-6 lg:px-10">
         <motion.div
           className="border-l-2 border-white/20 pl-6 lg:pl-8"
