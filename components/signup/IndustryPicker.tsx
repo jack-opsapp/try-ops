@@ -28,10 +28,6 @@ export function IndustryPicker({
 
   return (
     <div className="w-full">
-      <label className="font-kosugi text-ops-caption text-ops-text-secondary uppercase tracking-wider mb-2 block">
-        INDUSTRY <span className="text-ops-error">*</span>
-      </label>
-
       {/* Selected display / trigger */}
       <button
         type="button"

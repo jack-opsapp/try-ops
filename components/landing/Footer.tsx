@@ -35,7 +35,7 @@ export function Footer() {
                 { label: 'Features', action: () => scrollTo('solution') },
                 { label: 'Pricing', action: () => scrollTo('pricing') },
                 { label: 'Roadmap', action: () => scrollTo('roadmap') },
-                { label: 'Download', href: 'https://apps.apple.com/app/ops-app/id6503204873' },
+                { label: 'Download', href: 'https://apps.apple.com/us/app/ops-job-crew-management/id6746662078' },
               ].map((link) => (
                 <li key={link.label}>
                   {link.href ? (

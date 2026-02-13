@@ -15,7 +15,7 @@ export function PillSelector({
 }: PillSelectorProps) {
   return (
     <div className="w-full">
-      <label className="font-kosugi text-ops-caption text-ops-text-secondary uppercase tracking-wider mb-3 block">
+      <label className="font-kosugi font-normal text-ops-caption text-ops-text-secondary uppercase tracking-wider mb-3 block">
         {label}
       </label>
       <div className="flex flex-wrap gap-2">

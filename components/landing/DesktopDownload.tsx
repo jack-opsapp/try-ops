@@ -114,7 +114,7 @@ export function DesktopDownload() {
                 DIRECT LINK
               </h3>
               <a
-                href="https://apps.apple.com/app/ops-app/id6503204873"
+                href="https://apps.apple.com/us/app/ops-job-crew-management/id6746662078"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block bg-ops-accent text-white font-mohave font-medium text-[14px] uppercase px-6 py-3 rounded-[4px] hover:brightness-110 transition-all"

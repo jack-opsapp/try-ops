@@ -98,7 +98,7 @@ export function PhasedPrimaryButton({
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                 />
               </svg>
-              <span className="font-mohave font-bold text-ops-body text-black">
+              <span className="font-mohave font-medium text-ops-body text-black">
                 {loadingText || title}
               </span>
             </span>
@@ -113,7 +113,7 @@ export function PhasedPrimaryButton({
                   <span className="absolute inset-0 flex items-center">
                     <TypewriterText
                       text={title}
-                      className="font-mohave font-bold text-ops-body text-black"
+                      className="font-mohave font-medium text-ops-body text-black"
                       typingSpeed={40}
                       onComplete={() => {
                         // iOS: 0.35s delay then show icon

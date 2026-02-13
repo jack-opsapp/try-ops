@@ -4,7 +4,7 @@ const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN
 const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER
 
-const APP_STORE_URL = 'https://apps.apple.com/app/ops-app/id6503204873'
+const APP_STORE_URL = 'https://apps.apple.com/us/app/ops-job-crew-management/id6746662078'
 
 function normalizePhone(raw: string): string | null {
   const digits = raw.replace(/\D/g, '')

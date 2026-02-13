@@ -19,7 +19,7 @@ import { Footer } from '@/components/landing/Footer'
 import { StickyCTA } from '@/components/landing/StickyCTA'
 import { TestimonialsSection } from '@/components/landing/TestimonialsSection'
 
-const APP_STORE_URL = 'https://apps.apple.com/app/ops-app/id6503204873'
+const APP_STORE_URL = 'https://apps.apple.com/us/app/ops-job-crew-management/id6746662078'
 
 export default function LandingPage() {
   const router = useRouter()

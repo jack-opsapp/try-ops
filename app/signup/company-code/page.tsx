@@ -31,7 +31,9 @@ export default function CompanyCodePage() {
     }
     setSignupStep(5)
     trackSignupStepView('company-code', 5)
-    animation.start()
+    // Delay start to let page mount settle and avoid animation glitch
+    const t = setTimeout(() => animation.start(), 100)
+    return () => clearTimeout(t)
   }, [userId, router, setSignupStep, trackSignupStepView])
 
   const handleCopy = async () => {
@@ -109,7 +111,7 @@ export default function CompanyCodePage() {
                   <div className="flex flex-col items-center gap-2">
                     {/* iOS: Text("[CODE]").font(captionBold) — Kosugi Bold 14pt */}
                     <span
-                      className="font-kosugi font-bold text-ops-caption transition-colors"
+                      className="font-kosugi font-normal text-ops-caption transition-colors"
                       style={{
                         color: copied ? '#A5B368' : '#F5F5F5',
                       }}
@@ -156,7 +158,7 @@ export default function CompanyCodePage() {
               <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            <span className="font-mohave font-bold text-ops-body text-white">
+            <span className="font-mohave font-medium text-ops-body text-white">
               INVITE CREW
             </span>
           </button>

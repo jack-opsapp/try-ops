@@ -92,7 +92,7 @@ export default function ReadyPage() {
   }
 
   return (
-    <OnboardingScaffold>
+    <OnboardingScaffold showBack>
       {/* iOS BillingInfoView companyCreatorView layout: left-aligned VStack */}
       <div className="flex flex-col flex-1">
         {/* Spacer — iOS: Spacer().frame(height: 60) */}
@@ -163,15 +163,15 @@ export default function ReadyPage() {
           {/* Spacer — iOS: Spacer().frame(height: 24) */}
           <div className="h-6" />
 
-          {/* iOS: "SEE PLANS" button with chevron.right */}
-          <button className="flex items-center gap-2">
-            <span className="font-kosugi font-bold text-ops-caption text-ops-text-secondary">
+          {/* iOS: "SEE PLANS" button with chevron.right — links to pricing */}
+          <a href="/#pricing" className="flex items-center gap-2">
+            <span className="font-kosugi font-normal text-ops-caption text-ops-text-secondary">
               SEE PLANS
             </span>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-ops-text-tertiary">
               <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-          </button>
+          </a>
 
           {/* User-requested: "Upgrade anytime." */}
           <p className="font-kosugi text-ops-caption text-ops-text-secondary mt-6">
@@ -180,7 +180,7 @@ export default function ReadyPage() {
 
           {/* User-requested: Contact message */}
           <p className="font-kosugi text-ops-small text-ops-text-tertiary mt-4 leading-relaxed">
-            Get in touch with us if you have any trouble, or if the app is missing any features you need:{' '}
+            Get in touch with me if you have any trouble, or if the app is missing any features you need:{' '}
             <a
               href="mailto:jack@opsapp.co"
               className="text-ops-accent hover:underline"
@@ -199,7 +199,7 @@ export default function ReadyPage() {
             onClick={handleDownload}
             className="w-full h-14 rounded-ops bg-white flex items-center px-5 active:scale-[0.98] transition-transform"
           >
-            <span className="font-mohave font-bold text-ops-body text-black">
+            <span className="font-mohave font-medium text-ops-body text-black">
               START TRIAL
             </span>
             <div className="flex-1" />

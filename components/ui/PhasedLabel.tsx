@@ -28,7 +28,7 @@ export function PhasedLabel({
   return (
     <div className="relative">
       {/* Space reservation */}
-      <span className="font-kosugi font-bold text-ops-caption text-transparent select-none uppercase tracking-wider">
+      <span className="font-kosugi font-normal text-ops-caption text-transparent select-none uppercase tracking-wider">
         {text}
       </span>
       {/* Typed label (staggered by index) */}
@@ -36,7 +36,7 @@ export function PhasedLabel({
         <span className="absolute inset-0">
           <TypewriterText
             text={text}
-            className="font-kosugi font-bold text-ops-caption text-ops-text-secondary uppercase tracking-wider"
+            className="font-kosugi font-normal text-ops-caption text-ops-text-secondary uppercase tracking-wider"
             typingSpeed={25}
             startDelay={index * 250}
             onComplete={() => {
