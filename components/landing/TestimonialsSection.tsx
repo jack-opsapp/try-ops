@@ -47,11 +47,11 @@ const founderQuote = {
 }
 
 export function TestimonialsSection() {
-  // Include founder quote on mobile/tablet only (desktop shows it in Hero)
+  // Include founder quote first on mobile/tablet (desktop shows it in Hero)
   const [cards, setCards] = useState(testimonials)
   useEffect(() => {
     if (window.innerWidth < 1024) {
-      setCards([...testimonials, founderQuote])
+      setCards([founderQuote, ...testimonials])
     }
   }, [])
 
@@ -62,7 +62,7 @@ export function TestimonialsSection() {
       <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-12 z-10 bg-gradient-to-l from-[#0A0A0A] to-transparent" />
       <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-16 z-10 bg-gradient-to-t from-[#0A0A0A] to-transparent" />
 
-      <div className="max-w-[1200px] mx-auto px-4 md:px-6 lg:px-10">
+      <div className="max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10">
         <motion.h2
           className="font-bebas text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-8 lg:mb-16"
           {...fadeInUp}

@@ -22,9 +22,9 @@ const features = [
     why: 'No more hunting through text chains for that one photo. Everything lives with the job it belongs to.',
   },
   {
-    title: 'TIME TRACKING YOUR CREW WON\'T FIGHT',
-    copy: 'Clock in when you arrive. Clock out when you leave. Automatic GPS verification. Exports for payroll.',
-    why: 'Eliminates manual hour calculations. Your crew clocks in with one tap. Payroll exports are instant.',
+    title: 'A SCHEDULE YOUR CREW ACTUALLY READS',
+    copy: 'An intuitive job board and clean daily schedule. Your crew sees what\'s coming up, who\'s assigned where, and what needs to get done — all in one glance.',
+    why: 'No more morning phone calls asking "where am I going today?" Your crew opens the app and they\'re read in.',
   },
   {
     title: 'DIRECT LINE TO THE BUILDER',
@@ -36,7 +36,7 @@ const features = [
 export function SolutionSection() {
   return (
     <section id="solution" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
-      <div className="max-w-[1200px] mx-auto px-4 md:px-6 lg:px-10">
+      <div className="max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10">
         <motion.h2
           className="font-bebas text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-8 lg:mb-16"
           {...fadeInUp}

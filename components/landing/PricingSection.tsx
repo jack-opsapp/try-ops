@@ -23,12 +23,12 @@ const tiers = [
     users: 10,
     highlight: false,
     features: [
-      'Full access to all features',
+      'Full feature access',
       'Up to 10 users',
       'No credit card required',
-      'Unlimited projects & tasks',
-      'Photo documentation',
-      'Calendar & scheduling',
+      'Task management & scheduling',
+      'Photo storage & upload',
+      'Full project database',
     ],
     cta: 'START FREE TRIAL',
     ctaVariant: 'primary' as const,
@@ -41,12 +41,12 @@ const tiers = [
     users: 3,
     highlight: false,
     features: [
-      'Task management',
-      'Crew scheduling',
-      'Photo documentation',
-      'Calendar',
-      'Invoicing',
-      'Unlimited projects',
+      'Full feature access',
+      'Task management & crew scheduling',
+      'Photo storage & upload',
+      'Full project database',
+      'Client database management',
+      'Unlimited project & photo storage',
     ],
     cta: 'GET STARTED',
     ctaVariant: 'primary' as const,
@@ -59,12 +59,12 @@ const tiers = [
     users: 5,
     highlight: true,
     features: [
-      'Task management',
-      'Crew scheduling',
-      'Photo documentation',
-      'Calendar',
-      'Invoicing',
-      'Unlimited projects',
+      'Full feature access',
+      'Task management & crew scheduling',
+      'Photo storage & upload',
+      'Full project database',
+      'Client database management',
+      'Unlimited project & photo storage',
     ],
     cta: 'GET STARTED',
     ctaVariant: 'primary' as const,
@@ -77,12 +77,12 @@ const tiers = [
     users: 10,
     highlight: false,
     features: [
-      'Task management',
-      'Crew scheduling',
-      'Photo documentation',
-      'Calendar',
-      'Invoicing',
-      'Unlimited projects',
+      'Full feature access',
+      'Task management & crew scheduling',
+      'Photo storage & upload',
+      'Full project database',
+      'Client database management',
+      'Unlimited project & photo storage',
     ],
     cta: 'GET STARTED',
     ctaVariant: 'primary' as const,
@@ -146,7 +146,7 @@ function PricingCard({ tier }: { tier: typeof tiers[number] }) {
 export function PricingSection({ onDownloadClick }: PricingSectionProps) {
   return (
     <section id="pricing" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
-      <div className="max-w-[1200px] mx-auto px-4 md:px-6 lg:px-10">
+      <div className="max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10">
         <motion.h2
           className="font-bebas text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-3"
           {...fadeInUp}

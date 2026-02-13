@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FeatureCard } from '@/components/shared/FeatureCard'
 import {
@@ -57,10 +57,31 @@ const painCards = [
 
 export function PainSection() {
   const [activeCard, setActiveCard] = useState<string | null>(null)
+  const sectionRef = useRef<HTMLElement>(null)
+  const hasAutoExpanded = useRef(false)
+
+  // Auto-expand first card on mobile when section enters viewport
+  useEffect(() => {
+    if (typeof window === 'undefined' || window.innerWidth >= 768) return
+    const section = sectionRef.current
+    if (!section) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAutoExpanded.current) {
+          hasAutoExpanded.current = true
+          setActiveCard(painCards[0].id)
+        }
+      },
+      { threshold: 0.3 }
+    )
+    observer.observe(section)
+    return () => observer.disconnect()
+  }, [])
 
   return (
-    <section id="pain" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
-      <div className="max-w-[1200px] mx-auto px-4 md:px-6 lg:px-10">
+    <section ref={sectionRef} id="pain" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
+      <div className="max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10">
         <motion.h2
           className="font-bebas text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] max-w-[800px] mb-8 lg:mb-16"
           {...fadeInUp}

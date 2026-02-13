@@ -20,6 +20,7 @@ const inDevItems = [
   'Estimating & Invoices',
   'Request for Google Review',
   'Client Booking Portal',
+  'Inventory Tracking',
 ]
 
 const roadmapItems = [
@@ -38,11 +39,11 @@ const roadmapItems = [
 
 function CategoryHeader({ label, description }: { label: string; description: string }) {
   return (
-    <div className="px-4 md:px-5 py-2.5 bg-white/[0.03]">
-      <span className="font-mohave font-medium text-[11px] uppercase tracking-wider text-ops-gray-300">
+    <div className="px-4 md:px-5 py-2 md:py-2.5 bg-white/[0.03]">
+      <span className="font-mohave font-medium text-[10px] md:text-[11px] uppercase tracking-wider text-ops-gray-300">
         {label}
       </span>
-      <span className="font-kosugi text-[11px] text-ops-gray-400 ml-2">
+      <span className="font-kosugi text-[10px] md:text-[11px] text-ops-gray-400 ml-2">
         &mdash; {description}
       </span>
     </div>
@@ -51,7 +52,7 @@ function CategoryHeader({ label, description }: { label: string; description: st
 
 function RoadmapRow({ text, variant }: { text: string; variant: 'built' | 'indev' | 'planned' }) {
   return (
-    <div className="flex items-center gap-3 px-4 md:px-5 py-3">
+    <div className="flex items-center gap-3 px-4 md:px-5 py-2 md:py-3">
       <span className="flex-shrink-0 w-5 text-center">
         {variant === 'built' ? (
           <svg className="w-4 h-4 text-ops-success" viewBox="0 0 20 20" fill="currentColor">
@@ -65,7 +66,7 @@ function RoadmapRow({ text, variant }: { text: string; variant: 'built' | 'indev
       </span>
 
       <span
-        className={`font-kosugi text-[14px] md:text-[15px] flex-1 ${
+        className={`font-kosugi text-[13px] md:text-[15px] flex-1 ${
           variant === 'built'
             ? 'text-ops-gray-400 line-through'
             : variant === 'indev'
@@ -95,16 +96,16 @@ export function RoadmapSection() {
 
   return (
     <section id="roadmap" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
-      <div className="max-w-[700px] mx-auto px-4 md:px-6 lg:px-10">
+      <div className="max-w-[700px] mx-auto px-6 md:px-6 lg:px-10">
         <motion.h2
-          className="font-bebas text-[28px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-3"
+          className="font-bebas text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-2 lg:mb-3"
           {...fadeInUp}
         >
           WE&apos;RE BUILDING WHAT YOU ACTUALLY NEED
         </motion.h2>
 
         <motion.p
-          className="font-kosugi text-[14px] lg:text-[16px] text-ops-gray-300 mb-8 lg:mb-12"
+          className="font-kosugi text-[13px] lg:text-[16px] text-ops-gray-300 mb-4 lg:mb-12"
           {...fadeInUp}
         >
           Every feature gets built based on what real crews actually need. Not what looks good in a demo.

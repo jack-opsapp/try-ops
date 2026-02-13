@@ -7,16 +7,18 @@ interface CarouselProps {
   children: React.ReactNode
   gap?: number
   className?: string
+  startIndex?: number
 }
 
-export function Carousel({ children, gap = 16, className = '' }: CarouselProps) {
-  const [activeIndex, setActiveIndex] = useState(0)
+export function Carousel({ children, gap = 16, className = '', startIndex = 0 }: CarouselProps) {
+  const [activeIndex, setActiveIndex] = useState(startIndex)
   const [cardWidth, setCardWidth] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
   const x = useMotionValue(0)
   const controls = useAnimation()
   const items = Children.toArray(children)
   const count = items.length
+  const initialSnapped = useRef(false)
 
   useEffect(() => {
     const measure = () => {
@@ -28,6 +30,16 @@ export function Carousel({ children, gap = 16, className = '' }: CarouselProps) 
     window.addEventListener('resize', measure)
     return () => window.removeEventListener('resize', measure)
   }, [])
+
+  // Snap to startIndex once cardWidth is measured
+  useEffect(() => {
+    if (cardWidth > 0 && startIndex > 0 && !initialSnapped.current) {
+      initialSnapped.current = true
+      const offset = -startIndex * (cardWidth + gap)
+      x.set(offset)
+      controls.set({ x: offset })
+    }
+  }, [cardWidth, startIndex, gap, x, controls])
 
   const snapTo = (index: number) => {
     // Wrap around

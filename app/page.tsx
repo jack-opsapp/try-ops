@@ -227,37 +227,37 @@ export default function LandingPage() {
         onTryClick={handleTryClick}
       />
 
-      <div className="border-t border-white/10 mx-4 md:mx-6 lg:mx-10" />
+      <div className="border-t border-white/10 mx-6 md:mx-6 lg:mx-10" />
 
       <DesktopDownload />
 
-      <div className="border-t border-white/10 mx-4 md:mx-6 lg:mx-10" />
+      <div className="border-t border-white/10 mx-6 md:mx-6 lg:mx-10" />
 
       <TestimonialsSection />
 
-      <div className="border-t border-white/10 mx-4 md:mx-6 lg:mx-10" />
+      <div className="border-t border-white/10 mx-6 md:mx-6 lg:mx-10" />
 
       <PainSection />
 
-      <div className="border-t border-white/10 mx-4 md:mx-6 lg:mx-10" />
+      <div className="border-t border-white/10 mx-6 md:mx-6 lg:mx-10" />
 
       <SolutionSection />
 
-      <div className="border-t border-white/10 mx-4 md:mx-6 lg:mx-10" />
+      <div className="border-t border-white/10 mx-6 md:mx-6 lg:mx-10" />
 
       <RoadmapSection />
 
-      <div className="border-t border-white/10 mx-4 md:mx-6 lg:mx-10" />
+      <div className="border-t border-white/10 mx-6 md:mx-6 lg:mx-10" />
 
       <PricingSection
         onDownloadClick={handlePricingDownloadClick}
       />
 
-      <div className="border-t border-white/10 mx-4 md:mx-6 lg:mx-10" />
+      <div className="border-t border-white/10 mx-6 md:mx-6 lg:mx-10" />
 
       <FAQSection onFAQToggle={handleFAQToggle} />
 
-      <div className="border-t border-white/10 mx-4 md:mx-6 lg:mx-10" />
+      <div className="border-t border-white/10 mx-6 md:mx-6 lg:mx-10" />
 
       <ClosingCTA
         onDownloadClick={handleClosingDownloadClick}
