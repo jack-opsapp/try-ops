@@ -56,7 +56,7 @@ export function TestimonialsSection() {
   }, [])
 
   return (
-    <section id="testimonials" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
+    <section id="testimonials" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always overflow-hidden">
       <div className="max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10">
         <motion.h2
           className="font-bebas text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-8 lg:mb-16"
@@ -64,7 +64,9 @@ export function TestimonialsSection() {
         >
           CREWS THAT SWITCHED AREN&apos;T GOING BACK
         </motion.h2>
+      </div>
 
+      <div className="max-w-[1200px] mx-auto w-full px-6 md:px-6 lg:px-10">
         <motion.div {...fadeInUp}>
           <Carousel gap={16}>
             {cards.map((t) => (
