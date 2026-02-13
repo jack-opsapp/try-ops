@@ -14,10 +14,12 @@ const fadeInUp = {
 export function DesktopDownload() {
   const [phone, setPhone] = useState('')
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+  const [errorDetail, setErrorDetail] = useState('')
 
   const handleSend = async () => {
     if (!phone.trim()) return
     setStatus('sending')
+    setErrorDetail('')
     try {
       const res = await fetch('/api/send-link', {
         method: 'POST',
@@ -27,6 +29,8 @@ export function DesktopDownload() {
       if (res.ok) {
         setStatus('sent')
       } else {
+        const data = await res.json().catch(() => ({}))
+        setErrorDetail(data?.detail || `Status ${res.status}`)
         setStatus('error')
       }
     } catch {
@@ -100,7 +104,7 @@ export function DesktopDownload() {
               )}
               {status === 'error' && (
                 <p className="font-kosugi text-[14px] text-ops-error mt-2">
-                  Something went wrong. Try again.
+                  Something went wrong. Try again.{errorDetail && ` (${errorDetail})`}
                 </p>
               )}
             </div>

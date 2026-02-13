@@ -18,9 +18,13 @@ export async function POST(request: Request) {
     const { phone } = await request.json()
 
     if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !TWILIO_PHONE_NUMBER) {
-      console.error('Missing Twilio env vars')
+      console.error('Missing Twilio env vars:', {
+        hasSid: !!TWILIO_ACCOUNT_SID,
+        hasToken: !!TWILIO_AUTH_TOKEN,
+        hasPhone: !!TWILIO_PHONE_NUMBER,
+      })
       return NextResponse.json(
-        { error: 'Server configuration error' },
+        { error: 'Server configuration error', detail: 'Missing Twilio credentials' },
         { status: 500 }
       )
     }
@@ -53,7 +57,7 @@ export async function POST(request: Request) {
       const data = await response.json().catch(() => ({}))
       console.error('Twilio SMS error:', response.status, data)
       return NextResponse.json(
-        { error: 'Failed to send text' },
+        { error: 'Failed to send text', detail: data?.message || data?.error_message || JSON.stringify(data) },
         { status: response.status }
       )
     }
@@ -62,7 +66,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Send link error:', error)
     return NextResponse.json(
-      { error: 'An unexpected error occurred' },
+      { error: 'An unexpected error occurred', detail: String(error) },
       { status: 500 }
     )
   }
