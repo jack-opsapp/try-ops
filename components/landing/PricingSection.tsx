@@ -90,7 +90,7 @@ const tiers = [
   },
 ]
 
-function PricingCard({ tier }: { tier: typeof tiers[number] }) {
+function PricingCard({ tier, onCTAClick }: { tier: typeof tiers[number]; onCTAClick: () => void }) {
   return (
     <div
       className={`relative bg-ops-card border rounded-ops-card p-5 md:p-8 h-full flex flex-col ${
@@ -136,7 +136,7 @@ function PricingCard({ tier }: { tier: typeof tiers[number] }) {
         ))}
       </ul>
 
-      <Button variant={tier.ctaVariant} fullWidth>
+      <Button variant={tier.ctaVariant} fullWidth onClick={onCTAClick}>
         {tier.cta}
       </Button>
     </div>
@@ -165,7 +165,7 @@ export function PricingSection({ onDownloadClick }: PricingSectionProps) {
         <motion.div {...fadeInUp}>
           <Carousel gap={16}>
             {tiers.map((tier) => (
-              <PricingCard key={tier.name} tier={tier} />
+              <PricingCard key={tier.name} tier={tier} onCTAClick={onDownloadClick} />
             ))}
           </Carousel>
         </motion.div>
