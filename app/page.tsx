@@ -14,7 +14,6 @@ import { SolutionSection } from '@/components/landing/SolutionSection'
 import { RoadmapSection } from '@/components/landing/RoadmapSection'
 import { PricingSection } from '@/components/landing/PricingSection'
 import { FAQSection } from '@/components/landing/FAQSection'
-import { FounderQuote } from '@/components/landing/FounderQuote'
 import { ClosingCTA } from '@/components/landing/ClosingCTA'
 import { Footer } from '@/components/landing/Footer'
 import { StickyCTA } from '@/components/landing/StickyCTA'
@@ -160,7 +159,11 @@ export default function LandingPage() {
       getScrollDepth(),
       getTimeOnPage()
     )
-    window.location.href = APP_STORE_URL
+    if (isMobile()) {
+      window.location.href = APP_STORE_URL
+    } else {
+      document.getElementById('desktop-download')?.scrollIntoView({ behavior: 'smooth' })
+    }
   }, [trackLandingCTAClick, getScrollDepth, getTimeOnPage])
 
   const handleClosingDownloadClick = useCallback(() => {
@@ -239,10 +242,6 @@ export default function LandingPage() {
       <div className="border-t border-white/10 mx-4 md:mx-6 lg:mx-10" />
 
       <SolutionSection />
-
-      <div className="border-t border-white/10 mx-4 md:mx-6 lg:mx-10" />
-
-      <FounderQuote />
 
       <div className="border-t border-white/10 mx-4 md:mx-6 lg:mx-10" />
 

@@ -50,7 +50,7 @@ const faqs = [
 export function FAQSection({ onFAQToggle }: FAQSectionProps) {
   return (
     <section id="faq" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
-      <div className="max-w-[800px] mx-auto px-4 md:px-6 lg:px-10">
+      <div className="w-full max-w-[900px] mx-auto px-4 md:px-6 lg:px-10">
         <motion.h2
           className="font-bebas text-[32px] text-ops-gray-50 uppercase tracking-[0.05em] mb-12"
           {...fadeInUp}
@@ -58,7 +58,7 @@ export function FAQSection({ onFAQToggle }: FAQSectionProps) {
           QUESTIONS YOU&apos;RE PROBABLY ASKING
         </motion.h2>
 
-        <motion.div {...fadeInUp}>
+        <motion.div {...fadeInUp} className="w-full">
           {faqs.map((faq) => (
             <AccordionItem
               key={faq.question}

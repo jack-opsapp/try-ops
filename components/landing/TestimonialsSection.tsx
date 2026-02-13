@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Carousel } from '@/components/shared/Carousel'
 
@@ -37,7 +38,23 @@ const testimonials = [
   },
 ]
 
+// Founder quote shown only on mobile (desktop shows it in Hero)
+const founderQuote = {
+  quote: 'I scaled a deck and railing business to $1.6M. Tried Jobber, ServiceTitan, Housecall Pro. None of them worked the way my crew actually works. So I built OPS.',
+  name: 'Jack',
+  trade: 'Founder',
+  location: '',
+}
+
 export function TestimonialsSection() {
+  // Include founder quote on mobile/tablet only (desktop shows it in Hero)
+  const [cards, setCards] = useState(testimonials)
+  useEffect(() => {
+    if (window.innerWidth < 1024) {
+      setCards([...testimonials, founderQuote])
+    }
+  }, [])
+
   return (
     <section id="testimonials" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
       <div className="max-w-[1200px] mx-auto px-4 md:px-6 lg:px-10">
@@ -57,7 +74,7 @@ export function TestimonialsSection() {
           <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-12 z-10 bg-gradient-to-t from-black to-transparent" />
 
           <Carousel gap={16}>
-            {testimonials.map((t) => (
+            {cards.map((t) => (
               <div
                 key={t.name}
                 className="bg-ops-card rounded-ops-card p-8 h-full flex flex-col"
@@ -69,9 +86,15 @@ export function TestimonialsSection() {
                   <p className="font-mohave font-medium text-[14px] text-ops-gray-100 uppercase">
                     {t.name}
                   </p>
-                  <p className="font-kosugi text-[12px] text-ops-gray-400">
-                    {t.trade}, {t.location}
-                  </p>
+                  {t.location ? (
+                    <p className="font-kosugi text-[12px] text-ops-gray-400">
+                      {t.trade}, {t.location}
+                    </p>
+                  ) : (
+                    <p className="font-kosugi text-[12px] text-ops-gray-400">
+                      {t.trade}
+                    </p>
+                  )}
                 </div>
               </div>
             ))}

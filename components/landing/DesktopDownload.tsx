@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -37,14 +38,16 @@ export function DesktopDownload() {
         </h2>
 
         <div className="flex items-start justify-center gap-12">
-          {/* QR Code placeholder */}
+          {/* QR Code */}
           <div className="text-center">
-            <div className="w-[200px] h-[200px] border-2 border-ops-gray-500 rounded-ops-card bg-white flex items-center justify-center">
-              <div className="text-black font-kosugi text-sm text-center p-4">
-                <div className="text-2xl mb-2">📱</div>
-                QR Code
-                <div className="text-xs text-gray-500 mt-1">App Store link</div>
-              </div>
+            <div className="w-[200px] h-[200px] rounded-ops-card overflow-hidden bg-white p-3">
+              <Image
+                src="/images/app-store-qr.png"
+                alt="Scan to download OPS from the App Store"
+                width={200}
+                height={200}
+                className="w-full h-full object-contain"
+              />
             </div>
             <p className="font-kosugi text-[14px] text-ops-text-secondary mt-3">
               Scan with your iPhone

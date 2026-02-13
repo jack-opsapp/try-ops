@@ -91,6 +91,21 @@ export function Hero({ onDownloadClick, onTryClick }: HeroProps) {
             >
               Get started for free &middot; No credit card &middot; Rated 5.0&#9733;
             </motion.p>
+
+            {/* Founder quote — desktop only */}
+            <motion.div
+              className="hidden lg:block border-l-2 border-white/20 pl-6 mt-10"
+              {...fadeInUp}
+              transition={{ ...fadeInUp.transition, delay: 0.4 }}
+            >
+              <p className="font-kosugi text-[16px] text-ops-gray-200 leading-relaxed mb-2 max-w-[500px]">
+                &ldquo;I scaled a deck and railing business to $1.6M. Tried Jobber, ServiceTitan, Housecall Pro.
+                None of them worked the way my crew actually works. So I built OPS.&rdquo;
+              </p>
+              <p className="font-mohave font-medium text-[13px] text-ops-gray-400 uppercase tracking-wider">
+                &mdash; Jack, Founder
+              </p>
+            </motion.div>
           </div>
 
           {/* Wireframe animation — desktop only (mobile is above) */}

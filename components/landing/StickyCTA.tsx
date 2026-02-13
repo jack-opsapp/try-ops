@@ -55,7 +55,7 @@ export function StickyCTA({ onDownloadClick }: StickyCTAProps) {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 60, opacity: 0 }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] as const }}
-          className="fixed left-4 right-4 z-[999] md:hidden ultra-thin-material rounded-ops-card px-6 py-3 flex items-center justify-center gap-2.5 border border-white/10"
+          className="fixed z-[999] ultra-thin-material border border-white/10 flex items-center justify-center gap-2.5 left-4 right-4 rounded-ops-card px-6 py-3 md:left-auto md:right-auto md:left-1/2 md:-translate-x-1/2 md:rounded-full md:px-8 md:py-3.5"
           style={{ bottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))' }}
           onClick={onDownloadClick}
         >
