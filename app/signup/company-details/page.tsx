@@ -103,6 +103,44 @@ export default function CompanyDetailsPage() {
     }
   }
 
+  const handleSkip = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const res = await fetch('/api/company/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: companyName,
+          email: companyEmail || '',
+          phone: companyPhone || undefined,
+          industry: '',
+          size: '',
+          age: '',
+          address: '',
+          user: userId,
+          name_first: firstName,
+          name_last: lastName,
+          user_phone: phone || '',
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || 'Failed to save company')
+        setLoading(false)
+        return
+      }
+      if (data.companyId) setCompanyId(data.companyId)
+      if (data.companyCode) setCompanyCode(data.companyCode)
+      trackSignupStepComplete('company-details', 4)
+      router.push('/signup/company-code')
+    } catch {
+      setError('Connection error. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const isValid =
     industry &&
     companySize &&
@@ -172,6 +210,15 @@ export default function CompanyDetailsPage() {
 
       {/* Spacer — pushes button to bottom */}
       <div className="flex-1" />
+
+      {/* Skip link */}
+      <button
+        onClick={handleSkip}
+        disabled={loading}
+        className="font-kosugi text-ops-caption text-ops-text-tertiary hover:text-ops-text-secondary transition-colors pb-2 disabled:opacity-40"
+      >
+        SKIP FOR NOW
+      </button>
 
       {/* Button — iOS: PhasedPrimaryButton .padding(.horizontal, 40) .padding(.bottom, 50) */}
       <PhasedPrimaryButton

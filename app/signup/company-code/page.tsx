@@ -11,10 +11,31 @@ import { useOnboardingAnimation } from '@/lib/hooks/useOnboardingAnimation'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { useAnalytics } from '@/lib/hooks/useAnalytics'
 
-const APP_STORE_URL = 'https://apps.apple.com/us/app/ops-job-crew-management/id6746662078'
-
 function isValidEmail(email: string): boolean {
   return /^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,64}$/.test(email)
+}
+
+function isValidPhone(value: string): boolean {
+  const digits = value.replace(/\D/g, '')
+  return digits.length === 10 || (digits.length === 11 && digits.startsWith('1'))
+}
+
+function detectType(value: string): 'email' | 'phone' | 'unknown' {
+  const trimmed = value.trim()
+  if (!trimmed) return 'unknown'
+  if (isValidEmail(trimmed)) return 'email'
+  if (isValidPhone(trimmed)) return 'phone'
+  // If it contains @ it's probably an incomplete email
+  if (trimmed.includes('@')) return 'unknown'
+  // If it has mostly digits, likely a phone being typed
+  const digits = trimmed.replace(/\D/g, '')
+  if (digits.length >= 3 && digits.length / trimmed.replace(/\s/g, '').length > 0.5) return 'unknown'
+  return 'unknown'
+}
+
+function isValidContact(value: string): boolean {
+  const trimmed = value.trim()
+  return isValidEmail(trimmed) || isValidPhone(trimmed)
 }
 
 // ─── Invite Sheet Modal ───────────────────────────────────────────────
@@ -28,13 +49,14 @@ interface InviteSheetProps {
 
 function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteSheetProps) {
   const [showCopied, setShowCopied] = useState(false)
-  const [showEmailSection, setShowEmailSection] = useState(false)
-  const [emails, setEmails] = useState([''])
+  const [showInviteSection, setShowInviteSection] = useState(false)
+  const [contacts, setContacts] = useState([''])
   const [sending, setSending] = useState(false)
-  const [sentEmails, setSentEmails] = useState<string[]>([])
+  const [sentContacts, setSentContacts] = useState<string[]>([])
+  const [sendError, setSendError] = useState('')
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
-  const hasValidEmails = emails.some((e) => isValidEmail(e.trim()))
+  const hasValidContacts = contacts.some((c) => isValidContact(c.trim()))
 
   const handleCopy = async () => {
     try {
@@ -44,54 +66,74 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
     } catch {}
   }
 
-  const smsMessage = encodeURIComponent(
-    `${companyName} added you to OPS.\n\nGet the app: ${APP_STORE_URL}\nYour code: ${companyCode}`
-  )
-
-  const handleEmailToggleOrSend = async () => {
-    if (!showEmailSection) {
-      setShowEmailSection(true)
+  const handleInviteToggleOrSend = async () => {
+    if (!showInviteSection) {
+      setShowInviteSection(true)
       setTimeout(() => inputRefs.current[0]?.focus(), 100)
       return
     }
-    // Send invites
-    const validEmails = emails.filter((e) => isValidEmail(e.trim())).map((e) => e.trim())
-    if (validEmails.length === 0) return
+
+    const validContacts = contacts.filter((c) => isValidContact(c.trim())).map((c) => c.trim())
+    if (validContacts.length === 0) return
 
     setSending(true)
+    setSendError('')
     try {
-      await fetch('/api/company/invite', {
+      const res = await fetch('/api/invite/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ emails: validEmails, company: companyId }),
+        body: JSON.stringify({
+          contacts: validContacts,
+          company: companyId,
+          companyName,
+          companyCode,
+        }),
       })
-      setSentEmails(validEmails)
-      setEmails([''])
-      setShowEmailSection(false)
-    } catch {}
+      const data = await res.json()
+      if (!res.ok) {
+        setSendError(data.detail || data.error || 'Failed to send invites')
+      } else {
+        setSentContacts((prev) => [...prev, ...validContacts])
+        setContacts([''])
+        setShowInviteSection(false)
+        if (data.errors?.length) {
+          setSendError(data.errors.join('; '))
+        }
+      }
+    } catch {
+      setSendError('Connection error. Try again.')
+    }
     setSending(false)
   }
 
-  const addEmail = () => {
-    if (emails.length >= 10) return
-    const newEmails = [...emails, '']
-    setEmails(newEmails)
-    setTimeout(() => inputRefs.current[newEmails.length - 1]?.focus(), 100)
+  const addContact = () => {
+    if (contacts.length >= 10) return
+    const newContacts = [...contacts, '']
+    setContacts(newContacts)
+    setTimeout(() => inputRefs.current[newContacts.length - 1]?.focus(), 100)
   }
 
-  const removeEmail = (index: number) => {
-    if (emails.length === 1) {
-      setEmails([''])
-      setShowEmailSection(false)
+  const removeContact = (index: number) => {
+    if (contacts.length === 1) {
+      setContacts([''])
+      setShowInviteSection(false)
       return
     }
-    setEmails(emails.filter((_, i) => i !== index))
+    setContacts(contacts.filter((_, i) => i !== index))
   }
 
-  const updateEmail = (index: number, value: string) => {
-    const updated = [...emails]
+  const updateContact = (index: number, value: string) => {
+    const updated = [...contacts]
     updated[index] = value
-    setEmails(updated)
+    setContacts(updated)
+  }
+
+  // Show type indicator for each input
+  const getTypeIndicator = (value: string) => {
+    const type = detectType(value.trim())
+    if (type === 'email') return { label: 'EMAIL', color: '#597794' }
+    if (type === 'phone') return { label: 'SMS', color: '#A5B368' }
+    return null
   }
 
   return (
@@ -159,31 +201,18 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
             </div>
           </div>
 
-          {/* TEXT IT button — opens native SMS */}
-          <a
-            href={`sms:&body=${smsMessage}`}
-            className="w-full h-14 flex items-center justify-center gap-2 rounded-ops bg-white text-black"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-black">
-              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            <span className="font-mohave font-medium text-ops-body">TEXT IT</span>
-          </a>
-
-          {/* EMAIL IT / SEND INVITES button */}
+          {/* INVITE CREW button / SEND INVITES button */}
           <button
-            onClick={handleEmailToggleOrSend}
-            disabled={showEmailSection && (!hasValidEmails || sending)}
+            onClick={handleInviteToggleOrSend}
+            disabled={showInviteSection && (!hasValidContacts || sending)}
             className="w-full h-14 flex items-center justify-center gap-2 rounded-ops border transition-all duration-200 disabled:opacity-40"
             style={{
               backgroundColor:
-                showEmailSection && hasValidEmails
+                showInviteSection && hasValidContacts
                   ? 'white'
-                  : showEmailSection
-                  ? 'rgba(255,255,255,0.5)'
                   : 'rgba(13, 13, 13, 0.8)',
-              color: showEmailSection ? 'black' : 'white',
-              borderColor: showEmailSection ? 'transparent' : 'rgba(255,255,255,0.1)',
+              color: showInviteSection && hasValidContacts ? 'black' : 'white',
+              borderColor: showInviteSection && hasValidContacts ? 'transparent' : 'rgba(255,255,255,0.1)',
             }}
           >
             {sending ? (
@@ -193,25 +222,27 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
               </svg>
             ) : (
               <>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  {showEmailSection ? (
+                {showInviteSection ? (
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
-                  ) : (
-                    <>
-                      <rect x="2" y="4" width="20" height="16" rx="2" />
-                      <path d="M22 7l-10 6L2 7" />
-                    </>
-                  )}
-                </svg>
+                  </svg>
+                ) : (
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-white" strokeWidth="2" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg>
+                )}
                 <span className="font-mohave font-medium text-ops-body">
-                  {showEmailSection ? 'SEND INVITES' : 'EMAIL IT'}
+                  {showInviteSection ? 'SEND INVITES' : 'INVITE CREW'}
                 </span>
               </>
             )}
           </button>
 
-          {/* Email Section (expanded) */}
-          {showEmailSection && (
+          {/* Invite Section (expanded) */}
+          {showInviteSection && (
             <div
               className="space-y-3"
               style={{ animation: 'fadeInUp 0.25s ease-out' }}
@@ -220,53 +251,74 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
               <div className="flex items-center gap-3">
                 <div className="flex-1 h-px bg-white/10" />
                 <span className="font-kosugi text-ops-caption text-ops-text-tertiary">
-                  EMAIL INVITES
+                  EMAIL OR PHONE
                 </span>
                 <div className="flex-1 h-px bg-white/10" />
               </div>
 
-              {/* Email inputs */}
-              {emails.map((email, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <input
-                    ref={(el) => { inputRefs.current[i] = el }}
-                    type="email"
-                    value={email}
-                    onChange={(e) => updateEmail(i, e.target.value)}
-                    placeholder="team.member@example.com"
-                    className="flex-1 h-12 px-4 rounded-ops font-mohave text-ops-body text-white border border-white/10 outline-none focus:border-white/30 placeholder:text-[#999] transition-colors"
-                    style={{ backgroundColor: 'rgba(13, 13, 13, 0.8)' }}
-                  />
-                  <button
-                    onClick={() => removeEmail(i)}
-                    className="w-7 h-7 flex items-center justify-center"
-                  >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-ops-text-tertiary">
-                      <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    </svg>
-                  </button>
-                </div>
-              ))}
+              {/* Contact inputs */}
+              {contacts.map((contact, i) => {
+                const indicator = getTypeIndicator(contact)
+                return (
+                  <div key={i} className="flex items-center gap-2">
+                    <div className="flex-1 relative">
+                      <input
+                        ref={(el) => { inputRefs.current[i] = el }}
+                        type="text"
+                        inputMode={contact.includes('@') ? 'email' : 'text'}
+                        value={contact}
+                        onChange={(e) => updateContact(i, e.target.value)}
+                        placeholder="email or phone number"
+                        className="w-full h-12 px-4 pr-16 rounded-ops font-mohave text-ops-body text-white border border-white/10 outline-none focus:border-white/30 placeholder:text-[#999] transition-colors"
+                        style={{ backgroundColor: 'rgba(13, 13, 13, 0.8)' }}
+                      />
+                      {indicator && (
+                        <span
+                          className="absolute right-3 top-1/2 -translate-y-1/2 font-kosugi text-[10px] font-medium px-1.5 py-0.5 rounded"
+                          style={{ color: indicator.color, backgroundColor: `${indicator.color}20` }}
+                        >
+                          {indicator.label}
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => removeContact(i)}
+                      className="w-7 h-7 flex items-center justify-center"
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-ops-text-tertiary">
+                        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                      </svg>
+                    </button>
+                  </div>
+                )
+              })}
 
-              {/* Add email button */}
-              {emails.length < 10 && (
+              {/* Add contact button */}
+              {contacts.length < 10 && (
                 <button
-                  onClick={addEmail}
+                  onClick={addContact}
                   className="flex items-center gap-1.5 text-ops-accent"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
                   </svg>
-                  <span className="font-mohave text-ops-body">Add email</span>
+                  <span className="font-mohave text-ops-body">Add another</span>
                 </button>
               )}
             </div>
           )}
 
+          {/* Send error */}
+          {sendError && (
+            <p className="font-kosugi text-ops-caption text-ops-error">
+              {sendError}
+            </p>
+          )}
+
           {/* Sent confirmation */}
-          {sentEmails.length > 0 && (
+          {sentContacts.length > 0 && (
             <p className="font-kosugi text-ops-caption text-[#A5B368]">
-              Invite sent to {sentEmails.join(', ')}
+              Invite sent to {sentContacts.join(', ')}
             </p>
           )}
 
