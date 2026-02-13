@@ -34,6 +34,7 @@ export default function CredentialsPage() {
   const { trackSignupStepView, trackSignupStepComplete } = useAnalytics()
   const { setAuth, setProfile, setSignupStep } = useOnboardingStore()
 
+  const [isLoginMode, setIsLoginMode] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -151,7 +152,7 @@ export default function CredentialsPage() {
 
   const validatePassword = (value: string) => {
     if (!value) return 'Password is required'
-    if (value.length < 8) return 'Must be at least 8 characters'
+    if (!isLoginMode && value.length < 8) return 'Must be at least 8 characters'
     return ''
   }
 
@@ -166,7 +167,8 @@ export default function CredentialsPage() {
     setError('')
 
     try {
-      const res = await fetch('/api/auth/signup', {
+      const endpoint = isLoginMode ? '/api/auth/login' : '/api/auth/signup'
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -175,14 +177,14 @@ export default function CredentialsPage() {
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.error || 'Signup failed. Please try again.')
+        setError(data.error || (isLoginMode ? 'Login failed.' : 'Signup failed. Please try again.'))
         setLoading(false)
         return
       }
 
       setAuth(data.userId, 'email', email)
       trackSignupStepComplete('credentials', 1)
-      router.push('/signup/profile')
+      router.push(isLoginMode ? '/download' : '/signup/profile')
     } catch {
       setError('Connection error. Please check your internet and try again.')
     } finally {
@@ -196,17 +198,29 @@ export default function CredentialsPage() {
     }
   }
 
+  const toggleMode = () => {
+    setIsLoginMode(!isLoginMode)
+    setError('')
+    setEmailError('')
+    setPasswordError('')
+  }
+
   return (
     <OnboardingScaffold showBack onBack={() => router.push('/tutorial/complete')}>
-      {/* iOS: OnboardingScaffold with title/subtitle, content in VStack, 40px horizontal padding */}
       <div className="px-10">
         <h1 className="font-mohave font-semibold text-ops-title tracking-wide mb-2">
-          <TypewriterText text="CREATE YOUR ACCOUNT" typingSpeed={30} />
+          <TypewriterText
+            text={isLoginMode ? 'WELCOME BACK' : 'CREATE YOUR ACCOUNT'}
+            typingSpeed={30}
+            key={isLoginMode ? 'login' : 'signup'}
+          />
         </h1>
 
         <PhasedContent delay={800}>
           <p className="font-kosugi text-ops-body text-ops-text-secondary mb-8">
-            Let&apos;s get you set up. No credit card required.
+            {isLoginMode
+              ? 'Sign in to your existing account.'
+              : "Let's get you set up. No credit card required."}
           </p>
         </PhasedContent>
 
@@ -234,10 +248,10 @@ export default function CredentialsPage() {
                 setPassword(v)
                 setPasswordError('')
               }}
-              placeholder="8+ characters"
+              placeholder={isLoginMode ? 'Your password' : '8+ characters'}
               required
               error={passwordError}
-              autoComplete="new-password"
+              autoComplete={isLoginMode ? 'current-password' : 'new-password'}
             />
 
             {error && (
@@ -249,10 +263,10 @@ export default function CredentialsPage() {
             <OPSButton
               onClick={handleSubmit}
               loading={loading}
-              loadingText="CREATING ACCOUNT..."
+              loadingText={isLoginMode ? 'SIGNING IN...' : 'CREATING ACCOUNT...'}
               disabled={!email || !password}
             >
-              CREATE ACCOUNT
+              {isLoginMode ? 'SIGN IN' : 'CREATE ACCOUNT'}
             </OPSButton>
 
             {/* Divider */}
@@ -293,6 +307,20 @@ export default function CredentialsPage() {
                 CONTINUE WITH GOOGLE
               </span>
             </OPSButton>
+
+            {/* Login/Signup toggle */}
+            <p className="text-center pt-2">
+              <span className="font-kosugi text-ops-caption text-ops-text-tertiary">
+                {isLoginMode ? "Don't have an account? " : 'Already have an account? '}
+              </span>
+              <button
+                type="button"
+                onClick={toggleMode}
+                className="font-kosugi text-ops-caption text-ops-accent hover:text-ops-accent/80 transition-colors"
+              >
+                {isLoginMode ? 'Sign up' : 'Log in'}
+              </button>
+            </p>
 
             {/* Hidden Google Identity Services button */}
             <div
