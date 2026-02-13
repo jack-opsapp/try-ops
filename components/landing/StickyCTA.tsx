@@ -56,7 +56,7 @@ export function StickyCTA({ onDownloadClick, onTryClick }: StickyCTAProps) {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 60, opacity: 0 }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] as const }}
-          className="fixed z-[999] left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-[500px] flex gap-2"
+          className="fixed z-[999] left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] flex gap-2"
           style={{ bottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))' }}
         >
           {/* Download button */}

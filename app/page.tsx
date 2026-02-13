@@ -206,19 +206,9 @@ export default function LandingPage() {
   }, [trackLandingCTAClick, getScrollDepth, getTimeOnPage, setTutorialStartTime, router])
 
   const handlePricingDownloadClick = useCallback(() => {
-    trackLandingCTAClick(
-      'primary',
-      'DOWNLOAD NOW',
-      'pricing',
-      getScrollDepth(),
-      getTimeOnPage()
-    )
-    if (isMobile()) {
-      window.location.href = APP_STORE_URL
-    } else {
-      document.getElementById('desktop-download')?.scrollIntoView({ behavior: 'smooth' })
-    }
-  }, [trackLandingCTAClick, getScrollDepth, getTimeOnPage])
+    trackLandingCTAClick('primary', 'GET STARTED', 'pricing', getScrollDepth(), getTimeOnPage())
+    router.push('/signup/credentials')
+  }, [trackLandingCTAClick, getScrollDepth, getTimeOnPage, router])
 
   const handleFAQToggle = useCallback(
     (question: string, expanded: boolean) => {
