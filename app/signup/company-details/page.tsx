@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { TypewriterText } from '@/components/ui/TypewriterText'
-import { OPSButton } from '@/components/ui/OPSButton'
-import { PhasedContent } from '@/components/ui/PhasedContent'
 import { OnboardingScaffold } from '@/components/layout/OnboardingScaffold'
+import { PhasedOnboardingHeader } from '@/components/ui/PhasedOnboardingHeader'
+import { PhasedContent } from '@/components/ui/PhasedContent'
+import { PhasedLabel } from '@/components/ui/PhasedLabel'
+import { PhasedPrimaryButton } from '@/components/ui/PhasedPrimaryButton'
 import { IndustryPicker } from '@/components/signup/IndustryPicker'
 import { PillSelector } from '@/components/signup/PillSelector'
+import { useOnboardingAnimation } from '@/lib/hooks/useOnboardingAnimation'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { useAnalytics } from '@/lib/hooks/useAnalytics'
 import { COMPANY_SIZES, COMPANY_AGES } from '@/lib/constants/industries'
@@ -28,6 +30,7 @@ export default function CompanyDetailsPage() {
     setCompanyCode,
     setSignupStep,
   } = useOnboardingStore()
+  const animation = useOnboardingAnimation()
 
   const [industry, setIndustry] = useState('')
   const [customIndustry, setCustomIndustry] = useState('')
@@ -43,6 +46,7 @@ export default function CompanyDetailsPage() {
     }
     setSignupStep(4)
     trackSignupStepView('company-details', 4)
+    animation.start()
   }, [userId, router, setSignupStep, trackSignupStepView])
 
   const effectiveIndustry =
@@ -66,7 +70,7 @@ export default function CompanyDetailsPage() {
           industry: effectiveIndustry,
           size: companySize,
           age: companyAge,
-          address: '', // iOS always sends address; web doesn't collect it
+          address: '',
           user: userId,
           name_first: firstName,
           name_last: lastName,
@@ -107,57 +111,77 @@ export default function CompanyDetailsPage() {
 
   return (
     <OnboardingScaffold showBack>
-      <div className="max-w-md mx-auto w-full">
-        <h1 className="text-ops-title font-mohave font-semibold tracking-wide mb-2">
-          <TypewriterText text="ALMOST DONE" typingSpeed={30} />
-        </h1>
-
-        <PhasedContent delay={500}>
-          <p className="font-kosugi text-ops-body text-ops-text-secondary mb-8">
-            Quick details to set you up right.
-          </p>
-        </PhasedContent>
-
-        <PhasedContent delay={900}>
-          <div className="space-y-6">
-            <IndustryPicker
-              value={industry}
-              onChange={setIndustry}
-              customIndustry={customIndustry}
-              onCustomChange={setCustomIndustry}
-            />
-
-            <PillSelector
-              label="COMPANY SIZE"
-              options={COMPANY_SIZES}
-              value={companySize}
-              onChange={setCompanySize}
-            />
-
-            <PillSelector
-              label="YEARS IN BUSINESS"
-              options={COMPANY_AGES}
-              value={companyAge}
-              onChange={setCompanyAge}
-            />
-
-            {error && (
-              <p className="font-kosugi text-ops-small text-ops-error text-center">
-                {error}
-              </p>
-            )}
-
-            <OPSButton
-              onClick={handleContinue}
-              loading={loading}
-              loadingText="SAVING..."
-              disabled={!isValid}
-            >
-              CONTINUE
-            </OPSButton>
-          </div>
-        </PhasedContent>
+      {/* Title — iOS: .padding(.horizontal, 40) .padding(.top, 16) */}
+      <div className="px-10 pt-4">
+        <PhasedOnboardingHeader
+          title="ALMOST DONE"
+          subtitle="Quick details to set you up right."
+          animation={animation}
+        />
       </div>
+
+      {/* Spacer — iOS: Spacer().frame(height: 32) */}
+      <div className="h-8" />
+
+      {/* Content — fades in upward during contentFadeIn */}
+      <PhasedContent animation={animation}>
+        <div className="px-10 space-y-6">
+          <div>
+            <PhasedLabel text="INDUSTRY" index={0} animation={animation} />
+            <div className="mt-2">
+              <IndustryPicker
+                value={industry}
+                onChange={setIndustry}
+                customIndustry={customIndustry}
+                onCustomChange={setCustomIndustry}
+              />
+            </div>
+          </div>
+
+          <div>
+            <PhasedLabel text="COMPANY SIZE" index={1} animation={animation} />
+            <div className="mt-2">
+              <PillSelector
+                label=""
+                options={COMPANY_SIZES}
+                value={companySize}
+                onChange={setCompanySize}
+              />
+            </div>
+          </div>
+
+          <div>
+            <PhasedLabel text="YEARS IN BUSINESS" index={2} isLast animation={animation} />
+            <div className="mt-2">
+              <PillSelector
+                label=""
+                options={COMPANY_AGES}
+                value={companyAge}
+                onChange={setCompanyAge}
+              />
+            </div>
+          </div>
+
+          {error && (
+            <p className="font-kosugi text-ops-small text-ops-error text-center">
+              {error}
+            </p>
+          )}
+        </div>
+      </PhasedContent>
+
+      {/* Spacer — pushes button to bottom */}
+      <div className="flex-1" />
+
+      {/* Button — iOS: PhasedPrimaryButton .padding(.horizontal, 40) .padding(.bottom, 50) */}
+      <PhasedPrimaryButton
+        title="CONTINUE"
+        isEnabled={!!isValid}
+        isLoading={loading}
+        loadingText="SAVING..."
+        animation={animation}
+        onClick={handleContinue}
+      />
     </OnboardingScaffold>
   )
 }

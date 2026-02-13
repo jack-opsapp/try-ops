@@ -9,6 +9,12 @@ interface OnboardingScaffoldProps {
   className?: string
 }
 
+/**
+ * Matches iOS OnboardingScaffold layout:
+ * - Full height dark background
+ * - Header with back button at top (40px horizontal padding, matching iOS .padding(.horizontal, 40))
+ * - Content area as flex column (children manage their own spacing + button)
+ */
 export function OnboardingScaffold({
   children,
   showBack = false,
@@ -27,8 +33,8 @@ export function OnboardingScaffold({
 
   return (
     <div className="min-h-screen bg-ops-background flex flex-col">
-      {/* Header */}
-      <div className="flex items-center px-6 pt-6 pb-4">
+      {/* Header — iOS: .padding(.horizontal, 40) .padding(.top, 16) */}
+      <div className="flex items-center px-10 pt-4 pb-4">
         {showBack && (
           <button
             onClick={handleBack}
@@ -51,8 +57,8 @@ export function OnboardingScaffold({
         )}
       </div>
 
-      {/* Content */}
-      <div className={`flex-1 px-6 pb-8 ${className}`}>
+      {/* Content — flex column so children can use flex-1 spacer + bottom button */}
+      <div className={`flex-1 flex flex-col ${className}`}>
         {children}
       </div>
     </div>

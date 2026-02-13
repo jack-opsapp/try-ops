@@ -54,7 +54,6 @@ export default function CredentialsPage() {
       setError('')
 
       try {
-        // Decode the JWT to get user info (for display; server verifies)
         const payload = JSON.parse(
           atob(response.credential.split('.')[1])
         )
@@ -79,9 +78,8 @@ export default function CredentialsPage() {
           return
         }
 
-        setAuth(data.userId, 'google')
+        setAuth(data.userId, 'google', payload.email)
 
-        // If Bubble returned profile info, store it so we can pre-fill
         if (data.firstName || data.lastName) {
           setProfile({
             firstName: data.firstName || payload.given_name || '',
@@ -101,7 +99,6 @@ export default function CredentialsPage() {
     [setAuth, setProfile, trackSignupStepComplete, router]
   )
 
-  // Initialize Google Sign-In (hidden button, triggered by custom OPSButton)
   useEffect(() => {
     if (!GOOGLE_CLIENT_ID) return
 
@@ -114,7 +111,6 @@ export default function CredentialsPage() {
         auto_select: false,
       })
 
-      // Render into hidden container so we can proxy clicks
       if (googleBtnRef.current) {
         window.google.accounts.id.renderButton(googleBtnRef.current, {
           type: 'standard',
@@ -138,7 +134,6 @@ export default function CredentialsPage() {
   }, [handleGoogleResponse])
 
   const handleGoogleClick = () => {
-    // Click the hidden Google button to trigger the OAuth popup
     const btn =
       googleBtnRef.current?.querySelector<HTMLElement>('[role="button"]') ||
       googleBtnRef.current?.querySelector<HTMLElement>('div[style]')
@@ -185,7 +180,7 @@ export default function CredentialsPage() {
         return
       }
 
-      setAuth(data.userId, 'email')
+      setAuth(data.userId, 'email', email)
       trackSignupStepComplete('credentials', 1)
       router.push('/signup/profile')
     } catch {
@@ -203,8 +198,9 @@ export default function CredentialsPage() {
 
   return (
     <OnboardingScaffold showBack onBack={() => router.push('/tutorial/complete')}>
-      <div className="max-w-md mx-auto w-full">
-        <h1 className="text-ops-title font-mohave font-semibold tracking-wide mb-2">
+      {/* iOS: OnboardingScaffold with title/subtitle, content in VStack, 40px horizontal padding */}
+      <div className="px-10">
+        <h1 className="font-mohave font-semibold text-ops-title tracking-wide mb-2">
           <TypewriterText text="CREATE YOUR ACCOUNT" typingSpeed={30} />
         </h1>
 

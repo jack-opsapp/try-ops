@@ -20,7 +20,8 @@ export interface OnboardingState {
   userId: string | null
   companyId: string | null
   authMethod: string | null
-  setAuth: (userId: string, authMethod: string) => void
+  email: string
+  setAuth: (userId: string, authMethod: string, email?: string) => void
   setCompanyId: (id: string) => void
 
   // User profile
@@ -81,6 +82,7 @@ const initialState = {
   userId: null as string | null,
   companyId: null as string | null,
   authMethod: null as string | null,
+  email: '',
   firstName: '',
   lastName: '',
   phone: '',
@@ -112,7 +114,7 @@ export const useOnboardingStore = create<OnboardingState>()(
         })),
       setTutorialCompleted: () => set({ tutorialCompleted: true }),
 
-      setAuth: (userId, authMethod) => set({ userId, authMethod }),
+      setAuth: (userId, authMethod, email) => set({ userId, authMethod, email: email || '' }),
       setCompanyId: (id) => set({ companyId: id }),
 
       setProfile: (data) =>

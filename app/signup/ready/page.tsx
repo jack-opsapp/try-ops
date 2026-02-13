@@ -3,11 +3,23 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { TypewriterText } from '@/components/ui/TypewriterText'
-import { OPSButton } from '@/components/ui/OPSButton'
-import { PhasedContent } from '@/components/ui/PhasedContent'
 import { OnboardingScaffold } from '@/components/layout/OnboardingScaffold'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { useAnalytics } from '@/lib/hooks/useAnalytics'
+
+/**
+ * Matches iOS BillingInfoView companyCreatorView exactly:
+ * - Left-aligned VStack
+ * - "30 DAYS FREE" typewriter title
+ * - "Full access. No card required." subtitle
+ * - Benefit rows with "→" prefix and divider lines
+ * - "SEE PLANS" link
+ * - "START TRIAL" button at bottom
+ *
+ * Plus user-requested additions:
+ * - "Upgrade anytime."
+ * - Contact message with jack@opsapp.co
+ */
 
 const BENEFITS = [
   'Every feature unlocked',
@@ -17,12 +29,18 @@ const BENEFITS = [
 
 export default function ReadyPage() {
   const router = useRouter()
-  const { trackSignupStepView, trackSignupStepComplete, trackSignupComplete, trackAppDownload } =
-    useAnalytics()
+  const {
+    trackSignupStepView,
+    trackSignupStepComplete,
+    trackSignupComplete,
+    trackAppDownload,
+  } = useAnalytics()
   const { userId, companyId, authMethod, setSignupStep, setSignupCompleted } =
     useOnboardingStore()
 
   const [marked, setMarked] = useState(false)
+  const [showTitle, setShowTitle] = useState(false)
+  const [showContent, setShowContent] = useState(false)
 
   useEffect(() => {
     if (!userId) {
@@ -31,6 +49,9 @@ export default function ReadyPage() {
     }
     setSignupStep(6)
     trackSignupStepView('ready', 6)
+
+    // iOS: start title typing after 0.2s delay
+    setTimeout(() => setShowTitle(true), 200)
   }, [userId, router, setSignupStep, trackSignupStepView])
 
   // Mark onboarding as complete on the backend
@@ -56,7 +77,14 @@ export default function ReadyPage() {
     }
 
     markComplete()
-  }, [userId, marked, setSignupCompleted, trackSignupStepComplete, trackSignupComplete, authMethod])
+  }, [
+    userId,
+    marked,
+    setSignupCompleted,
+    trackSignupStepComplete,
+    trackSignupComplete,
+    authMethod,
+  ])
 
   const handleDownload = () => {
     trackAppDownload(userId || undefined, companyId || undefined)
@@ -65,55 +93,121 @@ export default function ReadyPage() {
 
   return (
     <OnboardingScaffold>
-      <div className="max-w-md mx-auto w-full flex flex-col items-center justify-center min-h-[70vh]">
-        <h1 className="text-ops-large-title font-mohave font-bold tracking-wide mb-3 text-center">
-          <TypewriterText text="30 DAYS FREE" typingSpeed={50} />
-        </h1>
+      {/* iOS BillingInfoView companyCreatorView layout: left-aligned VStack */}
+      <div className="flex flex-col flex-1">
+        {/* Spacer — iOS: Spacer().frame(height: 60) */}
+        <div className="h-[60px]" />
 
-        <PhasedContent delay={800}>
-          <p className="font-kosugi text-ops-body text-ops-text-secondary text-center mb-10">
+        {/* Title — iOS: TypewriterText("30 DAYS FREE", font: .title, typingSpeed: 28) */}
+        <div className="px-10 pt-4">
+          <div className="relative">
+            <h1 className="font-mohave font-semibold text-ops-title tracking-wide text-transparent select-none">
+              30 DAYS FREE
+            </h1>
+            {showTitle && (
+              <span className="absolute inset-0">
+                <TypewriterText
+                  text="30 DAYS FREE"
+                  className="font-mohave font-semibold text-ops-title tracking-wide text-white"
+                  typingSpeed={36}
+                  onComplete={() => {
+                    // iOS: 0.25s delay then show content
+                    setTimeout(() => setShowContent(true), 250)
+                  }}
+                />
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Spacer — iOS: Spacer().frame(height: 48) */}
+        <div className="h-12" />
+
+        {/* Content — iOS: fades in with .easeOut(duration: 0.4) */}
+        <div
+          className="px-10 transition-all duration-[400ms] ease-out"
+          style={{
+            opacity: showContent ? 1 : 0,
+            transform: showContent ? 'translateY(0)' : 'translateY(20px)',
+          }}
+        >
+          {/* iOS: "Full access. No card required." */}
+          <p className="font-mohave text-ops-body text-ops-text-secondary">
             Full access. No card required.
           </p>
-        </PhasedContent>
 
-        <PhasedContent delay={1200}>
-          <div className="space-y-4 mb-10 w-full">
+          {/* Spacer — iOS: Spacer().frame(height: 8) */}
+          <div className="h-2" />
+
+          {/* iOS: VStack(alignment: .leading, spacing: 0) with trialBenefitRow */}
+          <div className="flex flex-col mt-4">
             {BENEFITS.map((benefit, i) => (
-              <div
-                key={benefit}
-                className="flex items-center gap-3"
-                style={{ animationDelay: `${1200 + i * 200}ms` }}
-              >
-                <div className="w-6 h-6 rounded-full bg-ops-success/20 flex items-center justify-center flex-shrink-0">
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    className="text-ops-success"
-                  >
-                    <path
-                      d="M20 6L9 17l-5-5"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+              <div key={benefit}>
+                {/* iOS: HStack(spacing: 12) with "→" + text, .padding(.vertical, 12) */}
+                <div className="flex items-center gap-3 py-3">
+                  <span className="font-kosugi text-ops-caption text-ops-text-tertiary">
+                    →
+                  </span>
+                  <span className="font-kosugi text-ops-caption text-white">
+                    {benefit}
+                  </span>
                 </div>
-                <span className="font-mohave text-ops-body text-white">
-                  {benefit}
-                </span>
+                {/* iOS: Rectangle().fill(Color.white.opacity(0.08)).frame(height: 1) — not on last */}
+                {i < BENEFITS.length - 1 && (
+                  <div className="h-px" style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)' }} />
+                )}
               </div>
             ))}
           </div>
-        </PhasedContent>
 
-        <PhasedContent delay={2000}>
-          <OPSButton onClick={handleDownload} className="w-full">
-            DOWNLOAD OPS
-          </OPSButton>
-        </PhasedContent>
+          {/* Spacer — iOS: Spacer().frame(height: 24) */}
+          <div className="h-6" />
+
+          {/* iOS: "SEE PLANS" button with chevron.right */}
+          <button className="flex items-center gap-2">
+            <span className="font-kosugi font-bold text-ops-caption text-ops-text-secondary">
+              SEE PLANS
+            </span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-ops-text-tertiary">
+              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+
+          {/* User-requested: "Upgrade anytime." */}
+          <p className="font-kosugi text-ops-caption text-ops-text-secondary mt-6">
+            Upgrade anytime.
+          </p>
+
+          {/* User-requested: Contact message */}
+          <p className="font-kosugi text-ops-small text-ops-text-tertiary mt-4 leading-relaxed">
+            Get in touch with us if you have any trouble, or if the app is missing any features you need:{' '}
+            <a
+              href="mailto:jack@opsapp.co"
+              className="text-ops-accent hover:underline"
+            >
+              jack@opsapp.co
+            </a>
+          </p>
+        </div>
+
+        {/* Spacer — pushes button to bottom */}
+        <div className="flex-1" />
+
+        {/* Button — iOS: OnboardingPrimaryButton("START TRIAL") .padding(.horizontal, 40) .padding(.bottom, 50) */}
+        <div className="px-10 pb-[50px] pt-4">
+          <button
+            onClick={handleDownload}
+            className="w-full h-14 rounded-ops bg-white flex items-center px-5 active:scale-[0.98] transition-transform"
+          >
+            <span className="font-mohave font-bold text-ops-body text-black">
+              START TRIAL
+            </span>
+            <div className="flex-1" />
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-black">
+              <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
       </div>
     </OnboardingScaffold>
   )

@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { TypewriterText } from '@/components/ui/TypewriterText'
-import { OPSButton } from '@/components/ui/OPSButton'
-import { OPSInput } from '@/components/ui/OPSInput'
-import { PhasedContent } from '@/components/ui/PhasedContent'
 import { OnboardingScaffold } from '@/components/layout/OnboardingScaffold'
+import { PhasedOnboardingHeader } from '@/components/ui/PhasedOnboardingHeader'
+import { PhasedContent } from '@/components/ui/PhasedContent'
+import { PhasedLabel } from '@/components/ui/PhasedLabel'
+import { PhasedPrimaryButton } from '@/components/ui/PhasedPrimaryButton'
+import { useOnboardingAnimation } from '@/lib/hooks/useOnboardingAnimation'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { useAnalytics } from '@/lib/hooks/useAnalytics'
 
@@ -15,8 +16,8 @@ export default function ProfilePage() {
   const { trackSignupStepView, trackSignupStepComplete } = useAnalytics()
   const store = useOnboardingStore()
   const { userId, setProfile, setSignupStep } = store
+  const animation = useOnboardingAnimation()
 
-  // Pre-fill from store if Google sign-in already set these
   const [firstName, setFirstName] = useState(store.firstName || '')
   const [lastName, setLastName] = useState(store.lastName || '')
   const [phone, setPhone] = useState(store.phone || '')
@@ -30,6 +31,7 @@ export default function ProfilePage() {
     }
     setSignupStep(2)
     trackSignupStepView('profile', 2)
+    animation.start()
   }, [userId, router, setSignupStep, trackSignupStepView])
 
   const handleContinue = async () => {
@@ -73,69 +75,78 @@ export default function ProfilePage() {
 
   return (
     <OnboardingScaffold showBack>
-      <div className="max-w-md mx-auto w-full">
-        <h1 className="text-ops-title font-mohave font-semibold tracking-wide mb-2">
-          <TypewriterText text="YOUR INFO" typingSpeed={30} />
-        </h1>
+      {/* Title — iOS: .padding(.horizontal, 40) .padding(.top, 16) */}
+      <div className="px-10 pt-4">
+        <PhasedOnboardingHeader
+          title="YOUR INFO"
+          subtitle="Your crew will see this."
+          animation={animation}
+        />
+      </div>
 
-        <PhasedContent delay={500}>
-          <p className="font-kosugi text-ops-body text-ops-text-secondary mb-8">
-            Your crew will see this.
-          </p>
-        </PhasedContent>
+      {/* Spacer — iOS: Spacer().frame(height: 32) */}
+      <div className="h-8" />
 
-        <PhasedContent delay={900}>
-          <div className="space-y-4">
-            <OPSInput
-              label="First Name"
+      {/* Content — fades in upward during contentFadeIn */}
+      <PhasedContent animation={animation}>
+        <div className="px-10 space-y-5">
+          {/* First Name */}
+          <div className="flex flex-col gap-2">
+            <PhasedLabel text="FIRST NAME" index={0} animation={animation} />
+            <input
+              type="text"
               value={firstName}
-              onChange={(v) => {
-                setFirstName(v)
-                setError('')
-              }}
-              placeholder="John"
-              required
+              onChange={(e) => { setFirstName(e.target.value); setError('') }}
               autoComplete="given-name"
+              className="w-full h-12 px-4 rounded-ops bg-[#0D0D0D]/80 font-mohave text-ops-body text-white border border-white/10 outline-none placeholder:text-ops-text-tertiary"
             />
+          </div>
 
-            <OPSInput
-              label="Last Name"
+          {/* Last Name */}
+          <div className="flex flex-col gap-2">
+            <PhasedLabel text="LAST NAME" index={1} animation={animation} />
+            <input
+              type="text"
               value={lastName}
-              onChange={(v) => {
-                setLastName(v)
-                setError('')
-              }}
-              placeholder="Smith"
-              required
+              onChange={(e) => { setLastName(e.target.value); setError('') }}
               autoComplete="family-name"
+              className="w-full h-12 px-4 rounded-ops bg-[#0D0D0D]/80 font-mohave text-ops-body text-white border border-white/10 outline-none placeholder:text-ops-text-tertiary"
             />
+          </div>
 
-            <OPSInput
-              label="Phone"
+          {/* Phone */}
+          <div className="flex flex-col gap-2">
+            <PhasedLabel text="PHONE" index={2} isLast animation={animation} />
+            <input
               type="tel"
               value={phone}
-              onChange={setPhone}
-              placeholder="(555) 123-4567"
+              onChange={(e) => setPhone(e.target.value)}
               autoComplete="tel"
+              placeholder="(555) 123-4567"
+              className="w-full h-12 px-4 rounded-ops bg-[#0D0D0D]/80 font-mohave text-ops-body text-white border border-white/10 outline-none placeholder:text-ops-text-tertiary"
             />
-
-            {error && (
-              <p className="font-kosugi text-ops-small text-ops-error text-center">
-                {error}
-              </p>
-            )}
-
-            <OPSButton
-              onClick={handleContinue}
-              loading={loading}
-              loadingText="SAVING..."
-              disabled={!firstName.trim() || !lastName.trim()}
-            >
-              CONTINUE
-            </OPSButton>
           </div>
-        </PhasedContent>
-      </div>
+
+          {error && (
+            <p className="font-kosugi text-ops-small text-ops-error text-center">
+              {error}
+            </p>
+          )}
+        </div>
+      </PhasedContent>
+
+      {/* Spacer — pushes button to bottom */}
+      <div className="flex-1" />
+
+      {/* Button — iOS: PhasedPrimaryButton .padding(.horizontal, 40) .padding(.bottom, 50) */}
+      <PhasedPrimaryButton
+        title="CONTINUE"
+        isEnabled={!!firstName.trim() && !!lastName.trim()}
+        isLoading={loading}
+        loadingText="SAVING..."
+        animation={animation}
+        onClick={handleContinue}
+      />
     </OnboardingScaffold>
   )
 }
