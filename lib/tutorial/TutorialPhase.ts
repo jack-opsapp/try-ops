@@ -27,7 +27,6 @@ export interface PhaseConfig {
   continueLabel?: string
   autoAdvanceMs?: number // auto-advance after N ms
   tooltipTop?: string // CSS top value, default '0' (top of screen)
-  spotlight?: { x: string; y: string; radius: number }
 }
 
 export const PHASE_ORDER: TutorialPhase[] = [
@@ -57,14 +56,14 @@ export const PHASE_CONFIGS: Record<TutorialPhase, PhaseConfig> = {
     tooltipDescription: 'This is how you create projects, tasks, clients, and more.',
     showContinueButton: false,
     tooltipTop: '55%',
-    spotlight: { x: '85%', y: '85%', radius: 40 },
+
   },
   fabTap: {
     tooltipText: 'TAP "CREATE PROJECT"',
     tooltipDescription: 'Every job starts here.',
     showContinueButton: false,
     tooltipTop: '25%',
-    spotlight: { x: '80%', y: '68%', radius: 70 },
+
   },
   projectFormClient: {
     tooltipText: 'SELECT A CLIENT',
@@ -111,7 +110,7 @@ export const PHASE_CONFIGS: Record<TutorialPhase, PhaseConfig> = {
     tooltipDescription: 'Client accepts the estimate—drag it to Accepted. Watch it move.',
     showContinueButton: true,
     continueLabel: 'CONTINUE',
-    spotlight: { x: '50%', y: '35%', radius: 80 },
+
   },
   projectListStatusDemo: {
     tooltipText: 'STATUS UPDATES AUTOMATICALLY',
@@ -123,7 +122,7 @@ export const PHASE_CONFIGS: Record<TutorialPhase, PhaseConfig> = {
     tooltipText: 'SWIPE TO CLOSE',
     tooltipDescription: 'Swipe right to advance, left to go back. This closes the job—paid and filed.',
     showContinueButton: false,
-    spotlight: { x: '50%', y: '40%', radius: 80 },
+
   },
   closedProjectsScroll: {
     tooltipText: 'JOB CLOSED',
@@ -140,14 +139,14 @@ export const PHASE_CONFIGS: Record<TutorialPhase, PhaseConfig> = {
     tooltipText: 'TAP "MONTH"',
     tooltipDescription: 'See the bigger picture.',
     showContinueButton: false,
-    spotlight: { x: '75%', y: '18%', radius: 50 },
+
   },
   calendarMonth: {
     tooltipText: 'TAP EXPAND',
     tooltipDescription: 'In the app, pinch to expand rows—like your phone\'s calendar. This button does the same thing.',
     showContinueButton: true,
     continueLabel: 'DONE',
-    spotlight: { x: '50%', y: '50%', radius: 100 },
+
   },
   completed: {
     tooltipText: '',
