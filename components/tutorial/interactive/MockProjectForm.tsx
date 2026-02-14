@@ -54,12 +54,18 @@ export function MockProjectForm({
     }
   }, [phase])
 
-  // Auto-focus input on name phase
+  // Auto-fill project name with typewriter effect
   useEffect(() => {
-    if (phase === 'projectFormName' && inputRef.current) {
-      setTimeout(() => inputRef.current?.focus(), 400)
-    }
-  }, [phase])
+    if (phase !== 'projectFormName') return
+    const name = 'TEST PROJECT 01'
+    let i = 0
+    const timer = setInterval(() => {
+      i++
+      onChangeProjectName(name.slice(0, i))
+      if (i >= name.length) clearInterval(timer)
+    }, 50)
+    return () => clearInterval(timer)
+  }, [phase]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const isFieldActive = (field: 'client' | 'name' | 'addTask' | 'create') => {
     switch (field) {
@@ -331,7 +337,7 @@ export function MockProjectForm({
                       ref={inputRef}
                       type="text"
                       value={projectName}
-                      onChange={(e) => onChangeProjectName(e.target.value)}
+                      readOnly
                       placeholder="Enter project name"
                       disabled={!isFieldActive('name')}
                       className="w-full font-mohave text-[16px] text-white placeholder:text-[#777777] outline-none disabled:cursor-default"

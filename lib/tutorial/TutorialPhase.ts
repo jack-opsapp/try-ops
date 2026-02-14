@@ -71,9 +71,10 @@ export const PHASE_CONFIGS: Record<TutorialPhase, PhaseConfig> = {
     showContinueButton: false,
   },
   projectFormName: {
-    tooltipText: 'NAME YOUR PROJECT',
-    tooltipDescription: 'Type anything—"Test Project" works fine.',
-    showContinueButton: false,
+    tooltipText: 'PROJECT NAME',
+    tooltipDescription: 'In the real app, you\'d type this yourself.',
+    showContinueButton: true,
+    continueLabel: 'CONTINUE',
   },
   projectFormAddTask: {
     tooltipText: 'ADD A TASK',

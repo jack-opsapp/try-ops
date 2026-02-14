@@ -154,12 +154,6 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
 
   const handleProjectNameChange = (name: string) => {
     setProjectName(name)
-    // Debounce: advance after user types 3+ chars
-    if (name.length >= 3) {
-      setTimeout(() => {
-        if (phase === 'projectFormName') advance()
-      }, 800)
-    }
   }
 
   const handleAddTask = () => {
@@ -398,21 +392,23 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
         style={{ zIndex: 60 }}
       >
         {isContinuePhase ? (
-          /* Continue/Done phase — single wide button, centered */
+          /* Continue/Done phase — single wide button, centered, accent-tinted material */
           <button
             onClick={handleContinue}
-            className="mx-auto flex items-center justify-center gap-2 bg-white text-black font-mohave font-medium text-[16px] tracking-wide
-                       hover:bg-gray-100 active:bg-gray-200 transition-colors duration-150"
+            className="ultra-thin-material mx-auto flex items-center justify-center gap-2 font-mohave font-medium text-[16px] tracking-wide
+                       transition-colors duration-150"
             style={{
               width: '70%',
               paddingTop: 14,
               paddingBottom: 14,
               borderRadius: 5,
-              boxShadow: '0 0 20px rgba(0,0,0,0.8), 0 8px 40px rgba(0,0,0,0.6)',
+              backgroundColor: 'rgba(65, 115, 148, 0.35)',
+              border: '1px solid rgba(65, 115, 148, 0.5)',
+              color: '#FFFFFF',
             }}
           >
             <span>{continueLabel}</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-black">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-white">
               <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
@@ -429,14 +425,13 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
                 goBack()
               }}
               disabled={phaseIndex <= 0}
-              className="font-mohave font-medium text-[14px] uppercase tracking-wider transition-colors duration-150"
+              className="ultra-thin-material font-mohave font-medium text-[14px] uppercase tracking-wider transition-colors duration-150"
               style={{
                 flex: 3,
                 paddingTop: 14,
                 paddingBottom: 14,
                 borderRadius: 5,
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.15)',
+                border: '1px solid rgba(255,255,255,0.1)',
                 color: phaseIndex > 0 ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.15)',
                 cursor: phaseIndex > 0 ? 'pointer' : 'default',
               }}
@@ -447,13 +442,13 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
             {/* Continue button — greyed out / disabled */}
             <button
               disabled
-              className="font-mohave font-medium text-[16px] tracking-wide"
+              className="ultra-thin-material font-mohave font-medium text-[16px] tracking-wide"
               style={{
                 flex: 4,
                 paddingTop: 14,
                 paddingBottom: 14,
                 borderRadius: 5,
-                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.05)',
                 color: 'rgba(255,255,255,0.2)',
                 cursor: 'default',
               }}
@@ -464,15 +459,13 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
             {/* Skip step button */}
             <button
               onClick={() => advance()}
-              className="font-mohave font-medium text-[14px] uppercase tracking-wider transition-colors duration-150
-                         hover:bg-white/10 active:bg-white/15"
+              className="ultra-thin-material font-mohave font-medium text-[14px] uppercase tracking-wider transition-colors duration-150"
               style={{
                 flex: 3,
                 paddingTop: 14,
                 paddingBottom: 14,
                 borderRadius: 5,
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.15)',
+                border: '1px solid rgba(255,255,255,0.1)',
                 color: 'rgba(255,255,255,0.6)',
               }}
             >
