@@ -18,9 +18,22 @@ function normalizePhone(raw: string): string | null {
   return null
 }
 
-async function sendSMS(to: string, body: string): Promise<{ ok: boolean; error?: string }> {
+async function sendSMS(
+  to: string,
+  body: string,
+  mediaUrl?: string
+): Promise<{ ok: boolean; error?: string }> {
   if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !TWILIO_PHONE_NUMBER) {
     return { ok: false, error: 'Twilio not configured' }
+  }
+
+  const params: Record<string, string> = {
+    To: to,
+    From: TWILIO_PHONE_NUMBER,
+    Body: body,
+  }
+  if (mediaUrl) {
+    params.MediaUrl = mediaUrl
   }
 
   const response = await fetch(
@@ -31,11 +44,7 @@ async function sendSMS(to: string, body: string): Promise<{ ok: boolean; error?:
         'Authorization': `Basic ${Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString('base64')}`,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: new URLSearchParams({
-        To: to,
-        From: TWILIO_PHONE_NUMBER,
-        Body: body,
-      }).toString(),
+      body: new URLSearchParams(params).toString(),
     }
   )
 
@@ -46,7 +55,11 @@ async function sendSMS(to: string, body: string): Promise<{ ok: boolean; error?:
   return { ok: true }
 }
 
-async function sendEmailInvites(emails: string[], company: string): Promise<{ ok: boolean; error?: string }> {
+async function sendEmailInvites(
+  emails: string[],
+  company: string,
+  logoUrl: string
+): Promise<{ ok: boolean; error?: string }> {
   if (!BUBBLE_BASE_URL) {
     return { ok: false, error: 'Bubble not configured' }
   }
@@ -54,7 +67,7 @@ async function sendEmailInvites(emails: string[], company: string): Promise<{ ok
   const response = await fetch(`${BUBBLE_BASE_URL}/api/1.1/wf/send_invite`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ emails, company }),
+    body: JSON.stringify({ emails, company, logoUrl }),
   })
 
   if (!response.ok) {
@@ -74,6 +87,10 @@ export async function POST(request: Request) {
     if (!company || !companyCode) {
       return NextResponse.json({ error: 'Company info is required' }, { status: 400 })
     }
+
+    // Derive public logo URL from the request origin
+    const origin = new URL(request.url).origin
+    const logoUrl = `${origin}/images/ops-logo-white.png`
 
     const emails: string[] = []
     const phones: string[] = []
@@ -100,9 +117,9 @@ export async function POST(request: Request) {
       errors,
     }
 
-    // Send email invites via Bubble
+    // Send email invites via Bubble (with logo URL)
     if (emails.length > 0) {
-      const emailResult = await sendEmailInvites(emails, company)
+      const emailResult = await sendEmailInvites(emails, company, logoUrl)
       if (emailResult.ok) {
         results.emailsSent = emails.length
       } else {
@@ -111,11 +128,18 @@ export async function POST(request: Request) {
     }
 
     // Send SMS invites via Twilio
-    const smsBody = `${companyName || 'Your company'} added you to OPS.\n\nDownload the app: ${APP_STORE_URL}\nYour crew code: ${companyCode}\n\nReply STOP to opt out.`
+    // Message 1: Invite with OPS logo (MMS)
+    const smsBody = `${companyName || 'Your company'} added you to OPS.\n\nDownload the app: ${APP_STORE_URL}\n\nReply STOP to opt out.`
 
     for (const phone of phones) {
-      const smsResult = await sendSMS(phone, smsBody)
+      // First message: invite text + logo
+      const smsResult = await sendSMS(phone, smsBody, logoUrl)
       if (smsResult.ok) {
+        // Second message: crew code only (easy to copy)
+        const codeResult = await sendSMS(phone, companyCode)
+        if (!codeResult.ok) {
+          results.errors.push(`Code SMS to ${phone}: ${codeResult.error}`)
+        }
         results.smsSent++
       } else {
         results.errors.push(`SMS to ${phone}: ${smsResult.error}`)

@@ -173,13 +173,10 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
             className="p-4 rounded-ops border border-white/10"
             style={{ backgroundColor: 'rgba(13, 13, 13, 0.8)' }}
           >
-            <p className="font-kosugi text-ops-caption text-ops-text-tertiary mb-2">
-              CREW CODE
-            </p>
-            <div className="flex items-center justify-between">
-              <span className="font-kosugi font-medium text-ops-caption text-white tracking-[2px]">
-                [{companyCode}]
-              </span>
+            <div className="flex items-center justify-between mb-2">
+              <p className="font-kosugi text-ops-caption text-ops-text-tertiary">
+                CREW CODE
+              </p>
               <button onClick={handleCopy} className="flex items-center gap-1.5">
                 {showCopied ? (
                   <>
@@ -199,6 +196,9 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
                 )}
               </button>
             </div>
+            <span className="font-kosugi font-medium text-ops-caption text-white tracking-[2px]">
+              [{companyCode}]
+            </span>
           </div>
 
           {/* INVITE CREW button / SEND INVITES button */}
