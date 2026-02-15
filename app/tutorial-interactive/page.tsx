@@ -128,6 +128,7 @@ export default function InteractiveTutorialPage() {
       <div
         className="relative w-full overflow-hidden"
         style={{
+          maxWidth: 430,
           maxHeight: 'min(calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)), 932px)',
           height: '100%',
         }}

@@ -431,6 +431,7 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
                 paddingTop: 14,
                 paddingBottom: 14,
                 borderRadius: 5,
+                backgroundColor: 'rgba(255,255,255,0.08)',
                 border: '1px solid rgba(255,255,255,0.1)',
                 color: phaseIndex > 0 ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.15)',
                 cursor: phaseIndex > 0 ? 'pointer' : 'default',
@@ -465,6 +466,7 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
                 paddingTop: 14,
                 paddingBottom: 14,
                 borderRadius: 5,
+                backgroundColor: 'rgba(255,255,255,0.08)',
                 border: '1px solid rgba(255,255,255,0.1)',
                 color: 'rgba(255,255,255,0.6)',
               }}
