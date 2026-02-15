@@ -396,7 +396,7 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
           <button
             onClick={handleContinue}
             className="ultra-thin-material mx-auto flex items-center justify-center gap-2 font-mohave font-medium text-[16px] tracking-wide
-                       transition-colors duration-150"
+                       transition-all duration-200 hover:brightness-125 hover:scale-[1.02] active:scale-[0.98]"
             style={{
               width: '70%',
               paddingTop: 14,
@@ -425,7 +425,9 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
                 goBack()
               }}
               disabled={phaseIndex <= 0}
-              className="ultra-thin-material font-mohave font-medium text-[14px] uppercase tracking-wider transition-colors duration-150"
+              className="ultra-thin-material font-mohave font-medium text-[14px] uppercase tracking-wider
+                         transition-all duration-200 hover:brightness-125 hover:scale-[1.02] active:scale-[0.98]
+                         disabled:hover:brightness-100 disabled:hover:scale-100"
               style={{
                 flex: 3,
                 paddingTop: 14,
@@ -460,7 +462,8 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
             {/* Skip step button */}
             <button
               onClick={() => advance()}
-              className="ultra-thin-material font-mohave font-medium text-[14px] uppercase tracking-wider transition-colors duration-150"
+              className="ultra-thin-material font-mohave font-medium text-[14px] uppercase tracking-wider
+                         transition-all duration-200 hover:brightness-125 hover:scale-[1.02] active:scale-[0.98]"
               style={{
                 flex: 3,
                 paddingTop: 14,

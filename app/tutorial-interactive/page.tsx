@@ -125,14 +125,20 @@ export default function InteractiveTutorialPage() {
   // Interactive tutorial
   return (
     <div className="h-screen bg-ops-background overflow-hidden flex items-center justify-center">
+      {/* iPhone frame — only visible on desktop (md+) */}
       <div
-        className="relative w-full overflow-hidden"
+        className="relative w-full overflow-hidden
+                   md:border-[3px] md:border-[#2A2A2A] md:rounded-[44px] md:shadow-2xl"
         style={{
           maxWidth: 430,
           maxHeight: 'min(calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)), 932px)',
           height: '100%',
         }}
       >
+        {/* Dynamic Island — desktop only */}
+        <div className="hidden md:flex absolute top-3 left-1/2 -translate-x-1/2 items-center justify-center"
+          style={{ zIndex: 70, width: 126, height: 36, borderRadius: 18, background: '#000000' }}
+        />
         <TutorialProvider>
           <TutorialShell onComplete={handleComplete} />
         </TutorialProvider>

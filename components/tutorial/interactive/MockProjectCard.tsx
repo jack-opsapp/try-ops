@@ -253,7 +253,7 @@ function ListCard({
       className={`overflow-hidden ${className}`}
       style={{
         height: 80,
-        background: '#0D0D0D',
+        background: '#000000',
         borderRadius: 5,
         border: showShimmer
           ? '2px solid #417394'
