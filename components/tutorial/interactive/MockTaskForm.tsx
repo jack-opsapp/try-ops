@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { DEMO_TASK_TYPES, DEMO_CREW } from '@/lib/constants/demo-data'
 import type { TutorialPhase } from '@/lib/tutorial/TutorialPhase'
 
@@ -13,7 +13,8 @@ interface MockTaskFormProps {
   onSelectType: (type: string) => void
   onSelectCrew: (crew: string) => void
   onSelectDate: (date: string) => void
-  onDone: () => void
+  onDateSheetStateChange?: (open: boolean, hasDates: boolean) => void
+  confirmDatesSignal?: number
 }
 
 export function MockTaskForm({
@@ -25,7 +26,8 @@ export function MockTaskForm({
   onSelectType,
   onSelectCrew,
   onSelectDate,
-  onDone,
+  onDateSheetStateChange,
+  confirmDatesSignal,
 }: MockTaskFormProps) {
   const [showTypeDropdown, setShowTypeDropdown] = useState(false)
   const [showCrewList, setShowCrewList] = useState(false)
@@ -42,12 +44,11 @@ export function MockTaskForm({
   // Color for the left bar on task type field and preview
   const typeColor = selectedTaskTypeObj?.color ?? null
 
-  const isFieldActive = (field: 'type' | 'crew' | 'date' | 'done') => {
+  const isFieldActive = (field: 'type' | 'crew' | 'date') => {
     switch (field) {
       case 'type': return phase === 'taskFormType'
       case 'crew': return phase === 'taskFormCrew'
       case 'date': return phase === 'taskFormDate'
-      case 'done': return phase === 'taskFormDone'
     }
   }
 
@@ -55,6 +56,36 @@ export function MockTaskForm({
   const isFieldDimmed = (field: 'type' | 'crew' | 'date') => {
     return !isFieldActive(field) && phase !== 'taskFormDone'
   }
+
+  // Notify parent of date sheet state changes
+  useEffect(() => {
+    onDateSheetStateChange?.(showDateSheet && !dateSheetClosing, dateStartDate !== null)
+  }, [showDateSheet, dateSheetClosing, dateStartDate, onDateSheetStateChange])
+
+  // Handle external date confirmation signal from action bar
+  const prevConfirmSignal = useRef(0)
+  const runDateConfirm = useCallback(() => {
+    if (dateStartDate !== null) {
+      const today = new Date()
+      const month = today.toLocaleString('en-US', { month: 'short' })
+      const dateStr = dateEndDate && dateEndDate !== dateStartDate
+        ? `${month} ${dateStartDate} - ${dateEndDate}`
+        : `${month} ${dateStartDate}, ${today.getFullYear()}`
+      setDateSheetClosing(true)
+      setTimeout(() => {
+        setShowDateSheet(false)
+        setDateSheetClosing(false)
+        onSelectDate(dateStr)
+      }, 350)
+    }
+  }, [dateStartDate, dateEndDate, onSelectDate])
+
+  useEffect(() => {
+    if (confirmDatesSignal !== undefined && confirmDatesSignal > prevConfirmSignal.current) {
+      prevConfirmSignal.current = confirmDatesSignal
+      runDateConfirm()
+    }
+  }, [confirmDatesSignal, runDateConfirm])
 
   if (!visible) return null
 
@@ -82,11 +113,6 @@ export function MockTaskForm({
           maxHeight: '92vh',
         }}
       >
-        {/* Extra top spacing during taskFormDone to push nav bar below tooltip */}
-        {phase === 'taskFormDone' && (
-          <div style={{ height: 90, background: '#000000' }} />
-        )}
-
         {/* Header: CANCEL | CREATE TASK | DONE */}
         <div className="relative flex items-center" style={{ background: '#000000', padding: '12px 16px' }}>
           {/* Cancel - left */}
@@ -102,29 +128,13 @@ export function MockTaskForm({
             Create Task
           </span>
 
-          {/* DONE - right */}
-          <button
-            onClick={onDone}
-            disabled={!isFieldActive('done')}
-            className={`ml-auto font-mohave font-medium text-[16px] uppercase transition-all duration-300 ${
-              isFieldActive('done')
-                ? 'text-[#417394]'
-                : 'text-[#777777]'
-            }`}
-            style={{
-              padding: '4px 8px',
-              borderRadius: 5,
-              border: isFieldActive('done')
-                ? '2px solid #417394'
-                : '2px solid transparent',
-              animation: isFieldActive('done')
-                ? 'tutorial-pulse-ring 2s ease-in-out infinite'
-                : 'none',
-              transition: 'border 0.3s ease',
-            }}
+          {/* DONE - right, always greyed out (action handled by bottom action bar) */}
+          <span
+            className="ml-auto font-mohave font-medium text-[16px] uppercase"
+            style={{ color: '#777777' }}
           >
             Done
-          </button>
+          </span>
         </div>
 
         {/* Divider below header */}
@@ -537,28 +547,7 @@ export function MockTaskForm({
             <div className="h-4" />
           </div>
 
-          {/* taskFormDone overlay: dark overlay over all form content */}
-          {phase === 'taskFormDone' && (
-            <div
-              className="absolute inset-0 pointer-events-auto"
-              style={{
-                background: 'rgba(0,0,0,0.6)',
-                zIndex: 10,
-              }}
-            />
-          )}
         </div>
-
-        {/* Radial gradient for DONE button visibility during taskFormDone */}
-        {phase === 'taskFormDone' && (
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: 'radial-gradient(circle at 85% 12%, transparent 60px, rgba(0,0,0,0.6) 350px)',
-              zIndex: 11,
-            }}
-          />
-        )}
       </div>
 
       {/* Calendar Scheduler Sheet — slides up when date field is tapped */}
@@ -827,21 +816,8 @@ function MockCalendarSchedulerSheet({
         </div>
       </div>
 
-      {/* Confirm button */}
-      <div className="px-4 py-4 pb-6">
-        <button
-          onClick={onConfirm}
-          disabled={!hasDates}
-          className="w-full py-3.5 font-kosugi font-normal text-[14px] uppercase tracking-wider transition-all duration-200"
-          style={{
-            borderRadius: 5,
-            background: hasDates ? '#FFFFFF' : '#0D0D0D',
-            color: hasDates ? '#000000' : '#777777',
-          }}
-        >
-          Confirm Dates
-        </button>
-      </div>
+      {/* Bottom padding (confirm action is in the bottom action bar) */}
+      <div className="h-6" />
     </div>
   )
 }

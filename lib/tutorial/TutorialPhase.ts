@@ -73,8 +73,7 @@ export const PHASE_CONFIGS: Record<TutorialPhase, PhaseConfig> = {
   projectFormName: {
     tooltipText: 'PROJECT NAME',
     tooltipDescription: 'In the real app, you\'d type this yourself.',
-    showContinueButton: true,
-    continueLabel: 'CONTINUE',
+    showContinueButton: false,
   },
   projectFormAddTask: {
     tooltipText: 'ADD A TASK',
@@ -97,14 +96,16 @@ export const PHASE_CONFIGS: Record<TutorialPhase, PhaseConfig> = {
     showContinueButton: false,
   },
   taskFormDone: {
-    tooltipText: 'TAP "DONE"',
-    tooltipDescription: 'Task saved.',
-    showContinueButton: false,
+    tooltipText: 'TASK COMPLETE',
+    tooltipDescription: 'All details set.',
+    showContinueButton: true,
+    continueLabel: 'DONE',
   },
   projectFormComplete: {
-    tooltipText: 'TAP "CREATE"',
-    tooltipDescription: 'Project saved to your job board.',
-    showContinueButton: false,
+    tooltipText: 'PROJECT READY',
+    tooltipDescription: "Everything's set. Create your project.",
+    showContinueButton: true,
+    continueLabel: 'CREATE',
   },
   dragToAccepted: {
     tooltipText: 'PROJECT POSTED',

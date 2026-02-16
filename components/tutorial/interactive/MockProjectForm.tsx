@@ -13,7 +13,6 @@ interface MockProjectFormProps {
   onSelectClient: (client: string) => void
   onChangeProjectName: (name: string) => void
   onAddTask: () => void
-  onCreate: () => void
 }
 
 export function MockProjectForm({
@@ -25,11 +24,12 @@ export function MockProjectForm({
   onSelectClient,
   onChangeProjectName,
   onAddTask,
-  onCreate,
 }: MockProjectFormProps) {
   const [showClientDropdown, setShowClientDropdown] = useState(false)
   const [sheetVisible, setSheetVisible] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const addTaskRef = useRef<HTMLDivElement>(null)
 
   // Slide-up animation on mount
   useEffect(() => {
@@ -54,6 +54,16 @@ export function MockProjectForm({
     }
   }, [phase])
 
+  // Auto-scroll to ADD TASK button when phase is projectFormAddTask
+  useEffect(() => {
+    if (phase === 'projectFormAddTask' && scrollRef.current && addTaskRef.current) {
+      const timer = setTimeout(() => {
+        addTaskRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 300)
+      return () => clearTimeout(timer)
+    }
+  }, [phase])
+
   // Auto-fill project name with typewriter effect
   useEffect(() => {
     if (phase !== 'projectFormName') return
@@ -67,12 +77,11 @@ export function MockProjectForm({
     return () => clearInterval(timer)
   }, [phase]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const isFieldActive = (field: 'client' | 'name' | 'addTask' | 'create') => {
+  const isFieldActive = (field: 'client' | 'name' | 'addTask') => {
     switch (field) {
       case 'client': return phase === 'projectFormClient'
       case 'name': return phase === 'projectFormName'
       case 'addTask': return phase === 'projectFormAddTask'
-      case 'create': return phase === 'projectFormComplete'
     }
   }
 
@@ -103,11 +112,6 @@ export function MockProjectForm({
           className="flex-shrink-0"
           style={{ background: '#000000' }}
         >
-          {/* Extra top spacing during projectFormComplete to push below tooltip */}
-          {phase === 'projectFormComplete' && (
-            <div style={{ height: 90 }} />
-          )}
-
           <div
             className="flex items-center justify-between"
             style={{ padding: '12px 16px' }}
@@ -120,36 +124,18 @@ export function MockProjectForm({
               CANCEL
             </span>
 
-            {/* CREATE PROJECT - center title — bodyBold = Mohave Medium 16pt */}
+            {/* CREATE PROJECT - center title */}
             <span className="font-mohave font-medium text-[16px] text-white whitespace-nowrap">
               CREATE PROJECT
             </span>
 
-            {/* CREATE - right — bodyBold = Mohave Medium 16pt, pulsing border in create phase */}
-            <button
-              onClick={onCreate}
-              disabled={!isFieldActive('create')}
-              className="font-mohave font-medium text-[16px] flex items-center justify-center"
-              style={{
-                color: isFormValid && isFieldActive('create') ? '#417394' : '#777777',
-                background: 'none',
-                cursor: isFieldActive('create') ? 'pointer' : 'default',
-                padding: '4px 12px',
-                borderRadius: 5,
-                border: isFieldActive('create')
-                  ? '2px solid #417394'
-                  : '2px solid transparent',
-                boxShadow: isFieldActive('create')
-                  ? '0 0 12px rgba(65, 115, 148, 0.4)'
-                  : 'none',
-                animation: isFieldActive('create')
-                  ? 'tutorial-pulse-ring 2s ease-in-out infinite'
-                  : 'none',
-                transition: 'border 0.3s ease, box-shadow 0.3s ease',
-              }}
+            {/* CREATE - right, always greyed out (action handled by bottom action bar) */}
+            <span
+              className="font-mohave font-medium text-[16px]"
+              style={{ color: '#777777', minWidth: 70, textAlign: 'right' }}
             >
               CREATE
-            </button>
+            </span>
           </div>
 
           {/* Divider */}
@@ -158,31 +144,10 @@ export function MockProjectForm({
 
         {/* === SCROLLABLE FORM CONTENT === */}
         <div
+          ref={scrollRef}
           className="flex-1 overflow-y-auto relative"
           style={{ background: '#000000' }}
         >
-          {/* Dark overlay during projectFormComplete phase */}
-          {phase === 'projectFormComplete' && (
-            <>
-              <div
-                className="absolute inset-0"
-                style={{
-                  background: 'rgba(0,0,0,0.6)',
-                  zIndex: 10,
-                  pointerEvents: 'auto',
-                }}
-              />
-              {/* Radial gradient spotlight on CREATE button */}
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background: 'radial-gradient(circle at 85% 12%, transparent 60px, rgba(0,0,0,0.6) 350px)',
-                  zIndex: 11,
-                }}
-              />
-            </>
-          )}
-
           <div style={{ padding: 16 }}>
             {/* Section Header: PROJECT DETAILS */}
             <div
@@ -434,7 +399,7 @@ export function MockProjectForm({
 
             {/* === TASKS SECTION (expanded, shows when task is added or addTask phase) === */}
             {(addedTask || isFieldActive('addTask')) && (
-              <div style={{ marginTop: 16 }}>
+              <div ref={addTaskRef} style={{ marginTop: 16 }}>
                 {/* Section header */}
                 <div className="flex items-center gap-1" style={{ marginBottom: 12 }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ color: '#AAAAAA' }}>
@@ -534,8 +499,8 @@ export function MockProjectForm({
               </div>
             )}
 
-            {/* Bottom spacing */}
-            <div style={{ height: 24 }} />
+            {/* Bottom spacing — extra room for bottom action bar */}
+            <div style={{ height: 120 }} />
           </div>
         </div>
       </div>

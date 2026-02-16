@@ -59,6 +59,11 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
   const [closedSheetOpen, setClosedSheetOpen] = useState(false)
   const [closedSheetReady, setClosedSheetReady] = useState(false)
 
+  // Date sheet state — communicated from MockTaskForm
+  const [dateSheetOpen, setDateSheetOpen] = useState(false)
+  const [dateSheetHasDates, setDateSheetHasDates] = useState(false)
+  const [dateConfirmSignal, setDateConfirmSignal] = useState(0)
+
   useEffect(() => {
     // When transitioning from taskFormDone to projectFormComplete, trigger close animation
     if (prevPhaseRef.current === 'taskFormDone' && phase === 'projectFormComplete') {
@@ -71,6 +76,10 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
     if (phase !== 'closedProjectsScroll') {
       setClosedSheetOpen(false)
       setClosedSheetReady(false)
+    }
+    if (phase !== 'taskFormDate') {
+      setDateSheetOpen(false)
+      setDateSheetHasDates(false)
     }
     prevPhaseRef.current = phase
   }, [phase])
@@ -161,11 +170,6 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
     advance()
   }
 
-  const handleCreate = () => {
-    // projectFormComplete -> dragToAccepted
-    advance()
-  }
-
   const handleSelectType = (type: string) => {
     setSelectedTaskType(type)
     setTimeout(() => advance(), 300)
@@ -179,11 +183,6 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
   const handleSelectDate = (date: string) => {
     setSelectedDate(date)
     setTimeout(() => advance(), 300)
-  }
-
-  const handleTaskDone = () => {
-    // taskFormDone -> projectFormComplete
-    advance()
   }
 
   const handleSwipeComplete = () => {
@@ -209,6 +208,11 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
       advance()
       return
     }
+    // Date sheet confirm — signal MockTaskForm to run confirmation
+    if (phase === 'taskFormDate' && dateSheetOpen && dateSheetHasDates) {
+      setDateConfirmSignal(prev => prev + 1)
+      return
+    }
     advance()
   }
 
@@ -223,9 +227,14 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
   const isContinuePhase =
     (phaseConfig.showContinueButton && !dragAnimStarted) ||
     dragAnimLanded ||
-    closedSheetReady
+    closedSheetReady ||
+    (dateSheetOpen && dateSheetHasDates)
 
-  const continueLabel = dragAnimLanded ? 'CONTINUE' : phaseConfig.continueLabel || 'CONTINUE'
+  const continueLabel = dragAnimLanded
+    ? 'CONTINUE'
+    : (dateSheetOpen && dateSheetHasDates)
+      ? 'CONFIRM DATES'
+      : phaseConfig.continueLabel || 'CONTINUE'
 
   // Progress fraction (exclude 'completed' from total)
   const totalPhases = tutorial.totalPhases
@@ -325,7 +334,6 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
             onSelectClient={handleSelectClient}
             onChangeProjectName={handleProjectNameChange}
             onAddTask={handleAddTask}
-            onCreate={handleCreate}
           />
         </div>
       )}
@@ -349,7 +357,11 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
             onSelectType={handleSelectType}
             onSelectCrew={handleSelectCrew}
             onSelectDate={handleSelectDate}
-            onDone={handleTaskDone}
+            onDateSheetStateChange={(open, hasDates) => {
+              setDateSheetOpen(open)
+              setDateSheetHasDates(hasDates)
+            }}
+            confirmDatesSignal={dateConfirmSignal}
           />
         </div>
       )}
@@ -386,10 +398,13 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
         </div>
       </div>
 
-      {/* Layer 7: Bottom action bar (z-60) */}
+      {/* Layer 7: Bottom action bar (z-60) — opaque backing to prevent tab bar bleed-through */}
       <div
-        className="absolute bottom-0 left-0 right-0 flex items-center gap-3 px-4 pb-4"
-        style={{ zIndex: 60 }}
+        className="absolute bottom-0 left-0 right-0"
+        style={{ zIndex: 60, background: '#000000' }}
+      >
+      <div
+        className="flex items-center gap-3 px-4 pb-4 pt-3"
       >
         {isContinuePhase ? (
           /* Continue/Done phase — single wide button, centered, accent-tinted material */
@@ -442,22 +457,33 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
               BACK
             </button>
 
-            {/* Continue button — greyed out / disabled */}
-            <button
-              disabled
-              className="ultra-thin-material font-mohave font-medium text-[16px] tracking-wide"
-              style={{
-                flex: 4,
-                paddingTop: 14,
-                paddingBottom: 14,
-                borderRadius: 5,
-                border: '1px solid rgba(255,255,255,0.05)',
-                color: 'rgba(255,255,255,0.2)',
-                cursor: 'default',
-              }}
-            >
-              CONTINUE
-            </button>
+            {/* Continue button — active during projectFormName (after typewriter), greyed out otherwise */}
+            {(() => {
+              const continueActive = phase === 'projectFormName' && projectName.length >= 15
+              return (
+                <button
+                  disabled={!continueActive}
+                  onClick={continueActive ? handleContinue : undefined}
+                  className={`ultra-thin-material font-mohave font-medium text-[16px] tracking-wide
+                    ${continueActive ? 'transition-all duration-200 hover:brightness-125 hover:scale-[1.02] active:scale-[0.98]' : ''}`}
+                  style={{
+                    flex: 4,
+                    paddingTop: 14,
+                    paddingBottom: 14,
+                    borderRadius: 5,
+                    backgroundColor: continueActive ? 'rgba(65, 115, 148, 0.35)' : undefined,
+                    border: continueActive
+                      ? '1px solid rgba(65, 115, 148, 0.5)'
+                      : '1px solid rgba(255,255,255,0.05)',
+                    color: continueActive ? '#FFFFFF' : 'rgba(255,255,255,0.2)',
+                    cursor: continueActive ? 'pointer' : 'default',
+                    transition: 'all 0.3s ease',
+                  }}
+                >
+                  CONTINUE
+                </button>
+              )
+            })()}
 
             {/* Skip step button */}
             <button
@@ -478,6 +504,7 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
             </button>
           </>
         )}
+      </div>
       </div>
     </div>
   )
