@@ -104,13 +104,13 @@ function DashboardCard({
     <div
       className={`overflow-hidden ${className}`}
       style={{
-        background: '#000000',
+        background: '#0D0D0D',
         borderRadius: 5,
         border: isHighlighted
-          ? '2px solid rgba(65, 115, 148, 0.8)'
+          ? `2px solid ${statusColor}CC`
           : '1px solid rgba(255,255,255,0.08)',
         boxShadow: isHighlighted
-          ? '0 0 16px rgba(65, 115, 148, 0.25)'
+          ? `0 0 16px ${statusColor}40`
           : 'none',
         ...style,
       }}
@@ -253,15 +253,15 @@ function ListCard({
       className={`overflow-hidden ${className}`}
       style={{
         height: 80,
-        background: '#000000',
+        background: '#0D0D0D',
         borderRadius: 5,
         border: showShimmer
-          ? '2px solid #417394'
+          ? `2px solid ${statusColor}`
           : isHighlighted
-            ? '2px solid rgba(65, 115, 148, 0.8)'
+            ? `2px solid ${statusColor}CC`
             : '1px solid rgba(255,255,255,0.2)', // iOS: cardBorder
         boxShadow: isHighlighted
-          ? '0 0 16px rgba(65, 115, 148, 0.25)'
+          ? `0 0 16px ${statusColor}40`
           : 'none',
         position: 'relative',
         overflow: 'hidden',
@@ -280,7 +280,7 @@ function ListCard({
               top: 0,
               bottom: 0,
               width: 80,
-              background: 'linear-gradient(to right, transparent, rgba(65,115,148,0.15), rgba(65,115,148,0.25), rgba(65,115,148,0.15), transparent)',
+              background: `linear-gradient(to right, transparent, ${statusColor}26, ${statusColor}40, ${statusColor}26, transparent)`,
               animation: 'cardShimmer 1.5s linear infinite',
             }}
           />

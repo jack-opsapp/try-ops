@@ -242,8 +242,8 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
 
   return (
     <div
-      className="relative w-full h-full overflow-hidden bg-ops-background"
-      style={{ touchAction: 'none' }}
+      className="relative w-full h-full overflow-hidden"
+      style={{ touchAction: 'none', background: '#000000' }}
     >
       {/* Layer 1: Mock app content (z-0) */}
       <div
