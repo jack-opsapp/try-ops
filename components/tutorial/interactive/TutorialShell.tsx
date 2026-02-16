@@ -376,10 +376,10 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
         </div>
       )}
 
-      {/* Layer 6: Tooltip (z-50, always on top of content) */}
+      {/* Layer 6: Tooltip (z-50, always on top of content, min 54px to clear Dynamic Island) */}
       <div
         className="absolute left-0 right-0"
-        style={{ zIndex: 50, top: phaseConfig.tooltipTop || '0' }}
+        style={{ zIndex: 50, top: `max(54px, ${phaseConfig.tooltipTop || '0'})` }}
       >
         <CollapsibleTooltip
           text={phaseConfig.tooltipText}
@@ -388,8 +388,8 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
         />
       </div>
 
-      {/* Layer 6b: Progress bar (z-55) */}
-      <div className="absolute top-0 left-0 right-0" style={{ zIndex: 55 }}>
+      {/* Layer 6b: Progress bar (z-55) — top margin clears Dynamic Island on iPhone */}
+      <div className="absolute left-0 right-0" style={{ zIndex: 55, top: 48 }}>
         <div className="h-[3px] bg-white/10">
           <div
             className="h-full bg-[#417394] transition-all duration-500 ease-out"
