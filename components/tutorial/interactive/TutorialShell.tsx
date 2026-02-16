@@ -398,13 +398,14 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
         </div>
       </div>
 
-      {/* Layer 7: Bottom action bar (z-60) — opaque backing to prevent tab bar bleed-through */}
+      {/* Layer 7: Bottom action bar (z-60) — gradient fade from transparent to black */}
       <div
         className="absolute bottom-0 left-0 right-0"
-        style={{ zIndex: 60, background: '#000000' }}
+        style={{ zIndex: 60 }}
       >
       <div
-        className="flex items-center gap-3 px-4 pb-4 pt-3"
+        className="flex items-center gap-3 px-4 pb-4 pt-8"
+        style={{ background: 'linear-gradient(to bottom, transparent, #000000 40%)' }}
       >
         {isContinuePhase ? (
           /* Continue/Done phase — single wide button, centered, accent-tinted material */
