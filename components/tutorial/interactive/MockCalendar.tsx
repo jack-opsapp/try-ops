@@ -7,6 +7,8 @@ interface MockCalendarProps {
   phase: TutorialPhase
   viewMode: 'week' | 'month'
   onToggleMonth: () => void
+  expansionLevel?: number
+  onExpand?: () => void
   userProject?: {
     name: string
     clientName: string
@@ -27,7 +29,7 @@ const TASK_COLORS = [
   '#E8945A', // Demolition (orange)
 ]
 
-export function MockCalendar({ phase, viewMode, onToggleMonth, userProject }: MockCalendarProps) {
+export function MockCalendar({ phase, viewMode, onToggleMonth, expansionLevel: externalExpansionLevel, onExpand, userProject }: MockCalendarProps) {
   const today = useMemo(() => new Date(), [])
   const isMonthView = viewMode === 'month'
   const isMonthPrompt = phase === 'calendarMonthPrompt'
@@ -189,7 +191,8 @@ export function MockCalendar({ phase, viewMode, onToggleMonth, userProject }: Mo
   // Level 0 = 80px (iOS <120 = Level 1: compact bars, 0.5 opacity, no text)
   // Level 1 = 120px (iOS 120-180 = Level 2: bars with title, 0.2 opacity)
   // Level 2 = 180px (iOS >=180 = Level 3: tall single-day, multi-day bars with title)
-  const [expansionLevel, setExpansionLevel] = useState(1) // start at Level 2 like iOS default (cellHeight=120)
+  const [internalExpansionLevel, setInternalExpansionLevel] = useState(1)
+  const expansionLevel = externalExpansionLevel ?? internalExpansionLevel
 
   // =========================================================================
   // MONTH EVENT DATA — week-span based layout matching iOS MonthGridView
@@ -655,13 +658,14 @@ export function MockCalendar({ phase, viewMode, onToggleMonth, userProject }: Mo
             }}
           >
             Month
-            {/* Pulsing 3pt border highlight during calendarMonthPrompt */}
+            {/* Pulsing 3pt border highlight + outer glow during calendarMonthPrompt */}
             {isMonthPrompt && (
               <span
                 className="absolute inset-0 pointer-events-none"
                 style={{
                   borderRadius: 5,
-                  border: '3px solid rgba(65, 115, 148, 0.6)',
+                  border: '3px solid rgba(65, 115, 148, 0.8)',
+                  boxShadow: '0 0 12px rgba(65, 115, 148, 0.5), 0 0 24px rgba(65, 115, 148, 0.3), 0 0 40px rgba(65, 115, 148, 0.15)',
                   animation: 'calendarPulse 2.4s ease-in-out infinite',
                 }}
               />
@@ -990,38 +994,8 @@ export function MockCalendar({ phase, viewMode, onToggleMonth, userProject }: Mo
             </div>
           </div>
 
-          {/* Expand/Contract button — replaces iOS pinch gesture */}
-          <div
-            className="absolute left-0 right-0 flex justify-center"
-            style={{ bottom: 110, zIndex: 10 }}
-          >
-            <button
-              onClick={() => setExpansionLevel(prev => (prev + 1) % 3)}
-              className="flex items-center gap-2 px-4 py-2"
-              style={{
-                background: '#0D0D0D',
-                borderRadius: 5,
-                border: '2px solid rgba(65, 115, 148, 0.6)',
-                boxShadow: '0 0 12px rgba(65, 115, 148, 0.3)',
-                animation: 'calendarPulse 2.4s ease-in-out infinite',
-              }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-[#417394]">
-                {expansionLevel < 2 ? (
-                  <>
-                    <path d="M7 7l5-5 5 5M7 17l5 5 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </>
-                ) : (
-                  <>
-                    <path d="M7 3l5 5 5-5M7 21l5-5 5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </>
-                )}
-              </svg>
-              <span className="font-mohave font-medium text-[14px] text-[#417394] uppercase tracking-wider">
-                {expansionLevel === 0 ? 'Expand' : expansionLevel === 1 ? 'Expand More' : 'Contract'}
-              </span>
-            </button>
-          </div>
+          {/* Expand/Contract button — rendered here but will be overlaid by TutorialShell's higher z-index button */}
+          {/* (Actual interactive button is rendered in TutorialShell at z-15 to sit above tab bar) */}
         </div>
       ) : (
         /* ===== WEEK VIEW ===== */

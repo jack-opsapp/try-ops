@@ -30,6 +30,8 @@ interface MockProjectCardProps {
   isHighlighted?: boolean
   showShimmer?: boolean
   showStatusGlow?: boolean
+  showCardGlow?: boolean // animated glow border around entire card
+  highlightColor?: string // override color for shimmer/highlight border
   statusOverride?: string
   className?: string
   style?: React.CSSProperties
@@ -41,12 +43,15 @@ export function MockProjectCard({
   isHighlighted = false,
   showShimmer = false,
   showStatusGlow = false,
+  showCardGlow = false,
+  highlightColor,
   statusOverride,
   className = '',
   style,
 }: MockProjectCardProps) {
   const effectiveStatus = statusOverride || project.status
   const statusColor = STATUS_COLORS[effectiveStatus] || '#417394'
+  const effectiveHighlightColor = highlightColor || statusColor
 
   if (variant === 'dashboard') {
     return (
@@ -56,6 +61,7 @@ export function MockProjectCard({
         effectiveStatus={effectiveStatus}
         isHighlighted={isHighlighted}
         showStatusGlow={showStatusGlow}
+        showCardGlow={showCardGlow}
         className={className}
         style={style}
       />
@@ -67,6 +73,7 @@ export function MockProjectCard({
       project={project}
       effectiveStatus={effectiveStatus}
       statusColor={statusColor}
+      highlightColor={effectiveHighlightColor}
       isHighlighted={isHighlighted}
       showShimmer={showShimmer}
       className={className}
@@ -83,6 +90,7 @@ function DashboardCard({
   effectiveStatus,
   isHighlighted,
   showStatusGlow,
+  showCardGlow,
   className,
   style,
 }: {
@@ -91,6 +99,7 @@ function DashboardCard({
   effectiveStatus: string
   isHighlighted: boolean
   showStatusGlow: boolean
+  showCardGlow?: boolean
   className: string
   style?: React.CSSProperties
 }) {
@@ -106,20 +115,24 @@ function DashboardCard({
       style={{
         background: '#0D0D0D',
         borderRadius: 5,
-        border: isHighlighted
-          ? `2px solid ${statusColor}CC`
+        border: (isHighlighted || showCardGlow)
+          ? `2px solid ${statusColor}99`
           : '1px solid rgba(255,255,255,0.08)',
-        boxShadow: isHighlighted
-          ? `0 0 16px ${statusColor}40`
-          : 'none',
+        boxShadow: showCardGlow
+          ? `0 0 12px ${statusColor}4D, 0 0 24px ${statusColor}26`
+          : isHighlighted
+            ? `0 0 16px ${statusColor}40`
+            : 'none',
+        animation: showCardGlow ? 'statusBadgeGlow 1.5s ease-in-out infinite' : 'none',
+        color: showCardGlow ? statusColor : undefined,
         ...style,
       }}
     >
       <div className="flex h-full">
-        {/* Left status bar - 4px wide */}
+        {/* Left status bar - 4px wide, rounded on left to match card border */}
         <div
           className="flex-shrink-0"
-          style={{ width: 4, background: statusColor }}
+          style={{ width: 4, background: statusColor, borderRadius: '3px 0 0 3px' }}
         />
 
         {/* Content area */}
@@ -229,6 +242,7 @@ function ListCard({
   project,
   effectiveStatus,
   statusColor,
+  highlightColor,
   isHighlighted,
   showShimmer,
   className,
@@ -237,6 +251,7 @@ function ListCard({
   project: DemoProject
   effectiveStatus: string
   statusColor: string
+  highlightColor: string
   isHighlighted: boolean
   showShimmer: boolean
   className: string
@@ -256,12 +271,12 @@ function ListCard({
         background: '#0D0D0D',
         borderRadius: 5,
         border: showShimmer
-          ? `2px solid ${statusColor}`
+          ? `2px solid ${highlightColor}`
           : isHighlighted
-            ? `2px solid ${statusColor}CC`
+            ? `2px solid ${highlightColor}CC`
             : '1px solid rgba(255,255,255,0.2)', // iOS: cardBorder
         boxShadow: isHighlighted
-          ? `0 0 16px ${statusColor}40`
+          ? `0 0 16px ${highlightColor}40`
           : 'none',
         position: 'relative',
         overflow: 'hidden',
@@ -280,7 +295,7 @@ function ListCard({
               top: 0,
               bottom: 0,
               width: 80,
-              background: `linear-gradient(to right, transparent, ${statusColor}26, ${statusColor}40, ${statusColor}26, transparent)`,
+              background: `linear-gradient(to right, transparent, ${highlightColor}26, ${highlightColor}40, ${highlightColor}26, transparent)`,
               animation: 'cardShimmer 1.5s linear infinite',
             }}
           />

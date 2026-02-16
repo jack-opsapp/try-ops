@@ -434,6 +434,7 @@ function DashboardView({
                           project={project}
                           variant="dashboard"
                           isHighlighted={!!isUserCard && phase === 'dragToAccepted' && !cardLifted && dragAnimPhase !== 'landed'}
+                          showCardGlow={!!isUserCard && phase === 'dragToAccepted' && !cardLifted && dragAnimPhase !== 'landed'}
                           showStatusGlow={!!isLandedUserCard && showStatusGlow}
                           statusOverride={
                             isUserCard && (dragAnimPhase === 'sliding' || dragAnimPhase === 'landed')
@@ -1141,6 +1142,7 @@ function ListView({
                           variant="list"
                           isHighlighted={!swipeDismissed}
                           showShimmer={!swipeDismissed}
+                          highlightColor="#417394"
                           statusOverride={userStatus}
                         />
                       </div>

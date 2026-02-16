@@ -64,6 +64,15 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
   const [dateSheetHasDates, setDateSheetHasDates] = useState(false)
   const [dateConfirmSignal, setDateConfirmSignal] = useState(0)
 
+  // Month calendar expansion level (lifted from MockCalendar so expand button can be at higher z)
+  const [calendarExpansion, setCalendarExpansion] = useState(1)
+
+  // Desktop detection (no touch support)
+  const [isDesktop, setIsDesktop] = useState(false)
+  useEffect(() => {
+    setIsDesktop(!('ontouchstart' in window))
+  }, [])
+
   useEffect(() => {
     // When transitioning from taskFormDone to projectFormComplete, trigger close animation
     if (prevPhaseRef.current === 'taskFormDone' && phase === 'projectFormComplete') {
@@ -213,6 +222,11 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
       setDateConfirmSignal(prev => prev + 1)
       return
     }
+    // Desktop fallback for swipe — skip the swipe animation and advance
+    if (phase === 'projectListSwipe' && isDesktop) {
+      advance()
+      return
+    }
     advance()
   }
 
@@ -228,7 +242,8 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
     (phaseConfig.showContinueButton && !dragAnimStarted) ||
     dragAnimLanded ||
     closedSheetReady ||
-    (dateSheetOpen && dateSheetHasDates)
+    (dateSheetOpen && dateSheetHasDates) ||
+    (phaseConfig.showDesktopContinue && isDesktop)
 
   const continueLabel = dragAnimLanded
     ? 'CONTINUE'
@@ -278,6 +293,8 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
               phase={phase}
               viewMode={phase === 'calendarMonth' ? 'month' : 'week'}
               onToggleMonth={handleMonthTap}
+              expansionLevel={calendarExpansion}
+              onExpand={() => setCalendarExpansion(prev => (prev + 1) % 3)}
               userProject={
                 userProject
                   ? {
@@ -299,6 +316,37 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
       <div className="absolute bottom-0 left-0 right-0" style={{ zIndex: 10 }}>
         <MockTabBar activeTab={activeTab} />
       </div>
+
+      {/* Layer 2b: Expand button (z-15) — above tab bar during calendarMonth */}
+      {phase === 'calendarMonth' && (
+        <div
+          className="absolute left-0 right-0 flex justify-center"
+          style={{ bottom: 110, zIndex: 15 }}
+        >
+          <button
+            onClick={() => setCalendarExpansion(prev => (prev + 1) % 3)}
+            className="flex items-center gap-2 px-4 py-2"
+            style={{
+              background: '#0D0D0D',
+              borderRadius: 5,
+              border: '2px solid rgba(255, 255, 255, 0.6)',
+              boxShadow: '0 0 12px rgba(255, 255, 255, 0.2), 0 0 24px rgba(255, 255, 255, 0.1)',
+              animation: 'calendarPulse 2.4s ease-in-out infinite',
+            }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-white">
+              {calendarExpansion < 2 ? (
+                <path d="M7 7l5-5 5 5M7 17l5 5 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              ) : (
+                <path d="M7 3l5 5 5-5M7 21l5-5 5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              )}
+            </svg>
+            <span className="font-mohave font-medium text-[14px] text-white uppercase tracking-wider">
+              {calendarExpansion === 0 ? 'Expand' : calendarExpansion === 1 ? 'Expand More' : 'Contract'}
+            </span>
+          </button>
+        </div>
+      )}
 
       {/* Layer 3: Blocking overlay (z-20) - only during jobBoardIntro */}
       {showBlockingOverlay && (
@@ -420,6 +468,7 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
               borderRadius: 5,
               backgroundColor: 'rgba(65, 115, 148, 0.35)',
               border: '1px solid rgba(65, 115, 148, 0.5)',
+              boxShadow: '0 0 12px rgba(65, 115, 148, 0.4), 0 0 24px rgba(65, 115, 148, 0.2)',
               color: '#FFFFFF',
             }}
           >
@@ -476,6 +525,9 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
                     border: continueActive
                       ? '1px solid rgba(65, 115, 148, 0.5)'
                       : '1px solid rgba(255,255,255,0.05)',
+                    boxShadow: continueActive
+                      ? '0 0 12px rgba(65, 115, 148, 0.4), 0 0 24px rgba(65, 115, 148, 0.2)'
+                      : 'none',
                     color: continueActive ? '#FFFFFF' : 'rgba(255,255,255,0.2)',
                     cursor: continueActive ? 'pointer' : 'default',
                     transition: 'all 0.3s ease',

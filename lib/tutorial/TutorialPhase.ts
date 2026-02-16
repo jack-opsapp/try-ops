@@ -27,6 +27,7 @@ export interface PhaseConfig {
   continueLabel?: string
   autoAdvanceMs?: number // auto-advance after N ms
   tooltipTop?: string // CSS top value, default '0' (top of screen)
+  showDesktopContinue?: boolean // show continue button on desktop (non-touch) as fallback
 }
 
 export const PHASE_ORDER: TutorialPhase[] = [
@@ -61,7 +62,7 @@ export const PHASE_CONFIGS: Record<TutorialPhase, PhaseConfig> = {
     tooltipText: 'TAP "CREATE PROJECT"',
     tooltipDescription: 'Every job starts here.',
     showContinueButton: false,
-    tooltipTop: '28%',
+    tooltipTop: '55%',
   },
   projectFormClient: {
     tooltipText: 'SELECT A CLIENT',
@@ -97,7 +98,7 @@ export const PHASE_CONFIGS: Record<TutorialPhase, PhaseConfig> = {
     tooltipText: 'SET THE DATES',
     tooltipDescription: 'Tap once for start, again for end. Same day for quick jobs, or span weeks for longer work.',
     showContinueButton: false,
-    tooltipTop: '35%',
+    tooltipTop: '8%',
   },
   taskFormDone: {
     tooltipText: 'TASK COMPLETE',
@@ -131,13 +132,14 @@ export const PHASE_CONFIGS: Record<TutorialPhase, PhaseConfig> = {
     tooltipText: 'SWIPE TO CLOSE',
     tooltipDescription: 'Swipe right to advance, left to go back. This closes the job—paid and filed.',
     showContinueButton: false,
+    showDesktopContinue: true,
     tooltipTop: '8%',
   },
   closedProjectsScroll: {
     tooltipText: 'JOB CLOSED',
     tooltipDescription: 'Closed jobs drop to the bottom. Active work stays on top.',
     showContinueButton: false,
-    tooltipTop: '30%',
+    tooltipTop: '8%',
   },
   calendarWeek: {
     tooltipText: 'YOUR WEEK',
@@ -150,7 +152,7 @@ export const PHASE_CONFIGS: Record<TutorialPhase, PhaseConfig> = {
     tooltipText: 'TAP "MONTH"',
     tooltipDescription: 'See the bigger picture.',
     showContinueButton: false,
-    tooltipTop: '8%',
+    tooltipTop: '25%',
   },
   calendarMonth: {
     tooltipText: 'TAP EXPAND',
