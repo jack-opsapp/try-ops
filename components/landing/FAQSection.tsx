@@ -58,16 +58,23 @@ export function FAQSection({ onFAQToggle }: FAQSectionProps) {
           QUESTIONS YOU&apos;RE PROBABLY ASKING
         </motion.h2>
 
-        <motion.div {...fadeInUp} className="w-full lg:max-h-none" style={{ maxHeight: '70svh', overflowY: 'auto' }}>
-          {faqs.map((faq) => (
-            <AccordionItem
+        <div className="w-full lg:max-h-none" style={{ maxHeight: '70svh', overflowY: 'auto' }}>
+          {faqs.map((faq, i) => (
+            <motion.div
               key={faq.question}
-              question={faq.question}
-              answer={faq.answer}
-              onToggle={(expanded) => onFAQToggle?.(faq.question, expanded)}
-            />
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: i * 0.08 }}
+              viewport={{ once: true, amount: 0.2 }}
+            >
+              <AccordionItem
+                question={faq.question}
+                answer={faq.answer}
+                onToggle={(expanded) => onFAQToggle?.(faq.question, expanded)}
+              />
+            </motion.div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   )

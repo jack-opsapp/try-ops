@@ -91,11 +91,19 @@ export function TestimonialsSection() {
       </div>
 
       <div className="max-w-[1200px] mx-auto w-full px-6 md:px-6 lg:px-10">
-        <motion.div {...fadeInUp}>
+        <div>
           {/* Grid on desktop, carousel on mobile */}
           <div className="hidden lg:grid lg:grid-cols-2 lg:gap-4">
-            {cards.map((t) => (
-              <TestimonialCard key={t.name} testimonial={t} />
+            {cards.map((t, i) => (
+              <motion.div
+                key={t.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: i * 0.1 }}
+                viewport={{ once: true, amount: 0.2 }}
+              >
+                <TestimonialCard testimonial={t} />
+              </motion.div>
             ))}
           </div>
           <div className="lg:hidden">
@@ -105,7 +113,7 @@ export function TestimonialsSection() {
               ))}
             </Carousel>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   )

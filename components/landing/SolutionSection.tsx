@@ -61,10 +61,18 @@ export function SolutionSection() {
         </motion.h2>
 
         {/* Feature grid (desktop) / carousel (mobile) */}
-        <motion.div {...fadeInUp}>
+        <div>
           <div className="hidden lg:grid lg:grid-cols-2 lg:gap-4">
-            {features.map((feature) => (
-              <FeatureCard key={feature.title} feature={feature} />
+            {features.map((feature, i) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: i * 0.1 }}
+                viewport={{ once: true, amount: 0.2 }}
+              >
+                <FeatureCard feature={feature} />
+              </motion.div>
             ))}
           </div>
           <div className="lg:hidden">
@@ -74,7 +82,7 @@ export function SolutionSection() {
               ))}
             </Carousel>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   )

@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { motion } from 'framer-motion'
 
 export function Footer() {
   const scrollTo = (id: string) => {
@@ -9,7 +10,13 @@ export function Footer() {
 
   return (
     <footer id="footer" className="border-t border-ops-border bg-ops-background py-16 lg:py-20">
-      <div className="max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10">
+      <motion.div
+        className="max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        viewport={{ once: true, amount: 0.2 }}
+      >
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
           {/* Logo + tagline */}
           <div className="lg:flex-1">
@@ -91,7 +98,7 @@ export function Footer() {
             &copy; 2026 OPS. All rights reserved.
           </p>
         </div>
-      </div>
+      </motion.div>
     </footer>
   )
 }
