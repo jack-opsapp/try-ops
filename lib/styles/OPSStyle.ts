@@ -15,10 +15,10 @@ export const OPSStyle = {
     // No secondary accent per design system
 
     // Backgrounds
-    background: '#0D0D0D',           // colorBackground
-    darkBackground: '#0D0D0D',       // colorBackground
+    background: '#080808',           // colorBackground
+    darkBackground: '#080808',       // colorBackground
     cardBackground: '#1D1D1D',       // colorSurfaceSecondary
-    cardBackgroundDark: '#0D0D0D',   // colorBackground (cards use material/borders, not bg color)
+    cardBackgroundDark: '#080808',   // colorBackground (cards use material/borders, not bg color)
 
     // Text
     primaryText: '#E5E5E5',          // colorTextPrimary

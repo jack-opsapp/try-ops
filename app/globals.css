@@ -81,7 +81,7 @@ html {
 
 body {
   font-family: 'Mohave', sans-serif;
-  background-color: #0D0D0D;
+  background-color: #080808;
   color: #E5E5E5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -92,7 +92,7 @@ body {
   width: 4px;
 }
 ::-webkit-scrollbar-track {
-  background: #0D0D0D;
+  background: #080808;
 }
 ::-webkit-scrollbar-thumb {
   background: #333333;
@@ -103,7 +103,7 @@ body {
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 1000px #0D0D0D inset;
+  -webkit-box-shadow: 0 0 0 1000px #080808 inset;
   -webkit-text-fill-color: #E5E5E5;
   caret-color: #E5E5E5;
 }

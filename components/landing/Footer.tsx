@@ -67,8 +67,8 @@ export function Footer() {
             </h4>
             <ul className="space-y-2">
               {[
-                { label: 'About', href: '#' },
-                { label: 'Contact', href: 'mailto:jackson@opsapp.co' },
+                { label: 'About', href: 'https://opsapp.co/about' },
+                { label: 'Support', href: 'https://opsapp.co/support' },
                 { label: 'Privacy Policy', href: '#' },
                 { label: 'Terms of Service', href: '#' },
               ].map((link) => (

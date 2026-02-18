@@ -10,7 +10,7 @@ const config: Config = {
     extend: {
       colors: {
         ops: {
-          background: '#0D0D0D',
+          background: '#080808',
           card: '#0D0D0D',
           'card-dark': '#1D1D1D',
           accent: '#597794',

@@ -21,7 +21,7 @@ export const metadata: Metadata = {
       'Field-first job management built for trades crews. No training required. Works offline.',
   },
   other: {
-    'theme-color': '#0D0D0D',
+    'theme-color': '#080808',
   },
 }
 
