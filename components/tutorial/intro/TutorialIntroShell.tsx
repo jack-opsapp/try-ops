@@ -106,15 +106,6 @@ export function TutorialIntroShell() {
     setSequenceState('complete')
   }, [])
 
-  // Tap right — skip to checkpoint (show buttons), don't auto-play next
-  const handleTapRight = useCallback(() => {
-    if (sequenceState === 'playing') {
-      // Skip to end of current sequence — show action bar
-      setSequenceState('complete')
-    }
-    // If already at checkpoint/complete, do nothing — user must press Continue
-  }, [sequenceState])
-
   // Continue button — advance to next phase and play it
   const handleContinue = useCallback(() => {
     const currentPhase = PHASES[phaseIndex]
@@ -132,6 +123,15 @@ export function TutorialIntroShell() {
     setPhaseStartTime(Date.now())
     setSequenceState('playing')
   }, [phaseIndex, stepDurations, finishTutorial])
+
+  // Tap right — if playing, skip to checkpoint; if already at checkpoint, continue
+  const handleTapRight = useCallback(() => {
+    if (sequenceState === 'playing') {
+      setSequenceState('complete')
+    } else {
+      handleContinue()
+    }
+  }, [sequenceState, handleContinue])
 
   // Tap left / Back button — go to previous phase, or restart current if on first
   const handleBack = useCallback(() => {
