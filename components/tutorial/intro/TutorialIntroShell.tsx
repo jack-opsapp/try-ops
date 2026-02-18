@@ -106,8 +106,17 @@ export function TutorialIntroShell() {
     setSequenceState('complete')
   }, [])
 
-  // Tap right — skip to next phase (always plays)
+  // Tap right — skip to checkpoint (show buttons), don't auto-play next
   const handleTapRight = useCallback(() => {
+    if (sequenceState === 'playing') {
+      // Skip to end of current sequence — show action bar
+      setSequenceState('complete')
+    }
+    // If already at checkpoint/complete, do nothing — user must press Continue
+  }, [sequenceState])
+
+  // Continue button — advance to next phase and play it
+  const handleContinue = useCallback(() => {
     const currentPhase = PHASES[phaseIndex]
     const ms = Date.now() - phaseStartRef.current
 
@@ -124,9 +133,16 @@ export function TutorialIntroShell() {
     setSequenceState('playing')
   }, [phaseIndex, stepDurations, finishTutorial])
 
-  // Tap left — go to previous phase and replay it
-  const handleTapLeft = useCallback(() => {
-    if (phaseIndex <= 0) return
+  // Tap left / Back button — go to previous phase, or restart current if on first
+  const handleBack = useCallback(() => {
+    if (phaseIndex <= 0) {
+      // Restart current sequence
+      setSeqKey(prev => prev + 1)
+      setPhaseStartTime(Date.now())
+      phaseStartRef.current = Date.now()
+      setSequenceState('playing')
+      return
+    }
     phaseStartRef.current = Date.now()
     setStepDurations(prev => prev.slice(0, -1))
     setPhaseIndex(prev => prev - 1)
@@ -152,7 +168,7 @@ export function TutorialIntroShell() {
       {/* Tap zones */}
       <div
         className="absolute top-0 left-0 w-1/2 h-full z-50 cursor-pointer"
-        onClick={handleTapLeft}
+        onClick={handleBack}
       />
       <div
         className="absolute top-0 right-0 w-1/2 h-full z-50 cursor-pointer"
@@ -192,26 +208,26 @@ export function TutorialIntroShell() {
       {/* Action bar — appears when sequence finishes */}
       {showButtons && (
         <div
-          className="absolute left-0 right-0 z-[60] flex items-center gap-3 px-6"
+          className="absolute left-0 right-0 z-[60] flex justify-center px-6"
           style={{
             bottom: 'max(1.5rem, env(safe-area-inset-bottom, 1.5rem))',
             animation: 'fadeInUp 0.3s ease-out',
           }}
         >
-          {phaseIndex > 0 && (
+          <div className="flex items-center gap-3 w-full" style={{ maxWidth: 600 }}>
             <button
-              onClick={handleTapLeft}
+              onClick={handleBack}
               className="h-12 px-5 rounded-ops border border-ops-border bg-ops-surface font-mohave font-medium text-ops-label uppercase text-ops-text-secondary tracking-wide transition-colors hover:text-ops-text-primary"
             >
               BACK
             </button>
-          )}
-          <button
-            onClick={handleTapRight}
-            className="flex-1 h-12 rounded-ops bg-ops-accent font-mohave font-medium text-ops-label uppercase text-ops-text-primary tracking-wide transition-all hover:brightness-110 active:scale-[0.98]"
-          >
-            {phaseIndex >= PHASES.length - 1 ? 'START TUTORIAL' : 'CONTINUE'}
-          </button>
+            <button
+              onClick={handleContinue}
+              className="flex-1 h-12 rounded-ops bg-ops-accent font-mohave font-medium text-ops-label uppercase text-ops-text-primary tracking-wide transition-all hover:brightness-110 active:scale-[0.98]"
+            >
+              {phaseIndex >= PHASES.length - 1 ? 'START TUTORIAL' : 'CONTINUE'}
+            </button>
+          </div>
         </div>
       )}
 
