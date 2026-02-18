@@ -189,6 +189,32 @@ export function TutorialIntroShell() {
         </div>
       )}
 
+      {/* Action bar — appears when sequence finishes */}
+      {showButtons && (
+        <div
+          className="absolute left-0 right-0 z-[60] flex items-center gap-3 px-6"
+          style={{
+            bottom: 'max(1.5rem, env(safe-area-inset-bottom, 1.5rem))',
+            animation: 'fadeInUp 0.3s ease-out',
+          }}
+        >
+          {phaseIndex > 0 && (
+            <button
+              onClick={handleTapLeft}
+              className="h-12 px-5 rounded-ops border border-ops-border bg-ops-surface font-mohave font-medium text-ops-label uppercase text-ops-text-secondary tracking-wide transition-colors hover:text-ops-text-primary"
+            >
+              BACK
+            </button>
+          )}
+          <button
+            onClick={handleTapRight}
+            className="flex-1 h-12 rounded-ops bg-ops-accent font-mohave font-medium text-ops-label uppercase text-ops-text-primary tracking-wide transition-all hover:brightness-110 active:scale-[0.98]"
+          >
+            {phaseIndex >= PHASES.length - 1 ? 'START TUTORIAL' : 'CONTINUE'}
+          </button>
+        </div>
+      )}
+
     </div>
   )
 }
