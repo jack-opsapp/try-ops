@@ -106,7 +106,7 @@ export function HamburgerMenu({ onDownloadClick, onTryClick }: HamburgerMenuProp
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.1 + i * 0.05, duration: 0.3 }}
                     onClick={() => scrollTo(section.id)}
-                    className="block w-full text-left font-mohave font-medium text-[16px] uppercase tracking-[0.08em] text-ops-gray-200 hover:text-white py-4 border-b border-ops-border transition-colors"
+                    className="block w-full text-left font-mohave font-medium text-ops-body uppercase tracking-[0.08em] text-ops-text-secondary hover:text-ops-text-primary py-4 border-b border-ops-border transition-colors"
                   >
                     {section.label}
                   </motion.button>
@@ -122,13 +122,13 @@ export function HamburgerMenu({ onDownloadClick, onTryClick }: HamburgerMenuProp
               >
                 <button
                   onClick={() => { close(); onDownloadClick() }}
-                  className="w-full bg-ops-accent text-white font-mohave font-medium text-[14px] uppercase tracking-[0.03em] rounded-[4px] px-6 py-4 hover:brightness-110 transition-all"
+                  className="w-full bg-ops-accent text-ops-text-primary font-mohave font-medium text-ops-label uppercase tracking-[0.03em] rounded-ops px-6 py-4 hover:brightness-110 transition-all"
                 >
                   DOWNLOAD FREE
                 </button>
                 <button
                   onClick={() => { close(); onTryClick() }}
-                  className="w-full bg-transparent border-2 border-ops-gray-300 text-ops-gray-200 font-mohave font-medium text-[14px] uppercase tracking-[0.03em] rounded-[4px] px-6 py-3 hover:border-white hover:text-white transition-all"
+                  className="w-full bg-transparent border-2 border-ops-border-emphasis text-ops-text-secondary font-mohave font-medium text-ops-label uppercase tracking-[0.03em] rounded-ops px-6 py-3 hover:border-ops-text-primary hover:text-ops-text-primary transition-all"
                 >
                   TRY IT FIRST
                 </button>

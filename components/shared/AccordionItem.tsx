@@ -35,7 +35,7 @@ export function AccordionItem({ question, answer, onToggle }: AccordionItemProps
       }}
     >
       <div className="flex items-center justify-between px-4 py-3 lg:px-6 lg:py-5">
-        <span className="font-mohave font-medium text-[14px] lg:text-[16px] text-ops-gray-50 pr-4">
+        <span className="font-mohave font-medium text-ops-label lg:text-ops-body text-ops-text-primary pr-4">
           {question}
         </span>
         <motion.span
@@ -57,7 +57,7 @@ export function AccordionItem({ question, answer, onToggle }: AccordionItemProps
             transition={{ duration: 0.3, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <p className="font-kosugi text-[13px] lg:text-[16px] text-ops-text-secondary leading-relaxed px-4 pb-4 lg:px-6 lg:pb-6">
+            <p className="font-kosugi text-ops-caption lg:text-ops-body text-ops-text-secondary leading-relaxed px-4 pb-4 lg:px-6 lg:pb-6">
               {answer}
             </p>
           </motion.div>

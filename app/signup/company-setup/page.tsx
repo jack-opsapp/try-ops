@@ -73,7 +73,7 @@ export default function CompanySetupPage() {
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
               autoComplete="organization"
-              className="w-full h-12 px-4 rounded-ops bg-[#0D0D0D]/80 font-mohave text-ops-body text-white border border-white/10 outline-none placeholder:text-ops-text-tertiary"
+              className="w-full h-12 px-4 rounded-ops bg-ops-surface font-mohave text-ops-body text-ops-text-primary border border-ops-border outline-none placeholder:text-ops-text-tertiary"
             />
           </div>
 
@@ -96,7 +96,7 @@ export default function CompanySetupPage() {
               value={officeEmail}
               onChange={(e) => setOfficeEmail(e.target.value)}
               autoComplete="email"
-              className="w-full h-12 px-4 rounded-ops bg-[#0D0D0D]/80 font-mohave text-ops-body text-white border border-white/10 outline-none placeholder:text-ops-text-tertiary"
+              className="w-full h-12 px-4 rounded-ops bg-ops-surface font-mohave text-ops-body text-ops-text-primary border border-ops-border outline-none placeholder:text-ops-text-tertiary"
             />
           </div>
 
@@ -120,7 +120,7 @@ export default function CompanySetupPage() {
               onChange={(e) => setOfficePhone(e.target.value)}
               autoComplete="tel"
               placeholder="(555) 123-4567"
-              className="w-full h-12 px-4 rounded-ops bg-[#0D0D0D]/80 font-mohave text-ops-body text-white border border-white/10 outline-none placeholder:text-ops-text-tertiary"
+              className="w-full h-12 px-4 rounded-ops bg-ops-surface font-mohave text-ops-body text-ops-text-primary border border-ops-border outline-none placeholder:text-ops-text-tertiary"
             />
           </div>
         </div>

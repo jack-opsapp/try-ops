@@ -63,8 +63,8 @@ export function PhasedPrimaryButton({
           style={{
             backgroundColor:
               isEnabled && !isLoading
-                ? 'white'
-                : 'rgba(255, 255, 255, 0.5)',
+                ? '#597794'
+                : 'rgba(89, 119, 148, 0.5)',
             opacity: containerVisible ? 1 : 0,
             transform: containerVisible ? 'translateY(0)' : 'translateY(20px)',
             // CSS spring approximation
@@ -80,7 +80,7 @@ export function PhasedPrimaryButton({
           {isLoading ? (
             <span className="flex items-center gap-2 mx-auto">
               <svg
-                className="animate-spin h-5 w-5 text-black"
+                className="animate-spin h-5 w-5 text-ops-text-primary"
                 viewBox="0 0 24 24"
                 fill="none"
               >
@@ -98,7 +98,7 @@ export function PhasedPrimaryButton({
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                 />
               </svg>
-              <span className="font-mohave font-medium text-ops-body text-black">
+              <span className="font-mohave font-medium text-ops-body text-ops-text-primary">
                 {loadingText || title}
               </span>
             </span>
@@ -113,7 +113,7 @@ export function PhasedPrimaryButton({
                   <span className="absolute inset-0 flex items-center">
                     <TypewriterText
                       text={title}
-                      className="font-mohave font-medium text-ops-body text-black"
+                      className="font-mohave font-medium text-ops-body text-ops-text-primary"
                       typingSpeed={40}
                       onComplete={() => {
                         // iOS: 0.35s delay then show icon
@@ -133,7 +133,7 @@ export function PhasedPrimaryButton({
                 height="14"
                 viewBox="0 0 24 24"
                 fill="none"
-                className="text-black flex-shrink-0 transition-all duration-400"
+                className="text-ops-text-primary flex-shrink-0 transition-all duration-400"
                 style={{
                   opacity: iconVisible ? 1 : 0,
                   transform: iconVisible

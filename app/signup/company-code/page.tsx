@@ -143,7 +143,7 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
 
       {/* Sheet */}
       <div
-        className="relative w-full max-w-lg max-h-[85vh] overflow-y-auto bg-ops-background border-t sm:border border-white/10 sm:rounded-ops"
+        className="relative w-full max-w-lg max-h-[85vh] overflow-y-auto bg-ops-background border-t sm:border border-ops-border sm:rounded-ops"
         style={{ animation: 'slideUp 0.3s ease-out' }}
       >
         {/* Header */}
@@ -151,7 +151,7 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
           <div className="flex-1" />
           <button
             onClick={onClose}
-            className="font-mohave font-medium text-ops-body text-white"
+            className="font-mohave font-medium text-ops-body text-ops-text-primary"
           >
             Done
           </button>
@@ -160,7 +160,7 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
         <div className="px-6 pb-8 space-y-6">
           {/* Title + description */}
           <div>
-            <h2 className="font-mohave font-semibold text-[28px] text-white tracking-wide mb-2">
+            <h2 className="font-mohave font-semibold text-[28px] text-ops-text-primary tracking-wide mb-2">
               GET YOUR CREW ON OPS
             </h2>
             <p className="font-mohave text-ops-body text-ops-text-secondary">
@@ -170,8 +170,7 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
 
           {/* Crew Code Card */}
           <div
-            className="p-4 rounded-ops border border-white/10"
-            style={{ backgroundColor: 'rgba(13, 13, 13, 0.8)' }}
+            className="p-4 rounded-ops border border-ops-border bg-ops-surface"
           >
             <div className="flex items-center justify-between mb-2">
               <p className="font-kosugi text-ops-caption text-ops-text-tertiary">
@@ -180,10 +179,10 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
               <button onClick={handleCopy} className="flex items-center gap-1.5">
                 {showCopied ? (
                   <>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-[#A5B368]">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-ops-success">
                       <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <span className="font-kosugi text-ops-caption text-[#A5B368]">COPIED</span>
+                    <span className="font-kosugi text-ops-caption text-ops-success">COPIED</span>
                   </>
                 ) : (
                   <>
@@ -196,7 +195,7 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
                 )}
               </button>
             </div>
-            <span className="font-kosugi font-medium text-ops-caption text-white tracking-[2px]">
+            <span className="font-kosugi font-medium text-ops-caption text-ops-text-primary tracking-[2px]">
               [{companyCode}]
             </span>
           </div>
@@ -205,15 +204,11 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
           <button
             onClick={handleInviteToggleOrSend}
             disabled={showInviteSection && (!hasValidContacts || sending)}
-            className="w-full h-14 flex items-center justify-center gap-2 rounded-ops border transition-all duration-200 disabled:opacity-40"
-            style={{
-              backgroundColor:
-                showInviteSection && hasValidContacts
-                  ? 'white'
-                  : 'rgba(13, 13, 13, 0.8)',
-              color: showInviteSection && hasValidContacts ? 'black' : 'white',
-              borderColor: showInviteSection && hasValidContacts ? 'transparent' : 'rgba(255,255,255,0.1)',
-            }}
+            className={`w-full h-14 flex items-center justify-center gap-2 rounded-ops border transition-all duration-200 disabled:opacity-40 ${
+              showInviteSection && hasValidContacts
+                ? 'bg-ops-accent text-ops-text-primary border-transparent'
+                : 'bg-ops-surface text-ops-text-primary border-ops-border'
+            }`}
           >
             {sending ? (
               <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
@@ -227,14 +222,14 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
                     <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
                   </svg>
                 ) : (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-white" strokeWidth="2" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-ops-text-primary" strokeWidth="2" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                     <circle cx="9" cy="7" r="4" />
                     <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
                     <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                   </svg>
                 )}
-                <span className="font-mohave font-medium text-ops-body">
+                <span className="font-mohave font-medium text-ops-body text-ops-text-primary">
                   {showInviteSection ? 'SEND INVITES' : 'INVITE CREW'}
                 </span>
               </>
@@ -249,11 +244,11 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
             >
               {/* Divider with label */}
               <div className="flex items-center gap-3">
-                <div className="flex-1 h-px bg-white/10" />
+                <div className="flex-1 h-px bg-ops-border" />
                 <span className="font-kosugi text-ops-caption text-ops-text-tertiary">
                   EMAIL OR PHONE
                 </span>
-                <div className="flex-1 h-px bg-white/10" />
+                <div className="flex-1 h-px bg-ops-border" />
               </div>
 
               {/* Contact inputs */}
@@ -269,8 +264,7 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
                         value={contact}
                         onChange={(e) => updateContact(i, e.target.value)}
                         placeholder="email or phone number"
-                        className="w-full h-12 px-4 pr-16 rounded-ops font-mohave text-ops-body text-white border border-white/10 outline-none focus:border-white/30 placeholder:text-[#999] transition-colors"
-                        style={{ backgroundColor: 'rgba(13, 13, 13, 0.8)' }}
+                        className="w-full h-12 px-4 pr-16 rounded-ops font-mohave text-ops-body text-ops-text-primary border border-ops-border outline-none focus:border-ops-accent placeholder:text-ops-text-tertiary transition-colors bg-ops-surface"
                       />
                       {indicator && (
                         <span
@@ -317,7 +311,7 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
 
           {/* Sent confirmation */}
           {sentContacts.length > 0 && (
-            <p className="font-kosugi text-ops-caption text-[#A5B368]">
+            <p className="font-kosugi text-ops-caption text-ops-success">
               Invite sent to {sentContacts.join(', ')}
             </p>
           )}
@@ -401,26 +395,21 @@ export default function CompanyCodePage() {
             {companyCode && (
               <button onClick={handleCopy} className="w-full">
                 <div
-                  className="p-4 rounded-ops border transition-colors duration-200"
-                  style={{
-                    backgroundColor: 'rgba(13, 13, 13, 0.8)',
-                    borderColor: copied ? 'rgba(165, 179, 104, 0.5)' : 'rgba(255, 255, 255, 0.1)',
-                  }}
+                  className={`p-4 rounded-ops border transition-colors duration-200 bg-ops-surface ${copied ? 'border-ops-success/50' : 'border-ops-border'}`}
                 >
                   <div className="flex items-center justify-center gap-2">
                     {copied ? (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-[#A5B368]">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-ops-success">
                         <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     ) : (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-white">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-ops-text-primary">
                         <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="2" />
                         <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" strokeWidth="2" />
                       </svg>
                     )}
                     <span
-                      className="font-kosugi font-medium text-ops-caption tracking-[2px] transition-colors duration-200"
-                      style={{ color: copied ? '#A5B368' : '#F5F5F5' }}
+                      className={`font-kosugi font-medium text-ops-caption tracking-[2px] transition-colors duration-200 ${copied ? 'text-ops-success' : 'text-ops-text-primary'}`}
                     >
                       {copied ? 'CODE COPIED' : `[${companyCode}]`}
                     </span>
@@ -439,16 +428,15 @@ export default function CompanyCodePage() {
           {/* Invite Crew Button — opens sheet modal */}
           <button
             onClick={() => setShowInviteSheet(true)}
-            className="w-full h-14 flex items-center justify-center gap-2 rounded-ops border border-white/10"
-            style={{ backgroundColor: 'rgba(13, 13, 13, 0.8)' }}
+            className="w-full h-14 flex items-center justify-center gap-2 rounded-ops border border-ops-border bg-ops-surface"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-white" strokeWidth="2" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-ops-text-primary" strokeWidth="2" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
               <circle cx="9" cy="7" r="4" />
               <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
               <path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
-            <span className="font-mohave font-medium text-ops-body text-white">
+            <span className="font-mohave font-medium text-ops-body text-ops-text-primary">
               INVITE CREW
             </span>
           </button>

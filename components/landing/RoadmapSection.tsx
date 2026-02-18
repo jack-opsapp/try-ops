@@ -46,7 +46,7 @@ function RoadmapRow({ text, variant }: { text: string; variant: 'built' | 'indev
             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
           </svg>
         ) : variant === 'indev' ? (
-          <span className="w-2 h-2 rounded-full bg-white inline-block" />
+          <span className="w-2 h-2 rounded-full bg-ops-text-primary inline-block" />
         ) : (
           <span className="w-1.5 h-1.5 rounded-full bg-ops-gray-400 inline-block" />
         )}
@@ -70,7 +70,7 @@ function RoadmapRow({ text, variant }: { text: string; variant: 'built' | 'indev
         </span>
       )}
       {variant === 'indev' && (
-        <span className="flex-shrink-0 font-mohave text-[10px] uppercase tracking-wider text-ops-gray-300 border border-white/10 rounded-[3px] px-2 py-0.5">
+        <span className="flex-shrink-0 font-mohave text-[10px] uppercase tracking-wider text-ops-gray-300 border border-ops-border-emphasis rounded-[3px] px-2 py-0.5">
           IN DEV
         </span>
       )}
@@ -95,7 +95,7 @@ function AccordionHeader({
   return (
     <button
       onClick={onToggle}
-      className="w-full flex items-center justify-between px-4 py-2.5 bg-white/[0.03] text-left"
+      className="w-full flex items-center justify-between px-4 py-2.5 bg-ops-border text-left"
     >
       <div className="flex-1 min-w-0">
         <span className="font-mohave font-medium text-[10px] uppercase tracking-wider text-ops-gray-300">
@@ -122,7 +122,7 @@ function AccordionHeader({
 // Desktop category header (non-interactive)
 function CategoryHeader({ label, description }: { label: string; description: string }) {
   return (
-    <div className="px-4 md:px-5 py-2 md:py-2.5 bg-white/[0.03]">
+    <div className="px-4 md:px-5 py-2 md:py-2.5 bg-ops-border">
       <span className="font-mohave font-medium text-[10px] md:text-[11px] uppercase tracking-wider text-ops-gray-300">
         {label}
       </span>
@@ -179,7 +179,7 @@ export function RoadmapSection() {
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className={`overflow-hidden ${i > 0 ? 'border-t border-white/5' : ''}`}
+                className={`overflow-hidden ${i > 0 ? 'border-t border-ops-border' : ''}`}
               >
                 <RoadmapRow text={item} variant="built" />
               </motion.div>
@@ -187,7 +187,7 @@ export function RoadmapSection() {
           </AnimatePresence>
 
           {/* In Development */}
-          <div className="border-t border-white/10">
+          <div className="border-t border-ops-border-emphasis">
             <AccordionHeader
               label="In Development"
               description="Building now"
@@ -204,7 +204,7 @@ export function RoadmapSection() {
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className={`overflow-hidden ${i > 0 ? 'border-t border-white/5' : ''}`}
+                className={`overflow-hidden ${i > 0 ? 'border-t border-ops-border' : ''}`}
               >
                 <RoadmapRow text={item} variant="indev" />
               </motion.div>
@@ -212,7 +212,7 @@ export function RoadmapSection() {
           </AnimatePresence>
 
           {/* On the Roadmap */}
-          <div className="border-t border-white/10">
+          <div className="border-t border-ops-border-emphasis">
             <AccordionHeader
               label="Roadmap"
               description="Planned features"
@@ -229,7 +229,7 @@ export function RoadmapSection() {
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className={`overflow-hidden ${i > 0 ? 'border-t border-white/5' : ''}`}
+                className={`overflow-hidden ${i > 0 ? 'border-t border-ops-border' : ''}`}
               >
                 <RoadmapRow text={item} variant="planned" />
               </motion.div>
@@ -244,25 +244,25 @@ export function RoadmapSection() {
         >
           <CategoryHeader label="Customer Requested (Built)" description="Features you asked for that we shipped" />
           {builtItems.map((item, i) => (
-            <div key={item} className={i > 0 ? 'border-t border-white/5' : ''}>
+            <div key={item} className={i > 0 ? 'border-t border-ops-border' : ''}>
               <RoadmapRow text={item} variant="built" />
             </div>
           ))}
 
-          <div className="border-t border-white/10">
+          <div className="border-t border-ops-border-emphasis">
             <CategoryHeader label="Customer Requested (In Development)" description="Features you asked for that we're building now" />
           </div>
           {inDevItems.map((item, i) => (
-            <div key={item} className={i > 0 ? 'border-t border-white/5' : ''}>
+            <div key={item} className={i > 0 ? 'border-t border-ops-border' : ''}>
               <RoadmapRow text={item} variant="indev" />
             </div>
           ))}
 
-          <div className="border-t border-white/10">
+          <div className="border-t border-ops-border-emphasis">
             <CategoryHeader label="On the Roadmap" description="Planned features based on crew needs" />
           </div>
           {roadmapItems.map((item, i) => (
-            <div key={item} className={i > 0 ? 'border-t border-white/5' : ''}>
+            <div key={item} className={i > 0 ? 'border-t border-ops-border' : ''}>
               <RoadmapRow text={item} variant="planned" />
             </div>
           ))}

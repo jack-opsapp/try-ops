@@ -25,11 +25,9 @@ export function OPSButton({
     'h-14 px-8 rounded-ops font-mohave font-semibold text-ops-body tracking-wide transition-all duration-200 flex items-center justify-center w-full disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]'
 
   const variantStyles = {
-    // iOS OPSButtonStyle.Primary: white bg, black text, buttonRadius 5
-    primary: 'bg-white text-black hover:bg-gray-200 active:bg-gray-300',
-    // iOS OPSButtonStyle.Secondary: cardBackgroundDark@0.6 bg, accent text, accent 1px border
+    primary: 'bg-ops-accent text-ops-text-primary hover:brightness-110 active:brightness-90',
     secondary:
-      'bg-[#0D0D0D]/60 text-ops-accent border border-ops-accent hover:bg-[#0D0D0D]/80 active:bg-[#0D0D0D]',
+      'bg-ops-surface text-ops-accent border border-ops-accent hover:brightness-110 active:brightness-90',
     ghost:
       'bg-transparent text-ops-text-secondary hover:text-ops-text-primary',
   }

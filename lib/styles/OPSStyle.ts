@@ -11,28 +11,28 @@ export const OPSStyle = {
   // =====================================================================
   Colors: {
     // Brand
-    primaryAccent: '#59779F',        // Blue — web primary accent (per CLAUDE.md brand guide)
-    secondaryAccent: '#417394',      // Blue   — AccentSecondary
+    primaryAccent: '#597794',        // colorAccent — steel blue
+    // No secondary accent per design system
 
     // Backgrounds
-    background: '#000000',           // Main background (black)
-    darkBackground: '#090C15',       // Darker background
-    cardBackground: '#1A1A1A',       // Card background (dark gray)
-    cardBackgroundDark: '#0D0D0D',   // Darker card background (used by section selector, etc.)
+    background: '#0D0D0D',           // colorBackground
+    darkBackground: '#0D0D0D',       // colorBackground
+    cardBackground: '#1D1D1D',       // colorSurfaceSecondary
+    cardBackgroundDark: '#0D0D0D',   // colorBackground (cards use material/borders, not bg color)
 
     // Text
-    primaryText: '#FFFFFF',          // White  — TextPrimary
-    secondaryText: '#AAAAAA',        // Light gray — TextSecondary
-    tertiaryText: '#777777',         // Darker gray — TextTertiary
-    inactiveText: '#555555',         // Dark gray — TextInactive
-    placeholderText: '#999999',      // Medium gray
+    primaryText: '#E5E5E5',          // colorTextPrimary
+    secondaryText: '#A0A0A0',        // colorTextSecondary
+    tertiaryText: '#6B6B6B',         // colorTextTertiary
+    inactiveText: '#444444',         // colorTextDisabled
+    placeholderText: '#6B6B6B',      // colorTextTertiary
 
     // Borders
-    cardBorder: 'rgba(255,255,255,0.2)',
-    cardBorderSubtle: 'rgba(255,255,255,0.05)',
-    inputFieldBorder: 'rgba(255,255,255,0.2)',
-    separator: 'rgba(255,255,255,0.15)',
-    subtleBackground: 'rgba(255,255,255,0.1)',
+    cardBorder: 'rgba(255,255,255,0.12)',
+    cardBorderSubtle: 'rgba(255,255,255,0.08)',
+    inputFieldBorder: 'rgba(255,255,255,0.12)',
+    separator: 'rgba(255,255,255,0.08)',
+    subtleBackground: 'rgba(255,255,255,0.08)',
 
     // Status colors (from xcassets)
     status: {
@@ -42,7 +42,7 @@ export const OPSStyle = {
       inProgress: '#8195B5',
       completed: '#B58289',
       closed: '#E9E9E9',
-      archived: '#A182B5',
+      archived: '#A1B582',
     } as Record<string, string>,
 
     // Semantic status
@@ -108,14 +108,14 @@ export const OPSStyle = {
     spacing5: 32,
 
     // Touch targets
-    touchTargetMin: 44,
+    touchTargetMin: 56,
     touchTargetStandard: 56,
     touchTargetLarge: 64,
 
     // Corner radius
-    cornerRadius: 5,
-    buttonRadius: 5,
-    smallCornerRadius: 2.5,
+    cornerRadius: 8,
+    buttonRadius: 8,
+    smallCornerRadius: 4,
     cardCornerRadius: 8,
     largeCornerRadius: 12,
 

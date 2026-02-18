@@ -94,7 +94,7 @@ export function Hero({ onDownloadClick, onTryClick }: HeroProps) {
 
             {/* Founder quote — desktop only */}
             <motion.div
-              className="hidden lg:block border-l-2 border-white/20 pl-6 mt-10"
+              className="hidden lg:block border-l-2 border-ops-border-emphasis pl-6 mt-10"
               {...fadeInUp}
               transition={{ ...fadeInUp.transition, delay: 0.4 }}
             >

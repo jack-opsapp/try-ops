@@ -14,7 +14,7 @@ export function FounderQuote() {
     <section className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[160px] snap-start snap-always">
       <div className="max-w-[700px] mx-auto px-4 md:px-6 lg:px-10">
         <motion.div
-          className="border-l-2 border-white/20 pl-6 lg:pl-8"
+          className="border-l-2 border-ops-border-emphasis pl-6 lg:pl-8"
           {...fadeInUp}
         >
           <p className="font-kosugi text-[18px] lg:text-[22px] text-ops-gray-200 leading-relaxed mb-4">

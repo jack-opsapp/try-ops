@@ -19,13 +19,13 @@ export function Button({
   className = '',
   fullWidth = false,
 }: ButtonProps) {
-  const base = `font-mohave font-medium text-[16px] uppercase tracking-[0.03em] rounded-[4px] cursor-pointer inline-flex items-center justify-center gap-2 ${fullWidth ? 'w-full' : ''}`
+  const base = `font-mohave font-medium text-ops-body uppercase tracking-[0.03em] rounded-ops cursor-pointer inline-flex items-center justify-center gap-2 ${fullWidth ? 'w-full' : ''}`
 
   const variants = {
     primary:
-      'bg-ops-accent text-white px-8 py-4 hover:brightness-110',
+      'bg-ops-accent text-ops-text-primary px-8 py-4 hover:brightness-110',
     outline:
-      'bg-transparent border-2 border-ops-gray-300 text-ops-gray-200 px-8 py-[14px] hover:border-white hover:text-white',
+      'bg-transparent border-2 border-ops-border-emphasis text-ops-text-secondary px-8 py-[14px] hover:border-ops-text-primary hover:text-ops-text-primary',
   }
 
   const classes = `${base} ${variants[variant]} ${className}`

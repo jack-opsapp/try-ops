@@ -36,7 +36,7 @@ export function PhasedOnboardingHeader({
           <span className="absolute inset-0">
             <TypewriterText
               text={title}
-              className="font-mohave font-semibold text-ops-title tracking-wide text-white"
+              className="font-mohave font-semibold text-ops-title tracking-wide text-ops-text-primary"
               typingSpeed={36}
               onComplete={() => {
                 // iOS: 0.45s delay then advance to subtitleTyping

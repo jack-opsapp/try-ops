@@ -43,14 +43,14 @@ export function Footer() {
                       href={link.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-kosugi text-[14px] text-ops-text-secondary hover:text-white hover:underline transition-colors leading-10"
+                      className="font-kosugi text-[14px] text-ops-text-secondary hover:text-ops-text-primary hover:underline transition-colors leading-10"
                     >
                       {link.label}
                     </a>
                   ) : (
                     <button
                       onClick={link.action}
-                      className="font-kosugi text-[14px] text-ops-text-secondary hover:text-white hover:underline transition-colors leading-10"
+                      className="font-kosugi text-[14px] text-ops-text-secondary hover:text-ops-text-primary hover:underline transition-colors leading-10"
                     >
                       {link.label}
                     </button>
@@ -75,7 +75,7 @@ export function Footer() {
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    className="font-kosugi text-[14px] text-ops-text-secondary hover:text-white hover:underline transition-colors leading-10"
+                    className="font-kosugi text-[14px] text-ops-text-secondary hover:text-ops-text-primary hover:underline transition-colors leading-10"
                   >
                     {link.label}
                   </a>

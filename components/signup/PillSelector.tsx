@@ -29,8 +29,8 @@ export function PillSelector({
               border transition-all duration-200
               ${
                 value === option
-                  ? 'bg-ops-accent text-white border-ops-accent'
-                  : 'bg-[#0D0D0D]/60 text-ops-text-secondary border-white/20 hover:border-ops-accent/50'
+                  ? 'bg-ops-accent text-ops-text-primary border-ops-accent'
+                  : 'bg-ops-surface text-ops-text-secondary border-ops-border hover:border-ops-accent/50'
               }
             `}
           >

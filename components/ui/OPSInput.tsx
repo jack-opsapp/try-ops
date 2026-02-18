@@ -53,10 +53,11 @@ export function OPSInput({
         disabled={disabled}
         autoComplete={autoComplete}
         className={`
-          w-full h-12 px-4 rounded-ops bg-[#0D0D0D]/60 font-mohave text-ops-body text-white
+          w-full h-12 px-4 rounded-ops bg-ops-surface font-mohave text-ops-body text-ops-text-primary
           border transition-colors duration-200 outline-none
           placeholder:text-ops-text-tertiary
-          ${error ? 'border-ops-error' : 'border-white/20'}
+          ${error ? 'border-ops-error' : 'border-ops-border'}
+          focus:border-ops-accent
           ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
         `}
       />

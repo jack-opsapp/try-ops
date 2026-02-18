@@ -98,7 +98,7 @@ export default function ProfilePage() {
               value={firstName}
               onChange={(e) => { setFirstName(e.target.value); setError('') }}
               autoComplete="given-name"
-              className="w-full h-12 px-4 rounded-ops bg-[#0D0D0D]/80 font-mohave text-ops-body text-white border border-white/10 outline-none placeholder:text-ops-text-tertiary"
+              className="w-full h-12 px-4 rounded-ops bg-ops-surface font-mohave text-ops-body text-ops-text-primary border border-ops-border outline-none placeholder:text-ops-text-tertiary"
             />
           </div>
 
@@ -110,7 +110,7 @@ export default function ProfilePage() {
               value={lastName}
               onChange={(e) => { setLastName(e.target.value); setError('') }}
               autoComplete="family-name"
-              className="w-full h-12 px-4 rounded-ops bg-[#0D0D0D]/80 font-mohave text-ops-body text-white border border-white/10 outline-none placeholder:text-ops-text-tertiary"
+              className="w-full h-12 px-4 rounded-ops bg-ops-surface font-mohave text-ops-body text-ops-text-primary border border-ops-border outline-none placeholder:text-ops-text-tertiary"
             />
           </div>
 
@@ -123,7 +123,7 @@ export default function ProfilePage() {
               onChange={(e) => setPhone(e.target.value)}
               autoComplete="tel"
               placeholder="(555) 123-4567"
-              className="w-full h-12 px-4 rounded-ops bg-[#0D0D0D]/80 font-mohave text-ops-body text-white border border-white/10 outline-none placeholder:text-ops-text-tertiary"
+              className="w-full h-12 px-4 rounded-ops bg-ops-surface font-mohave text-ops-body text-ops-text-primary border border-ops-border outline-none placeholder:text-ops-text-tertiary"
             />
           </div>
 

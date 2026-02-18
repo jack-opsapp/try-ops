@@ -33,10 +33,10 @@ export function IndustryPicker({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={`
-          w-full h-12 px-4 rounded-ops bg-[#0D0D0D]/60 font-mohave text-ops-body text-left
-          border border-white/20 transition-colors
+          w-full h-12 px-4 rounded-ops bg-ops-surface font-mohave text-ops-body text-left
+          border border-ops-border transition-colors
           flex items-center justify-between
-          ${value ? 'text-white' : 'text-ops-text-tertiary'}
+          ${value ? 'text-ops-text-primary' : 'text-ops-text-tertiary'}
         `}
       >
         <span>{value || 'Select your trade'}</span>
@@ -57,15 +57,15 @@ export function IndustryPicker({
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="mt-2 rounded-ops bg-[#0D0D0D] border border-white/20 overflow-hidden">
+        <div className="mt-2 rounded-ops bg-ops-background border border-ops-border overflow-hidden">
           {/* Search */}
-          <div className="p-3 border-b border-white/10">
+          <div className="p-3 border-b border-ops-border">
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search trades..."
-              className="w-full h-10 px-3 rounded-ops bg-[#0D0D0D]/60 font-mohave text-ops-body text-white border border-white/20 outline-none focus:border-white/40 placeholder:text-ops-text-tertiary"
+              className="w-full h-10 px-3 rounded-ops bg-ops-surface font-mohave text-ops-body text-ops-text-primary border border-ops-border outline-none focus:border-ops-accent placeholder:text-ops-text-tertiary"
               autoFocus
             />
           </div>
@@ -83,8 +83,8 @@ export function IndustryPicker({
                 }}
                 className={`
                   w-full px-4 py-3 text-left font-mohave text-ops-body
-                  hover:bg-white/5 transition-colors
-                  ${value === industry ? 'text-ops-accent bg-ops-accent/5' : 'text-white'}
+                  hover:bg-ops-border transition-colors
+                  ${value === industry ? 'text-ops-accent bg-ops-accent/5' : 'text-ops-text-primary'}
                 `}
               >
                 {industry}

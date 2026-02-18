@@ -20,8 +20,8 @@ export function ProgressBar({
             i < currentStep
               ? 'bg-ops-accent'
               : i === currentStep
-              ? 'bg-white'
-              : 'bg-white/20'
+              ? 'bg-ops-text-primary'
+              : 'bg-ops-border-emphasis'
           }`}
         />
       ))}

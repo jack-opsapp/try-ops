@@ -15,12 +15,12 @@ export function PhoneMockup({ children, className = '' }: PhoneMockupProps) {
       transition={{ duration: 4, ease: 'easeInOut', repeat: Infinity }}
     >
       {/* Subtle glow behind device */}
-      <div className="absolute inset-0 rounded-[40px] blur-2xl bg-ops-gray-400/20 scale-105" />
+      <div className="absolute inset-0 rounded-[40px] blur-2xl bg-ops-text-disabled/20 scale-105" />
 
       {/* iPhone frame */}
-      <div className="relative bg-black rounded-[40px] border-2 border-gray-700 p-3 shadow-2xl">
+      <div className="relative bg-ops-background rounded-[40px] border-2 border-ops-border-emphasis p-3">
         {/* Notch */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-[28px] bg-black rounded-b-2xl z-10" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-[28px] bg-ops-background rounded-b-2xl z-10" />
 
         {/* Screen */}
         <div className="relative bg-ops-background rounded-[32px] overflow-hidden aspect-[9/19.5]">
@@ -37,7 +37,7 @@ export function PhoneMockup({ children, className = '' }: PhoneMockupProps) {
         </div>
 
         {/* Home indicator */}
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-[100px] h-[4px] bg-gray-600 rounded-full" />
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-[100px] h-[4px] bg-ops-text-tertiary rounded-full" />
       </div>
     </motion.div>
   )

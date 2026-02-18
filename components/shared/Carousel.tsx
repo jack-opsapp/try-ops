@@ -80,19 +80,19 @@ export function Carousel({ children, gap = 16, className = '', startIndex = 0 }:
           <>
             <button
               onClick={() => snapTo(activeIndex - 1)}
-              className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-200"
+              className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-ops-border hover:bg-ops-border-emphasis transition-colors duration-200"
               aria-label="Previous slide"
             >
-              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg className="w-5 h-5 text-ops-text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="15 18 9 12 15 6" />
               </svg>
             </button>
             <button
               onClick={() => snapTo(activeIndex + 1)}
-              className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-200"
+              className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-ops-border hover:bg-ops-border-emphasis transition-colors duration-200"
               aria-label="Next slide"
             >
-              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg className="w-5 h-5 text-ops-text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="9 6 15 12 9 18" />
               </svg>
             </button>
@@ -139,7 +139,7 @@ export function Carousel({ children, gap = 16, className = '', startIndex = 0 }:
               key={i}
               onClick={() => snapTo(i)}
               className={`w-2 h-2 rounded-full transition-colors duration-200 ${
-                i === activeIndex ? 'bg-white' : 'bg-ops-gray-400'
+                i === activeIndex ? 'bg-ops-text-primary' : 'bg-ops-text-disabled'
               }`}
               aria-label={`Go to slide ${i + 1}`}
             />

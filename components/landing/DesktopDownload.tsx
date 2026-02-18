@@ -78,7 +78,7 @@ export function DesktopDownload() {
           {/* SMS form + Direct link */}
           <div className="space-y-8">
             <div>
-              <h3 className="font-mohave font-medium text-[16px] uppercase text-white mb-4">
+              <h3 className="font-mohave font-medium text-ops-body uppercase text-ops-text-primary mb-4">
                 TEXT ME THE LINK
               </h3>
               <div className="flex gap-3">
@@ -87,12 +87,12 @@ export function DesktopDownload() {
                   placeholder="(555) 123-4567"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="bg-ops-card border border-ops-border rounded-[4px] px-4 py-3 font-kosugi text-[16px] text-ops-gray-50 w-[240px] focus:border-ops-gray-300 focus:outline-none transition-colors placeholder:text-ops-text-tertiary"
+                  className="bg-ops-card border border-ops-border rounded-ops-sm px-4 py-3 font-kosugi text-ops-body text-ops-text-primary w-[240px] focus:border-ops-accent focus:outline-none transition-colors placeholder:text-ops-text-tertiary"
                 />
                 <button
                   onClick={handleSend}
                   disabled={status === 'sending' || status === 'sent'}
-                  className="bg-ops-accent text-white font-mohave font-medium text-[14px] uppercase px-6 py-3 rounded-[4px] hover:brightness-110 transition-all disabled:opacity-50"
+                  className="bg-ops-accent text-ops-text-primary font-mohave font-medium text-ops-label uppercase px-6 py-3 rounded-ops hover:brightness-110 transition-all disabled:opacity-50"
                 >
                   {status === 'sending' ? 'SENDING...' : status === 'sent' ? 'SENT!' : 'SEND LINK →'}
                 </button>
@@ -110,14 +110,14 @@ export function DesktopDownload() {
             </div>
 
             <div>
-              <h3 className="font-mohave font-medium text-[16px] uppercase text-white mb-4">
+              <h3 className="font-mohave font-medium text-ops-body uppercase text-ops-text-primary mb-4">
                 DIRECT LINK
               </h3>
               <a
                 href="https://apps.apple.com/us/app/ops-job-crew-management/id6746662078"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block bg-ops-accent text-white font-mohave font-medium text-[14px] uppercase px-6 py-3 rounded-[4px] hover:brightness-110 transition-all"
+                className="inline-block bg-ops-accent text-ops-text-primary font-mohave font-medium text-ops-label uppercase px-6 py-3 rounded-ops hover:brightness-110 transition-all"
               >
                 TAKE ME TO THE APP STORE →
               </a>
