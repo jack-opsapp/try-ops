@@ -48,6 +48,7 @@ interface InviteSheetProps {
 }
 
 function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteSheetProps) {
+  const { trackCrewInviteSent } = useAnalytics()
   const [showCopied, setShowCopied] = useState(false)
   const [showInviteSection, setShowInviteSection] = useState(false)
   const [contacts, setContacts] = useState([''])
@@ -93,6 +94,8 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
       if (!res.ok) {
         setSendError(data.detail || data.error || 'Failed to send invites')
       } else {
+        const methods = validContacts.map((c) => detectType(c) === 'email' ? 'email' : 'sms')
+        trackCrewInviteSent(companyId, validContacts.length, methods)
         setSentContacts((prev) => [...prev, ...validContacts])
         setContacts([''])
         setShowInviteSection(false)
@@ -337,7 +340,7 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
 
 export default function CompanyCodePage() {
   const router = useRouter()
-  const { trackSignupStepView, trackSignupStepComplete } = useAnalytics()
+  const { trackSignupStepView, trackSignupStepComplete, trackCrewInviteOpened, trackCrewInviteSent, trackCrewInviteSkipped } = useAnalytics()
   const { userId, companyName, companyCode, companyId, setSignupStep } =
     useOnboardingStore()
   const animation = useOnboardingAnimation()
@@ -366,6 +369,7 @@ export default function CompanyCodePage() {
   }
 
   const handleContinue = () => {
+    if (companyId) trackCrewInviteSkipped(companyId)
     trackSignupStepComplete('company-code', 5)
     router.push('/signup/ready')
   }
@@ -427,7 +431,10 @@ export default function CompanyCodePage() {
 
           {/* Invite Crew Button — opens sheet modal */}
           <button
-            onClick={() => setShowInviteSheet(true)}
+            onClick={() => {
+              setShowInviteSheet(true)
+              if (companyId) trackCrewInviteOpened(companyId)
+            }}
             className="w-full h-14 flex items-center justify-center gap-2 rounded-ops border border-ops-border bg-ops-surface"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-ops-text-primary" strokeWidth="2" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">

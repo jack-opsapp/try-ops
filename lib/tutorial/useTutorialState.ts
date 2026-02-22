@@ -7,6 +7,7 @@ import {
   PHASE_CONFIGS,
   getNextPhase,
 } from './TutorialPhase'
+import { useAnalytics } from '@/lib/hooks/useAnalytics'
 
 export interface TutorialState {
   phase: TutorialPhase
@@ -47,6 +48,14 @@ export function useTutorialState(): TutorialState {
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
   const [stepDurations, setStepDurations] = useState<string[]>([])
 
+  const {
+    trackTutorialPhaseStart,
+    trackTutorialPhaseComplete,
+    trackTutorialPhaseBack,
+    trackTutorialPhaseSkip,
+    trackTutorialAbandon,
+  } = useAnalytics()
+
   const startTimeRef = useRef(Date.now())
   const phaseStartRef = useRef(Date.now())
   const autoAdvanceTimerRef = useRef<NodeJS.Timeout | null>(null)
@@ -59,6 +68,36 @@ export function useTutorialState(): TutorialState {
     return () => clearInterval(interval)
   }, [])
 
+  // Track phase start on every phase change (including initial)
+  const totalPhases = PHASE_ORDER.length - 1 // exclude 'completed'
+  useEffect(() => {
+    const idx = PHASE_ORDER.indexOf(phase)
+    if (phase !== 'completed') {
+      trackTutorialPhaseStart(phase, idx, totalPhases)
+    }
+  }, [phase, totalPhases, trackTutorialPhaseStart])
+
+  // Track abandon on unmount (if tutorial not completed)
+  useEffect(() => {
+    return () => {
+      // Use refs to get current values at unmount time
+      const currentPhase = phaseRef.current
+      if (currentPhase !== 'completed') {
+        const idx = PHASE_ORDER.indexOf(currentPhase)
+        const timeInPhase = Date.now() - phaseStartRef.current
+        const totalTime = Date.now() - startTimeRef.current
+        trackTutorialAbandon(currentPhase, idx, timeInPhase, totalTime)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Keep a ref to current phase for unmount cleanup
+  const phaseRef = useRef<TutorialPhase>(phase)
+  useEffect(() => {
+    phaseRef.current = phase
+  }, [phase])
+
   // Handle auto-advance phases
   useEffect(() => {
     if (autoAdvanceTimerRef.current) {
@@ -70,7 +109,13 @@ export function useTutorialState(): TutorialState {
     if (config.autoAdvanceMs) {
       autoAdvanceTimerRef.current = setTimeout(() => {
         const next = getNextPhase(phase)
-        if (next) setPhase(next)
+        if (next) {
+          const idx = PHASE_ORDER.indexOf(phase)
+          const timeInPhase = Date.now() - phaseStartRef.current
+          trackTutorialPhaseComplete(phase, idx, timeInPhase)
+          phaseStartRef.current = Date.now()
+          setPhase(next)
+        }
       }, config.autoAdvanceMs)
     }
 
@@ -79,30 +124,38 @@ export function useTutorialState(): TutorialState {
         clearTimeout(autoAdvanceTimerRef.current)
       }
     }
-  }, [phase])
+  }, [phase, trackTutorialPhaseComplete])
 
   const advance = useCallback(() => {
     const next = getNextPhase(phase)
     if (next) {
-      setStepDurations(prev => [...prev, `${phase}:${Date.now() - phaseStartRef.current}`])
+      const idx = PHASE_ORDER.indexOf(phase)
+      const timeInPhase = Date.now() - phaseStartRef.current
+      trackTutorialPhaseComplete(phase, idx, timeInPhase)
+      setStepDurations(prev => [...prev, `${phase}:${timeInPhase}`])
       phaseStartRef.current = Date.now()
       setPhase(next)
     }
-  }, [phase])
+  }, [phase, trackTutorialPhaseComplete])
 
   const goBack = useCallback(() => {
     const idx = PHASE_ORDER.indexOf(phase)
     if (idx > 0) {
+      const prevPhase = PHASE_ORDER[idx - 1]
+      trackTutorialPhaseBack(prevPhase, idx - 1, phase)
       setStepDurations(prev => prev.slice(0, -1))
       phaseStartRef.current = Date.now()
-      setPhase(PHASE_ORDER[idx - 1])
+      setPhase(prevPhase)
     }
-  }, [phase])
+  }, [phase, trackTutorialPhaseBack])
 
   const skip = useCallback(() => {
-    setStepDurations(prev => [...prev, `${phase}:${Date.now() - phaseStartRef.current}`])
+    const idx = PHASE_ORDER.indexOf(phase)
+    const timeInPhase = Date.now() - phaseStartRef.current
+    trackTutorialPhaseSkip(phase, idx, timeInPhase)
+    setStepDurations(prev => [...prev, `${phase}:${timeInPhase}`])
     setPhase('completed')
-  }, [phase])
+  }, [phase, trackTutorialPhaseSkip])
 
   const phaseIndex = PHASE_ORDER.indexOf(phase)
 

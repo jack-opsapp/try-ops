@@ -31,7 +31,7 @@ const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
 
 export default function CredentialsPage() {
   const router = useRouter()
-  const { trackSignupStepView, trackSignupStepComplete } = useAnalytics()
+  const { trackSignupStepView, trackSignupStepComplete, trackSignupAuthAttempt, trackSignupFieldError } = useAnalytics()
   const { setAuth, setProfile, setSignupStep } = useOnboardingStore()
 
   const [isLoginMode, setIsLoginMode] = useState(false)
@@ -53,6 +53,7 @@ export default function CredentialsPage() {
     async (response: { credential: string }) => {
       setGoogleLoading(true)
       setError('')
+      trackSignupAuthAttempt('google', 'started')
 
       try {
         const payload = JSON.parse(
@@ -74,7 +75,9 @@ export default function CredentialsPage() {
         const data = await res.json()
 
         if (!res.ok) {
-          setError(data.error || 'Google sign-in failed. Please try again.')
+          const errorMsg = data.error || 'Google sign-in failed. Please try again.'
+          setError(errorMsg)
+          trackSignupAuthAttempt('google', 'failed', errorMsg)
           setGoogleLoading(false)
           return
         }
@@ -89,15 +92,18 @@ export default function CredentialsPage() {
           })
         }
 
+        trackSignupAuthAttempt('google', 'completed')
         trackSignupStepComplete('credentials', 1)
         router.push('/signup/profile')
       } catch {
-        setError('Connection error. Please try again.')
+        const errorMsg = 'Connection error. Please try again.'
+        setError(errorMsg)
+        trackSignupAuthAttempt('google', 'failed', errorMsg)
       } finally {
         setGoogleLoading(false)
       }
     },
-    [setAuth, setProfile, trackSignupStepComplete, router]
+    [setAuth, setProfile, trackSignupStepComplete, trackSignupAuthAttempt, router]
   )
 
   useEffect(() => {
@@ -161,10 +167,18 @@ export default function CredentialsPage() {
     const pErr = validatePassword(password)
     setEmailError(eErr)
     setPasswordError(pErr)
+    if (eErr) {
+      trackSignupFieldError('credentials', 'email', eErr)
+    }
+    if (pErr) {
+      trackSignupFieldError('credentials', 'password', pErr)
+    }
     if (eErr || pErr) return
 
     setLoading(true)
     setError('')
+    const method = isLoginMode ? 'email_login' : 'email_signup'
+    trackSignupAuthAttempt(method, 'started')
 
     try {
       const endpoint = isLoginMode ? '/api/auth/login' : '/api/auth/signup'
@@ -177,16 +191,21 @@ export default function CredentialsPage() {
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.error || (isLoginMode ? 'Login failed.' : 'Signup failed. Please try again.'))
+        const errorMsg = data.error || (isLoginMode ? 'Login failed.' : 'Signup failed. Please try again.')
+        setError(errorMsg)
+        trackSignupAuthAttempt(method, 'failed', errorMsg)
         setLoading(false)
         return
       }
 
       setAuth(data.userId, 'email', email)
+      trackSignupAuthAttempt(method, 'completed')
       trackSignupStepComplete('credentials', 1)
       router.push(isLoginMode ? '/download' : '/signup/profile')
     } catch {
-      setError('Connection error. Please check your internet and try again.')
+      const errorMsg = 'Connection error. Please check your internet and try again.'
+      setError(errorMsg)
+      trackSignupAuthAttempt(method, 'failed', errorMsg)
     } finally {
       setLoading(false)
     }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
+import { useAnalytics } from '@/lib/hooks/useAnalytics'
 
 const APP_STORE_URL = 'https://apps.apple.com/us/app/ops-job-crew-management/id6746662078'
 
@@ -49,8 +50,10 @@ function TacticalLoadingBar() {
 
 export default function DownloadPage() {
   const { userId, companyId } = useOnboardingStore()
+  const { trackDeepLinkAttempt, trackDeepLinkFallback } = useAnalytics()
   const [showFallback, setShowFallback] = useState(false)
   const [minTimeElapsed, setMinTimeElapsed] = useState(false)
+  const deepLinkStartRef = useRef<number>(0)
 
   useEffect(() => {
     // Minimum 3s display of loading animation
@@ -63,15 +66,19 @@ export default function DownloadPage() {
 
     // After 3s, attempt deep link then redirect to App Store
     const deepLink = `opsapp://launch?userId=${userId || ''}&companyId=${companyId || ''}&source=web_onboarding`
+    deepLinkStartRef.current = Date.now()
+    trackDeepLinkAttempt('deep_link', userId || '', companyId || '')
     window.location.href = deepLink
 
     const timeout = setTimeout(() => {
+      const waitTime = Date.now() - deepLinkStartRef.current
+      trackDeepLinkFallback(userId || '', companyId || '', waitTime)
       setShowFallback(true)
       window.location.href = APP_STORE_URL
     }, 1500)
 
     return () => clearTimeout(timeout)
-  }, [minTimeElapsed, userId, companyId])
+  }, [minTimeElapsed, userId, companyId, trackDeepLinkAttempt, trackDeepLinkFallback])
 
   return (
     <div className="min-h-screen bg-ops-background flex flex-col items-center justify-center px-6">
