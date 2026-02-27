@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { Button } from '@/components/shared/Button'
 import { HeroAnimation } from '@/components/landing/HeroAnimation'
+import { InlineSignupForm } from '@/components/landing/InlineSignupForm'
 
 interface HeroProps {
   onDownloadClick: () => void
@@ -83,11 +84,30 @@ export function Hero({ onDownloadClick, onTryClick }: HeroProps) {
               </Button>
             </motion.div>
 
-            {/* Trust line */}
-            <motion.p
-              className="font-kosugi text-[14px] text-ops-gray-300"
+            {/* OR divider */}
+            <motion.div
+              className="flex items-center gap-4 my-6 max-w-[440px]"
+              {...fadeInUp}
+              transition={{ ...fadeInUp.transition, delay: 0.25 }}
+            >
+              <div className="flex-1 h-px bg-white/10" />
+              <span className="font-kosugi text-[12px] text-ops-gray-400 uppercase tracking-[0.15em]">or</span>
+              <div className="flex-1 h-px bg-white/10" />
+            </motion.div>
+
+            {/* Inline signup form */}
+            <motion.div
               {...fadeInUp}
               transition={{ ...fadeInUp.transition, delay: 0.3 }}
+            >
+              <InlineSignupForm location="hero" />
+            </motion.div>
+
+            {/* Trust line */}
+            <motion.p
+              className="font-kosugi text-[14px] text-ops-gray-300 mt-6"
+              {...fadeInUp}
+              transition={{ ...fadeInUp.transition, delay: 0.35 }}
             >
               Get started for free &middot; No credit card &middot; Rated 5.0&#9733;
             </motion.p>

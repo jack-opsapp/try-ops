@@ -18,6 +18,7 @@ import { ClosingCTA } from '@/components/landing/ClosingCTA'
 import { Footer } from '@/components/landing/Footer'
 import { StickyCTA } from '@/components/landing/StickyCTA'
 import { TestimonialsSection } from '@/components/landing/TestimonialsSection'
+import { InlineSignupForm } from '@/components/landing/InlineSignupForm'
 
 const APP_STORE_URL = 'https://apps.apple.com/us/app/ops-job-crew-management/id6746662078'
 
@@ -210,6 +211,11 @@ export default function LandingPage() {
     router.push('/signup/credentials')
   }, [trackLandingCTAClick, getScrollDepth, getTimeOnPage, router])
 
+  const handleInlineSignup = useCallback(() => {
+    setTutorialStartTime(Date.now())
+    router.push('/tutorial-intro')
+  }, [setTutorialStartTime, router])
+
   const handleFAQToggle = useCallback(
     (question: string, expanded: boolean) => {
       trackFAQInteraction(question, expanded ? 'expand' : 'collapse')
@@ -266,6 +272,33 @@ export default function LandingPage() {
       <div className="border-t border-ops-border-emphasis mx-6 md:mx-6 lg:mx-10" />
 
       <SolutionSection />
+
+      <div className="border-t border-ops-border-emphasis mx-6 md:mx-6 lg:mx-10" />
+
+      {/* Mid-page inline signup */}
+      <section className="py-20 lg:py-28 snap-start">
+        <div className="max-w-[600px] mx-auto px-6 md:px-6 lg:px-10 flex flex-col items-center text-center">
+          <p className="font-mohave font-medium text-[11px] text-ops-gray-400 uppercase tracking-[0.3em] mb-4">
+            [ GET STARTED ]
+          </p>
+          <h2 className="font-mohave font-bold text-[36px] lg:text-[48px] text-ops-gray-50 uppercase leading-[1.1] tracking-[0.05em] mb-4">
+            GET STARTED IN 30 SECONDS
+          </h2>
+          <p className="font-kosugi text-[14px] lg:text-[16px] text-ops-gray-200 mb-10">
+            Create your free account. Then try OPS for yourself.
+          </p>
+          <InlineSignupForm location="midpage" onSuccess={handleInlineSignup} />
+          <p className="font-kosugi text-[13px] text-ops-gray-400 mt-6">
+            Or{' '}
+            <button
+              onClick={handleTryClick}
+              className="text-ops-gray-200 underline hover:text-white transition-colors cursor-pointer"
+            >
+              try it without an account
+            </button>
+          </p>
+        </div>
+      </section>
 
       <div className="border-t border-ops-border-emphasis mx-6 md:mx-6 lg:mx-10" />
 
