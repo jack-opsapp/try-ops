@@ -115,8 +115,14 @@ export function PainSection() {
   return (
     <section ref={sectionRef} id="pain" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
       <div className="max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10">
+        <motion.p
+          className="font-kosugi text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary mb-4"
+          {...fadeInUp}
+        >
+          [ THE PROBLEM ]
+        </motion.p>
         <motion.h2
-          className="font-bebas text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] max-w-[800px] mb-4 lg:mb-16"
+          className="font-mohave font-bold text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] max-w-[800px] mb-4 lg:mb-16"
           {...fadeInUp}
         >
           YOU&apos;RE EITHER DROWNING IN CHAOS OR PAYING FOR SOFTWARE NOBODY USES

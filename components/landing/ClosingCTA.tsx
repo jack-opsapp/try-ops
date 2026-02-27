@@ -17,10 +17,10 @@ const fadeInUp = {
 
 export function ClosingCTA({ onDownloadClick, onTryClick }: ClosingCTAProps) {
   return (
-    <section id="closing" className="bg-ops-card border-t-2 border-ops-gray-500 min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
+    <section id="closing" className="bg-ops-card border-t border-white/10 min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
       <div className="max-w-[700px] mx-auto px-6 md:px-6 lg:px-10">
         <motion.h2
-          className="font-bebas text-[40px] lg:text-[56px] text-ops-gray-50 uppercase leading-[1.1] tracking-[0.05em] mb-6"
+          className="font-mohave font-bold text-[40px] lg:text-[56px] text-ops-gray-50 uppercase leading-[1.1] tracking-[0.05em] mb-6"
           {...fadeInUp}
         >
           YOUR CREW DESERVES SOFTWARE THAT WORKS AS HARD AS YOU DO

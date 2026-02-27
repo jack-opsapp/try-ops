@@ -93,8 +93,8 @@ const tiers = [
 function PricingCard({ tier, onCTAClick }: { tier: typeof tiers[number]; onCTAClick: () => void }) {
   return (
     <div
-      className={`relative bg-ops-card border rounded-ops-card p-5 md:p-8 h-full flex flex-col ${
-        tier.highlight ? 'border-ops-accent' : 'border-ops-border'
+      className={`relative bg-ops-card border border-white/10 rounded-ops-card p-5 md:p-8 h-full flex flex-col ${
+        tier.highlight ? 'border-t-2 border-t-ops-accent' : ''
       }`}
     >
       {tier.highlight && (
@@ -106,7 +106,7 @@ function PricingCard({ tier, onCTAClick }: { tier: typeof tiers[number]; onCTACl
       <p className="font-mohave font-medium text-[14px] uppercase text-ops-gray-300 mb-1 md:mb-2">
         {tier.name}
       </p>
-      <p className="font-bebas text-[40px] md:text-[48px] text-ops-gray-50 leading-none mb-1">
+      <p className="font-mohave font-bold text-[40px] md:text-[48px] text-ops-gray-50 leading-none mb-1">
         {tier.price}
       </p>
       <p className="font-mohave text-[12px] text-ops-gray-400 mb-3 md:mb-4">
@@ -147,8 +147,14 @@ export function PricingSection({ onDownloadClick }: PricingSectionProps) {
   return (
     <section id="pricing" className="py-6 lg:py-[120px] snap-start snap-always">
       <div className="max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10">
+        <motion.p
+          className="font-kosugi text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary mb-4"
+          {...fadeInUp}
+        >
+          [ PLANS ]
+        </motion.p>
         <motion.h2
-          className="font-bebas text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-2 lg:mb-3"
+          className="font-mohave font-bold text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-2 lg:mb-3"
           {...fadeInUp}
         >
           START FREE. UPGRADE WHEN YOU&apos;RE READY.
@@ -189,7 +195,7 @@ export function PricingSection({ onDownloadClick }: PricingSectionProps) {
 
         {/* Callout */}
         <motion.p
-          className="font-kosugi text-[13px] md:text-[14px] text-ops-gray-300 text-center mt-4 lg:mt-12 max-w-[700px] mx-auto"
+          className="font-kosugi text-[13px] md:text-[14px] text-ops-gray-300 mt-4 lg:mt-12 max-w-[700px]"
           {...fadeInUp}
         >
           After your free trial, pick the plan that fits your crew size. All plans include the same features &mdash; you only pay based on how many people you&apos;re managing.

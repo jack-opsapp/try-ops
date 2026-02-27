@@ -24,7 +24,7 @@ export function Hero({ onDownloadClick, onTryClick }: HeroProps) {
           {/* Mobile: title first, then animation */}
           <div className="lg:hidden w-full">
             <motion.h1
-              className="font-bebas text-[40px] text-ops-gray-50 uppercase leading-[1.1] tracking-[0.05em] mb-4"
+              className="font-mohave font-bold text-[40px] text-ops-gray-50 uppercase leading-[1.1] tracking-[0.05em] mb-4"
               {...fadeInUp}
             >
               JOB MANAGEMENT YOUR CREW WILL ACTUALLY USE
@@ -42,7 +42,7 @@ export function Hero({ onDownloadClick, onTryClick }: HeroProps) {
           {/* Text content — left-aligned */}
           <div className="flex-1">
             <motion.h1
-              className="hidden lg:block font-bebas text-[64px] text-ops-gray-50 uppercase leading-[1.1] tracking-[0.05em] max-w-[600px] mb-6"
+              className="hidden lg:block font-mohave font-bold text-[64px] text-ops-gray-50 uppercase leading-[1.1] tracking-[0.05em] max-w-[600px] mb-6"
               {...fadeInUp}
             >
               JOB MANAGEMENT YOUR CREW WILL ACTUALLY USE

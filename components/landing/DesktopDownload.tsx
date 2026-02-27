@@ -47,7 +47,7 @@ export function DesktopDownload() {
         className="max-w-[800px] mx-auto px-4 md:px-6 lg:px-10"
         {...fadeInUp}
       >
-        <h2 className="font-bebas text-[32px] text-ops-gray-50 uppercase tracking-[0.05em] mb-10">
+        <h2 className="font-mohave font-bold text-[32px] text-ops-gray-50 uppercase tracking-[0.05em] mb-10">
           GET OPS ON YOUR PHONE
         </h2>
 

@@ -48,7 +48,7 @@ const founderQuote = {
 
 function TestimonialCard({ testimonial: t }: { testimonial: typeof testimonials[number] }) {
   return (
-    <div className="bg-ops-card rounded-ops-card p-8 h-full flex flex-col">
+    <div className="bg-ops-card border border-white/10 rounded-ops-card p-8 h-full flex flex-col">
       <p className="font-kosugi text-[16px] text-ops-gray-200 leading-relaxed flex-1 mb-6">
         &ldquo;{t.quote}&rdquo;
       </p>
@@ -82,8 +82,14 @@ export function TestimonialsSection() {
   return (
     <section id="testimonials" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
       <div className="max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10">
+        <motion.p
+          className="font-kosugi text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary mb-4"
+          {...fadeInUp}
+        >
+          [ THE TRADES ]
+        </motion.p>
         <motion.h2
-          className="font-bebas text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-8 lg:mb-16"
+          className="font-mohave font-bold text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-8 lg:mb-16"
           {...fadeInUp}
         >
           CREWS THAT SWITCHED AREN&apos;T GOING BACK

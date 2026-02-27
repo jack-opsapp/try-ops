@@ -60,14 +60,6 @@
   font-display: swap;
 }
 
-@font-face {
-  font-family: 'Bebas Neue';
-  src: url('/fonts/BebasNeue-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
 html {
   scroll-behavior: smooth;
 }
@@ -95,8 +87,12 @@ body {
   background: #080808;
 }
 ::-webkit-scrollbar-thumb {
-  background: #333333;
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 2px;
+}
+
+::selection {
+  background: rgba(89, 119, 148, 0.4);
 }
 
 /* Input autofill override for dark theme */
@@ -182,6 +178,25 @@ input:-webkit-autofill:focus {
 @keyframes fadeInUp {
   from { transform: translateY(12px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
+}
+
+/* Noise texture overlay */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.03;
+}
+
+.noise-overlay svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* System-spec border (rgba-based) */
+.border-system {
+  border-color: rgba(255, 255, 255, 0.10);
 }
 
 /* Respect reduced motion preference */

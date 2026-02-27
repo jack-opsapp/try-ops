@@ -143,8 +143,14 @@ export function RoadmapSection() {
   return (
     <section id="roadmap" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
       <div className="max-w-[700px] mx-auto px-6 md:px-6 lg:px-10">
+        <motion.p
+          className="font-kosugi text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary mb-4"
+          {...fadeInUp}
+        >
+          [ THE ROADMAP ]
+        </motion.p>
         <motion.h2
-          className="font-bebas text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-2 lg:mb-3"
+          className="font-mohave font-bold text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-2 lg:mb-3"
           {...fadeInUp}
         >
           WE&apos;RE BUILDING WHAT YOU ACTUALLY NEED

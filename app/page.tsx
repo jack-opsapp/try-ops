@@ -219,10 +219,27 @@ export default function LandingPage() {
 
   return (
     <main className="relative bg-ops-background min-h-screen snap-y snap-mandatory overflow-y-auto overflow-x-hidden h-screen md:h-auto md:overflow-visible md:snap-none">
-      {/* Page-level edge gradients */}
-      <div className="pointer-events-none fixed left-0 top-0 bottom-0 w-6 z-[990] bg-gradient-to-r from-ops-background to-transparent" />
-      <div className="pointer-events-none fixed right-0 top-0 bottom-0 w-6 z-[990] bg-gradient-to-l from-ops-background to-transparent" />
-      <div className="pointer-events-none fixed left-0 right-0 bottom-0 h-16 z-[990] bg-gradient-to-t from-ops-background to-transparent" />
+      {/* Ambient edge glows */}
+      <div className="pointer-events-none fixed inset-0 z-[990]">
+        {/* Top-left glow */}
+        <div className="absolute -top-[200px] -left-[200px] w-[600px] h-[600px] rounded-full bg-ops-accent/[0.04] blur-[120px]" />
+        {/* Top-right glow */}
+        <div className="absolute -top-[100px] -right-[200px] w-[500px] h-[500px] rounded-full bg-ops-accent/[0.03] blur-[100px]" />
+        {/* Bottom-left glow */}
+        <div className="absolute -bottom-[200px] -left-[100px] w-[500px] h-[500px] rounded-full bg-ops-accent/[0.03] blur-[100px]" />
+        {/* Bottom-right glow */}
+        <div className="absolute -bottom-[100px] -right-[200px] w-[400px] h-[400px] rounded-full bg-ops-accent/[0.04] blur-[120px]" />
+      </div>
+
+      {/* Noise texture overlay */}
+      <div className="noise-overlay">
+        <svg>
+          <filter id="noise">
+            <feTurbulence type="fractalNoise" baseFrequency="0.80" numOctaves="4" stitchTiles="stitch" />
+          </filter>
+          <rect width="100%" height="100%" filter="url(#noise)" />
+        </svg>
+      </div>
 
       <HamburgerMenu
         onDownloadClick={handleDownloadClick}

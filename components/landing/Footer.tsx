@@ -9,9 +9,16 @@ export function Footer() {
   }
 
   return (
-    <footer id="footer" className="border-t border-ops-border bg-ops-background py-16 lg:py-20">
+    <footer id="footer" className="relative border-t border-white/10 bg-ops-background py-16 lg:py-20 overflow-hidden">
+      {/* Solar horizon glow */}
+      <div className="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px]">
+        <div className="absolute inset-0 rounded-full bg-ops-accent/[0.06] blur-[100px]" />
+        <div className="absolute inset-[15%] rounded-full bg-ops-accent/[0.04] blur-[80px]" />
+        <div className="absolute inset-[30%] rounded-full bg-ops-accent/[0.03] blur-[60px]" />
+      </div>
+
       <motion.div
-        className="max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10"
+        className="relative max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -27,14 +34,14 @@ export function Footer() {
               height={24}
               className="object-contain mb-3"
             />
-            <p className="font-kosugi text-[14px] text-ops-gray-300 italic">
+            <p className="font-kosugi text-[14px] text-ops-text-secondary italic">
               Built by trades, for trades.
             </p>
           </div>
 
           {/* Product links */}
           <div>
-            <h4 className="font-mohave font-medium text-[12px] uppercase text-ops-gray-300 tracking-wider mb-4">
+            <h4 className="font-kosugi text-[11px] uppercase tracking-[0.15em] text-ops-text-secondary mb-4">
               PRODUCT
             </h4>
             <ul className="space-y-2">
@@ -50,14 +57,14 @@ export function Footer() {
                       href={link.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-kosugi text-[14px] text-ops-text-secondary hover:text-ops-text-primary hover:underline transition-colors leading-10"
+                      className="font-mohave text-[14px] text-ops-text-secondary hover:text-white hover:underline transition-colors leading-10"
                     >
                       {link.label}
                     </a>
                   ) : (
                     <button
                       onClick={link.action}
-                      className="font-kosugi text-[14px] text-ops-text-secondary hover:text-ops-text-primary hover:underline transition-colors leading-10"
+                      className="font-mohave text-[14px] text-ops-text-secondary hover:text-white hover:underline transition-colors leading-10"
                     >
                       {link.label}
                     </button>
@@ -69,7 +76,7 @@ export function Footer() {
 
           {/* Company links */}
           <div>
-            <h4 className="font-mohave font-medium text-[12px] uppercase text-ops-gray-300 tracking-wider mb-4">
+            <h4 className="font-kosugi text-[11px] uppercase tracking-[0.15em] text-ops-text-secondary mb-4">
               COMPANY
             </h4>
             <ul className="space-y-2">
@@ -82,7 +89,33 @@ export function Footer() {
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    className="font-kosugi text-[14px] text-ops-text-secondary hover:text-ops-text-primary hover:underline transition-colors leading-10"
+                    className="font-mohave text-[14px] text-ops-text-secondary hover:text-white hover:underline transition-colors leading-10"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Connect links */}
+          <div>
+            <h4 className="font-kosugi text-[11px] uppercase tracking-[0.15em] text-ops-text-secondary mb-4">
+              CONNECT
+            </h4>
+            <ul className="space-y-2">
+              {[
+                { label: 'App Store', href: 'https://apps.apple.com/us/app/ops-job-crew-management/id6746662078' },
+                { label: 'Web App', href: 'https://try.opsapp.co/tutorial-intro' },
+                { label: 'Instagram', href: 'https://instagram.com/ops.app' },
+                { label: 'LinkedIn', href: 'https://linkedin.com/company/opsapp' },
+              ].map((link) => (
+                <li key={link.label}>
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mohave text-[14px] text-ops-text-secondary hover:text-white hover:underline transition-colors leading-10"
                   >
                     {link.label}
                   </a>
@@ -92,11 +125,28 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Copyright */}
-        <div className="border-t border-ops-border mt-10 pt-6">
-          <p className="font-kosugi text-[12px] text-ops-text-secondary">
-            &copy; 2026 OPS. All rights reserved.
-          </p>
+        {/* Bottom bar */}
+        <div className="border-t border-white/10 mt-10 pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Image
+              src="/images/ops-logo-white.png"
+              alt="OPS"
+              width={36}
+              height={14}
+              className="object-contain opacity-50"
+            />
+            <p className="font-kosugi text-[12px] text-ops-text-secondary">
+              &copy; 2026 OPS. All rights reserved.
+            </p>
+          </div>
+          <div className="flex gap-4">
+            <a href="#" className="font-mohave text-[12px] text-ops-text-secondary hover:text-white transition-colors">
+              Privacy
+            </a>
+            <a href="#" className="font-mohave text-[12px] text-ops-text-secondary hover:text-white transition-colors">
+              Terms
+            </a>
+          </div>
         </div>
       </motion.div>
     </footer>

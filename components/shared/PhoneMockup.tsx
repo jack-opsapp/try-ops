@@ -27,7 +27,7 @@ export function PhoneMockup({ children, className = '' }: PhoneMockupProps) {
           {children || (
             <div className="w-full h-full flex items-center justify-center">
               <div className="text-center p-6">
-                <div className="text-ops-accent font-bebas text-3xl tracking-wider mb-2">OPS</div>
+                <div className="text-ops-accent font-mohave font-bold text-3xl tracking-wider mb-2">OPS</div>
                 <div className="text-ops-text-secondary font-kosugi text-sm">
                   Job management your crew will actually use
                 </div>
