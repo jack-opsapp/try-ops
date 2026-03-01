@@ -56,13 +56,13 @@ export const PHASE_CONFIGS: Record<TutorialPhase, PhaseConfig> = {
     tooltipText: 'TAP THE + BUTTON',
     tooltipDescription: 'This is how you create projects, tasks, clients, and more.',
     showContinueButton: false,
-    tooltipTop: '58%',
+    tooltipTop: '8%',
   },
   fabTap: {
     tooltipText: 'TAP "CREATE PROJECT"',
     tooltipDescription: 'Every job starts here.',
     showContinueButton: false,
-    tooltipTop: '55%',
+    tooltipTop: '8%',
   },
   projectFormClient: {
     tooltipText: 'SELECT A CLIENT',
@@ -80,7 +80,7 @@ export const PHASE_CONFIGS: Record<TutorialPhase, PhaseConfig> = {
     tooltipText: 'ADD A TASK',
     tooltipDescription: 'Tasks are the work itself—Installation, Painting, Pressure Wash.',
     showContinueButton: false,
-    tooltipTop: '38%',
+    tooltipTop: '8%',
   },
   taskFormType: {
     tooltipText: 'SELECT A TASK TYPE',
@@ -92,7 +92,7 @@ export const PHASE_CONFIGS: Record<TutorialPhase, PhaseConfig> = {
     tooltipText: 'ASSIGN CREW',
     tooltipDescription: 'Sample crew for practice. In real use, they get notified instantly.',
     showContinueButton: false,
-    tooltipTop: '25%',
+    tooltipTop: '8%',
   },
   taskFormDate: {
     tooltipText: 'SET THE DATES',
@@ -105,18 +105,18 @@ export const PHASE_CONFIGS: Record<TutorialPhase, PhaseConfig> = {
     tooltipDescription: 'All details set.',
     showContinueButton: true,
     continueLabel: 'DONE',
-    tooltipTop: '55%',
+    tooltipTop: '8%',
   },
   projectFormComplete: {
     tooltipText: 'PROJECT READY',
     tooltipDescription: "Everything's set. Create your project.",
     showContinueButton: true,
     continueLabel: 'CREATE',
-    tooltipTop: '55%',
+    tooltipTop: '8%',
   },
   dragToAccepted: {
     tooltipText: 'PROJECT POSTED',
-    tooltipDescription: 'Client accepts the estimate—drag it to Accepted. Watch it move.',
+    tooltipDescription: 'When the client accepts the estimate, it gets dragged over to the accepted column.',
     showContinueButton: true,
     continueLabel: 'CONTINUE',
     tooltipTop: '8%',
@@ -137,7 +137,7 @@ export const PHASE_CONFIGS: Record<TutorialPhase, PhaseConfig> = {
   },
   closedProjectsScroll: {
     tooltipText: 'JOB CLOSED',
-    tooltipDescription: 'Closed jobs drop to the bottom. Active work stays on top.',
+    tooltipDescription: 'Closed jobs are filed at the bottom of your project list.',
     showContinueButton: false,
     tooltipTop: '8%',
   },
@@ -152,7 +152,7 @@ export const PHASE_CONFIGS: Record<TutorialPhase, PhaseConfig> = {
     tooltipText: 'TAP "MONTH"',
     tooltipDescription: 'See the bigger picture.',
     showContinueButton: false,
-    tooltipTop: '25%',
+    tooltipTop: '8%',
   },
   calendarMonth: {
     tooltipText: 'TAP EXPAND',

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ProjectFolder } from './ProjectFolder'
 import { TaskFolder } from './TaskFolder'
@@ -9,6 +9,7 @@ import Image from 'next/image'
 
 interface Sequence1BProps {
   onComplete: () => void
+  skipToEnd?: boolean
 }
 
 const TASK_COLORS = {
@@ -35,14 +36,16 @@ const TASK_POSITIONS = [
 // How far the project folder shifts down when tasks are spread — must match Sequence1
 const FOLDER_SHIFT_Y = 65
 
-export function Sequence1B({ onComplete }: Sequence1BProps) {
+export function Sequence1B({ onComplete, skipToEnd }: Sequence1BProps) {
   const [activeTask, setActiveTask] = useState<number | null>(null)
   const [showDetails, setShowDetails] = useState<number | null>(null)
   const [collapsing, setCollapsing] = useState(false)
   const [textVisible, setTextVisible] = useState(false)
+  const timersRef = useRef<NodeJS.Timeout[]>([])
 
   useEffect(() => {
     const timers: NodeJS.Timeout[] = []
+    timersRef.current = timers
 
     // Show text at start
     timers.push(setTimeout(() => setTextVisible(true), 200))
@@ -76,6 +79,16 @@ export function Sequence1B({ onComplete }: Sequence1BProps) {
 
     return () => timers.forEach(clearTimeout)
   }, [onComplete])
+
+  // Skip to final frame
+  useEffect(() => {
+    if (!skipToEnd) return
+    timersRef.current.forEach(clearTimeout)
+    setActiveTask(null)
+    setShowDetails(null)
+    setTextVisible(false)
+    setCollapsing(true)
+  }, [skipToEnd])
 
   const getTaskColor = (index: number) => {
     if (collapsing) return GRAYSCALE

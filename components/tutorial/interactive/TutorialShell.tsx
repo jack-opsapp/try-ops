@@ -251,14 +251,13 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
       ? 'CONFIRM DATES'
       : phaseConfig.continueLabel || 'CONTINUE'
 
-  // Progress fraction (exclude 'completed' from total)
+  // Total phases for step counter (exclude 'completed')
   const totalPhases = tutorial.totalPhases
-  const progressFraction = totalPhases > 0 ? phaseIndex / totalPhases : 0
 
   return (
     <div
       className="relative w-full h-full overflow-hidden"
-      style={{ touchAction: 'none', background: '#000000' }}
+      style={{ touchAction: 'none', background: '#000000', overscrollBehavior: 'none' }}
     >
       {/* Layer 1: Mock app content (z-0) */}
       <div
@@ -433,18 +432,12 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
           text={phaseConfig.tooltipText}
           description={phaseConfig.tooltipDescription}
           phase={phase}
+          stepNumber={phaseIndex + 1}
+          totalSteps={totalPhases}
         />
       </div>
 
-      {/* Layer 6b: Progress bar (z-55) — top margin clears Dynamic Island on iPhone */}
-      <div className="absolute left-0 right-0" style={{ zIndex: 55, top: 48 }}>
-        <div className="h-[3px] bg-white/10">
-          <div
-            className="h-full bg-[#417394] transition-all duration-500 ease-out"
-            style={{ width: `${progressFraction * 100}%` }}
-          />
-        </div>
-      </div>
+      {/* Progress bar removed — step counter now shown inside tooltip */}
 
       {/* Layer 7: Bottom action bar (z-60) — gradient fade from transparent to black */}
       <div
@@ -455,108 +448,86 @@ export function TutorialShell({ onComplete }: TutorialShellProps) {
         className="flex items-center gap-3 px-4 pb-4 pt-8"
         style={{ background: 'linear-gradient(to bottom, transparent, #000000 40%)' }}
       >
-        {isContinuePhase ? (
-          /* Continue/Done phase — single wide button, centered, accent-tinted material */
-          <button
-            onClick={handleContinue}
-            className="ultra-thin-material mx-auto flex items-center justify-center gap-2 font-mohave font-medium text-[16px] tracking-wide
-                       transition-all duration-200 hover:brightness-125 hover:scale-[1.02] active:scale-[0.98]"
-            style={{
-              width: '70%',
-              paddingTop: 14,
-              paddingBottom: 14,
-              borderRadius: 5,
-              backgroundColor: 'rgba(65, 115, 148, 0.35)',
-              border: '1px solid rgba(65, 115, 148, 0.5)',
-              boxShadow: '0 0 12px rgba(65, 115, 148, 0.4), 0 0 24px rgba(65, 115, 148, 0.2)',
-              color: '#FFFFFF',
-            }}
-          >
-            <span>{continueLabel}</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-white">
-              <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-        ) : (
-          /* Action phase — back + disabled continue + skip */
-          <>
-            {/* Back button */}
+        {/* Back button — always visible */}
+        <button
+          onClick={() => {
+            setDragAnimStarted(false)
+            setDragAnimLanded(false)
+            setClosedSheetOpen(false)
+            setClosedSheetReady(false)
+            goBack()
+          }}
+          disabled={phaseIndex <= 0}
+          className="ultra-thin-material font-mohave font-medium text-[14px] uppercase tracking-wider
+                     transition-all duration-200 hover:brightness-125 hover:scale-[1.02] active:scale-[0.98]
+                     disabled:hover:brightness-100 disabled:hover:scale-100"
+          style={{
+            flex: 3,
+            paddingTop: 14,
+            paddingBottom: 14,
+            borderRadius: 5,
+            backgroundColor: 'rgba(255,255,255,0.08)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            color: phaseIndex > 0 ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.15)',
+            cursor: phaseIndex > 0 ? 'pointer' : 'default',
+          }}
+        >
+          BACK
+        </button>
+
+        {/* Continue button — solid blue when active, greyed out otherwise */}
+        {(() => {
+          const continueActive = isContinuePhase || (phase === 'projectFormName' && projectName.length >= 15)
+          return (
             <button
-              onClick={() => {
-                setDragAnimStarted(false)
-                setDragAnimLanded(false)
-                setClosedSheetOpen(false)
-                setClosedSheetReady(false)
-                goBack()
-              }}
-              disabled={phaseIndex <= 0}
-              className="ultra-thin-material font-mohave font-medium text-[14px] uppercase tracking-wider
-                         transition-all duration-200 hover:brightness-125 hover:scale-[1.02] active:scale-[0.98]
-                         disabled:hover:brightness-100 disabled:hover:scale-100"
+              disabled={!continueActive}
+              onClick={continueActive ? handleContinue : undefined}
+              className={`font-mohave font-medium text-[16px] tracking-wide flex items-center justify-center gap-2
+                ${continueActive ? 'transition-all duration-200 hover:brightness-110 hover:scale-[1.02] active:scale-[0.98]' : 'ultra-thin-material'}`}
               style={{
-                flex: 3,
+                flex: 4,
                 paddingTop: 14,
                 paddingBottom: 14,
                 borderRadius: 5,
-                backgroundColor: 'rgba(255,255,255,0.08)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                color: phaseIndex > 0 ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.15)',
-                cursor: phaseIndex > 0 ? 'pointer' : 'default',
+                backgroundColor: continueActive ? '#417394' : undefined,
+                border: continueActive
+                  ? '1px solid rgba(65, 115, 148, 0.8)'
+                  : '1px solid rgba(255,255,255,0.05)',
+                boxShadow: continueActive
+                  ? '0 0 16px rgba(65, 115, 148, 0.6), 0 0 32px rgba(65, 115, 148, 0.3), 0 0 48px rgba(65, 115, 148, 0.15)'
+                  : 'none',
+                color: continueActive ? '#FFFFFF' : 'rgba(255,255,255,0.2)',
+                cursor: continueActive ? 'pointer' : 'default',
+                transition: 'all 0.3s ease',
               }}
             >
-              BACK
+              <span>{continueActive ? continueLabel : 'CONTINUE'}</span>
+              {continueActive && (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-white">
+                  <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
             </button>
+          )
+        })()}
 
-            {/* Continue button — active during projectFormName (after typewriter), greyed out otherwise */}
-            {(() => {
-              const continueActive = phase === 'projectFormName' && projectName.length >= 15
-              return (
-                <button
-                  disabled={!continueActive}
-                  onClick={continueActive ? handleContinue : undefined}
-                  className={`ultra-thin-material font-mohave font-medium text-[16px] tracking-wide
-                    ${continueActive ? 'transition-all duration-200 hover:brightness-125 hover:scale-[1.02] active:scale-[0.98]' : ''}`}
-                  style={{
-                    flex: 4,
-                    paddingTop: 14,
-                    paddingBottom: 14,
-                    borderRadius: 5,
-                    backgroundColor: continueActive ? 'rgba(65, 115, 148, 0.35)' : undefined,
-                    border: continueActive
-                      ? '1px solid rgba(65, 115, 148, 0.5)'
-                      : '1px solid rgba(255,255,255,0.05)',
-                    boxShadow: continueActive
-                      ? '0 0 12px rgba(65, 115, 148, 0.4), 0 0 24px rgba(65, 115, 148, 0.2)'
-                      : 'none',
-                    color: continueActive ? '#FFFFFF' : 'rgba(255,255,255,0.2)',
-                    cursor: continueActive ? 'pointer' : 'default',
-                    transition: 'all 0.3s ease',
-                  }}
-                >
-                  CONTINUE
-                </button>
-              )
-            })()}
-
-            {/* Skip step button */}
-            <button
-              onClick={() => advance()}
-              className="ultra-thin-material font-mohave font-medium text-[14px] uppercase tracking-wider
-                         transition-all duration-200 hover:brightness-125 hover:scale-[1.02] active:scale-[0.98]"
-              style={{
-                flex: 3,
-                paddingTop: 14,
-                paddingBottom: 14,
-                borderRadius: 5,
-                backgroundColor: 'rgba(255,255,255,0.08)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                color: 'rgba(255,255,255,0.6)',
-              }}
-            >
-              SKIP
-            </button>
-          </>
-        )}
+        {/* Skip button — always visible */}
+        <button
+          onClick={() => advance()}
+          className="ultra-thin-material font-mohave font-medium text-[14px] uppercase tracking-wider
+                     transition-all duration-200 hover:brightness-125 hover:scale-[1.02] active:scale-[0.98]"
+          style={{
+            flex: 3,
+            paddingTop: 14,
+            paddingBottom: 14,
+            borderRadius: 5,
+            backgroundColor: 'rgba(255,255,255,0.08)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            color: 'rgba(255,255,255,0.6)',
+          }}
+        >
+          SKIP
+        </button>
       </div>
       </div>
     </div>

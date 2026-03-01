@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ProjectFolder } from './ProjectFolder'
 import { TaskFolder } from './TaskFolder'
@@ -9,6 +9,7 @@ import { TypewriterText } from '@/components/ui/TypewriterText'
 
 interface Sequence3Props {
   onComplete: () => void
+  skipToEnd?: boolean
 }
 
 const STATUS_ORDER = ['rfq', 'estimated', 'accepted', 'inProgress', 'completed', 'closed'] as const
@@ -70,7 +71,7 @@ function CheckmarkOverlay({ color, centerY = '50%' }: { color: string; centerY?:
   )
 }
 
-export function Sequence3({ onComplete }: Sequence3Props) {
+export function Sequence3({ onComplete, skipToEnd }: Sequence3Props) {
   // Carousel state
   const [carouselVisible, setCarouselVisible] = useState(false)
   const [currentStatusIndex, setCurrentStatusIndex] = useState(0)
@@ -93,11 +94,14 @@ export function Sequence3({ onComplete }: Sequence3Props) {
   const [folderDissolving, setFolderDissolving] = useState(false)
   const [showFinalMessage, setShowFinalMessage] = useState(false)
 
+  const timersRef = useRef<NodeJS.Timeout[]>([])
+
   const currentStatus = STATUS_ORDER[currentStatusIndex]
   const folderColor = STATUS_COLORS[currentStatus] ?? '#FFFFFF'
 
   useEffect(() => {
     const timers: NodeJS.Timeout[] = []
+    timersRef.current = timers
     let t = 0
 
     // 1. Carousel appears, spins to IN PROGRESS (index 3) with slot-machine feel
@@ -208,6 +212,22 @@ export function Sequence3({ onComplete }: Sequence3Props) {
 
     return () => timers.forEach(clearTimeout)
   }, [onComplete])
+
+  // Skip to final frame
+  useEffect(() => {
+    if (!skipToEnd) return
+    timersRef.current.forEach(clearTimeout)
+    setCarouselVisible(false)
+    setTasksVisible(false)
+    setTasksCollapsing(true)
+    setShowMessage1(false)
+    setShowMessage2(false)
+    setShowInvoice(false)
+    setInvoiceCollapsing(true)
+    setFolderDissolving(true)
+    setShowFinalMessage(true)
+    setCurrentStatusIndex(5) // closed
+  }, [skipToEnd])
 
   const carouselX = -(currentStatusIndex * ITEM_WIDTH + ITEM_WIDTH / 2)
 

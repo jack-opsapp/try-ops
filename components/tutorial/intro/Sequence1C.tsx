@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ProjectFolder } from './ProjectFolder'
 import { TypewriterText } from '@/components/ui/TypewriterText'
 
 interface Sequence1CProps {
   onComplete: () => void
+  skipToEnd?: boolean
 }
 
 const TASK_COLORS = {
@@ -43,16 +44,18 @@ function PhotoPlaceholders() {
   )
 }
 
-export function Sequence1C({ onComplete }: Sequence1CProps) {
+export function Sequence1C({ onComplete, skipToEnd }: Sequence1CProps) {
   const [showText, setShowText] = useState(false)
   const [folderSmall, setFolderSmall] = useState(false)
   const [visibleDetails, setVisibleDetails] = useState<number>(0)
   const [collapsing, setCollapsing] = useState(false)
   const [collapsedCount, setCollapsedCount] = useState(0)
   const [labelSettled, setLabelSettled] = useState(false)
+  const timersRef = useRef<NodeJS.Timeout[]>([])
 
   useEffect(() => {
     const timers: NodeJS.Timeout[] = []
+    timersRef.current = timers
     let t = 0
 
     // Show message
@@ -105,6 +108,18 @@ export function Sequence1C({ onComplete }: Sequence1CProps) {
 
     return () => timers.forEach(clearTimeout)
   }, [onComplete])
+
+  // Skip to final frame
+  useEffect(() => {
+    if (!skipToEnd) return
+    timersRef.current.forEach(clearTimeout)
+    setShowText(false)
+    setFolderSmall(false)
+    setCollapsing(true)
+    setCollapsedCount(7)
+    setLabelSettled(true)
+    setVisibleDetails(0)
+  }, [skipToEnd])
 
   // Determine which details are visible during collapse
   const getDetailVisible = (index: number) => {

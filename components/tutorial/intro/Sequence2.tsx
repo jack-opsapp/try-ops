@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ProjectFolder } from './ProjectFolder'
 import { OPSStyle } from '@/lib/styles/OPSStyle'
@@ -10,6 +10,7 @@ interface Sequence2Props {
   onComplete: () => void
   initialState: '2-setup' | '2-carousel' | '2-archive'
   folderLabel?: string
+  skipToEnd?: boolean
 }
 
 const STATUS_ORDER = ['rfq', 'estimated', 'accepted', 'inProgress', 'completed', 'closed'] as const
@@ -21,7 +22,7 @@ const UNIFORM_DURATION = 1200 // Same duration for all transitions
 // Each status item width in the carousel
 const ITEM_WIDTH = 250
 
-export function Sequence2({ onComplete, initialState, folderLabel }: Sequence2Props) {
+export function Sequence2({ onComplete, initialState, folderLabel, skipToEnd }: Sequence2Props) {
   const [currentStatusIndex, setCurrentStatusIndex] = useState(0)
   const [isReversing, setIsReversing] = useState(false)
   const [isArchiving, setIsArchiving] = useState(false)
@@ -30,6 +31,7 @@ export function Sequence2({ onComplete, initialState, folderLabel }: Sequence2Pr
   const [showMainText, setShowMainText] = useState(false)
   const [showChangeText, setShowChangeText] = useState(false)
   const [showArchiveText, setShowArchiveText] = useState(false)
+  const timersRef = useRef<NodeJS.Timeout[]>([])
 
   const currentStatus = STATUS_ORDER[currentStatusIndex]
   const folderColor = isArchiving && !hasReturnedFromArchive ? STATUS_COLORS.archived :
@@ -38,6 +40,7 @@ export function Sequence2({ onComplete, initialState, folderLabel }: Sequence2Pr
 
   useEffect(() => {
     const timers: NodeJS.Timeout[] = []
+    timersRef.current = timers
     let cumulativeTime = 0
 
     // Show main text
@@ -137,6 +140,20 @@ export function Sequence2({ onComplete, initialState, folderLabel }: Sequence2Pr
 
     return () => timers.forEach(clearTimeout)
   }, [onComplete])
+
+  // Skip to final frame
+  useEffect(() => {
+    if (!skipToEnd) return
+    timersRef.current.forEach(clearTimeout)
+    setShowMainText(false)
+    setShowChangeText(false)
+    setShowArchiveText(false)
+    setShowArchiveLabel(false)
+    setIsReversing(false)
+    setIsArchiving(false)
+    setHasReturnedFromArchive(true)
+    setCurrentStatusIndex(1) // estimated
+  }, [skipToEnd])
 
   // Pixel offset to center the active item at x=0
   // Each item is ITEM_WIDTH wide, item center = index * ITEM_WIDTH + ITEM_WIDTH/2

@@ -572,13 +572,8 @@ export function MockCalendar({ phase, viewMode, onToggleMonth, expansionLevel: e
   // RENDER
   // =========================================================================
 
-  // Height reserved at top for the floating tooltip (no safe area on web)
-  const TOOLTIP_TOP_INSET = 80
-
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      {/* Spacer: push content below the floating tooltip */}
-      <div style={{ height: TOOLTIP_TOP_INSET, flexShrink: 0 }} />
 
       {/* App Header - matches iOS ScheduleView / CalendarHeaderView */}
       <div className="flex items-center justify-between" style={{ padding: '12px 20px 0' }}>
@@ -748,7 +743,7 @@ export function MockCalendar({ phase, viewMode, onToggleMonth, expansionLevel: e
         <div
           className="absolute left-0 right-0 bottom-0 pointer-events-none"
           style={{
-            top: TOOLTIP_TOP_INSET + 140, // below header + toggle row
+            top: 140, // below header + toggle row
             background: 'rgba(0, 0, 0, 0.6)',
             zIndex: 5,
           }}

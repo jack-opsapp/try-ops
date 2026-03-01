@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ProjectFolder } from './ProjectFolder'
 import { TaskFolder } from './TaskFolder'
@@ -8,6 +8,7 @@ import { TypewriterText } from '@/components/ui/TypewriterText'
 
 interface Sequence1Props {
   onComplete: () => void
+  skipToEnd?: boolean
 }
 
 const GRAYSCALE = '#888888'
@@ -22,11 +23,13 @@ const TASK_POSITIONS = [
 // How far the project folder shifts down when tasks emerge
 const FOLDER_SHIFT_Y = 65
 
-export function Sequence1({ onComplete }: Sequence1Props) {
+export function Sequence1({ onComplete, skipToEnd }: Sequence1Props) {
   const [step, setStep] = useState(0)
+  const timersRef = useRef<NodeJS.Timeout[]>([])
 
   useEffect(() => {
     const timers: NodeJS.Timeout[] = []
+    timersRef.current = timers
 
     // Step 0: Folder fades in
     timers.push(setTimeout(() => setStep(1), 1000))
@@ -45,6 +48,13 @@ export function Sequence1({ onComplete }: Sequence1Props) {
 
     return () => timers.forEach(clearTimeout)
   }, [onComplete])
+
+  // Skip to final frame when signalled
+  useEffect(() => {
+    if (!skipToEnd) return
+    timersRef.current.forEach(clearTimeout)
+    setStep(4)
+  }, [skipToEnd])
 
   const tasksVisible = step >= 3
   const textVisible = step >= 4

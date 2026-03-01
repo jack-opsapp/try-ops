@@ -179,15 +179,15 @@ export function TutorialIntroShell() {
       {showSequence && (
         <div className="absolute inset-0 flex items-center justify-center">
           {phase === 'seq1' && (
-            <Sequence1 key={seqKey} onComplete={handleSequenceComplete} />
+            <Sequence1 key={seqKey} onComplete={handleSequenceComplete} skipToEnd={sequenceState === 'complete'} />
           )}
 
           {phase === 'seq1b' && (
-            <Sequence1B key={seqKey} onComplete={handleSequenceComplete} />
+            <Sequence1B key={seqKey} onComplete={handleSequenceComplete} skipToEnd={sequenceState === 'complete'} />
           )}
 
           {phase === 'seq1c' && (
-            <Sequence1C key={seqKey} onComplete={handleSequenceComplete} />
+            <Sequence1C key={seqKey} onComplete={handleSequenceComplete} skipToEnd={sequenceState === 'complete'} />
           )}
 
           {phase === 'seq2' && (
@@ -196,11 +196,12 @@ export function TutorialIntroShell() {
               onComplete={handleSequenceComplete}
               initialState="2-setup"
               folderLabel="OFFICE REMODEL"
+              skipToEnd={sequenceState === 'complete'}
             />
           )}
 
           {phase === 'seq3' && (
-            <Sequence3 key={seqKey} onComplete={handleSequenceComplete} />
+            <Sequence3 key={seqKey} onComplete={handleSequenceComplete} skipToEnd={sequenceState === 'complete'} />
           )}
         </div>
       )}

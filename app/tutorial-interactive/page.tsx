@@ -124,7 +124,7 @@ export default function InteractiveTutorialPage() {
 
   // Interactive tutorial
   return (
-    <div className="h-screen bg-ops-background overflow-hidden flex items-center justify-center">
+    <div className="h-screen bg-ops-background overflow-hidden flex items-center justify-center" style={{ overscrollBehavior: 'none', touchAction: 'none' }}>
       {/* iPhone frame — only visible on desktop (md+) */}
       <div
         className="relative w-full overflow-hidden

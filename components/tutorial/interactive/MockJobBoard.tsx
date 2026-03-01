@@ -131,10 +131,7 @@ function MockSectionSelector({ selected, animateToProjects }: { selected: Sectio
 // MAIN COMPONENT
 // =============================================================================
 
-// Height reserved at top for the floating tooltip (no safe area on web)
-// iOS has ~47px safe area that pushes content below the tooltip naturally.
-// On web we must add this padding explicitly.
-const TOOLTIP_TOP_INSET = 80
+// No top inset — tooltip floats above content at z-50, content starts at top
 
 export function MockJobBoard({ phase, userProject, onSwipeComplete, onClosedSectionViewed, startDragAnimation, onDragAnimationDone }: MockJobBoardProps) {
   const isDashboardView = DASHBOARD_PHASES.includes(phase)
@@ -145,8 +142,6 @@ export function MockJobBoard({ phase, userProject, onSwipeComplete, onClosedSect
 
   return (
     <div className="flex-1 overflow-hidden relative flex flex-col">
-      {/* Spacer: push content below the floating tooltip */}
-      <div style={{ height: TOOLTIP_TOP_INSET, flexShrink: 0 }} />
 
       {viewMode === 'dashboard' ? (
         <DashboardView phase={phase} userProject={userProject} startDragAnimation={startDragAnimation} onDragAnimationDone={onDragAnimationDone} />
@@ -335,6 +330,12 @@ function DashboardView({
           {columns.map((status) => {
             const colProjects = groups[status]
             const isAcceptedCol = status === 'accepted'
+            // Allow glow to extend above column header when user card has active glow
+            const hasUserCard = colProjects.some(p => userProject && p.id === userProject.id)
+            const hasActiveGlow = hasUserCard && phase === 'dragToAccepted' && (
+              (!cardLifted && dragAnimPhase !== 'landed') || // pre-drag glow on estimated
+              (dragAnimPhase === 'landed' && showStatusGlow) // post-drag glow on accepted
+            )
             return (
               <div
                 key={status}
@@ -344,6 +345,7 @@ function DashboardView({
                   flexShrink: 0,
                   paddingLeft: 6,
                   paddingRight: 6,
+                  overflow: hasActiveGlow ? 'visible' : undefined,
                 }}
               >
                 {/* Left + right 1px separator borders */}
@@ -399,7 +401,7 @@ function DashboardView({
 
                 {/* Project cards list */}
                 <div
-                  className="flex-1 overflow-y-auto px-3 pb-4"
+                  className={`flex-1 px-3 pb-4 ${hasActiveGlow ? '' : 'overflow-y-auto'}`}
                   style={{ gap: 10, display: 'flex', flexDirection: 'column', position: 'relative', zIndex: 2 }}
                 >
                   {colProjects.map(project => {
@@ -628,9 +630,6 @@ export function ClosedProjectsSheet({
         animation: 'sheetSlideUp 0.35s cubic-bezier(0.32, 0.72, 0, 1)',
       }}
     >
-      {/* Spacer for tooltip above */}
-      <div style={{ height: 80, flexShrink: 0 }} />
-
       {/* Header — bodyBold = Mohave-Medium 16pt, centered title */}
       <div
         className="flex items-center justify-center flex-shrink-0"

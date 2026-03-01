@@ -7,9 +7,11 @@ interface CollapsibleTooltipProps {
   text: string
   description: string
   phase: TutorialPhase
+  stepNumber?: number
+  totalSteps?: number
 }
 
-export function CollapsibleTooltip({ text, description, phase }: CollapsibleTooltipProps) {
+export function CollapsibleTooltip({ text, description, phase, stepNumber, totalSteps }: CollapsibleTooltipProps) {
   const [collapsed, setCollapsed] = useState(false)
   const [displayTitle, setDisplayTitle] = useState('')
   const [displayDesc, setDisplayDesc] = useState('')
@@ -114,13 +116,20 @@ export function CollapsibleTooltip({ text, description, phase }: CollapsibleTool
 
           {/* Text content */}
           <div className="flex-1 min-w-0">
-            {/* Title: bodyBold (Mohave Medium 16pt) */}
-            <p className="font-mohave font-medium text-[16px] text-white leading-tight">
-              {displayTitle}
-              {!titleDone && (
-                <span className="animate-cursor-blink text-ops-accent">|</span>
+            {/* Title row: title + step counter */}
+            <div className="flex items-center justify-between gap-2">
+              <p className="font-mohave font-medium text-[16px] text-white leading-tight">
+                {displayTitle}
+                {!titleDone && (
+                  <span className="animate-cursor-blink text-ops-accent">|</span>
+                )}
+              </p>
+              {stepNumber != null && totalSteps != null && (
+                <span className="font-kosugi text-[12px] text-ops-text-secondary flex-shrink-0">
+                  {stepNumber}/{totalSteps}
+                </span>
               )}
-            </p>
+            </div>
 
             {/* Description: caption (Kosugi 14pt), secondaryText */}
             {titleDone && description && (

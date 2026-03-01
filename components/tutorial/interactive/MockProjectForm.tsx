@@ -477,13 +477,15 @@ export function MockProjectForm({
                       borderRadius: 5,
                       background: isFieldActive('addTask') ? 'rgba(13,13,13,1)' : 'rgba(13,13,13,1)',
                       border: isFieldActive('addTask')
-                        ? '2px solid rgba(65, 115, 148, 0.5)'
+                        ? '2px solid rgba(65, 115, 148, 0.7)'
                         : '2px dashed rgba(65, 115, 148, 0.3)',
                       cursor: isFieldActive('addTask') ? 'pointer' : 'default',
                       opacity: isFieldActive('addTask') ? 1 : 0.5,
                       transition: 'all 0.3s ease',
                       ...(isFieldActive('addTask') ? {
-                        animation: 'tutorial-pulse-ring 2s ease-in-out infinite',
+                        boxShadow: '0 0 12px rgba(65, 115, 148, 0.5), 0 0 24px rgba(65, 115, 148, 0.25), 0 0 40px rgba(65, 115, 148, 0.1)',
+                        animation: 'statusBadgeGlow 1.5s ease-in-out infinite',
+                        color: '#417394',
                       } : {}),
                     }}
                   >
