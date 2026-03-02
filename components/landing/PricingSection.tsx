@@ -1,12 +1,12 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { z } from 'zod'
 import { Button } from '@/components/shared/Button'
 import { Carousel } from '@/components/shared/Carousel'
+import { PricingSectionPropsSchema } from '@/lib/ab/types'
 
-interface PricingSectionProps {
-  onDownloadClick: () => void
-}
+type PricingSectionProps = z.infer<typeof PricingSectionPropsSchema>
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -143,7 +143,11 @@ function PricingCard({ tier, onCTAClick }: { tier: typeof tiers[number]; onCTACl
   )
 }
 
-export function PricingSection({ onDownloadClick }: PricingSectionProps) {
+export function PricingSection({ heading, subtext }: PricingSectionProps) {
+  function handleDownloadClick() {
+    window.open('https://apps.apple.com/us/app/ops-job-crew-management/id6746662078', '_blank')
+  }
+
   return (
     <section id="pricing" className="py-6 lg:py-[120px] snap-start snap-always">
       <div className="max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10">
@@ -157,14 +161,14 @@ export function PricingSection({ onDownloadClick }: PricingSectionProps) {
           className="font-mohave font-bold text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-2 lg:mb-3"
           {...fadeInUp}
         >
-          START FREE. UPGRADE WHEN YOU&apos;RE READY.
+          {heading ?? "START FREE. UPGRADE WHEN YOU\u2019RE READY."}
         </motion.h2>
 
         <motion.p
           className="font-kosugi text-[14px] lg:text-[16px] text-ops-gray-300 mb-4 lg:mb-16"
           {...fadeInUp}
         >
-          No credit card. No commitment. Cancel anytime.
+          {subtext ?? 'No credit card. No commitment. Cancel anytime.'}
         </motion.p>
       </div>
 
@@ -180,14 +184,14 @@ export function PricingSection({ onDownloadClick }: PricingSectionProps) {
                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: i * 0.1 }}
                 viewport={{ once: true, amount: 0.2 }}
               >
-                <PricingCard tier={tier} onCTAClick={onDownloadClick} />
+                <PricingCard tier={tier} onCTAClick={handleDownloadClick} />
               </motion.div>
             ))}
           </div>
           <div className="lg:hidden">
             <Carousel gap={16}>
               {tiers.map((tier) => (
-                <PricingCard key={tier.name} tier={tier} onCTAClick={onDownloadClick} />
+                <PricingCard key={tier.name} tier={tier} onCTAClick={handleDownloadClick} />
               ))}
             </Carousel>
           </div>
