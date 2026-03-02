@@ -179,11 +179,6 @@ export default function LandingPage() {
     router.push('/tutorial-intro')
   }, [trackLandingCTAClick, getScrollDepth, getTimeOnPage, setTutorialStartTime, router])
 
-  const handlePricingDownloadClick = useCallback(() => {
-    trackLandingCTAClick('primary', 'GET STARTED', 'pricing', getScrollDepth(), getTimeOnPage())
-    router.push('/signup/credentials')
-  }, [trackLandingCTAClick, getScrollDepth, getTimeOnPage, router])
-
   const handleInlineSignup = useCallback(() => {
     setTutorialStartTime(Date.now())
     router.push('/tutorial-intro')
@@ -242,11 +237,72 @@ export default function LandingPage() {
 
       <div className="border-t border-ops-border-emphasis mx-6 md:mx-6 lg:mx-10" />
 
-      <PainSection />
+      <PainSection
+        heading="YOU'RE EITHER DROWNING IN CHAOS OR PAYING FOR SOFTWARE NOBODY USES"
+        cards={[
+          {
+            id: 'messages',
+            title: 'GROUP TEXT HELL',
+            bullets: [
+              '"What\'s the address?"',
+              '"Who\'s going where?"',
+              '"Did anyone update the client?"',
+              'Messages lost in scroll',
+            ],
+            forLine: 'For 1-10 person crews with no software',
+          },
+          {
+            id: 'dashboard',
+            title: 'ENTERPRISE OVERKILL',
+            bullets: [
+              'Training takes days',
+              'Features you\'ll never use',
+              '"It\'s just somewhat complicated"',
+              'Your crew avoids opening it',
+            ],
+            forLine: 'For crews who tried Jobber/ServiceTitan and it\'s too much',
+          },
+          {
+            id: 'scattered',
+            title: 'TOOL SPRAWL',
+            bullets: [
+              'Spreadsheets for scheduling',
+              'Whiteboard for crew assignments',
+              'Group texts for updates',
+              'Sticky notes for everything else',
+            ],
+            forLine: 'For operations duct-taping manual solutions together',
+          },
+        ]}
+      />
 
       <div className="border-t border-ops-border-emphasis mx-6 md:mx-6 lg:mx-10" />
 
-      <SolutionSection />
+      <SolutionSection
+        heading="BUILT BY SOMEONE WHO ACTUALLY RUNS CREWS"
+        features={[
+          {
+            title: 'NO TRAINING REQUIRED',
+            copy: 'Your crew opens it once. They see their jobs. They know what to do. That\'s it.',
+            why: 'Every other tool requires days of training. Your guys won\'t use software they don\'t understand. OPS is obvious from the first tap.',
+          },
+          {
+            title: 'PHOTO DOCUMENTATION THAT WORKS',
+            copy: 'Before/after shots. Progress updates. Damage documentation. Markup with arrows and notes. All organized by job.',
+            why: 'No more hunting through text chains for that one photo. Everything lives with the job it belongs to.',
+          },
+          {
+            title: 'A SCHEDULE YOUR CREW ACTUALLY READS',
+            copy: 'An intuitive job board and clean daily schedule. Your crew sees what\'s coming up, who\'s assigned where, and what needs to get done — all in one glance.',
+            why: 'No more morning phone calls asking "where am I going today?" Your crew opens the app and they\'re read in.',
+          },
+          {
+            title: 'DIRECT LINE TO THE BUILDER',
+            copy: 'Missing a feature? Speak directly to the founder. We listen. We build what you actually need.',
+            why: 'No support tickets. No chatbots. You talk to the person who built it and uses it every day.',
+          },
+        ]}
+      />
 
       <div className="border-t border-ops-border-emphasis mx-6 md:mx-6 lg:mx-10" />
 
@@ -281,13 +337,45 @@ export default function LandingPage() {
 
       <div className="border-t border-ops-border-emphasis mx-6 md:mx-6 lg:mx-10" />
 
-      <PricingSection
-        onDownloadClick={handlePricingDownloadClick}
-      />
+      <PricingSection />
 
       <div className="border-t border-ops-border-emphasis mx-6 md:mx-6 lg:mx-10" />
 
-      <FAQSection onFAQToggle={handleFAQToggle} />
+      <FAQSection
+        faqs={[
+          {
+            question: 'Why should I switch from Jobber?',
+            answer:
+              "Honestly? If Jobber works for you and your crew uses it, don't switch. OPS is for crews who tried Jobber and found it too complicated, or who are still using group texts and need something simple.",
+          },
+          {
+            question: "What if you're missing a feature I need?",
+            answer:
+              "Tell me. If it makes sense for crews like yours, we'll build it. We're not trying to be everything to everyone - we're building exactly what field crews need, in the order they need it.",
+          },
+          {
+            question: "How do I know you won't shut down?",
+            answer:
+              "Fair question. Here's the honest answer: I built this because I needed it. It's solving my problem and yours. I'm not going anywhere. Month-to-month pricing means no risk for you. Your data exports anytime.",
+          },
+          {
+            question: 'Can my crew actually use this without training?',
+            answer:
+              "Download it right now. Open it. If you can't figure out how to create a job in 60 seconds, it failed. That's the standard.",
+          },
+          {
+            question: 'Can I import my Jobber data?',
+            answer:
+              "Manual import available now with our help. One-click import coming Q3 2026. Either way, you don't lose your history.",
+          },
+          {
+            question: 'Why should I try the tutorial first?',
+            answer:
+              "Two reasons: (1) You see exactly how OPS works before downloading anything. (2) You stay warm through the download - when you open the app, you already know what you're doing. Users who complete the tutorial are significantly more likely to become active users.",
+          },
+        ]}
+        onFAQToggle={handleFAQToggle}
+      />
 
       <div className="border-t border-ops-border-emphasis mx-6 md:mx-6 lg:mx-10" />
 
