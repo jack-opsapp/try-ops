@@ -7,6 +7,8 @@ import { RoadmapSection } from '@/components/landing/RoadmapSection'
 import { PricingSection } from '@/components/landing/PricingSection'
 import { FAQSection } from '@/components/landing/FAQSection'
 import { ClosingCTA } from '@/components/landing/ClosingCTA'
+import { DesktopDownload } from '@/components/landing/DesktopDownload'
+import { InlineSignupForm } from '@/components/landing/InlineSignupForm'
 import type { SectionType } from '@/lib/ab/types'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -19,4 +21,6 @@ export const SECTION_REGISTRY: Record<SectionType, React.ComponentType<any>> = {
   PricingSection,
   FAQSection,
   ClosingCTA,
+  DesktopDownload,
+  InlineSignupForm,
 }

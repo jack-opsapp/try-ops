@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
+import { z } from 'zod'
+import { DesktopDownloadPropsSchema } from '@/lib/ab/types'
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -11,7 +13,7 @@ const fadeInUp = {
   viewport: { once: true, amount: 0.2 },
 }
 
-export function DesktopDownload() {
+export function DesktopDownload({ heading }: z.infer<typeof DesktopDownloadPropsSchema>) {
   const [phone, setPhone] = useState('')
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [errorDetail, setErrorDetail] = useState('')
@@ -48,7 +50,7 @@ export function DesktopDownload() {
         {...fadeInUp}
       >
         <h2 className="font-mohave font-bold text-[32px] text-ops-gray-50 uppercase tracking-[0.05em] mb-10">
-          GET OPS ON YOUR PHONE
+          {heading ?? 'GET OPS ON YOUR PHONE'}
         </h2>
 
         <div className="flex items-start justify-center gap-12">

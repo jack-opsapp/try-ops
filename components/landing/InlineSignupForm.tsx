@@ -5,13 +5,14 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { useAnalytics } from '@/lib/hooks/useAnalytics'
+import { z } from 'zod'
+import { InlineSignupFormPropsSchema } from '@/lib/ab/types'
 
-interface InlineSignupFormProps {
+type InlineSignupFormProps = z.infer<typeof InlineSignupFormPropsSchema> & {
   onSuccess?: () => void
-  location: string
 }
 
-export function InlineSignupForm({ onSuccess, location }: InlineSignupFormProps) {
+export function InlineSignupForm({ onSuccess, location, heading: _heading, subtext: _subtext }: InlineSignupFormProps) {
   const router = useRouter()
   const setAuth = useOnboardingStore((s) => s.setAuth)
   const setTutorialStartTime = useOnboardingStore((s) => s.setTutorialStartTime)

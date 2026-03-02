@@ -65,6 +65,16 @@ export const ClosingCTAPropsSchema = z.object({
   secondaryCtaLabel: z.string(),
 })
 
+export const DesktopDownloadPropsSchema = z.object({
+  heading: z.string().optional(),
+})
+
+export const InlineSignupFormPropsSchema = z.object({
+  heading: z.string().optional(),
+  subtext: z.string().optional(),
+  location: z.string(),
+})
+
 // ── Section type registry ─────────────────────────────────────────────────
 export const SECTION_TYPES = [
   'Hero',
@@ -75,6 +85,8 @@ export const SECTION_TYPES = [
   'PricingSection',
   'FAQSection',
   'ClosingCTA',
+  'DesktopDownload',
+  'InlineSignupForm',
 ] as const
 
 export type SectionType = typeof SECTION_TYPES[number]
@@ -88,6 +100,8 @@ export const SectionSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('PricingSection'), props: PricingSectionPropsSchema }),
   z.object({ type: z.literal('FAQSection'), props: FAQSectionPropsSchema }),
   z.object({ type: z.literal('ClosingCTA'), props: ClosingCTAPropsSchema }),
+  z.object({ type: z.literal('DesktopDownload'), props: DesktopDownloadPropsSchema }),
+  z.object({ type: z.literal('InlineSignupForm'), props: InlineSignupFormPropsSchema }),
 ])
 
 export const VariantConfigSchema = z.object({

@@ -12,6 +12,10 @@ export const SEED_CONFIG_A: VariantConfig = {
       },
     },
     {
+      type: 'DesktopDownload',
+      props: {},
+    },
+    {
       type: 'PainSection',
       props: {
         cards: [
@@ -69,6 +73,10 @@ export const SEED_CONFIG_A: VariantConfig = {
     {
       type: 'PricingSection',
       props: {},
+    },
+    {
+      type: 'InlineSignupForm',
+      props: { location: 'mid-page' },
     },
     {
       type: 'FAQSection',
