@@ -52,6 +52,13 @@ export const SEED_CONFIG_A: VariantConfig = {
       },
     },
     {
+      type: 'Starburst',
+      props: {
+        leftText: 'COMMAND',
+        rightText: 'CHAOS',
+      },
+    },
+    {
       type: 'TestimonialsSection',
       props: {
         testimonials: [
