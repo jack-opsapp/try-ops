@@ -16,7 +16,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const supabase = getABSupabase()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabase = getABSupabase() as any
 
   const { data: test } = await supabase
     .from('ab_tests')
