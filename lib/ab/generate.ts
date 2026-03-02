@@ -1,4 +1,5 @@
 import OpenAI from 'openai'
+import { ZodError } from 'zod'
 import { VariantConfigSchema, SECTION_TYPES, type VariantConfig } from '@/lib/ab/types'
 import type { VariantSummary } from '@/lib/ab/aggregator'
 
@@ -66,28 +67,37 @@ LOSER (variant ${loser.slot}, generation ${loser.generation}):
 
 Generate a new challenger landing page config that learns from this data. Think carefully about which sections held attention (high dwell, high % viewers) and which didn't. Try a meaningfully different approach — not just minor copy tweaks.`
 
-  async function attempt(): Promise<GenerationResult> {
-    const response = await client.chat.completions.create({
-      model: 'gpt-4o',
-      max_tokens: 4096,
-      temperature: 0.8,
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT(brandContext) },
-        { role: 'user', content: userPrompt },
-      ],
-    })
+  const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
+    { role: 'system', content: SYSTEM_PROMPT(brandContext) },
+    { role: 'user', content: userPrompt },
+  ]
 
-    const text = response.choices[0]?.message?.content ?? ''
-    const parsed = JSON.parse(text)
-    const validated = VariantConfigSchema.parse(parsed.config)
-
-    return { config: validated, reasoning: String(parsed.reasoning) }
+  let lastErr: unknown
+  for (let i = 0; i < 3; i++) {
+    if (i > 0) await new Promise(r => setTimeout(r, 1000 * i))
+    let assistantText = ''
+    try {
+      const response = await client.chat.completions.create({
+        model: 'gpt-4o',
+        max_tokens: 4096,
+        temperature: 0.8,
+        messages,
+      })
+      assistantText = response.choices[0]?.message?.content ?? ''
+      const parsed = JSON.parse(assistantText)
+      const validated = VariantConfigSchema.parse(parsed.config)
+      return { config: validated, reasoning: String(parsed.reasoning) }
+    } catch (err) {
+      lastErr = err
+      console.error(`Generation attempt ${i + 1} failed:`, err)
+      // Feed Zod errors back so the model can self-correct
+      if (err instanceof ZodError && i < 2 && assistantText) {
+        messages.push(
+          { role: 'assistant', content: assistantText },
+          { role: 'user', content: `Your JSON failed schema validation. Fix these errors and output valid JSON only:\n${err.message}` }
+        )
+      }
+    }
   }
-
-  try {
-    return await attempt()
-  } catch (err) {
-    console.error('First generation attempt failed:', err)
-    return await attempt()
-  }
+  throw lastErr
 }

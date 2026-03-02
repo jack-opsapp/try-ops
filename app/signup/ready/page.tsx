@@ -71,6 +71,22 @@ export default function ReadyPage() {
         setSignupCompleted()
         trackSignupStepComplete('ready', 6)
         trackSignupComplete(authMethod || 'email')
+
+        // A/B conversion event — fire-and-forget
+        const abVariantId = sessionStorage.getItem('ops_ab_variant')
+        const abSessionId = sessionStorage.getItem('ops_ab_session')
+        if (abVariantId && abSessionId) {
+          fetch('/api/ab-events', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              variant_id: abVariantId,
+              session_id: abSessionId,
+              event_type: 'signup_complete',
+            }),
+            keepalive: true,
+          }).catch(() => {})
+        }
       } catch {
         // Non-critical, continue anyway
       }

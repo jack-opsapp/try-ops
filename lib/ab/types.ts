@@ -75,6 +75,11 @@ export const InlineSignupFormPropsSchema = z.object({
   location: z.string(),
 })
 
+export const StarburstPropsSchema = z.object({
+  leftText: z.string().optional(),
+  rightText: z.string().optional(),
+})
+
 // ── Section type registry ─────────────────────────────────────────────────
 export const SECTION_TYPES = [
   'Hero',
@@ -87,6 +92,7 @@ export const SECTION_TYPES = [
   'ClosingCTA',
   'DesktopDownload',
   'InlineSignupForm',
+  'Starburst',
 ] as const
 
 export type SectionType = typeof SECTION_TYPES[number]
@@ -102,10 +108,11 @@ export const SectionSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('ClosingCTA'), props: ClosingCTAPropsSchema }),
   z.object({ type: z.literal('DesktopDownload'), props: DesktopDownloadPropsSchema }),
   z.object({ type: z.literal('InlineSignupForm'), props: InlineSignupFormPropsSchema }),
+  z.object({ type: z.literal('Starburst'), props: StarburstPropsSchema }),
 ])
 
 export const VariantConfigSchema = z.object({
-  sections: z.array(SectionSchema).min(1).max(10),
+  sections: z.array(SectionSchema).min(1).max(12),
 })
 
 export type VariantConfig = z.infer<typeof VariantConfigSchema>

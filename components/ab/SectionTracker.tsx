@@ -6,10 +6,9 @@ interface Props {
   children: React.ReactNode
   sectionName: string
   variantId: string
-  sessionId: string
 }
 
-export function SectionTracker({ children, sectionName, variantId, sessionId }: Props) {
+export function SectionTracker({ children, sectionName, variantId }: Props) {
   const ref = useRef<HTMLDivElement>(null)
   const entryTimeRef = useRef<number | null>(null)
 
@@ -21,7 +20,6 @@ export function SectionTracker({ children, sectionName, variantId, sessionId }: 
       ([entry]) => {
         if (entry.isIntersecting) {
           entryTimeRef.current = Date.now()
-          fireEvent('section_view', { section_name: sectionName })
         } else if (entryTimeRef.current !== null) {
           const dwell_ms = Date.now() - entryTimeRef.current
           entryTimeRef.current = null
@@ -33,9 +31,10 @@ export function SectionTracker({ children, sectionName, variantId, sessionId }: 
 
     observer.observe(el)
     return () => observer.disconnect()
-  }, [sectionName, variantId, sessionId])
+  }, [sectionName, variantId])
 
   function fireEvent(eventType: string, extra: Record<string, unknown> = {}) {
+    const sessionId = sessionStorage.getItem('ops_ab_session') ?? ''
     const utmParams = getUTMParams()
     fetch('/api/ab-events', {
       method: 'POST',

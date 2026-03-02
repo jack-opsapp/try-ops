@@ -33,6 +33,9 @@ export function LandingPageClient({ config, variantId }: Props) {
     const sid = existingId ?? crypto.randomUUID()
     if (!existingId) sessionStorage.setItem('ops_ab_session', sid)
 
+    // Persist variantId so signup flow can attribute the conversion
+    sessionStorage.setItem('ops_ab_variant', variantId)
+
     const params = new URLSearchParams(window.location.search)
     const utmSource = params.get('utm_source')
     const utmMedium = params.get('utm_medium')
@@ -109,8 +112,6 @@ export function LandingPageClient({ config, variantId }: Props) {
 
   // ── Render ────────────────────────────────────────────────────────────────
 
-  const sessionId = typeof window !== 'undefined' ? (sessionStorage.getItem('ops_ab_session') ?? '') : ''
-
   return (
     <main className="relative bg-ops-background min-h-screen snap-y snap-mandatory overflow-y-auto overflow-x-hidden h-screen md:h-auto md:overflow-visible md:snap-none">
       {/* Ambient edge glows */}
@@ -148,7 +149,6 @@ export function LandingPageClient({ config, variantId }: Props) {
             key={`${section.type}-${i}`}
             sectionName={section.type}
             variantId={variantId}
-            sessionId={sessionId}
           >
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             <Component {...(section.props as any)} />

@@ -9,6 +9,7 @@ import { FAQSection } from '@/components/landing/FAQSection'
 import { ClosingCTA } from '@/components/landing/ClosingCTA'
 import { DesktopDownload } from '@/components/landing/DesktopDownload'
 import { InlineSignupForm } from '@/components/landing/InlineSignupForm'
+import { Starburst } from '@/components/landing/Starburst'
 import type { SectionType } from '@/lib/ab/types'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -23,4 +24,5 @@ export const SECTION_REGISTRY: Record<SectionType, React.ComponentType<any>> = {
   ClosingCTA,
   DesktopDownload,
   InlineSignupForm,
+  Starburst,
 }

@@ -47,15 +47,10 @@ export async function POST(req: NextRequest) {
   // Mark as rotating
   await supabase.from('ab_tests').update({ status: 'rotating' }).eq('id', test.id)
 
-  const { data: varA } = await supabase.from('ab_variants').select('*').eq('id', test.variant_a_id).single()
-  const { data: varB } = await supabase.from('ab_variants').select('*').eq('id', test.variant_b_id).single()
-
-  if (!varA || !varB) {
-    await supabase.from('ab_tests').update({ status: 'active' }).eq('id', test.id)
-    return NextResponse.json({ error: 'Could not fetch variants' }, { status: 500 })
-  }
-
   try {
+    const { data: varA } = await supabase.from('ab_variants').select('*').eq('id', test.variant_a_id).single()
+    const { data: varB } = await supabase.from('ab_variants').select('*').eq('id', test.variant_b_id).single()
+    if (!varA || !varB) throw new Error('Could not fetch variants')
     const winnerSlot: 'a' | 'b' = varA.conversion_rate >= varB.conversion_rate ? 'a' : 'b'
     const winner = winnerSlot === 'a' ? varA : varB
     const loser = winnerSlot === 'a' ? varB : varA

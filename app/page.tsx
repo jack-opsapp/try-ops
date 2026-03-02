@@ -2,8 +2,6 @@ import { cookies } from 'next/headers'
 import { fetchActiveVariant } from '@/lib/ab/fetch-config'
 import { LandingPageClient } from '@/components/ab/LandingPageClient'
 
-export const revalidate = 300
-
 export default async function Page() {
   const cookieStore = await cookies()
   const slot = cookieStore.get('ops_variant')?.value === 'b' ? 'b' : 'a'
