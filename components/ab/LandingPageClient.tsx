@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { useAnalytics } from '@/lib/hooks/useAnalytics'
@@ -26,20 +26,13 @@ export function LandingPageClient({ config, variantId }: Props) {
   const setUTMData = useOnboardingStore((s) => s.setUTMData)
   const setTutorialStartTime = useOnboardingStore((s) => s.setTutorialStartTime)
 
-  const sessionIdRef = useRef<string>('')
-
-  // Stable session ID — persisted in sessionStorage for the lifetime of the tab
-  useEffect(() => {
-    let id = sessionStorage.getItem('ops_ab_session')
-    if (!id) {
-      id = crypto.randomUUID()
-      sessionStorage.setItem('ops_ab_session', id)
-    }
-    sessionIdRef.current = id
-  }, [])
-
   // Capture UTM params, fire page_view to A/B event API, and fire GA page view
   useEffect(() => {
+    // Resolve session ID inline to avoid race with a separate useEffect
+    const existingId = sessionStorage.getItem('ops_ab_session')
+    const sid = existingId ?? crypto.randomUUID()
+    if (!existingId) sessionStorage.setItem('ops_ab_session', sid)
+
     const params = new URLSearchParams(window.location.search)
     const utmSource = params.get('utm_source')
     const utmMedium = params.get('utm_medium')
@@ -75,7 +68,7 @@ export function LandingPageClient({ config, variantId }: Props) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         variant_id: variantId,
-        session_id: sessionIdRef.current,
+        session_id: sid,
         event_type: 'page_view',
         device_type: deviceType,
         referrer,
@@ -116,7 +109,7 @@ export function LandingPageClient({ config, variantId }: Props) {
 
   // ── Render ────────────────────────────────────────────────────────────────
 
-  const sessionId = sessionIdRef.current
+  const sessionId = typeof window !== 'undefined' ? (sessionStorage.getItem('ops_ab_session') ?? '') : ''
 
   return (
     <main className="relative bg-ops-background min-h-screen snap-y snap-mandatory overflow-y-auto overflow-x-hidden h-screen md:h-auto md:overflow-visible md:snap-none">
