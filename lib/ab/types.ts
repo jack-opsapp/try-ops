@@ -79,7 +79,7 @@ export const SECTION_TYPES = [
 
 export type SectionType = typeof SECTION_TYPES[number]
 
-const SectionSchema = z.discriminatedUnion('type', [
+export const SectionSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('Hero'), props: HeroPropsSchema }),
   z.object({ type: z.literal('PainSection'), props: PainSectionPropsSchema }),
   z.object({ type: z.literal('SolutionSection'), props: SolutionSectionPropsSchema }),
