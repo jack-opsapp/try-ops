@@ -21,7 +21,7 @@ export interface VariantSummary {
 }
 
 export async function aggregateVariant(variantId: string): Promise<VariantSummary> {
-  const supabase = getABSupabase()
+  const supabase = getABSupabase() as any // eslint-disable-line @typescript-eslint/no-explicit-any
 
   const { data: variant } = await supabase
     .from('ab_variants')
