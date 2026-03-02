@@ -7,6 +7,10 @@ import {
   AnimatedDashboardOverload,
   AnimatedScatteredApps,
 } from '@/components/shared/AnimatedWireframeIcon'
+import type { z } from 'zod'
+import type { PainSectionPropsSchema } from '@/lib/ab/types'
+
+type PainSectionProps = z.infer<typeof PainSectionPropsSchema>
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -15,48 +19,18 @@ const fadeInUp = {
   viewport: { once: true, amount: 0.2 },
 }
 
-const painCards = [
-  {
-    id: 'messages',
-    animatedIcon: AnimatedTangledMessages,
-    title: 'GROUP TEXT HELL',
-    bullets: [
-      '"What\'s the address?"',
-      '"Who\'s going where?"',
-      '"Did anyone update the client?"',
-      'Messages lost in scroll',
-    ],
-    forLine: 'For 1-10 person crews with no software',
-  },
-  {
-    id: 'dashboard',
-    animatedIcon: AnimatedDashboardOverload,
-    title: 'ENTERPRISE OVERKILL',
-    bullets: [
-      'Training takes days',
-      'Features you\'ll never use',
-      '"It\'s just somewhat complicated"',
-      'Your crew avoids opening it',
-    ],
-    forLine: 'For crews who tried Jobber/ServiceTitan and it\'s too much',
-  },
-  {
-    id: 'scattered',
-    animatedIcon: AnimatedScatteredApps,
-    title: 'TOOL SPRAWL',
-    bullets: [
-      'Spreadsheets for scheduling',
-      'Whiteboard for crew assignments',
-      'Group texts for updates',
-      'Sticky notes for everything else',
-    ],
-    forLine: 'For operations duct-taping manual solutions together',
-  },
-]
+// Internal map from card id to its animated icon component
+const ICON_MAP: Record<string, React.ComponentType<{ isActive: boolean; size: number }>> = {
+  messages: AnimatedTangledMessages,
+  dashboard: AnimatedDashboardOverload,
+  scattered: AnimatedScatteredApps,
+}
 
-function HoverPainCard({ card, delay }: { card: typeof painCards[number]; delay: number }) {
+type CardType = PainSectionProps['cards'][number]
+
+function HoverPainCard({ card, delay }: { card: CardType; delay: number }) {
   const [hovered, setHovered] = useState(false)
-  const AnimIcon = card.animatedIcon
+  const AnimIcon = ICON_MAP[card.id]
 
   return (
     <motion.div
@@ -70,7 +44,7 @@ function HoverPainCard({ card, delay }: { card: typeof painCards[number]; delay:
         onMouseLeave={() => setHovered(false)}
       >
         <div className="mb-4">
-          <AnimIcon isActive={hovered} size={56} />
+          {AnimIcon && <AnimIcon isActive={hovered} size={56} />}
         </div>
         <h3 className="font-mohave font-medium text-[18px] uppercase text-ops-gray-50 mb-4">
           {card.title}
@@ -88,7 +62,7 @@ function HoverPainCard({ card, delay }: { card: typeof painCards[number]; delay:
   )
 }
 
-export function PainSection() {
+export function PainSection({ heading, cards }: PainSectionProps) {
   const [activeCard, setActiveCard] = useState<string | null>(null)
   const sectionRef = useRef<HTMLElement>(null)
   const hasAutoExpanded = useRef(false)
@@ -103,14 +77,14 @@ export function PainSection() {
       ([entry]) => {
         if (entry.isIntersecting && !hasAutoExpanded.current) {
           hasAutoExpanded.current = true
-          setActiveCard(painCards[0].id)
+          setActiveCard(cards[0].id)
         }
       },
       { threshold: 0.3 }
     )
     observer.observe(section)
     return () => observer.disconnect()
-  }, [])
+  }, [cards])
 
   return (
     <section ref={sectionRef} id="pain" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
@@ -121,19 +95,21 @@ export function PainSection() {
         >
           [ THE PROBLEM ]
         </motion.p>
-        <motion.h2
-          className="font-mohave font-bold text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] max-w-[800px] mb-4 lg:mb-16"
-          {...fadeInUp}
-        >
-          YOU&apos;RE EITHER DROWNING IN CHAOS OR PAYING FOR SOFTWARE NOBODY USES
-        </motion.h2>
+        {heading && (
+          <motion.h2
+            className="font-mohave font-bold text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] max-w-[800px] mb-4 lg:mb-16"
+            {...fadeInUp}
+          >
+            {heading}
+          </motion.h2>
+        )}
 
         {/* Mobile compact grid */}
         <div className="md:hidden">
           <div className="grid grid-cols-3 gap-3 mb-6">
-            {painCards.map((card) => {
+            {cards.map((card) => {
               const isActive = activeCard === card.id
-              const AnimIcon = card.animatedIcon
+              const AnimIcon = ICON_MAP[card.id]
               return (
                 <button
                   key={card.id}
@@ -144,7 +120,7 @@ export function PainSection() {
                       : 'border-ops-border bg-ops-card/50'
                   }`}
                 >
-                  <AnimIcon isActive={isActive} size={48} />
+                  {AnimIcon && <AnimIcon isActive={isActive} size={48} />}
                   <span className="font-mohave font-medium text-[11px] uppercase text-ops-gray-200 mt-2 text-center leading-tight">
                     {card.title}
                   </span>
@@ -164,7 +140,7 @@ export function PainSection() {
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
                 className="overflow-hidden"
               >
-                {painCards
+                {cards
                   .filter((c) => c.id === activeCard)
                   .map((card) => (
                     <div
@@ -188,7 +164,7 @@ export function PainSection() {
 
         {/* Desktop full grid */}
         <div className="hidden md:grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-stretch">
-          {painCards.map((card, i) => (
+          {cards.map((card, i) => (
             <HoverPainCard key={card.title} card={card} delay={i * 0.1} />
           ))}
         </div>
