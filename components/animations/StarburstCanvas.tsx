@@ -155,7 +155,7 @@ const ACCENT = { r: 89, g: 119, b: 148 };  // #597794
 const ORANGE = { r: 214, g: 138, b: 52 };  // #D68A34
 const GREY = { r: 100, g: 100, b: 100 };   // #646464
 
-const PROMO_TEXT = 'FOR THE ONES WHO [DIG DEEPER], 10% OFF';
+const PROMO_TEXT = 'USE CODE [DIGDEEPER] FOR 10% OFF';
 
 /* ------------------------------------------------------------------ */
 /*  Scene generation (stable across frames)                            */
