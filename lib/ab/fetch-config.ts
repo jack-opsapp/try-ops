@@ -9,7 +9,7 @@ export interface ActiveVariant {
 
 export async function fetchActiveVariant(slot: 'a' | 'b'): Promise<ActiveVariant> {
   try {
-    const supabase = getABSupabase()
+    const supabase = getABSupabase() as any // eslint-disable-line @typescript-eslint/no-explicit-any
 
     const { data: test } = await supabase
       .from('ab_tests')
