@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { z } from 'zod'
+import { RoadmapSectionPropsSchema } from '@/lib/ab/types'
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -9,33 +11,6 @@ const fadeInUp = {
   transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
   viewport: { once: true, amount: 0.2 },
 }
-
-const builtItems = ['Multiple Project Tasks']
-
-const inDevItems = [
-  'Auto Time Tracking',
-  'Team Locations',
-  'Expense Tracking',
-  'Client Portal',
-  'Estimating & Invoices',
-  'Request for Google Review',
-  'Client Booking Portal',
-  'Inventory Tracking',
-]
-
-const roadmapItems = [
-  'Calendar Request System',
-  'Weather Integration',
-  'Apple Watch',
-  'Work Analytics',
-  'Project Analytics',
-  'Team Member Notes',
-  'In-App Messaging',
-  'Project Note Notifications',
-  'AI Quoting System',
-  'Apple CarPlay',
-  'QuickBooks Integration',
-]
 
 function RoadmapRow({ text, variant }: { text: string; variant: 'built' | 'indev' | 'planned' }) {
   return (
@@ -133,7 +108,9 @@ function CategoryHeader({ label, description }: { label: string; description: st
   )
 }
 
-export function RoadmapSection() {
+type RoadmapSectionProps = z.infer<typeof RoadmapSectionPropsSchema>
+
+export function RoadmapSection({ heading, builtItems, inDevItems, roadmapItems }: RoadmapSectionProps) {
   const [openSection, setOpenSection] = useState<string | null>('indev')
 
   const toggleSection = (section: string) => {
@@ -153,7 +130,7 @@ export function RoadmapSection() {
           className="font-mohave font-bold text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-2 lg:mb-3"
           {...fadeInUp}
         >
-          WE&apos;RE BUILDING WHAT YOU ACTUALLY NEED
+          {heading ?? 'WE\u2019RE BUILDING WHAT YOU ACTUALLY NEED'}
         </motion.h2>
 
         <motion.p
