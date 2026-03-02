@@ -1,14 +1,16 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useRouter } from 'next/navigation'
+import type { z } from 'zod'
+import type { HeroPropsSchema } from '@/lib/ab/types'
 import { Button } from '@/components/shared/Button'
 import { HeroAnimation } from '@/components/landing/HeroAnimation'
 import { InlineSignupForm } from '@/components/landing/InlineSignupForm'
 
-interface HeroProps {
-  onDownloadClick: () => void
-  onTryClick: () => void
-}
+type HeroProps = z.infer<typeof HeroPropsSchema>
+
+const APP_STORE_URL = 'https://apps.apple.com/us/app/ops-job-crew-management/id6746662078'
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -17,7 +19,16 @@ const fadeInUp = {
   viewport: { once: true, amount: 0.2 },
 }
 
-export function Hero({ onDownloadClick, onTryClick }: HeroProps) {
+export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel }: HeroProps) {
+  const router = useRouter()
+
+  const handleDownloadClick = () => {
+    window.open(APP_STORE_URL, '_blank')
+  }
+
+  const handleTryClick = () => {
+    router.push('/signup')
+  }
   return (
     <section id="hero" className="relative min-h-[100svh] flex items-center snap-start snap-always">
       <div className="w-full max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10 py-10 lg:py-20">
@@ -28,7 +39,7 @@ export function Hero({ onDownloadClick, onTryClick }: HeroProps) {
               className="font-mohave font-bold text-[40px] text-ops-gray-50 uppercase leading-[1.1] tracking-[0.05em] mb-4"
               {...fadeInUp}
             >
-              JOB MANAGEMENT YOUR CREW WILL ACTUALLY USE
+              {headline}
             </motion.h1>
           </div>
 
@@ -46,7 +57,7 @@ export function Hero({ onDownloadClick, onTryClick }: HeroProps) {
               className="hidden lg:block font-mohave font-bold text-[64px] text-ops-gray-50 uppercase leading-[1.1] tracking-[0.05em] max-w-[600px] mb-6"
               {...fadeInUp}
             >
-              JOB MANAGEMENT YOUR CREW WILL ACTUALLY USE
+              {headline}
             </motion.h1>
 
             <motion.p
@@ -54,7 +65,7 @@ export function Hero({ onDownloadClick, onTryClick }: HeroProps) {
               {...fadeInUp}
               transition={{ ...fadeInUp.transition, delay: 0.1 }}
             >
-              Built by trades, for trades. Your software should handle the chaos so you don&apos;t have to.
+              {subtext}
             </motion.p>
 
             {/* CTAs */}
@@ -65,22 +76,22 @@ export function Hero({ onDownloadClick, onTryClick }: HeroProps) {
             >
               <Button
                 variant="primary"
-                onClick={onDownloadClick}
+                onClick={handleDownloadClick}
                 fullWidth
                 className="sm:w-auto"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
                 </svg>
-                DOWNLOAD FREE - iOS
+                {primaryCtaLabel}
               </Button>
               <Button
                 variant="outline"
-                onClick={onTryClick}
+                onClick={handleTryClick}
                 fullWidth
                 className="sm:w-auto"
               >
-                TRY IT FIRST
+                {secondaryCtaLabel}
               </Button>
             </motion.div>
 

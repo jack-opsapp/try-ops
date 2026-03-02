@@ -179,33 +179,6 @@ export default function LandingPage() {
     router.push('/tutorial-intro')
   }, [trackLandingCTAClick, getScrollDepth, getTimeOnPage, setTutorialStartTime, router])
 
-  const handleClosingDownloadClick = useCallback(() => {
-    trackLandingCTAClick(
-      'primary',
-      'DOWNLOAD FREE',
-      'closing',
-      getScrollDepth(),
-      getTimeOnPage()
-    )
-    if (isMobile()) {
-      window.location.href = APP_STORE_URL
-    } else {
-      document.getElementById('desktop-download')?.scrollIntoView({ behavior: 'smooth' })
-    }
-  }, [trackLandingCTAClick, getScrollDepth, getTimeOnPage])
-
-  const handleClosingTryClick = useCallback(() => {
-    trackLandingCTAClick(
-      'secondary',
-      'TRY IT FIRST',
-      'closing',
-      getScrollDepth(),
-      getTimeOnPage()
-    )
-    setTutorialStartTime(Date.now())
-    router.push('/tutorial-intro')
-  }, [trackLandingCTAClick, getScrollDepth, getTimeOnPage, setTutorialStartTime, router])
-
   const handlePricingDownloadClick = useCallback(() => {
     trackLandingCTAClick('primary', 'GET STARTED', 'pricing', getScrollDepth(), getTimeOnPage())
     router.push('/signup/credentials')
@@ -253,8 +226,10 @@ export default function LandingPage() {
       />
 
       <Hero
-        onDownloadClick={handleDownloadClick}
-        onTryClick={handleTryClick}
+        headline="JOB MANAGEMENT YOUR CREW WILL ACTUALLY USE"
+        subtext="Built by trades, for trades. Your software should handle the chaos so you don't have to."
+        primaryCtaLabel="DOWNLOAD FREE - iOS"
+        secondaryCtaLabel="TRY IT FIRST"
       />
 
       <div className="border-t border-ops-border-emphasis mx-6 md:mx-6 lg:mx-10" />
@@ -317,8 +292,10 @@ export default function LandingPage() {
       <div className="border-t border-ops-border-emphasis mx-6 md:mx-6 lg:mx-10" />
 
       <ClosingCTA
-        onDownloadClick={handleClosingDownloadClick}
-        onTryClick={handleClosingTryClick}
+        headline="YOUR CREW DESERVES SOFTWARE THAT WORKS AS HARD AS YOU DO"
+        subtext="Stop coordinating through chaos. Get OPS."
+        primaryCtaLabel="DOWNLOAD FREE"
+        secondaryCtaLabel="TRY IT FIRST"
       />
 
       <Footer />
