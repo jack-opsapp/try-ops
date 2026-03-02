@@ -10,7 +10,8 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = getABSupabase()
-    const { error } = await supabase.from('ab_events').insert({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase.from('ab_events') as any).insert({
       variant_id: body.variant_id,
       session_id: body.session_id,
       event_type: body.event_type,
