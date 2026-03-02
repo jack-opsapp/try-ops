@@ -28,12 +28,14 @@ export async function POST(req: NextRequest) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rpc = supabase.rpc.bind(supabase) as any
     if (body.event_type === 'page_view') {
-      await supabase.rpc('increment_visitor_count', { variant_id: body.variant_id })
+      await rpc('increment_visitor_count', { variant_id: body.variant_id })
     }
 
     if (body.event_type === 'signup_complete') {
-      await supabase.rpc('increment_signup_count', { variant_id: body.variant_id })
+      await rpc('increment_signup_count', { variant_id: body.variant_id })
     }
 
     return NextResponse.json({ ok: true })
