@@ -1,6 +1,5 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Carousel } from '@/components/shared/Carousel'
 import { z } from 'zod'
@@ -13,7 +12,7 @@ const fadeInUp = {
   viewport: { once: true, amount: 0.2 },
 }
 
-// Founder quote shown only on mobile (desktop shows it in Hero)
+// Founder quote always prepended to the display cards array
 const founderQuote = {
   quote: 'I scaled a deck and railing business from 0 to $1.6M in 4 years. Tried Jobber, ServiceTitan, Housecall Pro. None of them worked the way my crew actually works. So I built OPS.',
   name: 'Jack',
@@ -50,13 +49,7 @@ function TestimonialCard({ testimonial: t }: { testimonial: Testimonial }) {
 type TestimonialsSectionProps = z.infer<typeof TestimonialsSectionPropsSchema>
 
 export function TestimonialsSection({ heading, testimonials }: TestimonialsSectionProps) {
-  // Include founder quote first on mobile/tablet (desktop shows it in Hero)
-  const [cards, setCards] = useState(testimonials)
-  useEffect(() => {
-    if (window.innerWidth < 1024) {
-      setCards([founderQuote, ...testimonials])
-    }
-  }, [testimonials])
+  const cards = [founderQuote, ...testimonials]
 
   return (
     <section id="testimonials" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">

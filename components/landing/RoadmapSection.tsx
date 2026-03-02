@@ -157,7 +157,7 @@ export function RoadmapSection({ heading, builtItems, inDevItems, roadmapItems }
           <AnimatePresence>
             {openSection === 'built' && builtItems.map((item, i) => (
               <motion.div
-                key={item}
+                key={`${item}-${i}`}
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
@@ -182,7 +182,7 @@ export function RoadmapSection({ heading, builtItems, inDevItems, roadmapItems }
           <AnimatePresence>
             {openSection === 'indev' && inDevItems.map((item, i) => (
               <motion.div
-                key={item}
+                key={`${item}-${i}`}
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
@@ -207,7 +207,7 @@ export function RoadmapSection({ heading, builtItems, inDevItems, roadmapItems }
           <AnimatePresence>
             {openSection === 'roadmap' && roadmapItems.map((item, i) => (
               <motion.div
-                key={item}
+                key={`${item}-${i}`}
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
@@ -227,7 +227,7 @@ export function RoadmapSection({ heading, builtItems, inDevItems, roadmapItems }
         >
           <CategoryHeader label="Customer Requested (Built)" description="Features you asked for that we shipped" />
           {builtItems.map((item, i) => (
-            <div key={item} className={i > 0 ? 'border-t border-ops-border' : ''}>
+            <div key={`${item}-${i}`} className={i > 0 ? 'border-t border-ops-border' : ''}>
               <RoadmapRow text={item} variant="built" />
             </div>
           ))}
@@ -236,7 +236,7 @@ export function RoadmapSection({ heading, builtItems, inDevItems, roadmapItems }
             <CategoryHeader label="Customer Requested (In Development)" description="Features you asked for that we're building now" />
           </div>
           {inDevItems.map((item, i) => (
-            <div key={item} className={i > 0 ? 'border-t border-ops-border' : ''}>
+            <div key={`${item}-${i}`} className={i > 0 ? 'border-t border-ops-border' : ''}>
               <RoadmapRow text={item} variant="indev" />
             </div>
           ))}
@@ -245,7 +245,7 @@ export function RoadmapSection({ heading, builtItems, inDevItems, roadmapItems }
             <CategoryHeader label="On the Roadmap" description="Planned features based on crew needs" />
           </div>
           {roadmapItems.map((item, i) => (
-            <div key={item} className={i > 0 ? 'border-t border-ops-border' : ''}>
+            <div key={`${item}-${i}`} className={i > 0 ? 'border-t border-ops-border' : ''}>
               <RoadmapRow text={item} variant="planned" />
             </div>
           ))}
