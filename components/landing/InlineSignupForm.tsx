@@ -12,7 +12,7 @@ type InlineSignupFormProps = z.infer<typeof InlineSignupFormPropsSchema> & {
   onSuccess?: () => void
 }
 
-export function InlineSignupForm({ onSuccess, location, heading: _heading, subtext: _subtext }: InlineSignupFormProps) {
+export function InlineSignupForm({ onSuccess, location, heading, subtext }: InlineSignupFormProps) {
   const router = useRouter()
   const setAuth = useOnboardingStore((s) => s.setAuth)
   const setTutorialStartTime = useOnboardingStore((s) => s.setTutorialStartTime)
@@ -84,49 +84,72 @@ export function InlineSignupForm({ onSuccess, location, heading: _heading, subte
   )
 
   return (
-    <div className="w-full max-w-[440px]">
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={loading}
-          className="w-full bg-ops-card border border-white/10 rounded-[3px] px-4 py-3 font-kosugi text-[13px] text-ops-gray-50 placeholder:text-ops-gray-400 outline-none focus:border-white/30 transition-colors disabled:opacity-50"
-        />
-        <input
-          type="password"
-          placeholder="Password (6+ characters)"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          disabled={loading}
-          className="w-full bg-ops-card border border-white/10 rounded-[3px] px-4 py-3 font-kosugi text-[13px] text-ops-gray-50 placeholder:text-ops-gray-400 outline-none focus:border-white/30 transition-colors disabled:opacity-50"
-        />
-
-        {error && (
-          <p className="font-kosugi text-[12px] text-red-400">{error}</p>
+    <section className="py-16 lg:py-24 snap-start snap-always">
+      <div className="max-w-[1200px] mx-auto px-6 lg:px-10">
+        {heading && (
+          <motion.h2
+            className="font-mohave font-bold text-[26px] lg:text-[40px] text-ops-gray-50 uppercase tracking-[0.05em] mb-3"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            {heading}
+          </motion.h2>
         )}
-
-        <motion.button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-white text-[#0A0A0A] font-kosugi uppercase tracking-[0.15em] text-xs rounded-[3px] px-6 py-3 cursor-pointer inline-flex items-center justify-center gap-2 hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed"
-          whileHover={loading ? undefined : { scale: 1.02, transition: { duration: 0.2 } }}
-          whileTap={loading ? undefined : { scale: 0.98 }}
-        >
-          {loading ? 'CREATING ACCOUNT...' : 'CREATE ACCOUNT'}
-        </motion.button>
-      </form>
-
-      <p className="font-kosugi text-[12px] text-ops-gray-400 mt-3">
-        Already have an account?{' '}
-        <a
-          href="/signup/credentials"
-          className="text-ops-gray-200 underline hover:text-white transition-colors"
-        >
-          Log in
-        </a>
-      </p>
-    </div>
+        {subtext && (
+          <motion.p
+            className="font-kosugi text-[14px] lg:text-[16px] text-ops-gray-300 mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            {subtext}
+          </motion.p>
+        )}
+        <div className="w-full max-w-[440px]">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
+              className="w-full bg-ops-card border border-white/10 rounded-[3px] px-4 py-3 font-kosugi text-[13px] text-ops-gray-50 placeholder:text-ops-gray-400 outline-none focus:border-white/30 transition-colors disabled:opacity-50"
+            />
+            <input
+              type="password"
+              placeholder="Password (6+ characters)"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
+              className="w-full bg-ops-card border border-white/10 rounded-[3px] px-4 py-3 font-kosugi text-[13px] text-ops-gray-50 placeholder:text-ops-gray-400 outline-none focus:border-white/30 transition-colors disabled:opacity-50"
+            />
+            {error && (
+              <p className="font-kosugi text-[12px] text-red-400">{error}</p>
+            )}
+            <motion.button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-white text-[#0A0A0A] font-kosugi uppercase tracking-[0.15em] text-xs rounded-[3px] px-6 py-3 cursor-pointer inline-flex items-center justify-center gap-2 hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed"
+              whileHover={loading ? undefined : { scale: 1.02, transition: { duration: 0.2 } }}
+              whileTap={loading ? undefined : { scale: 0.98 }}
+            >
+              {loading ? 'CREATING ACCOUNT...' : 'CREATE ACCOUNT'}
+            </motion.button>
+          </form>
+          <p className="font-kosugi text-[12px] text-ops-gray-400 mt-3">
+            Already have an account?{' '}
+            <a
+              href="/signup/credentials"
+              className="text-ops-gray-200 underline hover:text-white transition-colors"
+            >
+              Log in
+            </a>
+          </p>
+        </div>
+      </div>
+    </section>
   )
 }
