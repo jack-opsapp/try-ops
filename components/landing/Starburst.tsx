@@ -9,7 +9,7 @@ interface StarburstProps {
 
 export function Starburst({ leftText = 'COMMAND', rightText = 'CHAOS' }: StarburstProps) {
   return (
-    <section className="relative h-[60vh] md:h-[80vh] w-full overflow-hidden bg-ops-background">
+    <section className="relative h-[100svh] md:h-[80vh] w-full overflow-hidden bg-ops-background snap-start snap-always">
       <StarburstCanvas className="absolute inset-0 w-full h-full" />
       <div className="pointer-events-none absolute inset-0">
         <h2

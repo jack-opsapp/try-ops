@@ -21,14 +21,19 @@ export function Carousel({ children, gap = 16, className = '', startIndex = 0 }:
   const initialSnapped = useRef(false)
 
   useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+
     const measure = () => {
-      if (containerRef.current) {
-        setCardWidth(containerRef.current.offsetWidth - 48)
-      }
+      const w = el.offsetWidth
+      if (w > 0) setCardWidth(w - 48)
     }
-    measure()
-    window.addEventListener('resize', measure)
-    return () => window.removeEventListener('resize', measure)
+
+    // ResizeObserver catches layout shifts, orientation changes, and initial paint
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+
+    return () => ro.disconnect()
   }, [])
 
   // Snap to startIndex once cardWidth is measured
@@ -67,16 +72,12 @@ export function Carousel({ children, gap = 16, className = '', startIndex = 0 }:
     }
   }
 
-  if (!cardWidth) {
-    return <div ref={containerRef} className={`overflow-hidden ${className}`} />
-  }
-
   return (
     <div className={className}>
       {/* Outer wrapper for arrows positioned outside */}
       <div className="relative md:px-14">
         {/* Arrow buttons — desktop only, positioned outside carousel */}
-        {count > 1 && (
+        {count > 1 && cardWidth > 0 && (
           <>
             <button
               onClick={() => snapTo(activeIndex - 1)}
@@ -99,40 +100,42 @@ export function Carousel({ children, gap = 16, className = '', startIndex = 0 }:
           </>
         )}
 
-        {/* Carousel track */}
+        {/* Carousel track — ref always lives here so ResizeObserver measures the real container */}
         <div
           ref={containerRef}
           className="overflow-hidden max-w-[100vw]"
           style={{ overscrollBehaviorX: 'contain' }}
         >
-          <motion.div
-            className="flex cursor-grab active:cursor-grabbing"
-            style={{ x, gap, touchAction: 'pan-y' }}
-            drag="x"
-            dragElastic={0.1}
-            dragDirectionLock
-            dragConstraints={{
-              left: -(count - 1) * (cardWidth + gap),
-              right: 0,
-            }}
-            animate={controls}
-            onDragEnd={handleDragEnd}
-          >
-            {items.map((child, i) => (
-              <div
-                key={i}
-                className="flex-shrink-0"
-                style={{ width: cardWidth }}
-              >
-                {child}
-              </div>
-            ))}
-          </motion.div>
+          {cardWidth > 0 && (
+            <motion.div
+              className="flex cursor-grab active:cursor-grabbing"
+              style={{ x, gap, touchAction: 'pan-y' }}
+              drag="x"
+              dragElastic={0.1}
+              dragDirectionLock
+              dragConstraints={{
+                left: -(count - 1) * (cardWidth + gap),
+                right: 0,
+              }}
+              animate={controls}
+              onDragEnd={handleDragEnd}
+            >
+              {items.map((child, i) => (
+                <div
+                  key={i}
+                  className="flex-shrink-0"
+                  style={{ width: cardWidth }}
+                >
+                  {child}
+                </div>
+              ))}
+            </motion.div>
+          )}
         </div>
       </div>
 
       {/* Dot indicators — outside overflow container for proper centering */}
-      {count > 1 && (
+      {count > 1 && cardWidth > 0 && (
         <div className="flex justify-center gap-2 mt-6">
           {items.map((_, i) => (
             <button
