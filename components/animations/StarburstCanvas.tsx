@@ -279,6 +279,7 @@ export default function StarburstCanvas({ className }: StarburstCanvasProps) {
   const dragRef = useRef({
     active: false,
     didDrag: false,
+    dismissed: false, // true when gesture is vertical-dominant → let scroll happen
     startX: 0,
     startY: 0,
     yawAtStart: 0,
@@ -341,6 +342,7 @@ export default function StarburstCanvas({ className }: StarburstCanvasProps) {
     mouseRef.current = { x: -9999, y: -9999 };
     dragRef.current.active = false;
     dragRef.current.didDrag = false;
+    dragRef.current.dismissed = false;
     if (containerRef.current) containerRef.current.style.cursor = 'grab';
   }, []);
 
@@ -351,6 +353,7 @@ export default function StarburstCanvas({ className }: StarburstCanvasProps) {
     const handleWindowMouseUp = () => {
       dragRef.current.active = false;
       dragRef.current.didDrag = false;
+      dragRef.current.dismissed = false;
       if (containerRef.current) containerRef.current.style.cursor = 'grab';
     };
     window.addEventListener('mouseup', handleWindowMouseUp);
@@ -363,6 +366,7 @@ export default function StarburstCanvas({ className }: StarburstCanvasProps) {
       const drag = dragRef.current;
       drag.active = true;
       drag.didDrag = false;
+      drag.dismissed = false;
       drag.startX = t.clientX;
       drag.startY = t.clientY;
       drag.yawAtStart = dragYawOffsetRef.current;
@@ -371,15 +375,21 @@ export default function StarburstCanvas({ className }: StarburstCanvasProps) {
 
     const handleTouchMove = (e: TouchEvent) => {
       const drag = dragRef.current;
-      if (!drag.active) return;
+      if (!drag.active || drag.dismissed) return;
       const t = e.touches[0];
       const deltaX = t.clientX - drag.startX;
       const deltaY = t.clientY - drag.startY;
       if (!drag.didDrag && Math.sqrt(deltaX * deltaX + deltaY * deltaY) > DRAG_THRESHOLD) {
+        // If gesture is more vertical than horizontal, let scroll happen
+        if (Math.abs(deltaY) > Math.abs(deltaX)) {
+          drag.dismissed = true;
+          drag.active = false;
+          return;
+        }
         drag.didDrag = true;
       }
       if (drag.didDrag) {
-        e.preventDefault(); // prevent scroll only once drag is confirmed
+        e.preventDefault(); // prevent scroll only for horizontal-dominant drags
         dragYawOffsetRef.current = drag.yawAtStart + deltaX * DRAG_SENSITIVITY;
         dragTiltOffsetRef.current = drag.tiltAtStart - deltaY * DRAG_SENSITIVITY;
       }
@@ -388,6 +398,7 @@ export default function StarburstCanvas({ className }: StarburstCanvasProps) {
     const handleTouchEnd = () => {
       dragRef.current.active = false;
       dragRef.current.didDrag = false;
+      dragRef.current.dismissed = false;
     };
 
     container.addEventListener('touchstart', handleTouchStart, { passive: true });
