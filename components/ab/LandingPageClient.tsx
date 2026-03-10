@@ -144,7 +144,7 @@ export function LandingPageClient({ config, variantId }: Props) {
 
       {config.sections.map((section, i) => {
         const Component = SECTION_REGISTRY[section.type]
-        const isInterstitial = section.type === 'InlineSignupForm' || section.type === 'Starburst'
+        const isInterstitial = section.type === 'InlineSignupForm' || section.type === 'Starburst' || section.type === 'FounderQuote'
         return (
           <SectionTracker
             key={`${section.type}-${i}`}

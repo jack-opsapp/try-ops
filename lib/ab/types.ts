@@ -80,6 +80,12 @@ export const StarburstPropsSchema = z.object({
   rightText: z.string().optional(),
 })
 
+export const FounderQuotePropsSchema = z.object({
+  quote: z.string(),
+  name: z.string(),
+  title: z.string().optional(),
+})
+
 // ── Section type registry ─────────────────────────────────────────────────
 export const SECTION_TYPES = [
   'Hero',
@@ -93,6 +99,7 @@ export const SECTION_TYPES = [
   'DesktopDownload',
   'InlineSignupForm',
   'Starburst',
+  'FounderQuote',
 ] as const
 
 export type SectionType = typeof SECTION_TYPES[number]
@@ -109,6 +116,7 @@ export const SectionSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('DesktopDownload'), props: DesktopDownloadPropsSchema }),
   z.object({ type: z.literal('InlineSignupForm'), props: InlineSignupFormPropsSchema }),
   z.object({ type: z.literal('Starburst'), props: StarburstPropsSchema }),
+  z.object({ type: z.literal('FounderQuote'), props: FounderQuotePropsSchema }),
 ])
 
 export const VariantConfigSchema = z.object({

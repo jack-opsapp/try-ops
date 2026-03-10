@@ -12,6 +12,14 @@ export const SEED_CONFIG_A: VariantConfig = {
       },
     },
     {
+      type: 'FounderQuote',
+      props: {
+        quote: "I scaled a deck and railing business from 0 to $1.6M in 4 years. Tried Jobber, ServiceTitan, Housecall Pro. None of them worked the way my crew actually works. So I built OPS.",
+        name: 'Jack',
+        title: 'Founder',
+      },
+    },
+    {
       type: 'DesktopDownload',
       props: {},
     },

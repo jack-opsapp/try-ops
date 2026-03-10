@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import type { z } from 'zod'
 import type { ClosingCTAPropsSchema } from '@/lib/ab/types'
 import { Button } from '@/components/shared/Button'
-import { InlineSignupForm } from '@/components/landing/InlineSignupForm'
 
 type ClosingCTAProps = z.infer<typeof ClosingCTAPropsSchema>
 
@@ -39,7 +38,7 @@ export function ClosingCTA({ headline, subtext, primaryCtaLabel, secondaryCtaLab
         </motion.h2>
 
         <motion.p
-          className="font-kosugi text-[18px] text-ops-gray-200 mb-12 max-w-[600px]"
+          className="font-kosugi text-[18px] text-ops-gray-200 mb-10 max-w-[600px]"
           {...fadeInUp}
           transition={{ ...fadeInUp.transition, delay: 0.1 }}
         >
@@ -47,7 +46,7 @@ export function ClosingCTA({ headline, subtext, primaryCtaLabel, secondaryCtaLab
         </motion.p>
 
         <motion.div
-          className="flex flex-col sm:flex-row gap-4 mb-8"
+          className="flex flex-col sm:flex-row gap-4 mb-4"
           {...fadeInUp}
           transition={{ ...fadeInUp.transition, delay: 0.2 }}
         >
@@ -64,31 +63,12 @@ export function ClosingCTA({ headline, subtext, primaryCtaLabel, secondaryCtaLab
 
         {/* Trust line */}
         <motion.p
-          className="font-kosugi text-[12px] text-ops-gray-400 mb-8"
+          className="font-kosugi text-[12px] text-ops-gray-400"
           {...fadeInUp}
           transition={{ ...fadeInUp.transition, delay: 0.25 }}
         >
           Get started for free &middot; No credit card &middot; No training required
         </motion.p>
-
-        {/* OR divider */}
-        <motion.div
-          className="flex items-center gap-4 mb-3 max-w-[440px]"
-          {...fadeInUp}
-          transition={{ ...fadeInUp.transition, delay: 0.3 }}
-        >
-          <div className="flex-1 h-px bg-white/10" />
-          <span className="font-kosugi text-[11px] text-ops-gray-400 uppercase tracking-[0.15em]">or sign up now</span>
-          <div className="flex-1 h-px bg-white/10" />
-        </motion.div>
-
-        {/* Inline signup form */}
-        <motion.div
-          {...fadeInUp}
-          transition={{ ...fadeInUp.transition, delay: 0.35 }}
-        >
-          <InlineSignupForm location="closing" />
-        </motion.div>
       </div>
     </section>
   )

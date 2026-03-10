@@ -1,6 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import type { z } from 'zod'
+import type { FounderQuotePropsSchema } from '@/lib/ab/types'
+
+type FounderQuoteProps = z.infer<typeof FounderQuotePropsSchema>
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -9,20 +13,19 @@ const fadeInUp = {
   viewport: { once: true, amount: 0.2 },
 }
 
-export function FounderQuote() {
+export function FounderQuote({ quote, name, title }: FounderQuoteProps) {
   return (
-    <section className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[160px] snap-start snap-always">
-      <div className="max-w-[700px] mx-auto px-4 md:px-6 lg:px-10">
+    <section className="py-16 lg:py-24">
+      <div className="max-w-[700px] mx-auto px-6 lg:px-10">
         <motion.div
           className="border-l-2 border-ops-border-emphasis pl-6 lg:pl-8"
           {...fadeInUp}
         >
-          <p className="font-kosugi text-[18px] lg:text-[22px] text-ops-gray-200 leading-relaxed mb-4">
-            &ldquo;I scaled a deck and railing business to $1.6M. Tried Jobber, ServiceTitan, Housecall Pro.
-            None of them worked the way my crew actually works. So I built OPS.&rdquo;
+          <p className="font-kosugi text-[18px] lg:text-[22px] text-ops-gray-200 leading-relaxed mb-4 max-w-[560px]">
+            &ldquo;{quote}&rdquo;
           </p>
           <p className="font-mohave font-medium text-[14px] lg:text-[16px] text-ops-gray-400 uppercase tracking-wider">
-            &mdash; Jack, Founder
+            &mdash; {name}{title ? `, ${title}` : ''}
           </p>
         </motion.div>
       </div>

@@ -6,7 +6,6 @@ import type { z } from 'zod'
 import type { HeroPropsSchema } from '@/lib/ab/types'
 import { Button } from '@/components/shared/Button'
 import { HeroAnimation } from '@/components/landing/HeroAnimation'
-import { InlineSignupForm } from '@/components/landing/InlineSignupForm'
 
 type HeroProps = z.infer<typeof HeroPropsSchema>
 
@@ -61,7 +60,7 @@ export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel }: 
             </motion.h1>
 
             <motion.p
-              className="font-kosugi text-[14px] lg:text-[20px] text-ops-gray-200 leading-relaxed max-w-[500px] mb-10"
+              className="font-kosugi text-[14px] lg:text-[20px] text-ops-gray-200 leading-relaxed max-w-[500px] mb-8"
               {...fadeInUp}
               transition={{ ...fadeInUp.transition, delay: 0.1 }}
             >
@@ -70,7 +69,7 @@ export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel }: 
 
             {/* CTAs */}
             <motion.div
-              className="flex flex-col sm:flex-row gap-4 mb-8"
+              className="flex flex-col sm:flex-row gap-4 mb-4"
               {...fadeInUp}
               transition={{ ...fadeInUp.transition, delay: 0.2 }}
             >
@@ -97,46 +96,12 @@ export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel }: 
 
             {/* Trust line */}
             <motion.p
-              className="font-kosugi text-[12px] text-ops-gray-400 mb-8"
+              className="font-kosugi text-[12px] text-ops-gray-400"
               {...fadeInUp}
               transition={{ ...fadeInUp.transition, delay: 0.25 }}
             >
               Get started for free &middot; No credit card &middot; Rated 5.0&#9733;
             </motion.p>
-
-            {/* OR divider */}
-            <motion.div
-              className="flex items-center gap-4 mb-3 max-w-[440px]"
-              {...fadeInUp}
-              transition={{ ...fadeInUp.transition, delay: 0.3 }}
-            >
-              <div className="flex-1 h-px bg-white/10" />
-              <span className="font-kosugi text-[11px] text-ops-gray-400 uppercase tracking-[0.15em]">or sign up now</span>
-              <div className="flex-1 h-px bg-white/10" />
-            </motion.div>
-
-            {/* Inline signup form */}
-            <motion.div
-              {...fadeInUp}
-              transition={{ ...fadeInUp.transition, delay: 0.35 }}
-            >
-              <InlineSignupForm location="hero" />
-            </motion.div>
-
-            {/* Founder quote — desktop only */}
-            <motion.div
-              className="hidden lg:block border-l-2 border-ops-border-emphasis pl-6 mt-12"
-              {...fadeInUp}
-              transition={{ ...fadeInUp.transition, delay: 0.4 }}
-            >
-              <p className="font-kosugi text-[16px] text-ops-gray-200 leading-relaxed mb-2 max-w-[500px]">
-                &ldquo;I scaled a deck and railing business from 0 to $1.6M in 4 years. Tried Jobber, ServiceTitan, Housecall Pro.
-                None of them worked the way my crew actually works. So I built OPS.&rdquo;
-              </p>
-              <p className="font-mohave font-medium text-[13px] text-ops-gray-400 uppercase tracking-wider">
-                &mdash; Jack, Founder
-              </p>
-            </motion.div>
           </div>
 
           {/* Wireframe animation — desktop only (mobile is above) */}
