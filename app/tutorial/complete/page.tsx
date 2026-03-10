@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { TypewriterText } from '@/components/ui/TypewriterText'
-import { OPSButton } from '@/components/ui/OPSButton'
+import { Button } from '@/components/ui/Button'
 import { PhasedContent } from '@/components/ui/PhasedContent'
 import { useAnalytics } from '@/lib/hooks/useAnalytics'
 
@@ -34,9 +34,9 @@ export default function TutorialCompletePage() {
         </PhasedContent>
 
         <PhasedContent delay={1800}>
-          <OPSButton onClick={() => router.push('/signup/credentials')}>
+          <Button variant="primary" onClick={() => router.push('/signup/credentials')} className="w-full">
             CREATE YOUR ACCOUNT
-          </OPSButton>
+          </Button>
         </PhasedContent>
       </div>
     </div>

@@ -7,9 +7,28 @@ import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { useAnalytics } from '@/lib/hooks/useAnalytics'
 import { z } from 'zod'
 import { InlineSignupFormPropsSchema } from '@/lib/ab/types'
+import { signUpWithEmail } from '@/lib/firebase/auth'
+import type { User } from 'firebase/auth'
 
 type InlineSignupFormProps = z.infer<typeof InlineSignupFormPropsSchema> & {
   onSuccess?: () => void
+}
+
+async function syncUser(firebaseUser: User) {
+  const idToken = await firebaseUser.getIdToken()
+  const res = await fetch('/api/auth/sync-user', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      idToken,
+      email: firebaseUser.email,
+    }),
+  })
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error(data.error || 'Failed to sync user')
+  }
+  return res.json()
 }
 
 export function InlineSignupForm({ onSuccess, location, heading, subtext }: InlineSignupFormProps) {
@@ -48,23 +67,10 @@ export function InlineSignupForm({ onSuccess, location, heading, subtext }: Inli
       trackSignupAuthAttempt(`inline_signup_${location}`, 'started')
 
       try {
-        const res = await fetch('/api/auth/signup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: trimmedEmail, password }),
-        })
+        const firebaseUser = await signUpWithEmail(trimmedEmail, password)
+        const data = await syncUser(firebaseUser)
 
-        const data = await res.json()
-
-        if (!res.ok) {
-          const errorMsg = data.error || 'Signup failed. Please try again.'
-          setError(errorMsg)
-          trackSignupAuthAttempt(`inline_signup_${location}`, 'failed', errorMsg)
-          setLoading(false)
-          return
-        }
-
-        setAuth(data.userId, 'email', trimmedEmail)
+        setAuth(data.user.id, 'email', trimmedEmail)
         setTutorialStartTime(Date.now())
         trackSignupAuthAttempt(`inline_signup_${location}`, 'completed')
 
@@ -73,8 +79,16 @@ export function InlineSignupForm({ onSuccess, location, heading, subtext }: Inli
         } else {
           router.push('/tutorial-intro')
         }
-      } catch {
-        const errorMsg = 'Connection error. Please check your internet and try again.'
+      } catch (err: unknown) {
+        const code = (err as { code?: string })?.code
+        let errorMsg = 'Signup failed. Please try again.'
+        if (code === 'auth/email-already-in-use') {
+          errorMsg = 'An account with this email already exists. Try signing in.'
+        } else if (code === 'auth/weak-password') {
+          errorMsg = 'Password must be at least 6 characters.'
+        } else if (err instanceof Error) {
+          errorMsg = err.message
+        }
         setError(errorMsg)
         trackSignupAuthAttempt(`inline_signup_${location}`, 'failed', errorMsg)
       } finally {

@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { TypewriterText } from '@/components/ui/TypewriterText'
-import { OPSButton } from '@/components/ui/OPSButton'
+import { Button } from '@/components/ui/Button'
 import { PhasedContent } from '@/components/ui/PhasedContent'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { TutorialVideo } from '@/components/tutorial/TutorialVideo'
@@ -137,14 +137,14 @@ export default function TutorialStepPage() {
         <PhasedContent delay={step.title.length * 30 + 800} key={`btns-${step.id}`}>
           <div className="space-y-3 pt-4">
             {!step.autoAdvance && (
-              <OPSButton onClick={handleContinue}>
+              <Button variant="primary" onClick={handleContinue} className="w-full">
                 {isLastStep ? 'CONTINUE' : 'CONTINUE'}
-              </OPSButton>
+              </Button>
             )}
             {!isLastStep && (
-              <OPSButton variant="ghost" onClick={handleSkip}>
+              <Button variant="ghost" onClick={handleSkip} className="w-full">
                 SKIP TUTORIAL
-              </OPSButton>
+              </Button>
             )}
           </div>
         </PhasedContent>

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { TutorialProvider } from '@/lib/tutorial/TutorialContext'
 import { TutorialShell } from '@/components/tutorial/interactive/TutorialShell'
 import { TypewriterText } from '@/components/ui/TypewriterText'
-import { OPSButton } from '@/components/ui/OPSButton'
+import { Button } from '@/components/ui/Button'
 import { PhasedContent } from '@/components/ui/PhasedContent'
 import { useAnalytics } from '@/lib/hooks/useAnalytics'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
@@ -115,7 +115,7 @@ export default function InteractiveTutorialPage() {
           </PhasedContent>
 
           <PhasedContent delay={headlineText.length * 35 + 1000}>
-            <OPSButton onClick={handleLetsGo}>{"LET'S GO"}</OPSButton>
+            <Button variant="primary" onClick={handleLetsGo} className="w-full">{"LET'S GO"}</Button>
           </PhasedContent>
         </div>
       </div>
