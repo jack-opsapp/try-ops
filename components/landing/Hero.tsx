@@ -95,37 +95,37 @@ export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel }: 
               </Button>
             </motion.div>
 
-            {/* OR divider */}
-            <motion.div
-              className="flex items-center gap-4 my-6 max-w-[440px]"
+            {/* Trust line */}
+            <motion.p
+              className="font-kosugi text-[12px] text-ops-gray-400 mb-8"
               {...fadeInUp}
               transition={{ ...fadeInUp.transition, delay: 0.25 }}
             >
+              Get started for free &middot; No credit card &middot; Rated 5.0&#9733;
+            </motion.p>
+
+            {/* OR divider */}
+            <motion.div
+              className="flex items-center gap-4 mb-3 max-w-[440px]"
+              {...fadeInUp}
+              transition={{ ...fadeInUp.transition, delay: 0.3 }}
+            >
               <div className="flex-1 h-px bg-white/10" />
-              <span className="font-kosugi text-[12px] text-ops-gray-400 uppercase tracking-[0.15em]">or</span>
+              <span className="font-kosugi text-[11px] text-ops-gray-400 uppercase tracking-[0.15em]">or sign up now</span>
               <div className="flex-1 h-px bg-white/10" />
             </motion.div>
 
             {/* Inline signup form */}
             <motion.div
               {...fadeInUp}
-              transition={{ ...fadeInUp.transition, delay: 0.3 }}
+              transition={{ ...fadeInUp.transition, delay: 0.35 }}
             >
               <InlineSignupForm location="hero" />
             </motion.div>
 
-            {/* Trust line */}
-            <motion.p
-              className="font-kosugi text-[14px] text-ops-gray-300 mt-6"
-              {...fadeInUp}
-              transition={{ ...fadeInUp.transition, delay: 0.35 }}
-            >
-              Get started for free &middot; No credit card &middot; Rated 5.0&#9733;
-            </motion.p>
-
             {/* Founder quote — desktop only */}
             <motion.div
-              className="hidden lg:block border-l-2 border-ops-border-emphasis pl-6 mt-10"
+              className="hidden lg:block border-l-2 border-ops-border-emphasis pl-6 mt-12"
               {...fadeInUp}
               transition={{ ...fadeInUp.transition, delay: 0.4 }}
             >

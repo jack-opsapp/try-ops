@@ -29,7 +29,7 @@ export function ClosingCTA({ headline, subtext, primaryCtaLabel, secondaryCtaLab
     router.push('/signup')
   }
   return (
-    <section id="closing" className="bg-ops-card border-t border-white/10 min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
+    <section id="closing" className="bg-ops-card min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
       <div className="max-w-[700px] mx-auto px-6 md:px-6 lg:px-10">
         <motion.h2
           className="font-mohave font-bold text-[40px] lg:text-[56px] text-ops-gray-50 uppercase leading-[1.1] tracking-[0.05em] mb-6"
@@ -62,32 +62,33 @@ export function ClosingCTA({ headline, subtext, primaryCtaLabel, secondaryCtaLab
           </Button>
         </motion.div>
 
-        {/* OR divider */}
-        <motion.div
-          className="flex items-center gap-4 my-6 max-w-[440px]"
+        {/* Trust line */}
+        <motion.p
+          className="font-kosugi text-[12px] text-ops-gray-400 mb-8"
           {...fadeInUp}
           transition={{ ...fadeInUp.transition, delay: 0.25 }}
         >
+          Get started for free &middot; No credit card &middot; No training required
+        </motion.p>
+
+        {/* OR divider */}
+        <motion.div
+          className="flex items-center gap-4 mb-3 max-w-[440px]"
+          {...fadeInUp}
+          transition={{ ...fadeInUp.transition, delay: 0.3 }}
+        >
           <div className="flex-1 h-px bg-white/10" />
-          <span className="font-kosugi text-[12px] text-ops-gray-400 uppercase tracking-[0.15em]">or</span>
+          <span className="font-kosugi text-[11px] text-ops-gray-400 uppercase tracking-[0.15em]">or sign up now</span>
           <div className="flex-1 h-px bg-white/10" />
         </motion.div>
 
         {/* Inline signup form */}
         <motion.div
           {...fadeInUp}
-          transition={{ ...fadeInUp.transition, delay: 0.3 }}
+          transition={{ ...fadeInUp.transition, delay: 0.35 }}
         >
           <InlineSignupForm location="closing" />
         </motion.div>
-
-        <motion.p
-          className="font-kosugi text-[14px] text-ops-gray-300 mt-6"
-          {...fadeInUp}
-          transition={{ ...fadeInUp.transition, delay: 0.35 }}
-        >
-          Get started for free &middot; No credit card &middot; No training required
-        </motion.p>
       </div>
     </section>
   )

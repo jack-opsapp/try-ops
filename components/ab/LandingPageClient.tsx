@@ -144,12 +144,17 @@ export function LandingPageClient({ config, variantId }: Props) {
 
       {config.sections.map((section, i) => {
         const Component = SECTION_REGISTRY[section.type]
+        const isInterstitial = section.type === 'InlineSignupForm' || section.type === 'Starburst'
         return (
           <SectionTracker
             key={`${section.type}-${i}`}
             sectionName={section.type}
             variantId={variantId}
+            isInterstitial={isInterstitial}
           >
+            {i > 0 && !isInterstitial && (
+              <div className="border-t border-ops-border-emphasis mx-6 md:mx-6 lg:mx-10" />
+            )}
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             <Component {...(section.props as any)} />
           </SectionTracker>
