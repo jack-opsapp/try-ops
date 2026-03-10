@@ -1,7 +1,7 @@
 # try-ops Signup Overhaul — Design Spec
 
 **Date:** 2026-03-10
-**Status:** Approved
+**Status:** Approved (rev 2 — post-review fixes)
 **Scope:** Complete overhaul of try-ops signup/credentials pages for desktop + mobile, migrating from Bubble.io auth to Firebase auth, consolidating flow from 6 steps to 3, and aligning all visual tokens with the OPS design system.
 
 ---
@@ -50,6 +50,33 @@ Tutorial / Download (redirect back)
 | Google Identity Services (GIS script) | Firebase `signInWithPopup` (GoogleAuthProvider) |
 | No Apple sign-in | Firebase `signInWithPopup` (OAuthProvider "apple.com") |
 | Custom `/api/auth/google` route | Direct Firebase SDK (no custom route needed) |
+
+### 2.4 User Sync (Firebase → Supabase)
+
+After Firebase auth succeeds, the user must be persisted to Supabase. try-ops needs its own `/api/auth/sync-user` route, ported from ops-web's `app/api/auth/sync-user/route.ts`. This route:
+
+1. Receives the Firebase ID token
+2. Verifies it with Firebase Admin SDK
+3. Upserts the user row in Supabase `users` table
+4. Creates/links company if applicable
+5. Returns `{ user, company }` for the client store
+
+The try-ops route should share the same Supabase project as ops-web (project ID: `ijeekuhbatykdomumfjx`). The Firebase Admin SDK service account credentials must be added to try-ops environment variables.
+
+### 2.5 Dropped Fields
+
+The current `company-setup` page collects Office Email and Office Phone. These are **intentionally dropped** from the new flow to reduce friction. The company record in Supabase will have these fields nullable. Users can add them later in app settings.
+
+### 2.6 Firebase Auth: Popup + Redirect Fallback
+
+The Firebase auth module must include the **popup-to-redirect fallback** pattern from ops-web. This is critical because popup auth fails silently on some browsers (COOP headers, popup blockers, Safari). The pattern:
+
+1. Try `signInWithPopup` first
+2. On `auth/popup-blocked` or `auth/network-request-failed` → set `sessionStorage` flag (`ops-auth-redirect-pending`) → call `signInWithRedirect`
+3. On page reload → check flag → call `getRedirectResult` to complete the flow
+4. `checkRedirectResult()` must be called in the auth layout on mount
+
+This is implemented in ops-web's `src/lib/firebase/auth.ts` (lines 29-119) and must be ported in full, not simplified.
 
 ## 3. Desktop Layout
 
@@ -129,7 +156,8 @@ For steps 2-3 (About You, Details):
 **Layout:** Split hero (desktop) / form-only (mobile)
 
 **Content:**
-- Title: "CREATE ACCOUNT" (Bebas Neue, 36px, tracking 0.1em) — login mode: "SIGN IN"
+- Title: "CREATE ACCOUNT" (Mohave, 32px/display, weight 600, UPPERCASE, tracking wide) — login mode: "SIGN IN"
+- Note: Bebas Neue is reserved for the OPS brand mark only (per design system: "No third display font in standard UI"). Form titles use Mohave display size.
 - Subtitle: "Start your 30-day free trial. No card required." (Mohave, body-sm, text-tertiary)
 - OAuth buttons (Google + Apple): full-width, border `rgba(255,255,255,0.12)`, bg `rgba(255,255,255,0.03)`, rounded-lg, Mohave body text
 - Divider: "or" (Kosugi, 11px, uppercase, tracking-widest)
@@ -215,7 +243,10 @@ Use `searchParams` or `sessionStorage` to track origin.
 | `app/signup/company-details/page.tsx` | Rewritten details with ops-web components |
 | `lib/firebase/config.ts` | Firebase config for try-ops |
 | `lib/firebase/auth.ts` | Auth helpers (port from ops-web) |
-| `stores/signup-store.ts` | Zustand store for signup state (replace onboarding-store) |
+| `stores/signup-store.ts` | Zustand store for signup-specific state (auth, profile, company fields) |
+| `app/api/auth/sync-user/route.ts` | Sync Firebase user to Supabase (port from ops-web) |
+
+**Important: `onboarding-store` is NOT replaced.** The existing `onboarding-store` holds tutorial state, UTM params, A/B variant, and analytics context used across the entire app. `signup-store` is a **new, separate store** for signup-specific fields only (auth state, profile data, company data). The `useAnalytics` hook continues to read `variant` from `onboarding-store`.
 
 ### 5.3 Delete
 
@@ -237,12 +268,11 @@ Use `searchParams` or `sessionStorage` to track origin.
 
 ### 6.1 Colors (align with ops-web + design system)
 
+**Transition strategy:** Add the new semantic token names alongside the existing `ops.*` tokens. The `ops.*` aliases remain (with corrected values) so that existing landing page, tutorial, and shared components don't break. New signup pages use the semantic names. A follow-up pass can migrate remaining pages and remove the `ops.*` aliases.
+
 ```diff
 colors: {
-  ops: {
--   background: '#080808',
-+   // Remove ops prefix — use semantic names matching ops-web
-  },
+  // NEW: semantic names matching ops-web
 + background: {
 +   DEFAULT: '#000000',
 +   panel: '#0A0A0A',
@@ -252,10 +282,10 @@ colors: {
 +   status: '#1D1D1D',
 + },
 + text: {
-+   primary: '#E5E5E5',      // was #FFFFFF
-+   secondary: '#A7A7A7',    // was #999999
-+   tertiary: '#777777',     // correct
-+   disabled: '#555555',     // was #444444
++   primary: '#E5E5E5',
++   secondary: '#A7A7A7',
++   tertiary: '#777777',
++   disabled: '#555555',
 +   placeholder: '#999999',
 + },
 + border: {
@@ -263,6 +293,16 @@ colors: {
 +   subtle: 'rgba(255, 255, 255, 0.05)',
 +   separator: 'rgba(255, 255, 255, 0.15)',
 + },
+  // EXISTING: keep ops.* aliases with CORRECTED values
+  ops: {
+-   background: '#080808',
++   background: '#000000',
+-   'text-primary': '#FFFFFF',
++   'text-primary': '#E5E5E5',
+-   'text-secondary': '#999999',
++   'text-secondary': '#A7A7A7',
+    // ... other ops.* tokens updated to correct values
+  },
 }
 ```
 
@@ -284,7 +324,7 @@ borderRadius: {
 
 ### 6.3 Typography
 
-Add Bebas Neue for display titles (matches ops-web):
+Add Bebas Neue for OPS brand mark only (per design system restrictions):
 
 ```diff
 fontFamily: {
@@ -293,6 +333,8 @@ fontFamily: {
 + bebas: ['Bebas Neue', 'sans-serif'],
 }
 ```
+
+Bebas Neue is used ONLY for the "OPS" brand mark in the hero panel. All form titles, section headers, and UI text use Mohave (UPPERCASE). This matches the design system rule: "No third display font (Bebas Neue) in standard UI."
 
 ## 7. Environment Variables
 
@@ -311,23 +353,37 @@ Use same Firebase project as ops-web. Add `try-ops` domain to Firebase authorize
 
 ## 8. Analytics
 
-Preserve existing analytics tracking from current implementation:
-- `trackSignupStepView(step, index)`
+### 8.1 Preserve (update step names/indices for new flow)
+
+- `trackSignupStepView(step, index)` — step names change: 'credentials'=1, 'profile'=2, 'details'=3
 - `trackSignupStepComplete(step, index)`
-- `trackSignupAuthAttempt(method, status, error?)`
+- `trackSignupAuthAttempt(method, status, error?)` — method adds 'apple'
 - `trackSignupFieldError(step, field, error)`
 - `trackSignupComplete(authMethod)`
+- `trackSignupStepAbandon(step)` — preserve for funnel analysis
 
-Add new events:
-- `trackSetupStepSkipped(step)` — when user clicks "Skip for now"
+### 8.2 Add to `useAnalytics` hook
+
+- `trackSetupStepSkipped(step)` — when user clicks "Skip for now" (new function in try-ops's `useAnalytics`, NOT the ops-web analytics module)
+
+### 8.3 Remove (pages deleted)
+
+- `trackCrewInviteOpened` — company-code page removed
+- `trackCrewInviteSent` — company-code page removed
+- `trackCrewInviteSkipped` — company-code page removed
+
+### 8.4 A/B Variant
+
+The `useAnalytics` hook reads `variant` from `onboarding-store` (NOT `signup-store`). This continues to work unchanged since `onboarding-store` is preserved.
 
 ## 9. Design System Compliance Checklist
 
 - [ ] All text uses `#E5E5E5` primary (not `#FFFFFF`)
 - [ ] Background is `#000000` (not `#080808`)
-- [ ] Border radius follows system (5px default, 8px lg)
-- [ ] Accent color (`#597794`) on ONE element per screen maximum
-- [ ] Fonts: Bebas Neue for display titles, Mohave for body/labels, Kosugi for captions/narrative
+- [ ] Border radius follows system (5px default, 8px lg, 12px xl)
+- [ ] Border opacity: `subtle=0.05`, `separator=0.15`, `DEFAULT=0.2`. Note: design system says 0.08/0.12 but ops-web uses 0.05/0.15/0.2 — we align with ops-web for cross-platform consistency
+- [ ] Accent color (`#597794`) on ONE element per screen maximum. Note: ops-web uses `#417394` via CSS var — the design system doc (`system.md`, updated 2026-02-17) is the canonical source at `#597794`. ops-web should be updated separately to match.
+- [ ] Fonts: Mohave for titles/body/labels, Kosugi for captions/narrative, Bebas Neue for OPS brand mark ONLY
 - [ ] All titles UPPERCASE
 - [ ] All captions in `[square brackets]`
 - [ ] 8dp grid spacing
