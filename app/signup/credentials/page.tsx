@@ -13,7 +13,6 @@ import {
   signInWithEmail,
   signUpWithEmail,
   updateUserProfile,
-  getIdToken,
 } from "@/lib/firebase/auth";
 import type { User } from "firebase/auth";
 

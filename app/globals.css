@@ -60,6 +60,14 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Bebas Neue';
+  src: url('/fonts/BebasNeue-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -73,7 +81,7 @@ html {
 
 body {
   font-family: 'Mohave', sans-serif;
-  background-color: #080808;
+  background-color: #000000;
   color: #E5E5E5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -84,7 +92,7 @@ body {
   width: 4px;
 }
 ::-webkit-scrollbar-track {
-  background: #080808;
+  background: #000000;
 }
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.15);
@@ -99,7 +107,7 @@ body {
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 1000px #080808 inset;
+  -webkit-box-shadow: 0 0 0 1000px #000000 inset;
   -webkit-text-fill-color: #E5E5E5;
   caret-color: #E5E5E5;
 }
@@ -211,10 +219,3 @@ input:-webkit-autofill:focus {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
