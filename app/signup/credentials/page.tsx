@@ -1,355 +1,381 @@
-'use client'
+"use client";
 
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { useRouter } from 'next/navigation'
-import { TypewriterText } from '@/components/ui/TypewriterText'
-import { OPSButton } from '@/components/ui/OPSButton'
-import { OPSInput } from '@/components/ui/OPSInput'
-import { PhasedContent } from '@/components/ui/PhasedContent'
-import { OnboardingScaffold } from '@/components/layout/OnboardingScaffold'
-import { useOnboardingStore } from '@/lib/stores/onboarding-store'
-import { useAnalytics } from '@/lib/hooks/useAnalytics'
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { useSignupStore } from "@/lib/stores/signup-store";
+import { useOnboardingStore } from "@/lib/stores/onboarding-store";
+import { useAnalytics } from "@/lib/hooks/useAnalytics";
+import {
+  signInWithGoogle,
+  signInWithApple,
+  signInWithEmail,
+  signUpWithEmail,
+  updateUserProfile,
+  getIdToken,
+} from "@/lib/firebase/auth";
+import type { User } from "firebase/auth";
 
-declare global {
-  interface Window {
-    google?: {
-      accounts: {
-        id: {
-          initialize: (config: Record<string, unknown>) => void
-          prompt: () => void
-          renderButton: (
-            element: HTMLElement,
-            config: Record<string, unknown>
-          ) => void
-        }
-      }
-    }
+async function syncUser(
+  firebaseUser: User,
+  extra?: { firstName?: string; lastName?: string }
+) {
+  const idToken = await firebaseUser.getIdToken();
+  const nameParts = firebaseUser.displayName?.split(" ") ?? [];
+
+  const res = await fetch("/api/auth/sync-user", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      idToken,
+      email: firebaseUser.email,
+      displayName: firebaseUser.displayName,
+      firstName: extra?.firstName || nameParts[0] || "",
+      lastName: extra?.lastName || nameParts.slice(1).join(" ") || "",
+      photoURL: firebaseUser.photoURL,
+    }),
+  });
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || "Failed to sync user");
   }
+
+  return res.json();
 }
 
-const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
-
 export default function CredentialsPage() {
-  const router = useRouter()
-  const { trackSignupStepView, trackSignupStepComplete, trackSignupAuthAttempt, trackSignupFieldError } = useAnalytics()
-  const { setAuth, setProfile, setSignupStep } = useOnboardingStore()
+  const router = useRouter();
+  const {
+    trackSignupStepView,
+    trackSignupStepComplete,
+    trackSignupAuthAttempt,
+    trackSignupFieldError,
+  } = useAnalytics();
+  const signupStore = useSignupStore();
+  const onboardingStore = useOnboardingStore();
 
-  const [isLoginMode, setIsLoginMode] = useState(false)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [googleLoading, setGoogleLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [emailError, setEmailError] = useState('')
-  const [passwordError, setPasswordError] = useState('')
-  const googleBtnRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    setSignupStep(1)
-    trackSignupStepView('credentials', 1)
-  }, [setSignupStep, trackSignupStepView])
-
-  const handleGoogleResponse = useCallback(
-    async (response: { credential: string }) => {
-      setGoogleLoading(true)
-      setError('')
-      trackSignupAuthAttempt('google', 'started')
-
-      try {
-        const payload = JSON.parse(
-          atob(response.credential.split('.')[1])
-        )
-
-        const res = await fetch('/api/auth/google', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id_token: response.credential,
-            email: payload.email,
-            name: payload.name || '',
-            given_name: payload.given_name || '',
-            family_name: payload.family_name || '',
-          }),
-        })
-
-        const data = await res.json()
-
-        if (!res.ok) {
-          const errorMsg = data.error || 'Google sign-in failed. Please try again.'
-          setError(errorMsg)
-          trackSignupAuthAttempt('google', 'failed', errorMsg)
-          setGoogleLoading(false)
-          return
-        }
-
-        setAuth(data.userId, 'google', payload.email)
-
-        if (data.firstName || data.lastName) {
-          setProfile({
-            firstName: data.firstName || payload.given_name || '',
-            lastName: data.lastName || payload.family_name || '',
-            phone: '',
-          })
-        }
-
-        trackSignupAuthAttempt('google', 'completed')
-        trackSignupStepComplete('credentials', 1)
-        router.push('/signup/profile')
-      } catch {
-        const errorMsg = 'Connection error. Please try again.'
-        setError(errorMsg)
-        trackSignupAuthAttempt('google', 'failed', errorMsg)
-      } finally {
-        setGoogleLoading(false)
-      }
-    },
-    [setAuth, setProfile, trackSignupStepComplete, trackSignupAuthAttempt, router]
-  )
+  const [isLoginMode, setIsLoginMode] = useState(false);
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState<"google" | "apple" | "email" | null>(null);
+  const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    if (!GOOGLE_CLIENT_ID) return
+    signupStore.setCurrentStep(1);
+    onboardingStore.setSignupStep(1);
+    trackSignupStepView("credentials", 1);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const initGoogle = () => {
-      if (!window.google?.accounts?.id) return
+  const handleAuthSuccess = async (
+    firebaseUser: User,
+    method: "google" | "apple" | "email",
+    extraNames?: { firstName?: string; lastName?: string }
+  ) => {
+    try {
+      const data = await syncUser(firebaseUser, extraNames);
 
-      window.google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: handleGoogleResponse,
-        auto_select: false,
-      })
+      // Bridge to both stores
+      signupStore.setAuth({
+        firebaseUid: firebaseUser.uid,
+        userId: data.user.id,
+        email: data.user.email,
+        authMethod: method,
+        isNewUser: data.isNewUser,
+      });
+      onboardingStore.setAuth(data.user.id, method, data.user.email);
 
-      if (googleBtnRef.current) {
-        window.google.accounts.id.renderButton(googleBtnRef.current, {
-          type: 'standard',
-          size: 'large',
-          width: 300,
-        })
+      if (data.user.firstName || data.user.lastName) {
+        signupStore.setProfile({
+          firstName: data.user.firstName,
+          lastName: data.user.lastName,
+          phone: "",
+          companyName: "",
+        });
+        onboardingStore.setProfile({
+          firstName: data.user.firstName,
+          lastName: data.user.lastName,
+          phone: "",
+        });
       }
+
+      trackSignupAuthAttempt(method, "completed");
+      trackSignupStepComplete("credentials", 1);
+
+      if (isLoginMode || !data.isNewUser) {
+        // Existing user — skip setup, go to tutorial or download
+        router.push("/tutorial");
+      } else {
+        router.push("/signup/profile");
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Failed to sync account";
+      setError(msg);
+      trackSignupAuthAttempt(method, "failed", msg);
     }
+  };
 
-    if (window.google?.accounts?.id) {
-      initGoogle()
-    } else {
-      const interval = setInterval(() => {
-        if (window.google?.accounts?.id) {
-          clearInterval(interval)
-          initGoogle()
-        }
-      }, 100)
-      setTimeout(() => clearInterval(interval), 5000)
-    }
-  }, [handleGoogleResponse])
-
-  const handleGoogleClick = () => {
-    const btn =
-      googleBtnRef.current?.querySelector<HTMLElement>('[role="button"]') ||
-      googleBtnRef.current?.querySelector<HTMLElement>('div[style]')
-    if (btn) {
-      btn.click()
-    }
-  }
-
-  const validateEmail = (value: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!value) return 'Email is required'
-    if (!emailRegex.test(value)) return 'Enter a valid email'
-    return ''
-  }
-
-  const validatePassword = (value: string) => {
-    if (!value) return 'Password is required'
-    if (!isLoginMode && value.length < 8) return 'Must be at least 8 characters'
-    return ''
-  }
-
-  const handleSubmit = async () => {
-    const eErr = validateEmail(email)
-    const pErr = validatePassword(password)
-    setEmailError(eErr)
-    setPasswordError(pErr)
-    if (eErr) {
-      trackSignupFieldError('credentials', 'email', eErr)
-    }
-    if (pErr) {
-      trackSignupFieldError('credentials', 'password', pErr)
-    }
-    if (eErr || pErr) return
-
-    setLoading(true)
-    setError('')
-    const method = isLoginMode ? 'email_login' : 'email_signup'
-    trackSignupAuthAttempt(method, 'started')
+  const handleOAuth = async (provider: "google" | "apple") => {
+    setLoading(provider);
+    setError("");
+    trackSignupAuthAttempt(provider, "started");
 
     try {
-      const endpoint = isLoginMode ? '/api/auth/login' : '/api/auth/signup'
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      })
+      const signIn = provider === "google" ? signInWithGoogle : signInWithApple;
+      const user = await signIn();
+      await handleAuthSuccess(user, provider);
+    } catch (err: unknown) {
+      const code = (err as { code?: string })?.code;
+      // User cancelled — just reset loading
+      if (
+        code === "auth/popup-closed-by-user" ||
+        code === "auth/cancelled-popup-request"
+      ) {
+        setLoading(null);
+        return;
+      }
+      const msg = err instanceof Error ? err.message : "Authentication failed";
+      setError(msg);
+      trackSignupAuthAttempt(provider, "failed", msg);
+    } finally {
+      setLoading(null);
+    }
+  };
 
-      const data = await res.json()
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-      if (!res.ok) {
-        const errorMsg = data.error || (isLoginMode ? 'Login failed.' : 'Signup failed. Please try again.')
-        setError(errorMsg)
-        trackSignupAuthAttempt(method, 'failed', errorMsg)
-        setLoading(false)
-        return
+    if (!isLoginMode && !firstName.trim()) errors.firstName = "First name is required";
+    if (!isLoginMode && !lastName.trim()) errors.lastName = "Last name is required";
+    if (!email) errors.email = "Email is required";
+    else if (!emailRegex.test(email)) errors.email = "Enter a valid email";
+    if (!password) errors.password = "Password is required";
+    else if (!isLoginMode && password.length < 8) errors.password = "Must be at least 8 characters";
+
+    setFieldErrors(errors);
+    Object.entries(errors).forEach(([field, err]) => {
+      trackSignupFieldError("credentials", field, err);
+    });
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleEmailSubmit = async () => {
+    if (!validateForm()) return;
+
+    setLoading("email");
+    setError("");
+    const method = isLoginMode ? "email_login" : "email_signup";
+    trackSignupAuthAttempt(method, "started");
+
+    try {
+      let user: User;
+      if (isLoginMode) {
+        user = await signInWithEmail(email, password);
+      } else {
+        user = await signUpWithEmail(email, password);
+        // Set display name for new users
+        const fullName = `${firstName.trim()} ${lastName.trim()}`;
+        await updateUserProfile(user, { displayName: fullName });
       }
 
-      setAuth(data.userId, 'email', email)
-      trackSignupAuthAttempt(method, 'completed')
-      trackSignupStepComplete('credentials', 1)
-      router.push(isLoginMode ? '/download' : '/signup/profile')
-    } catch {
-      const errorMsg = 'Connection error. Please check your internet and try again.'
-      setError(errorMsg)
-      trackSignupAuthAttempt(method, 'failed', errorMsg)
-    } finally {
-      setLoading(false)
-    }
-  }
+      await handleAuthSuccess(user, "email", {
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+      });
+    } catch (err: unknown) {
+      const code = (err as { code?: string })?.code;
+      let msg = "Authentication failed. Please try again.";
+      if (code === "auth/email-already-in-use") msg = "An account with this email already exists. Try signing in.";
+      else if (code === "auth/invalid-credential") msg = "Invalid email or password.";
+      else if (code === "auth/wrong-password") msg = "Incorrect password.";
+      else if (code === "auth/user-not-found") msg = "No account found with this email.";
+      else if (code === "auth/too-many-requests") msg = "Too many attempts. Please wait and try again.";
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && email && password) {
-      handleSubmit()
+      setError(msg);
+      trackSignupAuthAttempt(method, "failed", msg);
+    } finally {
+      setLoading(null);
     }
-  }
+  };
 
   const toggleMode = () => {
-    setIsLoginMode(!isLoginMode)
-    setError('')
-    setEmailError('')
-    setPasswordError('')
-  }
+    setIsLoginMode(!isLoginMode);
+    setError("");
+    setFieldErrors({});
+    setShowEmailForm(false);
+  };
 
   return (
-    <OnboardingScaffold showBack onBack={() => router.push('/tutorial/complete')}>
-      <div className="px-10">
-        <h1 className="font-mohave font-semibold text-ops-title tracking-wide mb-2">
-          <TypewriterText
-            text={isLoginMode ? 'WELCOME BACK' : 'CREATE YOUR ACCOUNT'}
-            typingSpeed={30}
-            key={isLoginMode ? 'login' : 'signup'}
-          />
-        </h1>
+    <div className="w-full">
+      {/* Mobile logo — hidden on desktop (hero has brand mark) */}
+      <div className="lg:hidden mb-8">
+        <p className="font-bebas text-[36px] tracking-[0.2em] text-white/90 leading-none">
+          OPS
+        </p>
+      </div>
 
-        <PhasedContent delay={800}>
-          <p className="font-kosugi text-ops-body text-ops-text-secondary mb-8">
-            {isLoginMode
-              ? 'Sign in to your existing account.'
-              : "Let's get you set up. No credit card required."}
-          </p>
-        </PhasedContent>
+      <h1 className="font-mohave text-display text-text-primary uppercase tracking-wide">
+        {isLoginMode ? "SIGN IN" : "CREATE ACCOUNT"}
+      </h1>
+      <p className="font-mohave text-body-sm text-text-tertiary mt-1 mb-6">
+        {isLoginMode
+          ? "Welcome back. Sign in to continue."
+          : "Start your 30-day free trial. No card required."}
+      </p>
 
-        <PhasedContent delay={1200}>
-          <div className="space-y-4" onKeyDown={handleKeyDown}>
-            <OPSInput
+      <div className="space-y-3">
+        {/* OAuth Buttons */}
+        <Button
+          variant="oauth"
+          onClick={() => handleOAuth("google")}
+          loading={loading === "google"}
+          disabled={loading !== null}
+          className="w-full"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" className="mr-2">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+          </svg>
+          CONTINUE WITH GOOGLE
+        </Button>
+
+        <Button
+          variant="oauth"
+          onClick={() => handleOAuth("apple")}
+          loading={loading === "apple"}
+          disabled={loading !== null}
+          className="w-full"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="mr-2">
+            <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+          </svg>
+          CONTINUE WITH APPLE
+        </Button>
+
+        {/* Divider */}
+        <div className="flex items-center gap-4 py-1">
+          <div className="flex-1 h-px bg-border" />
+          <span className="font-kosugi text-caption-sm text-text-tertiary uppercase tracking-widest">
+            or
+          </span>
+          <div className="flex-1 h-px bg-border" />
+        </div>
+
+        {/* Expandable Email */}
+        {!showEmailForm ? (
+          <Button
+            variant="secondary"
+            onClick={() => setShowEmailForm(true)}
+            disabled={loading !== null}
+            className="w-full"
+          >
+            {isLoginMode ? "SIGN IN WITH EMAIL" : "SIGN UP WITH EMAIL"}
+          </Button>
+        ) : (
+          <div className="space-y-3 animate-fade-in">
+            {!isLoginMode && (
+              <div className="grid grid-cols-2 gap-3">
+                <Input
+                  label="First Name"
+                  placeholder="John"
+                  value={firstName}
+                  onChange={(e) => {
+                    setFirstName(e.target.value);
+                    setFieldErrors((prev) => ({ ...prev, firstName: "" }));
+                  }}
+                  error={fieldErrors.firstName}
+                  autoFocus
+                />
+                <Input
+                  label="Last Name"
+                  placeholder="Smith"
+                  value={lastName}
+                  onChange={(e) => {
+                    setLastName(e.target.value);
+                    setFieldErrors((prev) => ({ ...prev, lastName: "" }));
+                  }}
+                  error={fieldErrors.lastName}
+                />
+              </div>
+            )}
+
+            <Input
               label="Email"
               type="email"
-              value={email}
-              onChange={(v) => {
-                setEmail(v)
-                setEmailError('')
-              }}
               placeholder="you@company.com"
-              required
-              error={emailError}
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setFieldErrors((prev) => ({ ...prev, email: "" }));
+              }}
+              error={fieldErrors.email}
               autoComplete="email"
+              autoFocus={isLoginMode}
             />
 
-            <OPSInput
+            <Input
               label="Password"
               type="password"
+              placeholder={isLoginMode ? "Your password" : "8+ characters"}
               value={password}
-              onChange={(v) => {
-                setPassword(v)
-                setPasswordError('')
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setFieldErrors((prev) => ({ ...prev, password: "" }));
               }}
-              placeholder={isLoginMode ? 'Your password' : '8+ characters'}
-              required
-              error={passwordError}
-              autoComplete={isLoginMode ? 'current-password' : 'new-password'}
+              error={fieldErrors.password}
+              autoComplete={isLoginMode ? "current-password" : "new-password"}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleEmailSubmit();
+              }}
             />
 
             {error && (
-              <p className="font-kosugi text-ops-small text-ops-error text-center">
+              <p className="text-caption text-ops-error font-mohave" role="alert">
                 {error}
               </p>
             )}
 
-            <OPSButton
-              onClick={handleSubmit}
-              loading={loading}
-              loadingText={isLoginMode ? 'SIGNING IN...' : 'CREATING ACCOUNT...'}
-              disabled={!email || !password}
+            <Button
+              variant="primary"
+              onClick={handleEmailSubmit}
+              loading={loading === "email"}
+              disabled={loading !== null}
+              className="w-full"
             >
-              {isLoginMode ? 'SIGN IN' : 'CREATE ACCOUNT'}
-            </OPSButton>
-
-            {/* Divider */}
-            <div className="flex items-center gap-4 py-2">
-              <div className="flex-1 h-px bg-ops-border" />
-              <span className="font-kosugi text-ops-small text-ops-text-tertiary">
-                OR
-              </span>
-              <div className="flex-1 h-px bg-ops-border" />
-            </div>
-
-            {/* Google Sign-In */}
-            <OPSButton
-              variant="secondary"
-              onClick={handleGoogleClick}
-              loading={googleLoading}
-              loadingText="SIGNING IN..."
-            >
-              <span className="flex items-center gap-3">
-                <svg width="18" height="18" viewBox="0 0 24 24">
-                  <path
-                    fill="#4285F4"
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                  />
-                </svg>
-                CONTINUE WITH GOOGLE
-              </span>
-            </OPSButton>
-
-            {/* Login/Signup toggle */}
-            <p className="text-center pt-2">
-              <span className="font-kosugi text-ops-caption text-ops-text-tertiary">
-                {isLoginMode ? "Don't have an account? " : 'Already have an account? '}
-              </span>
-              <button
-                type="button"
-                onClick={toggleMode}
-                className="font-kosugi text-ops-caption text-ops-accent hover:text-ops-accent/80 transition-colors"
-              >
-                {isLoginMode ? 'Sign up' : 'Log in'}
-              </button>
-            </p>
-
-            {/* Hidden Google Identity Services button */}
-            <div
-              ref={googleBtnRef}
-              className="absolute overflow-hidden"
-              style={{ width: 0, height: 0, opacity: 0, pointerEvents: 'none' }}
-            />
+              {isLoginMode ? "SIGN IN" : "CREATE ACCOUNT"}
+            </Button>
           </div>
-        </PhasedContent>
+        )}
+
+        {/* General error (for OAuth) */}
+        {error && !showEmailForm && (
+          <p className="text-caption text-ops-error font-mohave" role="alert">
+            {error}
+          </p>
+        )}
+
+        {/* Toggle login/signup */}
+        <p className="pt-2">
+          <span className="font-kosugi text-caption text-text-tertiary">
+            {isLoginMode ? "Don't have an account? " : "Already have an account? "}
+          </span>
+          <button
+            type="button"
+            onClick={toggleMode}
+            className="font-kosugi text-caption text-ops-accent hover:text-ops-accent-hover transition-colors"
+          >
+            {isLoginMode ? "Sign up" : "Sign in"}
+          </button>
+        </p>
       </div>
-    </OnboardingScaffold>
-  )
+    </div>
+  );
 }
