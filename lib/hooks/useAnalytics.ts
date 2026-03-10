@@ -310,32 +310,11 @@ export function useAnalytics() {
     [track]
   )
 
-  // ─── Crew invite tracking ──────────────────────────────────────────
-
-  const trackCrewInviteOpened = useCallback(
-    (companyId: string) => {
-      track('crew_invite_opened', {
-        company_id: companyId,
-      })
-    },
-    [track]
-  )
-
-  const trackCrewInviteSent = useCallback(
-    (companyId: string, inviteCount: number, methods: string[]) => {
-      track('crew_invite_sent', {
-        company_id: companyId,
-        invite_count: inviteCount,
-        methods,
-      })
-    },
-    [track]
-  )
-
-  const trackCrewInviteSkipped = useCallback(
-    (companyId: string) => {
-      track('crew_invite_skipped', {
-        company_id: companyId,
+  const trackSetupStepSkipped = useCallback(
+    (stepName: string, stepIndex: number) => {
+      track('setup_step_skipped', {
+        step_name: stepName,
+        step_index: stepIndex,
       })
     },
     [track]
@@ -427,10 +406,7 @@ export function useAnalytics() {
     trackSignupAuthAttempt,
     trackSignupFieldTime,
     trackSignupStepAbandon,
-    // Crew invite
-    trackCrewInviteOpened,
-    trackCrewInviteSent,
-    trackCrewInviteSkipped,
+    trackSetupStepSkipped,
     // Landing page deeper engagement
     trackLandingTestimonialView,
     trackLandingPricingPlanClick,
