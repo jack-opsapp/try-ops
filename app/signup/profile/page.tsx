@@ -1,152 +1,191 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { OnboardingScaffold } from '@/components/layout/OnboardingScaffold'
-import { PhasedOnboardingHeader } from '@/components/ui/PhasedOnboardingHeader'
-import { PhasedContent } from '@/components/ui/PhasedContent'
-import { PhasedLabel } from '@/components/ui/PhasedLabel'
-import { PhasedPrimaryButton } from '@/components/ui/PhasedPrimaryButton'
-import { useOnboardingAnimation } from '@/lib/hooks/useOnboardingAnimation'
-import { useOnboardingStore } from '@/lib/stores/onboarding-store'
-import { useAnalytics } from '@/lib/hooks/useAnalytics'
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { useSignupStore } from "@/lib/stores/signup-store";
+import { useOnboardingStore } from "@/lib/stores/onboarding-store";
+import { useAnalytics } from "@/lib/hooks/useAnalytics";
 
 export default function ProfilePage() {
-  const router = useRouter()
-  const { trackSignupStepView, trackSignupStepComplete } = useAnalytics()
-  const store = useOnboardingStore()
-  const { userId, setProfile, setSignupStep } = store
-  const animation = useOnboardingAnimation()
+  const router = useRouter();
+  const {
+    trackSignupStepView,
+    trackSignupStepComplete,
+    trackSignupFieldError,
+    trackSetupStepSkipped,
+  } = useAnalytics();
+  const signupStore = useSignupStore();
+  const onboardingStore = useOnboardingStore();
 
-  const [firstName, setFirstName] = useState(store.firstName || '')
-  const [lastName, setLastName] = useState(store.lastName || '')
-  const [phone, setPhone] = useState(store.phone || '')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [firstName, setFirstName] = useState(signupStore.firstName);
+  const [lastName, setLastName] = useState(signupStore.lastName);
+  const [companyName, setCompanyName] = useState(signupStore.companyName);
+  const [phone, setPhone] = useState(signupStore.phone);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!userId) {
-      router.push('/signup/credentials')
-      return
+    signupStore.setCurrentStep(2);
+    onboardingStore.setSignupStep(2);
+    trackSignupStepView("profile", 2);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Redirect if no auth
+  useEffect(() => {
+    if (!signupStore.userId) {
+      router.replace("/signup/credentials");
     }
-    setSignupStep(2)
-    trackSignupStepView('profile', 2)
-    animation.start()
-  }, [userId, router, setSignupStep, trackSignupStepView])
+  }, [signupStore.userId, router]);
 
-  const handleContinue = async () => {
-    if (!firstName.trim() || !lastName.trim()) return
+  const validate = () => {
+    const errs: Record<string, string> = {};
+    if (!firstName.trim()) errs.firstName = "First name is required";
+    if (!lastName.trim()) errs.lastName = "Last name is required";
+    if (!companyName.trim()) errs.companyName = "Company name is required";
 
-    setLoading(true)
-    setError('')
+    setErrors(errs);
+    Object.entries(errs).forEach(([field, err]) => {
+      trackSignupFieldError("profile", field, err);
+    });
+    return Object.keys(errs).length === 0;
+  };
 
+  const saveProgress = async () => {
+    signupStore.setProfile({
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      phone: phone.trim(),
+      companyName: companyName.trim(),
+    });
+    onboardingStore.setProfile({
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      phone: phone.trim(),
+    });
+    onboardingStore.setCompanyBasic({
+      name: companyName.trim(),
+      email: "",
+      phone: "",
+    });
+  };
+
+  const handleNext = async () => {
+    if (!validate()) return;
+
+    setSaving(true);
     try {
-      const res = await fetch(`/api/user/${userId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nameFirst: firstName.trim(),
-          nameLast: lastName.trim(),
-          phone: phone.trim() || undefined,
-          userType: 'Company',
-        }),
-      })
-
-      if (!res.ok) {
-        const data = await res.json()
-        setError(data.error || 'Failed to save profile')
-        setLoading(false)
-        return
-      }
-
-      setProfile({
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        phone: phone.trim(),
-      })
-      trackSignupStepComplete('profile', 2)
-      router.push('/signup/company-setup')
-    } catch {
-      setError('Connection error. Please try again.')
+      await saveProgress();
+      trackSignupStepComplete("profile", 2);
+      router.push("/signup/company-details");
     } finally {
-      setLoading(false)
+      setSaving(false);
     }
-  }
+  };
+
+  const handleSkip = async () => {
+    await saveProgress();
+    trackSetupStepSkipped("profile", 2);
+    router.push("/tutorial");
+  };
 
   return (
-    <OnboardingScaffold showBack>
-      {/* Title — iOS: .padding(.horizontal, 40) .padding(.top, 16) */}
-      <div className="px-10 pt-4">
-        <PhasedOnboardingHeader
-          title="YOUR INFO"
-          subtitle="Your crew will see this."
-          animation={animation}
+    <div className="w-full">
+      {/* Progress bar — 2 segments */}
+      <div className="flex gap-1 mb-6">
+        <div className="flex-1 h-0.5 bg-white/40 rounded-full" />
+        <div className="flex-1 h-0.5 bg-background-elevated rounded-full" />
+      </div>
+
+      {/* Step indicator + skip */}
+      <div className="flex items-center justify-between mb-6">
+        <span className="font-kosugi text-caption-sm text-text-tertiary uppercase tracking-widest">
+          [step 1 of 2]
+        </span>
+        <button
+          type="button"
+          onClick={handleSkip}
+          className="font-kosugi text-caption-sm text-text-tertiary uppercase tracking-widest hover:text-text-secondary transition-colors"
+        >
+          Skip for now
+        </button>
+      </div>
+
+      {/* Header */}
+      <h1 className="font-mohave text-heading text-text-primary uppercase tracking-wide">
+        ABOUT YOU
+      </h1>
+      <p className="font-kosugi text-caption text-text-tertiary mt-1 mb-6">
+        [the name behind the operation]
+      </p>
+
+      {/* Form */}
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <Input
+            label="First Name"
+            placeholder="John"
+            value={firstName}
+            onChange={(e) => {
+              setFirstName(e.target.value);
+              setErrors((prev) => ({ ...prev, firstName: "" }));
+            }}
+            error={errors.firstName}
+            autoFocus
+          />
+          <Input
+            label="Last Name"
+            placeholder="Smith"
+            value={lastName}
+            onChange={(e) => {
+              setLastName(e.target.value);
+              setErrors((prev) => ({ ...prev, lastName: "" }));
+            }}
+            error={errors.lastName}
+          />
+        </div>
+
+        <Input
+          label="Company Name"
+          placeholder="Smith Roofing Co."
+          value={companyName}
+          onChange={(e) => {
+            setCompanyName(e.target.value);
+            setErrors((prev) => ({ ...prev, companyName: "" }));
+          }}
+          error={errors.companyName}
+        />
+
+        <Input
+          label="Phone (Optional)"
+          type="tel"
+          placeholder="(555) 123-4567"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          helperText="[recovery only. we don't call.]"
         />
       </div>
 
-      {/* Spacer — iOS: Spacer().frame(height: 32) */}
-      <div className="h-8" />
-
-      {/* Content — fades in upward during contentFadeIn */}
-      <PhasedContent animation={animation}>
-        <div className="px-10 space-y-5">
-          {/* First Name */}
-          <div className="flex flex-col gap-2">
-            <PhasedLabel text="FIRST NAME" index={0} animation={animation} />
-            <input
-              type="text"
-              value={firstName}
-              onChange={(e) => { setFirstName(e.target.value); setError('') }}
-              autoComplete="given-name"
-              className="w-full h-12 px-4 rounded-ops bg-ops-surface font-mohave text-ops-body text-ops-text-primary border border-ops-border outline-none placeholder:text-ops-text-tertiary"
-            />
-          </div>
-
-          {/* Last Name */}
-          <div className="flex flex-col gap-2">
-            <PhasedLabel text="LAST NAME" index={1} animation={animation} />
-            <input
-              type="text"
-              value={lastName}
-              onChange={(e) => { setLastName(e.target.value); setError('') }}
-              autoComplete="family-name"
-              className="w-full h-12 px-4 rounded-ops bg-ops-surface font-mohave text-ops-body text-ops-text-primary border border-ops-border outline-none placeholder:text-ops-text-tertiary"
-            />
-          </div>
-
-          {/* Phone */}
-          <div className="flex flex-col gap-2">
-            <PhasedLabel text="PHONE" index={2} isLast animation={animation} />
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              autoComplete="tel"
-              placeholder="(555) 123-4567"
-              className="w-full h-12 px-4 rounded-ops bg-ops-surface font-mohave text-ops-body text-ops-text-primary border border-ops-border outline-none placeholder:text-ops-text-tertiary"
-            />
-          </div>
-
-          {error && (
-            <p className="font-kosugi text-ops-small text-ops-error text-center">
-              {error}
-            </p>
-          )}
-        </div>
-      </PhasedContent>
-
-      {/* Spacer — pushes button to bottom */}
-      <div className="flex-1" />
-
-      {/* Button — iOS: PhasedPrimaryButton .padding(.horizontal, 40) .padding(.bottom, 50) */}
-      <PhasedPrimaryButton
-        title="CONTINUE"
-        isEnabled={!!firstName.trim() && !!lastName.trim()}
-        isLoading={loading}
-        loadingText="SAVING..."
-        animation={animation}
-        onClick={handleContinue}
-      />
-    </OnboardingScaffold>
-  )
+      {/* Navigation */}
+      <div className="border-t border-border-separator mt-8 pt-4 flex items-center justify-between">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => router.back()}
+        >
+          <ArrowLeft className="w-4 h-4 mr-1" />
+          BACK
+        </Button>
+        <Button
+          variant="primary"
+          onClick={handleNext}
+          loading={saving}
+        >
+          NEXT
+        </Button>
+      </div>
+    </div>
+  );
 }
