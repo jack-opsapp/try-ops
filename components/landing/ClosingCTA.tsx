@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import type { z } from 'zod'
 import type { ClosingCTAPropsSchema } from '@/lib/ab/types'
 import { Button } from '@/components/shared/Button'
+import { trackABClick } from '@/lib/ab/track-click'
 
 type ClosingCTAProps = z.infer<typeof ClosingCTAPropsSchema>
 
@@ -21,10 +22,12 @@ export function ClosingCTA({ headline, subtext, primaryCtaLabel, secondaryCtaLab
   const router = useRouter()
 
   const handleDownloadClick = () => {
+    trackABClick('ClosingCTA', 'download_btn')
     window.open(APP_STORE_URL, '_blank')
   }
 
   const handleTryClick = () => {
+    trackABClick('ClosingCTA', 'try_btn')
     router.push('/tutorial-intro')
   }
   return (

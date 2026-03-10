@@ -6,6 +6,7 @@ import type { z } from 'zod'
 import type { HeroPropsSchema } from '@/lib/ab/types'
 import { Button } from '@/components/shared/Button'
 import { HeroAnimation } from '@/components/landing/HeroAnimation'
+import { trackABClick } from '@/lib/ab/track-click'
 
 type HeroProps = z.infer<typeof HeroPropsSchema>
 
@@ -22,10 +23,12 @@ export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel }: 
   const router = useRouter()
 
   const handleDownloadClick = () => {
+    trackABClick('Hero', 'download_btn')
     window.open(APP_STORE_URL, '_blank')
   }
 
   const handleTryClick = () => {
+    trackABClick('Hero', 'try_btn')
     router.push('/tutorial-intro')
   }
   return (

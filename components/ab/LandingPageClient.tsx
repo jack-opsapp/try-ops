@@ -11,6 +11,7 @@ import { StickyCTA } from '@/components/landing/StickyCTA'
 import { Footer } from '@/components/landing/Footer'
 import { SectionTracker } from '@/components/ab/SectionTracker'
 import { SECTION_REGISTRY } from '@/lib/ab/registry'
+import { trackABClick } from '@/lib/ab/track-click'
 import type { VariantConfig } from '@/lib/ab/types'
 
 const APP_STORE_URL = 'https://apps.apple.com/us/app/ops-job-crew-management/id6746662078'
@@ -85,6 +86,7 @@ export function LandingPageClient({ config, variantId }: Props) {
   // ── CTA handlers ──────────────────────────────────────────────────────────
 
   const handleDownloadClick = useCallback(() => {
+    trackABClick('HamburgerMenu', 'download_btn')
     if (isMobile()) {
       window.location.href = APP_STORE_URL
     } else {
@@ -93,11 +95,13 @@ export function LandingPageClient({ config, variantId }: Props) {
   }, [])
 
   const handleTryClick = useCallback(() => {
+    trackABClick('HamburgerMenu', 'try_btn')
     setTutorialStartTime(Date.now())
     router.push('/tutorial-intro')
   }, [setTutorialStartTime, router])
 
   const handleStickyDownloadClick = useCallback(() => {
+    trackABClick('StickyCTA', 'download_btn')
     if (isMobile()) {
       window.location.href = APP_STORE_URL
     } else {
@@ -106,6 +110,7 @@ export function LandingPageClient({ config, variantId }: Props) {
   }, [])
 
   const handleStickyTryClick = useCallback(() => {
+    trackABClick('StickyCTA', 'try_btn')
     setTutorialStartTime(Date.now())
     router.push('/tutorial-intro')
   }, [setTutorialStartTime, router])
