@@ -109,11 +109,11 @@ export function Sequence1C({ onComplete, skipToEnd }: Sequence1CProps) {
     return () => timers.forEach(clearTimeout)
   }, [onComplete])
 
-  // Skip to final frame
+  // Skip to final frame — keep text visible so user gets context
   useEffect(() => {
     if (!skipToEnd) return
     timersRef.current.forEach(clearTimeout)
-    setShowText(false)
+    setShowText(true)
     setFolderSmall(false)
     setCollapsing(true)
     setCollapsedCount(7)

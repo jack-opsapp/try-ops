@@ -5,10 +5,13 @@ import { useRouter } from 'next/navigation'
 import { Sequence1 } from './Sequence1'
 import { Sequence1B } from './Sequence1B'
 import { Sequence1C } from './Sequence1C'
-import { Sequence2 } from './Sequence2'
-import { Sequence3 } from './Sequence3'
+import { Seq2Statuses } from './Seq2Statuses'
+import { Seq2Archive } from './Seq2Archive'
+import { Seq3Tasks } from './Seq3Tasks'
+import { Seq3Invoice } from './Seq3Invoice'
+import { Seq3Finale } from './Seq3Finale'
 
-const PHASES = ['seq1', 'seq1b', 'seq1c', 'seq2', 'seq3'] as const
+const PHASES = ['seq1', 'seq1b', 'seq1c', 'seq2statuses', 'seq2archive', 'seq3tasks', 'seq3invoice', 'seq3finale'] as const
 type Phase = (typeof PHASES)[number]
 
 // Estimated durations per phase (ms) — for progress bar fill animation
@@ -16,8 +19,11 @@ const PHASE_DURATIONS: Record<Phase, number> = {
   seq1: 5300,
   seq1b: 9500,
   seq1c: 8800,
-  seq2: 15600,
-  seq3: 16000,
+  seq2statuses: 7400,
+  seq2archive: 7750,
+  seq3tasks: 7400,
+  seq3invoice: 5800,
+  seq3finale: 4000,
 }
 
 // ── Story Progress Bar ───────────────────────────────────────────
@@ -190,18 +196,24 @@ export function TutorialIntroShell() {
             <Sequence1C key={seqKey} onComplete={handleSequenceComplete} skipToEnd={sequenceState === 'complete'} />
           )}
 
-          {phase === 'seq2' && (
-            <Sequence2
-              key={seqKey}
-              onComplete={handleSequenceComplete}
-              initialState="2-setup"
-              folderLabel="OFFICE REMODEL"
-              skipToEnd={sequenceState === 'complete'}
-            />
+          {phase === 'seq2statuses' && (
+            <Seq2Statuses key={seqKey} onComplete={handleSequenceComplete} skipToEnd={sequenceState === 'complete'} />
           )}
 
-          {phase === 'seq3' && (
-            <Sequence3 key={seqKey} onComplete={handleSequenceComplete} skipToEnd={sequenceState === 'complete'} />
+          {phase === 'seq2archive' && (
+            <Seq2Archive key={seqKey} onComplete={handleSequenceComplete} skipToEnd={sequenceState === 'complete'} />
+          )}
+
+          {phase === 'seq3tasks' && (
+            <Seq3Tasks key={seqKey} onComplete={handleSequenceComplete} skipToEnd={sequenceState === 'complete'} />
+          )}
+
+          {phase === 'seq3invoice' && (
+            <Seq3Invoice key={seqKey} onComplete={handleSequenceComplete} skipToEnd={sequenceState === 'complete'} />
+          )}
+
+          {phase === 'seq3finale' && (
+            <Seq3Finale key={seqKey} onComplete={handleSequenceComplete} skipToEnd={sequenceState === 'complete'} />
           )}
         </div>
       )}

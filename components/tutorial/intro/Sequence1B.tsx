@@ -80,13 +80,13 @@ export function Sequence1B({ onComplete, skipToEnd }: Sequence1BProps) {
     return () => timers.forEach(clearTimeout)
   }, [onComplete])
 
-  // Skip to final frame
+  // Skip to final frame — keep text visible so user gets context
   useEffect(() => {
     if (!skipToEnd) return
     timersRef.current.forEach(clearTimeout)
     setActiveTask(null)
     setShowDetails(null)
-    setTextVisible(false)
+    setTextVisible(true)
     setCollapsing(true)
   }, [skipToEnd])
 

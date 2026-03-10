@@ -6,10 +6,8 @@ import { ProjectFolder } from './ProjectFolder'
 import { OPSStyle } from '@/lib/styles/OPSStyle'
 import { TypewriterText } from '@/components/ui/TypewriterText'
 
-interface Sequence2Props {
+interface Seq2ArchiveProps {
   onComplete: () => void
-  initialState: '2-setup' | '2-carousel' | '2-archive'
-  folderLabel?: string
   skipToEnd?: boolean
 }
 
@@ -17,172 +15,108 @@ const STATUS_ORDER = ['rfq', 'estimated', 'accepted', 'inProgress', 'completed',
 const STATUS_LABELS = OPSStyle.StatusLabels
 const STATUS_COLORS = OPSStyle.Colors.status
 
-const UNIFORM_DURATION = 1200 // Same duration for all transitions
-
-// Each status item width in the carousel
 const ITEM_WIDTH = 250
 
-export function Sequence2({ onComplete, initialState, folderLabel, skipToEnd }: Sequence2Props) {
-  const [currentStatusIndex, setCurrentStatusIndex] = useState(0)
+export function Seq2Archive({ onComplete, skipToEnd }: Seq2ArchiveProps) {
+  // Start on Closed (where Seq2Statuses left off)
+  const [currentStatusIndex, setCurrentStatusIndex] = useState(5)
   const [isReversing, setIsReversing] = useState(false)
   const [isArchiving, setIsArchiving] = useState(false)
   const [hasReturnedFromArchive, setHasReturnedFromArchive] = useState(false)
   const [showArchiveLabel, setShowArchiveLabel] = useState(false)
-  const [showMainText, setShowMainText] = useState(false)
   const [showChangeText, setShowChangeText] = useState(false)
   const [showArchiveText, setShowArchiveText] = useState(false)
+  const [carouselVisible, setCarouselVisible] = useState(true)
   const timersRef = useRef<NodeJS.Timeout[]>([])
 
   const currentStatus = STATUS_ORDER[currentStatusIndex]
-  const folderColor = isArchiving && !hasReturnedFromArchive ? STATUS_COLORS.archived :
-                      hasReturnedFromArchive ? '#FFFFFF' :
-                      STATUS_COLORS[currentStatus]
+  const folderColor = isArchiving && !hasReturnedFromArchive
+    ? STATUS_COLORS.archived
+    : hasReturnedFromArchive
+      ? '#FFFFFF'
+      : STATUS_COLORS[currentStatus]
 
   useEffect(() => {
     const timers: NodeJS.Timeout[] = []
     timersRef.current = timers
-    let cumulativeTime = 0
+    let t = 0
 
-    // Show main text
-    timers.push(setTimeout(() => setShowMainText(true), 200))
-    cumulativeTime = 200
+    // Start reversing immediately
+    t += 300
+    timers.push(setTimeout(() => setIsReversing(true), t))
 
-    // Forward progression with uniform timing
-    for (let i = 1; i <= 5; i++) {
-      cumulativeTime += UNIFORM_DURATION
-      const targetIndex = i
-      timers.push(
-        setTimeout(() => {
-          setCurrentStatusIndex(targetIndex)
-        }, cumulativeTime)
-      )
-    }
-
-    // Hold on "Closed"
-    cumulativeTime += 1000
-    timers.push(
-      setTimeout(() => {
-        setShowMainText(false)
-        setIsReversing(true)
-      }, cumulativeTime)
-    )
-
-    // Reverse roll back to Estimated (rapid, continuous)
-    const reverseSteps = [4, 3, 2, 1] // Closed -> Completed -> In Progress -> Accepted -> Estimated
+    // Rapid reverse: Closed → Completed → In Progress → Accepted → Estimated
+    const reverseSteps = [4, 3, 2, 1]
     reverseSteps.forEach((targetIndex) => {
-      cumulativeTime += 150
-      timers.push(
-        setTimeout(() => {
-          setCurrentStatusIndex(targetIndex)
-        }, cumulativeTime)
-      )
+      t += 150
+      timers.push(setTimeout(() => setCurrentStatusIndex(targetIndex), t))
     })
 
-    cumulativeTime += 150
-    timers.push(
-      setTimeout(() => {
-        setIsReversing(false)
-      }, cumulativeTime)
-    )
+    t += 150
+    timers.push(setTimeout(() => setIsReversing(false), t))
 
     // Settle on Estimated, show "CHANGE IT ANYTIME"
-    cumulativeTime += 1000
-    timers.push(
-      setTimeout(() => {
-        setShowChangeText(true)
-      }, cumulativeTime)
-    )
+    t += 800
+    timers.push(setTimeout(() => setShowChangeText(true), t))
 
-    // Hold "CHANGE IT ANYTIME" for 2s then hide
-    cumulativeTime += 2000
-    timers.push(
-      setTimeout(() => {
-        setShowChangeText(false)
-      }, cumulativeTime)
-    )
+    // Hold then hide
+    t += 2000
+    timers.push(setTimeout(() => setShowChangeText(false), t))
 
     // Show archive text and label
-    cumulativeTime += 600
-    timers.push(
-      setTimeout(() => {
-        setShowArchiveText(true)
-        setShowArchiveLabel(true)
-      }, cumulativeTime)
-    )
+    t += 600
+    timers.push(setTimeout(() => {
+      setShowArchiveText(true)
+      setShowArchiveLabel(true)
+      setCarouselVisible(false)
+    }, t))
 
     // Start archiving
-    cumulativeTime += 600
-    timers.push(
-      setTimeout(() => {
-        setIsArchiving(true)
-      }, cumulativeTime)
-    )
+    t += 600
+    timers.push(setTimeout(() => setIsArchiving(true), t))
 
     // Hold on archive
-    cumulativeTime += 2000
+    t += 2000
 
     // Return from archive
-    timers.push(
-      setTimeout(() => {
-        setHasReturnedFromArchive(true)
-        setShowArchiveLabel(false)
-        setShowArchiveText(false)
-      }, cumulativeTime)
-    )
+    timers.push(setTimeout(() => {
+      setHasReturnedFromArchive(true)
+      setShowArchiveLabel(false)
+      setShowArchiveText(false)
+    }, t))
 
-    // Complete — just call onComplete after brief hold
-    cumulativeTime += 800
-    timers.push(
-      setTimeout(() => {
-        onComplete()
-      }, cumulativeTime)
-    )
+    // Complete
+    t += 800
+    timers.push(setTimeout(() => onComplete(), t))
 
     return () => timers.forEach(clearTimeout)
   }, [onComplete])
 
-  // Skip to final frame
+  // Skip to final frame — show "CHANGE IT ANYTIME" for context
   useEffect(() => {
     if (!skipToEnd) return
     timersRef.current.forEach(clearTimeout)
-    setShowMainText(false)
-    setShowChangeText(false)
+    setShowChangeText(true)
     setShowArchiveText(false)
     setShowArchiveLabel(false)
     setIsReversing(false)
     setIsArchiving(false)
     setHasReturnedFromArchive(true)
-    setCurrentStatusIndex(1) // estimated
+    setCarouselVisible(false)
+    setCurrentStatusIndex(1) // Estimated
   }, [skipToEnd])
 
-  // Pixel offset to center the active item at x=0
-  // Each item is ITEM_WIDTH wide, item center = index * ITEM_WIDTH + ITEM_WIDTH/2
   const carouselX = -(currentStatusIndex * ITEM_WIDTH + ITEM_WIDTH / 2)
 
   const getTransitionDuration = () => {
     if (isReversing) return 0.15
-    return UNIFORM_DURATION / 1000 // Convert to seconds
+    return 0.6
   }
 
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-center" style={{ maxWidth: 600, margin: '0 auto' }}>
       {/* Text messages */}
       <AnimatePresence mode="wait">
-        {showMainText && (
-          <motion.div
-            key="main-text"
-            className="absolute top-16 left-0 right-0 text-center px-4"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.4 }}
-          >
-            <p className="font-mohave font-medium text-[20px] md:text-[24px] uppercase tracking-wider text-white">
-              <TypewriterText text="EVERY PROJECT HAS A STATUS" typingSpeed={30} />
-            </p>
-          </motion.div>
-        )}
-
         {showChangeText && (
           <motion.div
             key="change-text"
@@ -198,7 +132,6 @@ export function Sequence2({ onComplete, initialState, folderLabel, skipToEnd }: 
           </motion.div>
         )}
 
-        {/* Archive text */}
         {showArchiveText && (
           <motion.div
             key="archive-text"
@@ -216,11 +149,11 @@ export function Sequence2({ onComplete, initialState, folderLabel, skipToEnd }: 
         )}
       </AnimatePresence>
 
-      {/* Animation container — carousel and folder positioned together */}
+      {/* Animation container */}
       <div className="relative flex flex-col items-center">
-        {/* Status carousel — centered above the folder using zero-width anchor */}
+        {/* Status carousel */}
         <AnimatePresence>
-          {!isArchiving && (
+          {carouselVisible && !isArchiving && (
             <motion.div
               className="absolute"
               style={{
@@ -277,19 +210,14 @@ export function Sequence2({ onComplete, initialState, folderLabel, skipToEnd }: 
           animate={{
             y: isArchiving && !hasReturnedFromArchive ? 100 : 0,
             scale: isArchiving && !hasReturnedFromArchive ? 0.8 : 1,
-            opacity: 1,
           }}
-          transition={{
-            type: 'spring',
-            stiffness: 120,
-            damping: 18,
-          }}
+          transition={{ type: 'spring', stiffness: 120, damping: 18 }}
         >
-          <ProjectFolder color={folderColor} label={folderLabel} />
+          <ProjectFolder color={folderColor} label="OFFICE REMODEL" />
         </motion.div>
       </div>
 
-      {/* Archive label — in outer container, below center */}
+      {/* Archive label */}
       <AnimatePresence>
         {showArchiveLabel && (
           <motion.div
