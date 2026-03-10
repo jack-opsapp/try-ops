@@ -6,9 +6,10 @@ interface Props {
   children: React.ReactNode
   sectionName: string
   variantId: string
+  isInterstitial?: boolean
 }
 
-export function SectionTracker({ children, sectionName, variantId }: Props) {
+export function SectionTracker({ children, sectionName, variantId, isInterstitial }: Props) {
   const ref = useRef<HTMLDivElement>(null)
   const entryTimeRef = useRef<number | null>(null)
 
@@ -52,7 +53,14 @@ export function SectionTracker({ children, sectionName, variantId }: Props) {
     }).catch(() => {}) // fire-and-forget
   }
 
-  return <div ref={ref}>{children}</div>
+  return (
+    <div
+      ref={ref}
+      style={isInterstitial ? { scrollSnapAlign: 'none' } : undefined}
+    >
+      {children}
+    </div>
+  )
 }
 
 function getDeviceType(): 'mobile' | 'tablet' | 'desktop' {

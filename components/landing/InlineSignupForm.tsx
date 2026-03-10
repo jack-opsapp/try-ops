@@ -12,7 +12,8 @@ type InlineSignupFormProps = z.infer<typeof InlineSignupFormPropsSchema> & {
   onSuccess?: () => void
 }
 
-export function InlineSignupForm({ onSuccess, location, heading: _heading, subtext: _subtext }: InlineSignupFormProps) {
+export function InlineSignupForm({ onSuccess, location, heading, subtext }: InlineSignupFormProps) {
+  const isStandalone = location !== 'hero' && location !== 'closing'
   const router = useRouter()
   const setAuth = useOnboardingStore((s) => s.setAuth)
   const setTutorialStartTime = useOnboardingStore((s) => s.setTutorialStartTime)
@@ -83,7 +84,7 @@ export function InlineSignupForm({ onSuccess, location, heading: _heading, subte
     [email, password, location, setAuth, setTutorialStartTime, trackSignupAuthAttempt, onSuccess, router]
   )
 
-  return (
+  const formContent = (
     <div className="w-full max-w-[440px]">
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
         <input
@@ -128,5 +129,37 @@ export function InlineSignupForm({ onSuccess, location, heading: _heading, subte
         </a>
       </p>
     </div>
+  )
+
+  // When used inline inside Hero/ClosingCTA, return just the form
+  if (!isStandalone) return formContent
+
+  // When used as a standalone section, wrap with proper centering and padding
+  return (
+    <section className="py-16 lg:py-24">
+      <div className="max-w-[700px] mx-auto px-6 md:px-6 lg:px-10 flex flex-col items-center text-center">
+        {heading && (
+          <h2 className="font-mohave font-bold text-[28px] lg:text-[36px] text-ops-gray-50 uppercase leading-[1.1] tracking-[0.05em] mb-3">
+            {heading}
+          </h2>
+        )}
+        {subtext && (
+          <p className="font-kosugi text-[14px] text-ops-gray-300 mb-8 max-w-[500px]">
+            {subtext}
+          </p>
+        )}
+        {!heading && !subtext && (
+          <>
+            <h2 className="font-mohave font-bold text-[28px] lg:text-[36px] text-ops-gray-50 uppercase leading-[1.1] tracking-[0.05em] mb-3">
+              READY TO TRY IT?
+            </h2>
+            <p className="font-kosugi text-[14px] text-ops-gray-300 mb-8 max-w-[500px]">
+              Create your account in seconds. No credit card required.
+            </p>
+          </>
+        )}
+        {formContent}
+      </div>
+    </section>
   )
 }
