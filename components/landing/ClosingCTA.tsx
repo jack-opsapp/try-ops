@@ -26,7 +26,7 @@ export function ClosingCTA({ headline, subtext, primaryCtaLabel, secondaryCtaLab
   }
 
   const handleTryClick = () => {
-    router.push('/signup')
+    router.push('/tutorial-intro')
   }
   return (
     <section id="closing" className="bg-ops-card min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">

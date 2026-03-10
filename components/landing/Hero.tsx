@@ -27,7 +27,7 @@ export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel }: 
   }
 
   const handleTryClick = () => {
-    router.push('/signup')
+    router.push('/tutorial-intro')
   }
   return (
     <section id="hero" className="relative min-h-[100svh] flex items-center snap-start snap-always">
