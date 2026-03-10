@@ -42,7 +42,7 @@ export const INDUSTRIES = [
 
 export type Industry = (typeof INDUSTRIES)[number]
 
-export const COMPANY_SIZES = ['1-2', '3-5', '6-10', '11-20', '20+'] as const
+export const COMPANY_SIZES = ['1', '2-3', '4-5', '6-10', '10-20', '20+'] as const
 export type CompanySize = (typeof COMPANY_SIZES)[number]
 
 export const COMPANY_AGES = ['<1', '1-2', '2-5', '5-10', '10+'] as const

@@ -1,234 +1,187 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { OnboardingScaffold } from '@/components/layout/OnboardingScaffold'
-import { PhasedOnboardingHeader } from '@/components/ui/PhasedOnboardingHeader'
-import { PhasedContent } from '@/components/ui/PhasedContent'
-import { PhasedLabel } from '@/components/ui/PhasedLabel'
-import { PhasedPrimaryButton } from '@/components/ui/PhasedPrimaryButton'
-import { IndustryPicker } from '@/components/signup/IndustryPicker'
-import { PillSelector } from '@/components/signup/PillSelector'
-import { useOnboardingAnimation } from '@/lib/hooks/useOnboardingAnimation'
-import { useOnboardingStore } from '@/lib/stores/onboarding-store'
-import { useAnalytics } from '@/lib/hooks/useAnalytics'
-import { COMPANY_SIZES, COMPANY_AGES } from '@/lib/constants/industries'
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { SelectorButton } from "@/components/ui/SelectorButton";
+import { IndustryDropdown } from "@/components/ui/IndustryDropdown";
+import { useSignupStore } from "@/lib/stores/signup-store";
+import { useOnboardingStore } from "@/lib/stores/onboarding-store";
+import { useAnalytics } from "@/lib/hooks/useAnalytics";
+import { COMPANY_SIZES, COMPANY_AGES } from "@/lib/constants/industries";
 
 export default function CompanyDetailsPage() {
-  const router = useRouter()
-  const { trackSignupStepView, trackSignupStepComplete } = useAnalytics()
+  const router = useRouter();
   const {
-    userId,
-    firstName,
-    lastName,
-    phone,
-    companyName,
-    companyEmail,
-    companyPhone,
-    setCompanyDetails,
-    setCompanyId,
-    setCompanyCode,
-    setSignupStep,
-  } = useOnboardingStore()
-  const animation = useOnboardingAnimation()
+    trackSignupStepView,
+    trackSignupStepComplete,
+    trackSignupComplete,
+    trackSetupStepSkipped,
+  } = useAnalytics();
+  const signupStore = useSignupStore();
+  const onboardingStore = useOnboardingStore();
 
-  const [industry, setIndustry] = useState('')
-  const [customIndustry, setCustomIndustry] = useState('')
-  const [companySize, setCompanySize] = useState('')
-  const [companyAge, setCompanyAge] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [industries, setIndustries] = useState<string[]>(signupStore.industries);
+  const [companySize, setCompanySize] = useState(signupStore.companySize);
+  const [companyAge, setCompanyAge] = useState(signupStore.companyAge);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!userId) {
-      router.push('/signup/credentials')
-      return
+    signupStore.setCurrentStep(3);
+    onboardingStore.setSignupStep(3);
+    trackSignupStepView("details", 3);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Redirect if no auth
+  useEffect(() => {
+    if (!signupStore.userId) {
+      router.replace("/signup/credentials");
     }
-    setSignupStep(4)
-    trackSignupStepView('company-details', 4)
-    animation.start()
-  }, [userId, router, setSignupStep, trackSignupStepView])
+  }, [signupStore.userId, router]);
 
-  const effectiveIndustry =
-    industry === 'Other' ? customIndustry.trim() || 'Other' : industry
-
-  const handleContinue = async () => {
-    if (!industry || !companySize || !companyAge) return
-    if (industry === 'Other' && !customIndustry.trim()) return
-
-    setLoading(true)
-    setError('')
-
+  const saveAndFinish = async () => {
+    setSaving(true);
     try {
-      const res = await fetch('/api/company/update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: companyName,
-          email: companyEmail || '',
-          phone: companyPhone || undefined,
-          industry: effectiveIndustry,
-          size: companySize,
-          age: companyAge,
-          address: '',
-          user: userId,
-          name_first: firstName,
-          name_last: lastName,
-          user_phone: phone || '',
-        }),
-      })
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        setError(data.error || 'Failed to save company details')
-        setLoading(false)
-        return
-      }
-
-      if (data.companyId) setCompanyId(data.companyId)
-      if (data.companyCode) setCompanyCode(data.companyCode)
-
-      setCompanyDetails({
-        industry: effectiveIndustry,
+      signupStore.setDetails({
+        industries,
+        companySize,
+        companyAge,
+      });
+      onboardingStore.setCompanyDetails({
+        industry: industries.join(", "),
         size: companySize,
         age: companyAge,
-      })
-      trackSignupStepComplete('company-details', 4)
-      router.push('/signup/company-code')
-    } catch {
-      setError('Connection error. Please try again.')
+      });
+
+      // Create/update company via API
+      const idToken = await (await import("@/lib/firebase/auth")).getIdToken();
+      if (idToken && signupStore.userId) {
+        try {
+          const res = await fetch("/api/auth/sync-user", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              idToken,
+              email: signupStore.email,
+            }),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.user?.companyId) {
+              signupStore.setCompanyId(data.user.companyId);
+              onboardingStore.setCompanyId(data.user.companyId);
+            }
+          }
+        } catch {
+          // Non-blocking — company can be created later
+        }
+      }
+
+      trackSignupStepComplete("details", 3);
+      trackSignupComplete(signupStore.authMethod ?? "unknown");
+      onboardingStore.setSignupCompleted();
+
+      router.push("/tutorial");
     } finally {
-      setLoading(false)
+      setSaving(false);
     }
-  }
+  };
 
   const handleSkip = async () => {
-    setLoading(true)
-    setError('')
-    try {
-      const res = await fetch('/api/company/update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: companyName,
-          email: companyEmail || '',
-          phone: companyPhone || undefined,
-          industry: '',
-          size: '',
-          age: '',
-          address: '',
-          user: userId,
-          name_first: firstName,
-          name_last: lastName,
-          user_phone: phone || '',
-        }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setError(data.error || 'Failed to save company')
-        setLoading(false)
-        return
-      }
-      if (data.companyId) setCompanyId(data.companyId)
-      if (data.companyCode) setCompanyCode(data.companyCode)
-      trackSignupStepComplete('company-details', 4)
-      router.push('/signup/company-code')
-    } catch {
-      setError('Connection error. Please try again.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const isValid =
-    industry &&
-    companySize &&
-    companyAge &&
-    (industry !== 'Other' || customIndustry.trim())
+    onboardingStore.setSignupCompleted();
+    trackSetupStepSkipped("details", 3);
+    trackSignupComplete(signupStore.authMethod ?? "unknown");
+    router.push("/tutorial");
+  };
 
   return (
-    <OnboardingScaffold showBack>
-      {/* Title — iOS: .padding(.horizontal, 40) .padding(.top, 16) */}
-      <div className="px-10 pt-4">
-        <PhasedOnboardingHeader
-          title="ALMOST DONE"
-          subtitle="Quick details to set you up right."
-          animation={animation}
-        />
+    <div className="w-full">
+      {/* Progress bar — 2 segments, both filled */}
+      <div className="flex gap-1 mb-6">
+        <div className="flex-1 h-0.5 bg-white/40 rounded-full" />
+        <div className="flex-1 h-0.5 bg-white/40 rounded-full" />
       </div>
 
-      {/* Spacer — iOS: Spacer().frame(height: 32) */}
-      <div className="h-8" />
+      {/* Step indicator + skip */}
+      <div className="flex items-center justify-between mb-6">
+        <span className="font-kosugi text-caption-sm text-text-tertiary uppercase tracking-widest">
+          [step 2 of 2]
+        </span>
+        <button
+          type="button"
+          onClick={handleSkip}
+          className="font-kosugi text-caption-sm text-text-tertiary uppercase tracking-widest hover:text-text-secondary transition-colors"
+        >
+          Skip for now
+        </button>
+      </div>
 
-      {/* Content — fades in upward during contentFadeIn */}
-      <PhasedContent animation={animation}>
-        <div className="px-10 space-y-6">
-          <div>
-            <PhasedLabel text="INDUSTRY" index={0} animation={animation} />
-            <div className="mt-2">
-              <IndustryPicker
-                value={industry}
-                onChange={setIndustry}
-                customIndustry={customIndustry}
-                onCustomChange={setCustomIndustry}
+      {/* Header */}
+      <h1 className="font-mohave text-heading text-text-primary uppercase tracking-wide">
+        YOUR COMPANY
+      </h1>
+      <p className="font-kosugi text-caption text-text-tertiary mt-1 mb-6">
+        [this shapes your command center]
+      </p>
+
+      {/* Form */}
+      <div className="space-y-5">
+        <IndustryDropdown value={industries} onChange={setIndustries} />
+
+        {/* Team Size */}
+        <div role="group" aria-label="Team Size">
+          <label className="font-kosugi text-caption-sm text-text-secondary uppercase tracking-widest mb-1.5 block">
+            [team size]
+          </label>
+          <div className="flex gap-1.5">
+            {COMPANY_SIZES.map((size) => (
+              <SelectorButton
+                key={size}
+                label={size}
+                selected={companySize === size}
+                onClick={() => setCompanySize(companySize === size ? "" : size)}
               />
-            </div>
+            ))}
           </div>
-
-          <div>
-            <PhasedLabel text="COMPANY SIZE" index={1} animation={animation} />
-            <div className="mt-2">
-              <PillSelector
-                label=""
-                options={COMPANY_SIZES}
-                value={companySize}
-                onChange={setCompanySize}
-              />
-            </div>
-          </div>
-
-          <div>
-            <PhasedLabel text="YEARS IN BUSINESS" index={2} isLast animation={animation} />
-            <div className="mt-2">
-              <PillSelector
-                label=""
-                options={COMPANY_AGES}
-                value={companyAge}
-                onChange={setCompanyAge}
-              />
-            </div>
-          </div>
-
-          {error && (
-            <p className="font-kosugi text-ops-small text-ops-error text-center">
-              {error}
-            </p>
-          )}
         </div>
-      </PhasedContent>
 
-      {/* Spacer — pushes button to bottom */}
-      <div className="flex-1" />
+        {/* Years in Business */}
+        <div role="group" aria-label="Years in Business">
+          <label className="font-kosugi text-caption-sm text-text-secondary uppercase tracking-widest mb-1.5 block">
+            [years in business]
+          </label>
+          <div className="flex gap-1.5">
+            {COMPANY_AGES.map((age) => (
+              <SelectorButton
+                key={age}
+                label={age}
+                selected={companyAge === age}
+                onClick={() => setCompanyAge(companyAge === age ? "" : age)}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
 
-      {/* Skip link */}
-      <button
-        onClick={handleSkip}
-        disabled={loading}
-        className="font-kosugi text-ops-caption text-ops-text-tertiary hover:text-ops-text-secondary transition-colors pb-2 disabled:opacity-40"
-      >
-        SKIP FOR NOW
-      </button>
-
-      {/* Button — iOS: PhasedPrimaryButton .padding(.horizontal, 40) .padding(.bottom, 50) */}
-      <PhasedPrimaryButton
-        title="CONTINUE"
-        isEnabled={!!isValid}
-        isLoading={loading}
-        loadingText="SAVING..."
-        animation={animation}
-        onClick={handleContinue}
-      />
-    </OnboardingScaffold>
-  )
+      {/* Navigation */}
+      <div className="border-t border-border-separator mt-8 pt-4 flex items-center justify-between">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => router.back()}
+        >
+          <ArrowLeft className="w-4 h-4 mr-1" />
+          BACK
+        </Button>
+        <Button
+          variant="primary"
+          onClick={saveAndFinish}
+          loading={saving}
+        >
+          LAUNCH
+        </Button>
+      </div>
+    </div>
+  );
 }
