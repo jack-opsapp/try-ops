@@ -110,7 +110,7 @@ export default function CredentialsPage() {
         // Existing user — skip setup, go to tutorial or download
         router.push("/tutorial");
       } else {
-        router.push("/signup/profile");
+        router.push("/signup/account-type");
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to sync account";

@@ -30,12 +30,18 @@ export default function SignupLayout({
 }) {
   const pathname = usePathname();
   const isCredentials = pathname === "/signup/credentials";
+  const isAccountType = pathname === "/signup/account-type";
 
   return (
     <>
       <RedirectHandler />
 
-      {isCredentials ? (
+      {isAccountType ? (
+        // ─── Full-Screen Layout (Account Type Decision) ───
+        <div className="min-h-screen bg-background">
+          {children}
+        </div>
+      ) : isCredentials ? (
         // ─── Split Hero Layout (Credentials) ───
         <div className="min-h-screen bg-background flex">
           {/* Left: Hero image — hidden on mobile */}

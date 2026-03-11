@@ -9,6 +9,9 @@ export interface SignupState {
   authMethod: "google" | "apple" | "email" | null;
   isNewUser: boolean;
 
+  // Account type (set on decision screen)
+  accountType: "company" | "join" | null;
+
   // Profile (About You — step 2)
   firstName: string;
   lastName: string;
@@ -45,6 +48,7 @@ export interface SignupState {
     companySize: string;
     companyAge: string;
   }) => void;
+  setAccountType: (type: "company" | "join") => void;
   setCompanyId: (id: string) => void;
   setCurrentStep: (step: number) => void;
   reset: () => void;
@@ -56,6 +60,7 @@ const initialState = {
   email: "",
   authMethod: null as SignupState["authMethod"],
   isNewUser: false,
+  accountType: null as SignupState["accountType"],
   firstName: "",
   lastName: "",
   phone: "",
@@ -96,6 +101,7 @@ export const useSignupStore = create<SignupState>()(
           companyAge: data.companyAge,
         }),
 
+      setAccountType: (type) => set({ accountType: type }),
       setCompanyId: (id) => set({ companyId: id }),
       setCurrentStep: (step) => set({ currentStep: step }),
       reset: () => set(initialState),
