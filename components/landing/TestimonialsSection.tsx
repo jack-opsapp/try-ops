@@ -1,6 +1,7 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Carousel } from '@/components/shared/Carousel'
 import { z } from 'zod'
 import { TestimonialsSectionPropsSchema } from '@/lib/ab/types'
@@ -22,9 +23,46 @@ const founderQuote = {
 
 type Testimonial = z.infer<typeof TestimonialsSectionPropsSchema>['testimonials'][number]
 
+const GLOW_COLOR = 'rgba(89, 119, 148, 0.8)'
+const GLOW_DURATION = 0.8
+
 function TestimonialCard({ testimonial: t }: { testimonial: Testimonial }) {
+  const cardRef = useRef<HTMLDivElement>(null)
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
+  const [glowKey, setGlowKey] = useState(0)
+  const [isGlowing, setIsGlowing] = useState(false)
+
+  useEffect(() => {
+    if (!cardRef.current) return
+    const measure = () => {
+      if (cardRef.current) {
+        const rect = cardRef.current.getBoundingClientRect()
+        setDimensions({ width: rect.width, height: rect.height })
+      }
+    }
+    measure()
+    const ro = new ResizeObserver(() => measure())
+    ro.observe(cardRef.current)
+    return () => ro.disconnect()
+  }, [])
+
+  const triggerGlow = useCallback(() => {
+    if (isGlowing) return
+    setIsGlowing(true)
+    setGlowKey(k => k + 1)
+  }, [isGlowing])
+
+  const perimeter = 2 * (dimensions.width + dimensions.height)
+  const dashLength = perimeter * 0.15
+  const borderRadius = 5
+
   return (
-    <div className="bg-ops-card border border-white/10 rounded-ops-card p-8 h-full flex flex-col">
+    <div
+      ref={cardRef}
+      className="relative bg-ops-card border border-white/10 rounded-ops-card p-8 h-full flex flex-col cursor-pointer"
+      onMouseEnter={triggerGlow}
+      onClick={triggerGlow}
+    >
       <p className="font-kosugi text-[16px] text-ops-gray-200 leading-relaxed flex-1 mb-6">
         &ldquo;{t.quote}&rdquo;
       </p>
@@ -42,6 +80,40 @@ function TestimonialCard({ testimonial: t }: { testimonial: Testimonial }) {
           </p>
         )}
       </div>
+
+      {/* Racing glow border effect */}
+      <AnimatePresence>
+        {isGlowing && dimensions.width > 0 && (
+          <motion.svg
+            key={glowKey}
+            className="absolute inset-0 w-full h-full pointer-events-none z-10"
+            style={{ overflow: 'visible' }}
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <motion.rect
+              x={0.5}
+              y={0.5}
+              width={dimensions.width - 1}
+              height={dimensions.height - 1}
+              rx={borderRadius}
+              fill="none"
+              stroke={GLOW_COLOR}
+              strokeWidth={2}
+              strokeDasharray={`${dashLength} ${perimeter - dashLength}`}
+              strokeLinecap="round"
+              style={{
+                filter: `drop-shadow(0 0 6px ${GLOW_COLOR}) drop-shadow(0 0 14px rgba(89, 119, 148, 0.4))`,
+              }}
+              initial={{ strokeDashoffset: perimeter }}
+              animate={{ strokeDashoffset: 0 }}
+              transition={{ duration: GLOW_DURATION, ease: [0.22, 1, 0.36, 1] }}
+              onAnimationComplete={() => setIsGlowing(false)}
+            />
+          </motion.svg>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

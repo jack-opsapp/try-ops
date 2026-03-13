@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import type { z } from 'zod'
 import type { HeroPropsSchema } from '@/lib/ab/types'
 import { Button } from '@/components/shared/Button'
@@ -19,8 +20,29 @@ const fadeInUp = {
   viewport: { once: true, amount: 0.2 },
 }
 
-export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel }: HeroProps) {
+function HeroVisual({ mode, imageSrc }: { mode: 'animation' | 'image'; imageSrc?: string }) {
+  if (mode === 'image' && imageSrc) {
+    return (
+      <div className="relative w-full h-[260px] lg:h-[400px] rounded-[8px] overflow-hidden">
+        <Image
+          src={imageSrc}
+          alt="Trade crew using OPS"
+          fill
+          className="object-cover"
+          sizes="(max-width: 1024px) 100vw, 400px"
+          priority
+        />
+        {/* Subtle vignette overlay to blend with dark theme */}
+        <div className="absolute inset-0 bg-gradient-to-t from-ops-background/60 via-transparent to-transparent" />
+      </div>
+    )
+  }
+  return <HeroAnimation />
+}
+
+export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel, heroMode, heroImageSrc }: HeroProps) {
   const router = useRouter()
+  const mode = heroMode ?? 'animation'
 
   const handleDownloadClick = () => {
     trackABClick('Hero', 'download_btn')
@@ -35,7 +57,7 @@ export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel }: 
     <section id="hero" className="relative min-h-[100svh] flex items-center snap-start snap-always">
       <div className="w-full max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10 py-10 lg:py-20">
         <div className="flex flex-col lg:flex-row items-start gap-6 lg:gap-16">
-          {/* Mobile: title first, then animation */}
+          {/* Mobile: title first, then visual */}
           <div className="lg:hidden w-full">
             <motion.h1
               className="font-mohave font-bold text-[40px] text-ops-gray-50 uppercase leading-[1.1] tracking-[0.05em] mb-4"
@@ -45,12 +67,12 @@ export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel }: 
             </motion.h1>
           </div>
 
-          {/* Wireframe animation — below title on mobile, right side on desktop */}
+          {/* Visual — below title on mobile, right side on desktop */}
           <motion.div
             className="flex-shrink-0 w-full lg:hidden"
             {...fadeInUp}
           >
-            <HeroAnimation />
+            <HeroVisual mode={mode} imageSrc={heroImageSrc} />
           </motion.div>
 
           {/* Text content — left-aligned */}
@@ -107,13 +129,13 @@ export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel }: 
             </motion.p>
           </div>
 
-          {/* Wireframe animation — desktop only (mobile is above) */}
+          {/* Visual — desktop only (mobile is above) */}
           <motion.div
             className="hidden lg:block flex-shrink-0 w-[400px]"
             {...fadeInUp}
             transition={{ ...fadeInUp.transition, delay: 0.2 }}
           >
-            <HeroAnimation />
+            <HeroVisual mode={mode} imageSrc={heroImageSrc} />
           </motion.div>
         </div>
       </div>

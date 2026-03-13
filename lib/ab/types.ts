@@ -6,6 +6,8 @@ export const HeroPropsSchema = z.object({
   subtext: z.string(),
   primaryCtaLabel: z.string(),
   secondaryCtaLabel: z.string(),
+  heroMode: z.enum(['animation', 'image']).optional(),
+  heroImageSrc: z.string().optional(),
 })
 
 export const PainSectionPropsSchema = z.object({

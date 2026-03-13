@@ -290,13 +290,9 @@ export function HeroAnimation() {
                     x: { type: 'spring', stiffness: 100, damping: 16 },
                   }}
                 >
-                  {/* Folder body */}
-                  <motion.rect
-                    x={folderX}
-                    y={folderY}
-                    width={folderW}
-                    height={folderH}
-                    rx={4}
+                  {/* Folder body — top-left corner 0 radius (tab connects there), other corners 4px */}
+                  <motion.path
+                    d={`M${folderX} ${folderY} H${folderX + folderW - 4} Q${folderX + folderW} ${folderY} ${folderX + folderW} ${folderY + 4} V${folderY + folderH - 4} Q${folderX + folderW} ${folderY + folderH} ${folderX + folderW - 4} ${folderY + folderH} H${folderX + 4} Q${folderX} ${folderY + folderH} ${folderX} ${folderY + folderH - 4} V${folderY} Z`}
                     strokeWidth="1.5"
                     fill="none"
                     animate={{ stroke: folderStroke }}
