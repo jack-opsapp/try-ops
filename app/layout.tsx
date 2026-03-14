@@ -3,22 +3,26 @@ import './globals.css'
 import { AnalyticsProvider } from '@/components/layout/AnalyticsProvider'
 
 export const metadata: Metadata = {
-  title: 'OPS - Job Management Your Crew Will Actually Use',
+  metadataBase: new URL('https://try.opsapp.co'),
+  title: 'OPS — Job Management for Contractors | Try Free',
   description:
-    'Field-first job management built for trades crews. No training required. Works offline. Built by a crew lead who needed something that just works.',
+    'The job management app your crew will actually use. Crew scheduling, project tracking, photo documentation, and invoicing for trades contractors. No training required. Free to start.',
   openGraph: {
-    title: 'OPS - Job Management Your Crew Will Actually Use',
+    title: 'OPS — Job Management Your Crew Will Actually Use',
     description:
-      'Field-first job management built for trades crews. No training required. Works offline.',
+      'Crew scheduling, project tracking, photo docs. Built by a contractor for trades crews. No training required. Free to start.',
     url: 'https://try.opsapp.co',
     siteName: 'OPS',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'OPS - Job Management Your Crew Will Actually Use',
+    title: 'OPS — Job Management Your Crew Will Actually Use',
     description:
-      'Field-first job management built for trades crews. No training required. Works offline.',
+      'Crew scheduling, project tracking, photo docs. Built by a contractor for trades crews. Free to start.',
+  },
+  alternates: {
+    canonical: 'https://try.opsapp.co',
   },
   other: {
     'theme-color': '#000000',
@@ -30,17 +34,22 @@ const jsonLd = {
   '@type': 'SoftwareApplication',
   name: 'OPS',
   applicationCategory: 'BusinessApplication',
-  operatingSystem: 'iOS',
+  operatingSystem: 'iOS, Web',
+  url: 'https://opsapp.co',
+  description: 'Field-first job management app for trades contractors and field crews. Project tracking, crew scheduling, photo documentation, invoicing. No training required.',
   offers: {
-    '@type': 'Offer',
-    price: '0',
+    '@type': 'AggregateOffer',
+    lowPrice: '0',
+    highPrice: '190',
     priceCurrency: 'USD',
+    offerCount: '4',
   },
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '5.0',
-    ratingCount: '500',
+  creator: {
+    '@type': 'Organization',
+    name: 'OPS',
+    url: 'https://opsapp.co',
   },
+  featureList: 'Project Management, Crew Scheduling, Photo Documentation, Job Board, Client Management, Invoicing, Offline Mode',
 }
 
 export default function RootLayout({
