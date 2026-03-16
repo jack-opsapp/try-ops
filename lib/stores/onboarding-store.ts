@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type Variant = 'a' | 'b'
+export type Variant = 'a' | 'b' | 'c'
 
 export interface OnboardingState {
   // A/B variant

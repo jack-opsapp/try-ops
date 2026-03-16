@@ -3,50 +3,9 @@
 import { useEffect, useState, useRef } from 'react'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { useAnalytics } from '@/lib/hooks/useAnalytics'
+import { TacticalLoadingBar } from '@/components/ui/TacticalLoadingBar'
 
 const APP_STORE_URL = 'https://apps.apple.com/us/app/ops-job-crew-management/id6746662078'
-
-/**
- * TacticalLoadingBar — matches iOS TacticalLoadingBarAnimated exactly.
- * 8 vertical bars, 3-bar wave sweeping across at 150ms intervals.
- */
-function TacticalLoadingBar() {
-  const barCount = 8
-  const activeRange = 3
-  const [offset, setOffset] = useState(0)
-  const timerRef = useRef<NodeJS.Timeout | null>(null)
-
-  useEffect(() => {
-    timerRef.current = setInterval(() => {
-      setOffset((prev) => (prev + 1) % barCount)
-    }, 150)
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current)
-    }
-  }, [])
-
-  return (
-    <div className="flex items-center gap-1">
-      {Array.from({ length: barCount }).map((_, i) => {
-        const normalizedIndex = (i + barCount - offset) % barCount
-        const isActive = normalizedIndex < activeRange
-        return (
-          <div
-            key={i}
-            className="transition-colors duration-150"
-            style={{
-              width: 2,
-              height: 6,
-              backgroundColor: isActive
-                ? 'rgba(229, 229, 229, 1)'
-                : 'rgba(255, 255, 255, 0.2)',
-            }}
-          />
-        )
-      })}
-    </div>
-  )
-}
 
 export default function DownloadPage() {
   const { userId, companyId } = useOnboardingStore()

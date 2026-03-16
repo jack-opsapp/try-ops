@@ -6,7 +6,7 @@ export function middleware(request: NextRequest) {
   const variantParam = request.nextUrl.searchParams.get('variant')
   const existingCookie = request.cookies.get('ops_variant')?.value
 
-  if (variantParam === 'a' || variantParam === 'b') {
+  if (variantParam === 'a' || variantParam === 'b' || variantParam === 'c') {
     // URL param takes precedence, set/update cookie
     response.cookies.set('ops_variant', variantParam, {
       maxAge: 60 * 60 * 24 * 30, // 30 days
@@ -14,8 +14,9 @@ export function middleware(request: NextRequest) {
       sameSite: 'lax',
     })
   } else if (!existingCookie) {
-    // No param and no cookie: random 50/50 split
-    const randomVariant = Math.random() < 0.5 ? 'a' : 'b'
+    // No param and no cookie: random 33/33/34 split
+    const rand = Math.random()
+    const randomVariant = rand < 0.33 ? 'a' : rand < 0.66 ? 'b' : 'c'
     response.cookies.set('ops_variant', randomVariant, {
       maxAge: 60 * 60 * 24 * 30,
       path: '/',

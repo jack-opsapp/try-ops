@@ -17,13 +17,14 @@ export function useVariant(): Variant {
       ?.split('=')[1]
       ?.trim()
 
-    if (variantCookie === 'a' || variantCookie === 'b') {
-      setVariant(variantCookie)
+    if (variantCookie === 'a' || variantCookie === 'b' || variantCookie === 'c') {
+      setVariant(variantCookie as 'a' | 'b' | 'c')
     } else {
-      // Fallback: random assignment
-      setVariant(Math.random() < 0.5 ? 'a' : 'b')
+      // Fallback: random 3-way assignment
+      const rand = Math.random()
+      setVariant(rand < 0.33 ? 'a' : rand < 0.66 ? 'b' : 'c')
     }
   }, [variant, setVariant])
 
-  return variant || 'b'
+  return variant || 'a'
 }

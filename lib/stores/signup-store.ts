@@ -26,6 +26,9 @@ export interface SignupState {
   // Company
   companyId: string | null;
 
+  // Validated company preview (join crew flow — persisted for reload)
+  validatedCompany: { id: string; name: string; logoUrl: string | null } | null;
+
   // Progress
   currentStep: number; // 1=credentials, 2=profile, 3=details
 
@@ -50,6 +53,7 @@ export interface SignupState {
   }) => void;
   setAccountType: (type: "company" | "join") => void;
   setCompanyId: (id: string) => void;
+  setValidatedCompany: (company: { id: string; name: string; logoUrl: string | null } | null) => void;
   setCurrentStep: (step: number) => void;
   reset: () => void;
 }
@@ -69,6 +73,7 @@ const initialState = {
   companySize: "",
   companyAge: "",
   companyId: null as string | null,
+  validatedCompany: null as { id: string; name: string; logoUrl: string | null } | null,
   currentStep: 1,
 };
 
@@ -103,6 +108,7 @@ export const useSignupStore = create<SignupState>()(
 
       setAccountType: (type) => set({ accountType: type }),
       setCompanyId: (id) => set({ companyId: id }),
+      setValidatedCompany: (company) => set({ validatedCompany: company }),
       setCurrentStep: (step) => set({ currentStep: step }),
       reset: () => set(initialState),
     }),
