@@ -22,7 +22,7 @@ const buttonVariants = cva(
           "hover:bg-[rgba(255,255,255,0.12)]",
         ],
         oauth: [
-          "bg-[rgba(255,255,255,0.03)] text-text-primary border border-[rgba(255,255,255,0.12)] rounded-lg",
+          "bg-[rgba(255,255,255,0.03)] text-text-primary border border-[rgba(255,255,255,0.12)]",
           "hover:bg-[rgba(255,255,255,0.07)]",
         ],
         primary: [
