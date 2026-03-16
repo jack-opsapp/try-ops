@@ -82,7 +82,7 @@ export default function CompanyDetailsPage() {
       trackSignupComplete(signupStore.authMethod ?? "unknown");
       onboardingStore.setSignupCompleted();
 
-      router.push("/tutorial");
+      router.push("/download");
     } finally {
       setSaving(false);
     }
@@ -92,7 +92,7 @@ export default function CompanyDetailsPage() {
     onboardingStore.setSignupCompleted();
     trackSetupStepSkipped("details", 3);
     trackSignupComplete(signupStore.authMethod ?? "unknown");
-    router.push("/tutorial");
+    router.push("/download");
   };
 
   return (

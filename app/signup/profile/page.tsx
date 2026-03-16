@@ -88,7 +88,7 @@ export default function ProfilePage() {
   const handleSkip = async () => {
     await saveProgress();
     trackSetupStepSkipped("profile", 2);
-    router.push("/tutorial");
+    router.push("/download");
   };
 
   return (

@@ -173,8 +173,8 @@ export function AccountTypeScreen() {
         signupStore.setCompanyId(data.companyId);
         onboardingStore.setCompanyId(data.companyId);
 
-        // Joined — go to tutorial/app
-        router.push("/tutorial");
+        // Joined — go to download/completion
+        router.push("/download");
       } catch {
         setCodeError("Something went wrong. Try again.");
       } finally {

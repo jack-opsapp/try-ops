@@ -14,6 +14,7 @@ import {
   signUpWithEmail,
   updateUserProfile,
 } from "@/lib/firebase/auth";
+import { triageUser } from "@/lib/auth/triage";
 import type { User } from "firebase/auth";
 
 async function syncUser(
@@ -79,39 +80,17 @@ export default function CredentialsPage() {
     try {
       const data = await syncUser(firebaseUser, extraNames);
 
-      // Bridge to both stores
-      signupStore.setAuth({
-        firebaseUid: firebaseUser.uid,
-        userId: data.user.id,
-        email: data.user.email,
-        authMethod: method,
-        isNewUser: data.isNewUser,
-      });
-      onboardingStore.setAuth(data.user.id, method, data.user.email);
-
-      if (data.user.firstName || data.user.lastName) {
-        signupStore.setProfile({
-          firstName: data.user.firstName,
-          lastName: data.user.lastName,
-          phone: "",
-          companyName: "",
-        });
-        onboardingStore.setProfile({
-          firstName: data.user.firstName,
-          lastName: data.user.lastName,
-          phone: "",
-        });
-      }
-
       trackSignupAuthAttempt(method, "completed");
       trackSignupStepComplete("credentials", 1);
 
-      if (isLoginMode || !data.isNewUser) {
-        // Existing user — skip setup, go to tutorial or download
-        router.push("/tutorial");
-      } else {
-        router.push("/signup/account-type");
-      }
+      // Triage: routes user based on their current state in Supabase
+      triageUser(
+        data,
+        firebaseUser.uid,
+        method,
+        { signupStore, onboardingStore },
+        router
+      );
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to sync account";
       setError(msg);
