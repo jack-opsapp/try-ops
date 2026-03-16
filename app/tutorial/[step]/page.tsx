@@ -7,18 +7,13 @@ import { Button } from '@/components/ui/Button'
 import { PhasedContent } from '@/components/ui/PhasedContent'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { TutorialVideo } from '@/components/tutorial/TutorialVideo'
-import { useVariant } from '@/lib/hooks/useVariant'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { useAnalytics } from '@/lib/hooks/useAnalytics'
-import {
-  TUTORIAL_STEPS_A,
-  TUTORIAL_STEPS_B,
-} from '@/lib/constants/tutorial-steps'
+import { TUTORIAL_STEPS } from '@/lib/constants/tutorial-steps'
 
 export default function TutorialStepPage() {
   const router = useRouter()
   const params = useParams()
-  const variant = useVariant()
   const {
     trackTutorialStepView,
     trackTutorialStepComplete,
@@ -31,7 +26,7 @@ export default function TutorialStepPage() {
     tutorialStartTime,
   } = useOnboardingStore()
 
-  const steps = variant === 'a' ? TUTORIAL_STEPS_A : TUTORIAL_STEPS_B
+  const steps = TUTORIAL_STEPS
   const stepIndex = parseInt(params.step as string, 10) - 1
   const step = steps[stepIndex]
   const isLastStep = stepIndex === steps.length - 1

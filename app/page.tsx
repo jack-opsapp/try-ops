@@ -15,7 +15,10 @@ export default async function Page({ searchParams }: PageProps) {
     searchParams,
   ])
 
-  const slot = cookieStore.get('ops_variant')?.value === 'b' ? 'b' : 'a'
+  // Landing page A/B content uses 2 slots. Variant C (animation tutorial) uses A's landing content.
+  // The A/B/C split only affects which tutorial the CTA routes to, not landing page content.
+  const cookieVal = cookieStore.get('ops_variant')?.value
+  const slot = cookieVal === 'b' ? 'b' : 'a'
   const { variantId, config: baseConfig } = await fetchActiveVariant(slot)
 
   // Detect audience signals from UTM params + referrer

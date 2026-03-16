@@ -7,7 +7,7 @@ export interface TutorialStep {
   autoAdvance?: boolean
 }
 
-export const TUTORIAL_STEPS_B: TutorialStep[] = [
+export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 'job-board',
     title: 'YOUR JOB BOARD',
@@ -56,43 +56,6 @@ export const TUTORIAL_STEPS_B: TutorialStep[] = [
     title: 'YOUR SCHEDULE',
     description: 'See your week and month at a glance. Every task, every crew member, every deadline.',
     videoSrc: '/videos/step-7-schedule.mp4',
-    durationMs: 5000,
-  },
-  {
-    id: 'summary',
-    title: "THAT'S THE BASICS.",
-    description: 'Create projects, assign crew, track progress. All from your pocket.',
-  },
-]
-
-export const TUTORIAL_STEPS_A: TutorialStep[] = [
-  {
-    id: 'create-projects',
-    title: 'CREATE PROJECTS IN SECONDS',
-    description: 'Name it, assign a client, add tasks, set dates. Your whole project, set up in under a minute.',
-    videoSrc: '/videos/step-a1-create-projects.mp4',
-    durationMs: 8000,
-  },
-  {
-    id: 'drag-manage',
-    title: 'DRAG TO MANAGE STATUS',
-    description: 'Long-press and drag between columns. Your crew sees changes in real time.',
-    videoSrc: '/videos/step-a2-drag-manage.mp4',
-    durationMs: 4000,
-  },
-  {
-    id: 'crew-updates',
-    title: 'YOUR CREW SEES UPDATES LIVE',
-    description: 'Status flows through automatically. Everyone stays on the same page.',
-    videoSrc: '/videos/step-a3-crew-updates.mp4',
-    durationMs: 4000,
-    autoAdvance: true,
-  },
-  {
-    id: 'schedule',
-    title: 'SEE YOUR SCHEDULE',
-    description: 'Week view, month view. Every task, every crew member, every deadline.',
-    videoSrc: '/videos/step-a4-schedule.mp4',
     durationMs: 5000,
   },
   {

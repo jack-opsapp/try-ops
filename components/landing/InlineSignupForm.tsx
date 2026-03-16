@@ -8,6 +8,7 @@ import { useAnalytics } from '@/lib/hooks/useAnalytics'
 import { z } from 'zod'
 import { InlineSignupFormPropsSchema } from '@/lib/ab/types'
 import { signUpWithEmail } from '@/lib/firebase/auth'
+import { getTutorialRoute } from '@/lib/utils/tutorial-routes'
 import type { User } from 'firebase/auth'
 
 type InlineSignupFormProps = z.infer<typeof InlineSignupFormPropsSchema> & {
@@ -77,7 +78,8 @@ export function InlineSignupForm({ onSuccess, location, heading, subtext }: Inli
         if (onSuccess) {
           onSuccess()
         } else {
-          router.push('/tutorial-intro')
+          const variant = document.cookie.split(';').find(c => c.trim().startsWith('ops_variant='))?.split('=')[1]?.trim() || 'a'
+          router.push(getTutorialRoute(variant))
         }
       } catch (err: unknown) {
         const code = (err as { code?: string })?.code

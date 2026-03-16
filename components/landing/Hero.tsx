@@ -8,6 +8,7 @@ import type { HeroPropsSchema } from '@/lib/ab/types'
 import { Button } from '@/components/shared/Button'
 import { HeroAnimation } from '@/components/landing/HeroAnimation'
 import { trackABClick } from '@/lib/ab/track-click'
+import { getTutorialRoute } from '@/lib/utils/tutorial-routes'
 
 type HeroProps = z.infer<typeof HeroPropsSchema>
 
@@ -51,7 +52,8 @@ export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel, he
 
   const handleTryClick = () => {
     trackABClick('Hero', 'try_btn')
-    router.push('/tutorial-intro')
+    const variant = document.cookie.split(';').find(c => c.trim().startsWith('ops_variant='))?.split('=')[1]?.trim() || 'a'
+    router.push(getTutorialRoute(variant))
   }
   return (
     <section id="hero" className="relative min-h-[100svh] flex items-center snap-start snap-always">

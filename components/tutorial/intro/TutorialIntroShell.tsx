@@ -102,7 +102,7 @@ export function TutorialIntroShell() {
   const finishTutorial = useCallback(
     (durations: string[]) => {
       postTutorialLog(durations)
-      router.push('/tutorial-interactive')
+      router.push('/signup/credentials')
     },
     [postTutorialLog, router]
   )
@@ -238,7 +238,7 @@ export function TutorialIntroShell() {
               onClick={handleContinue}
               className="flex-1 h-12 rounded-ops bg-ops-accent font-mohave font-medium text-ops-label uppercase text-ops-text-primary tracking-wide transition-all hover:brightness-110 active:scale-[0.98]"
             >
-              {phaseIndex >= PHASES.length - 1 ? 'START TUTORIAL' : 'CONTINUE'}
+              {phaseIndex >= PHASES.length - 1 ? 'GET STARTED' : 'CONTINUE'}
             </button>
           </div>
         </div>

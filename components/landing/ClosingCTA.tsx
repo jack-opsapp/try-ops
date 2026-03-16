@@ -6,6 +6,7 @@ import type { z } from 'zod'
 import type { ClosingCTAPropsSchema } from '@/lib/ab/types'
 import { Button } from '@/components/shared/Button'
 import { trackABClick } from '@/lib/ab/track-click'
+import { getTutorialRoute } from '@/lib/utils/tutorial-routes'
 
 type ClosingCTAProps = z.infer<typeof ClosingCTAPropsSchema>
 
@@ -28,7 +29,8 @@ export function ClosingCTA({ headline, subtext, primaryCtaLabel, secondaryCtaLab
 
   const handleTryClick = () => {
     trackABClick('ClosingCTA', 'try_btn')
-    router.push('/tutorial-intro')
+    const variant = document.cookie.split(';').find(c => c.trim().startsWith('ops_variant='))?.split('=')[1]?.trim() || 'a'
+    router.push(getTutorialRoute(variant))
   }
   return (
     <section id="closing" className="bg-ops-card min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
