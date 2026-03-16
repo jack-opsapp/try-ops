@@ -4,13 +4,13 @@ import { AnalyticsProvider } from '@/components/layout/AnalyticsProvider'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://try.opsapp.co'),
-  title: 'OPS — Job Management for Contractors | Try Free',
+  title: 'OPS — Job Management Your Crew Will Actually Use | Try Free',
   description:
-    'The job management app your crew will actually use. Crew scheduling, project tracking, photo documentation, and invoicing for trades contractors. No training required. Free to start.',
+    'The job management app your crew will actually use. Crew scheduling, project tracking, photo documentation, and invoicing for service-based businesses and trades crews. No training required. Free to start.',
   openGraph: {
     title: 'OPS — Job Management Your Crew Will Actually Use',
     description:
-      'Crew scheduling, project tracking, photo docs. Built by a contractor for trades crews. No training required. Free to start.',
+      'Crew scheduling, project tracking, photo docs. Built by a tradesperson for field crews. No training required. Free to start.',
     url: 'https://try.opsapp.co',
     siteName: 'OPS',
     type: 'website',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'OPS — Job Management Your Crew Will Actually Use',
     description:
-      'Crew scheduling, project tracking, photo docs. Built by a contractor for trades crews. Free to start.',
+      'Crew scheduling, project tracking, photo docs. Built by a tradesperson for field crews. Free to start.',
   },
   alternates: {
     canonical: 'https://try.opsapp.co',
@@ -36,7 +36,7 @@ const jsonLd = {
   applicationCategory: 'BusinessApplication',
   operatingSystem: 'iOS, Web',
   url: 'https://opsapp.co',
-  description: 'Field-first job management app for trades contractors and field crews. Project tracking, crew scheduling, photo documentation, invoicing. No training required.',
+  description: 'Field-first job management app for service-based businesses and trades crews and field crews. Project tracking, crew scheduling, photo documentation, invoicing. No training required.',
   offers: {
     '@type': 'AggregateOffer',
     lowPrice: '0',
