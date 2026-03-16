@@ -9,6 +9,7 @@ import { IndustryDropdown } from "@/components/ui/IndustryDropdown";
 import { useSignupStore } from "@/lib/stores/signup-store";
 import { useOnboardingStore } from "@/lib/stores/onboarding-store";
 import { useAnalytics } from "@/lib/hooks/useAnalytics";
+import { TacticalLoadingBar } from "@/components/ui/TacticalLoadingBar";
 import { COMPANY_SIZES, COMPANY_AGES } from "@/lib/constants/industries";
 
 export default function CompanyDetailsPage() {
@@ -39,6 +40,14 @@ export default function CompanyDetailsPage() {
       router.replace("/signup/credentials");
     }
   }, [signupStore.userId, router]);
+
+  if (!signupStore.userId) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <TacticalLoadingBar />
+      </div>
+    );
+  }
 
   const saveAndFinish = async () => {
     setSaving(true);

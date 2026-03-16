@@ -1,24 +1,58 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import {
   checkRedirectResult,
-  isRedirectPending,
   clearRedirectFlag,
 } from "@/lib/firebase/auth";
+import { useSignupStore } from "@/lib/stores/signup-store";
+import { useOnboardingStore } from "@/lib/stores/onboarding-store";
+import { triageUser } from "@/lib/auth/triage";
+import type { User } from "firebase/auth";
+
+async function syncUserFromRedirect(firebaseUser: User) {
+  const idToken = await firebaseUser.getIdToken();
+  const nameParts = firebaseUser.displayName?.split(" ") ?? [];
+
+  const res = await fetch("/api/auth/sync-user", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      idToken,
+      email: firebaseUser.email,
+      displayName: firebaseUser.displayName,
+      firstName: nameParts[0] || "",
+      lastName: nameParts.slice(1).join(" ") || "",
+      photoURL: firebaseUser.photoURL,
+    }),
+  });
+
+  if (!res.ok) return null;
+  return res.json();
+}
 
 function RedirectHandler() {
+  const router = useRouter();
+  const signupStore = useSignupStore();
+  const onboardingStore = useOnboardingStore();
+
   useEffect(() => {
-    if (isRedirectPending()) {
-      clearRedirectFlag();
-      checkRedirectResult().then((user) => {
-        if (user) {
-          console.log("[auth] Redirect sign-in completed for:", user.email);
-        }
-      });
-    }
-  }, []);
+    clearRedirectFlag();
+    checkRedirectResult().then(async (firebaseUser) => {
+      if (!firebaseUser) return;
+
+      const data = await syncUserFromRedirect(firebaseUser);
+      if (!data) return;
+
+      const method =
+        firebaseUser.providerData[0]?.providerId === "google.com"
+          ? ("google" as const)
+          : ("apple" as const);
+
+      triageUser(data, firebaseUser.uid, method, { signupStore, onboardingStore }, router);
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return null;
 }

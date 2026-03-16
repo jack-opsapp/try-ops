@@ -51,11 +51,12 @@ export function AccountTypeScreen() {
   const [crewCode, setCrewCode] = useState("");
   const [codeError, setCodeError] = useState("");
   const [codeLoading, setCodeLoading] = useState(false);
+  const storedCompany = signupStore.validatedCompany;
   const [companyPreview, setCompanyPreview] = useState<{
     name: string;
     logo: string | null;
     id: string;
-  } | null>(null);
+  } | null>(storedCompany ? { name: storedCompany.name, logo: storedCompany.logoUrl, id: storedCompany.id } : null);
   const [joining, setJoining] = useState(false);
   const [headlineDone, setHeadlineDone] = useState(false);
   const [visibleFeatures, setVisibleFeatures] = useState<number>(0);
@@ -88,9 +89,10 @@ export function AccountTypeScreen() {
   useEffect(() => {
     setVisibleFeatures(0);
     setCompanyPreview(null);
+    signupStore.setValidatedCompany(null);
     setCrewCode("");
     setCodeError("");
-  }, [selected]);
+  }, [selected]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSelect = useCallback((id: string) => {
     setSelected(id);
@@ -122,6 +124,11 @@ export function AccountTypeScreen() {
         name: data.companyName,
         logo: data.companyLogo,
         id: data.companyId,
+      });
+      signupStore.setValidatedCompany({
+        id: data.companyId,
+        name: data.companyName,
+        logoUrl: data.companyLogo,
       });
     } catch {
       setCodeError("Failed to validate code. Try again.");

@@ -18,9 +18,10 @@ export default function InteractiveTutorialPage() {
   const [completionTime, setCompletionTime] = useState<number | null>(null)
   const [titleDone, setTitleDone] = useState(false)
 
-  // Set start time if not already set
+  // Set start time if not already set, or reset if stale (>1hr)
   useEffect(() => {
-    if (!tutorialStartTime) {
+    const ONE_HOUR = 60 * 60 * 1000
+    if (!tutorialStartTime || Date.now() - tutorialStartTime > ONE_HOUR) {
       setTutorialStartTime(Date.now())
     }
     track('tutorial_step_view', {
