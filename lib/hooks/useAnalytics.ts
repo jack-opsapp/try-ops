@@ -25,6 +25,27 @@ export function useAnalytics() {
         variant: variant || 'unknown',
         ...params,
       })
+
+      // Persist key onboarding events to Supabase for admin analytics
+      const persistedEvents = [
+        'triage_decision', 'signup_step_complete', 'signup_complete',
+        'tutorial_complete', 'tutorial_skip', 'tutorial_phase_complete',
+        'signup_auth_attempt', 'app_download_click', 'deep_link_attempt',
+      ]
+      if (persistedEvents.includes(eventName)) {
+        fetch('/api/onboarding-events', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            eventType: eventName,
+            userId: params?.user_id || params?.userId,
+            variant: variant || null,
+            decision: params?.decision,
+            step: params?.step || params?.stepName,
+            metadata: params,
+          }),
+        }).catch(() => {}) // fire-and-forget
+      }
     },
     [variant]
   )
@@ -376,8 +397,19 @@ export function useAnalytics() {
     [track]
   )
 
+  const trackTriageDecision = useCallback(
+    (decision: string, userId: string) => {
+      track('triage_decision', {
+        decision,
+        user_id: userId,
+      })
+    },
+    [track]
+  )
+
   return {
     track,
+    trackTriageDecision,
     trackTutorialStepView,
     trackTutorialStepComplete,
     trackTutorialSkip,
