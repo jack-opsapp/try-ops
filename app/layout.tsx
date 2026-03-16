@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'OPS — Job Management Your Crew Will Actually Use',
     description:
-      'Crew scheduling, project tracking, photo docs. Built by a tradesperson for field crews. No training required. Free to start.',
+      'Crew scheduling, project tracking, photo docs. Built by trades for field crews. No training required. Free to start.',
     url: 'https://try.opsapp.co',
     siteName: 'OPS',
     type: 'website',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'OPS — Job Management Your Crew Will Actually Use',
     description:
-      'Crew scheduling, project tracking, photo docs. Built by a tradesperson for field crews. Free to start.',
+      'Crew scheduling, project tracking, photo docs. Built by trades for field crews. Free to start.',
   },
   alternates: {
     canonical: 'https://try.opsapp.co',
