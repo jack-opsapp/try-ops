@@ -7,65 +7,42 @@ import { TutorialSwipeCard } from '../components/TutorialSwipeCard'
 import { PerimeterShimmer } from '../components/PerimeterShimmer'
 import { REVIEW_CARDS } from '../NarrativeTutorialData'
 import { useNarrativeTutorialStore } from '../NarrativeTutorialState'
-import {
-  fadeIn,
-  TIMING,
-  EASE_OUT,
-  prefersReducedMotion,
-} from '../utils/animations'
+import { narrativeText, fade, DURATION, EASE_ENTER } from '../utils/animations'
 
 interface WeeklyReviewStepProps {
   onAdvance: () => void
 }
 
-type StepPhase = 'intro' | 'swiping' | 'allDone'
-
 /**
  * Step 5: "End-of-Week Review"
  *
- * "FRIDAY. LET'S CLEAN UP." — then 4 Tinder-style swipe cards.
- * Swipe right to complete, left to skip. The mechanic is satisfying,
- * fast, and shows how OPS makes end-of-week cleanup effortless.
+ * Emotional beat: COMMITMENT (gamified)
+ * User feels: engaged, active — the first truly interactive moment
+ * Animation must: make cleanup satisfying and fast
  *
- * This is the hook. "I want to do this every Friday."
+ * THIS IS THE HOOK. The Tinder swipe mechanic is what users remember.
+ * But they need CONTEXT first — they need to understand they're
+ * reviewing completed tasks from the week.
  *
- * Card 2 (Final Inspection / Kitchen Renovation / Sarah Chen) connects
- * back to the main narrative — regardless of swipe direction, the
- * invoice in Step 6 will be for Kitchen Renovation.
+ * Narrative: "Friday. Review your week in 30 seconds."
+ * Scene: 4 swipe cards. Drag right = complete. Drag left = skip.
+ * Sell: "All caught up. That's your whole week."
  */
 export function WeeklyReviewStep({ onAdvance }: WeeklyReviewStepProps) {
-  const [phase, setPhase] = useState<StepPhase>('intro')
+  const [phase, setPhase] = useState<'narrative' | 'swiping' | 'allDone' | 'sellLine'>('narrative')
   const [swipedCount, setSwipedCount] = useState(0)
-  const [shimmerTrigger, setShimmerTrigger] = useState(false)
+  const [shimmerFired, setShimmerFired] = useState(false)
   const recordSwipe = useNarrativeTutorialStore((s) => s.recordSwipe)
-  const reduced = typeof window !== 'undefined' && prefersReducedMotion()
 
-  // Intro text: "FRIDAY. LET'S CLEAN UP." — hold 1.5s, then show cards
-  useEffect(() => {
-    if (reduced) {
-      setPhase('swiping')
-      return
-    }
-    const timer = setTimeout(() => setPhase('swiping'), 2000)
-    return () => clearTimeout(timer)
-  }, [reduced])
-
-  // When all cards swiped → "ALL CAUGHT UP"
+  // When all cards swiped → all done
   useEffect(() => {
     if (swipedCount >= REVIEW_CARDS.length && phase === 'swiping') {
-      setTimeout(() => {
+      requestAnimationFrame(() => setTimeout(() => {
         setPhase('allDone')
-        setShimmerTrigger(true)
-      }, reduced ? 100 : 400)
+        setShimmerFired(true)
+      }, 400))
     }
-  }, [swipedCount, phase, reduced])
-
-  // Auto-advance after "ALL CAUGHT UP"
-  useEffect(() => {
-    if (phase !== 'allDone') return
-    const timer = setTimeout(onAdvance, reduced ? 500 : 2000)
-    return () => clearTimeout(timer)
-  }, [phase, onAdvance, reduced])
+  }, [swipedCount, phase])
 
   const handleSwipe = useCallback(
     (direction: 'left' | 'right') => {
@@ -75,94 +52,137 @@ export function WeeklyReviewStep({ onAdvance }: WeeklyReviewStepProps) {
     [swipedCount, recordSwipe],
   )
 
-  // Cards remaining in the stack (newest swipes removed from front)
   const remainingCards = REVIEW_CARDS.slice(swipedCount)
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[400px]">
+    <div className="flex flex-col gap-6 min-h-[420px] justify-center">
       <AnimatePresence mode="wait">
-        {/* Intro text */}
-        {phase === 'intro' && (
+
+        {/* ─── Narrative — CRITICAL for user understanding ─── */}
+        {phase === 'narrative' && (
           <motion.div
-            key="intro"
-            className="text-center"
-            variants={fadeIn}
+            key="narrative"
+            className="flex flex-col gap-3"
+            variants={narrativeText}
             initial="hidden"
             animate="visible"
             exit="exit"
+            onAnimationComplete={() => {
+              requestAnimationFrame(() => setTimeout(() => setPhase('swiping'), 1500))
+            }}
           >
-            <span
-              className="uppercase tracking-widest"
-              style={{
-                ...fontStyle(OPSStyle.Typography.title),
-                color: OPSStyle.Colors.secondaryText,
-                letterSpacing: '0.15em',
-              }}
-            >
-              FRIDAY. LET&apos;S CLEAN UP.
+            <span className="uppercase tracking-widest" style={{ ...fontStyle(OPSStyle.Typography.smallCaption), color: OPSStyle.Colors.tertiaryText, letterSpacing: '0.2em' }}>
+              STEP 5
+            </span>
+            <span className="uppercase tracking-wide" style={{ ...fontStyle(OPSStyle.Typography.title), color: '#FFFFFF' }}>
+              Friday. Review your week.
+            </span>
+            <span style={{ ...fontStyle(OPSStyle.Typography.caption), color: OPSStyle.Colors.secondaryText, lineHeight: 1.5 }}>
+              Swipe through completed tasks. Drag right to confirm, left to skip. Clean up your entire week in 30 seconds.
             </span>
           </motion.div>
         )}
 
-        {/* Swipe cards */}
+        {/* ─── Swipe cards ─── */}
         {phase === 'swiping' && (
           <motion.div
             key="cards"
-            className="w-full max-w-sm relative"
-            style={{ height: 280 }}
-            variants={fadeIn}
+            className="flex flex-col gap-4"
+            variants={fade}
             initial="hidden"
             animate="visible"
           >
-            {/* Render remaining cards in reverse so top card renders last (highest z) */}
-            {remainingCards.map((card, i) => {
-              const reversedIndex = remainingCards.length - 1 - i
-              return (
-                <TutorialSwipeCard
-                  key={card.id}
-                  card={card}
-                  onSwipe={handleSwipe}
-                  isTop={reversedIndex === 0}
-                  stackIndex={reversedIndex}
-                />
-              )
-            }).reverse()}
-
-            {/* Count indicator */}
-            <div className="absolute -bottom-8 left-0 right-0 text-center">
-              <span
-                style={{
-                  ...fontStyle(OPSStyle.Typography.smallCaption),
-                  color: OPSStyle.Colors.tertiaryText,
-                }}
-              >
+            {/* Context header */}
+            <div className="flex items-center justify-between">
+              <span className="uppercase tracking-widest" style={{ ...fontStyle(OPSStyle.Typography.smallCaption), color: OPSStyle.Colors.tertiaryText, letterSpacing: '0.15em' }}>
+                WEEKLY REVIEW
+              </span>
+              <span style={{ ...fontStyle(OPSStyle.Typography.smallCaption), color: OPSStyle.Colors.tertiaryText }}>
                 {swipedCount} / {REVIEW_CARDS.length}
               </span>
             </div>
+
+            {/* Card stack */}
+            <div className="relative w-full" style={{ height: 240 }}>
+              {/* Render in reverse so top card renders last (highest z-index) */}
+              {remainingCards.map((card, i) => {
+                const reversedIndex = remainingCards.length - 1 - i
+                return (
+                  <TutorialSwipeCard
+                    key={card.id}
+                    card={card}
+                    onSwipe={handleSwipe}
+                    isTop={reversedIndex === 0}
+                    stackIndex={reversedIndex}
+                  />
+                )
+              }).reverse()}
+            </div>
+
+            {/* Instruction — visible until first swipe */}
+            {swipedCount === 0 && (
+              <motion.div
+                className="flex items-center justify-center gap-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5, duration: DURATION.slow }}
+              >
+                <span style={{ ...fontStyle(OPSStyle.Typography.smallCaption), color: 'rgba(255,255,255,0.3)' }}>
+                  ← SKIP
+                </span>
+                <span className="uppercase tracking-widest" style={{ ...fontStyle(OPSStyle.Typography.smallCaption), color: OPSStyle.Colors.tertiaryText }}>
+                  DRAG TO REVIEW
+                </span>
+                <span style={{ ...fontStyle(OPSStyle.Typography.smallCaption), color: `${OPSStyle.Colors.successStatus}80` }}>
+                  COMPLETE →
+                </span>
+              </motion.div>
+            )}
           </motion.div>
         )}
 
-        {/* ALL CAUGHT UP */}
+        {/* ─── All caught up ─── */}
         {phase === 'allDone' && (
           <motion.div
             key="done"
-            className="text-center relative"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: TIMING.standard, ease: EASE_OUT }}
+            className="flex flex-col items-start gap-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: DURATION.normal }}
+            onAnimationComplete={() => {
+              requestAnimationFrame(() => setTimeout(() => setPhase('sellLine'), 2000))
+            }}
           >
-            <div className="relative inline-block p-8">
-              <PerimeterShimmer trigger={shimmerTrigger} borderRadius={12} />
-              <span
-                className="uppercase tracking-wide"
-                style={{
-                  ...fontStyle(OPSStyle.Typography.title),
-                  color: '#FFFFFF',
-                }}
-              >
+            <div className="relative inline-block p-6 rounded-lg" style={{ border: `1px solid ${OPSStyle.Colors.cardBorder}` }}>
+              <PerimeterShimmer trigger={shimmerFired} borderRadius={OPSStyle.Layout.cardCornerRadius} />
+              <span className="uppercase tracking-wide" style={{ ...fontStyle(OPSStyle.Typography.title), color: '#FFFFFF' }}>
                 ALL CAUGHT UP
               </span>
             </div>
+            <span style={{ ...fontStyle(OPSStyle.Typography.caption), color: OPSStyle.Colors.secondaryText }}>
+              Four tasks reviewed. Your week is clean.
+            </span>
+          </motion.div>
+        )}
+
+        {/* ─── Sell line ─── */}
+        {phase === 'sellLine' && (
+          <motion.div
+            key="sellLine"
+            className="flex flex-col gap-2"
+            variants={narrativeText}
+            initial="hidden"
+            animate="visible"
+            onAnimationComplete={() => {
+              requestAnimationFrame(() => setTimeout(() => onAdvance(), 1500))
+            }}
+          >
+            <span className="uppercase tracking-wide" style={{ ...fontStyle(OPSStyle.Typography.subtitle), color: OPSStyle.Colors.primaryAccent, letterSpacing: '0.08em' }}>
+              Every Friday. 30 seconds.
+            </span>
+            <span style={{ ...fontStyle(OPSStyle.Typography.caption), color: OPSStyle.Colors.secondaryText }}>
+              No spreadsheets. No whiteboard. Just swipe.
+            </span>
           </motion.div>
         )}
       </AnimatePresence>

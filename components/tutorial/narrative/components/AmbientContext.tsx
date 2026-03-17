@@ -1,7 +1,7 @@
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
-import { TIMING, EASE_OUT } from '../utils/animations'
+import { DURATION, EASE_ENTER } from '../utils/animations'
 import type { Phase } from '../NarrativeTutorialData'
 
 interface AmbientContextProps {
@@ -288,7 +288,7 @@ export function AmbientContext({ phase, side }: AmbientContextProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: TIMING.ambientLag, ease: EASE_OUT }}
+          transition={{ duration: 0.4, ease: EASE_ENTER }}
           className="h-full"
         >
           {side === 'left' ? AMBIENT_MAP[phase].left : AMBIENT_MAP[phase].right}

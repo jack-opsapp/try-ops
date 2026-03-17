@@ -4,7 +4,7 @@ import { useCallback, useRef } from 'react'
 import { motion, useMotionValue, useTransform, type PanInfo } from 'framer-motion'
 import { OPSStyle, fontStyle } from '@/lib/styles/OPSStyle'
 import { TutorialSwipeStamp } from './TutorialSwipeStamp'
-import { SPRING_SWIPE_SETTLE, EASE_OUT } from '../utils/animations'
+import { SPRING_SETTLE, EASE_ENTER } from '../utils/animations'
 import type { ReviewCard } from '../NarrativeTutorialData'
 
 const SWIPE_THRESHOLD = 120
@@ -97,7 +97,7 @@ export function TutorialSwipeCard({ card, onSwipe, isTop, stackIndex }: Tutorial
       exit={{
         x: x.get() > 0 ? FLY_OUT_X : -FLY_OUT_X,
         opacity: 0,
-        transition: { duration: 0.3, ease: EASE_OUT },
+        transition: { duration: 0.3, ease: EASE_ENTER },
       }}
       whileDrag={{ cursor: 'grabbing' }}
       tabIndex={isTop ? 0 : -1}

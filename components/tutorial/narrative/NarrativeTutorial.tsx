@@ -8,7 +8,7 @@ import { useAnalytics } from '@/lib/hooks/useAnalytics'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { OPSStyle, fontStyle } from '@/lib/styles/OPSStyle'
 import { PHASE_CONFIG, TOTAL_STEPS } from './NarrativeTutorialData'
-import { TIMING, EASE_OUT } from './utils/animations'
+import { DURATION, EASE_ENTER } from './utils/animations'
 
 // Components
 import { TutorialProgressDots } from './components/TutorialProgressDots'
@@ -157,7 +157,7 @@ export function NarrativeTutorial() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: TIMING.stepTransition, ease: EASE_OUT }}
+                transition={{ duration: DURATION.normal, ease: EASE_ENTER }}
               >
                 {renderStep()}
               </motion.div>

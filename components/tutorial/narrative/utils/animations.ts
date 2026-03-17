@@ -1,160 +1,146 @@
 import type { Variants, Transition } from 'framer-motion'
 
-// ─── Timing Constants ──────────────────────────────────────────────
-// Per spec §4: 0.2-0.4s for all transitions. Military precision.
-// Things arrive with purpose and leave without lingering.
+// ─── Brand Motion Tokens ───────────────────────────────────────────
+// Source: .claude/animation-studio.local.md
+// Character: Military tactical minimalist. Every motion is deliberate,
+// precise, earned. The confidence of a tool that doesn't prove itself.
 
-export const TIMING = {
-  /** Snappy elements — status badge changes, dot fills */
-  fast: 0.2,
-  /** Card transitions, step crossfades */
-  standard: 0.3,
-  /** Sequential item reveals (line items, task cards) */
-  stagger: 0.15,
-  /** ms — pause after auto-advance animation finishes before next step */
-  autoAdvanceDelay: 1500,
-  /** ms — after auto-advance animation, stage becomes clickable as fallback */
-  clickFallbackDelay: 1500,
-  /** Step-to-step crossfade duration */
-  stepTransition: 0.3,
-  /** Ambient panel crossfade (slightly behind main content for depth) */
-  ambientLag: 0.4,
-  /** Perimeter shimmer — one full border circuit */
-  shimmerDuration: 0.6,
-  /** Staggered text reveal (Step 6 finale) — per line */
-  textRevealInterval: 0.5,
+/** Sharp ease-out — things arrive at their destination and stop. No settling. */
+export const EASE_ENTER: [number, number, number, number] = [0.16, 1, 0.3, 1]
+
+/** Clean ease-in — fast departure, no lingering. */
+export const EASE_EXIT: [number, number, number, number] = [0.4, 0, 1, 1]
+
+/** Smooth ease-in-out for transitions between states */
+export const EASE_TRANSITION: [number, number, number, number] = [0.4, 0, 0.2, 1]
+
+// ─── Duration Scale ────────────────────────────────────────────────
+export const DURATION = {
+  fast: 0.2,       // Snappy feedback (badge changes, dot fills)
+  normal: 0.3,     // Standard transitions (cards, fades)
+  slow: 0.6,       // Deliberate reveals (important moments)
+  stagger: 0.12,   // Between sequential items
+  text: 0.5,       // Between staggered text lines (finale)
 } as const
 
-// ─── Easing ────────────────────────────────────────────────────────
-// Sharp ease-out for entries (things arrive with decisiveness)
-// Clean ease-in for exits (things leave without lingering)
-// From system.md: [0.22, 1, 0.36, 1] for scroll reveals
-
-export const EASE_OUT: [number, number, number, number] = [0.22, 1, 0.36, 1]
-export const EASE_IN: [number, number, number, number] = [0.4, 0, 1, 1]
-export const EASE_IN_OUT: [number, number, number, number] = [0.4, 0, 0.2, 1]
-
 // ─── Spring Configs ────────────────────────────────────────────────
+// Brand rule: dampingFraction >= 0.75. No visible oscillation.
+// Springs only where physical weight serves the interaction.
+
+export const SPRING_SETTLE: Transition = {
+  type: 'spring',
+  stiffness: 400,
+  damping: 30,   // high damping = lands without bounce
+}
 
 export const SPRING_CARD: Transition = {
   type: 'spring',
-  stiffness: 400,
+  stiffness: 300,
   damping: 25,
-}
-
-export const SPRING_SWIPE_SETTLE: Transition = {
-  type: 'spring',
-  stiffness: 500,
-  damping: 30,
-}
-
-export const SPRING_SNAP: Transition = {
-  type: 'spring',
-  stiffness: 600,
-  damping: 35,
 }
 
 // ─── Reusable Variants ─────────────────────────────────────────────
 
-/** Card enters from top (notification style) */
-export const cardEnterFromTop: Variants = {
-  hidden: { y: -40, opacity: 0 },
+/** Card enters from top — notification style. Arrives with decisiveness. */
+export const enterFromTop: Variants = {
+  hidden: { y: -50, opacity: 0 },
   visible: {
     y: 0,
     opacity: 1,
-    transition: { duration: TIMING.standard, ease: EASE_OUT },
+    transition: { duration: DURATION.normal, ease: EASE_ENTER },
   },
   exit: {
-    y: -20,
+    y: -30,
     opacity: 0,
-    transition: { duration: TIMING.fast, ease: EASE_IN },
+    transition: { duration: DURATION.fast, ease: EASE_EXIT },
   },
 }
 
-/** Card scales up from center */
-export const cardScaleUp: Variants = {
+/** Scale up from center — estimate/invoice card appearance */
+export const scaleUp: Variants = {
   hidden: { scale: 0.92, opacity: 0 },
   visible: {
     scale: 1,
     opacity: 1,
-    transition: { duration: TIMING.standard, ease: EASE_OUT },
+    transition: { duration: DURATION.normal, ease: EASE_ENTER },
   },
   exit: {
     scale: 0.95,
     opacity: 0,
-    transition: { duration: TIMING.fast, ease: EASE_IN },
+    transition: { duration: DURATION.fast, ease: EASE_EXIT },
   },
 }
 
-/** Container that staggers its children */
-export const staggerContainer: Variants = {
+/** Container that orchestrates staggered children */
+export const staggerParent: Variants = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: TIMING.stagger },
+    transition: {
+      staggerChildren: DURATION.stagger,
+      delayChildren: 0.1,
+    },
   },
 }
 
-/** Individual staggered item — slides up from 12px below */
-export const staggerItem: Variants = {
-  hidden: { y: 12, opacity: 0 },
+/** Individual item within a stagger group */
+export const staggerChild: Variants = {
+  hidden: { y: 10, opacity: 0 },
   visible: {
     y: 0,
     opacity: 1,
-    transition: { duration: TIMING.standard, ease: EASE_OUT },
+    transition: { duration: DURATION.normal, ease: EASE_ENTER },
   },
 }
 
-/** Simple fade */
-export const fadeIn: Variants = {
+/** Simple opacity fade */
+export const fade: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { duration: TIMING.standard, ease: EASE_OUT },
+    transition: { duration: DURATION.normal, ease: EASE_ENTER },
   },
   exit: {
     opacity: 0,
-    transition: { duration: TIMING.fast, ease: EASE_IN },
+    transition: { duration: DURATION.fast, ease: EASE_EXIT },
   },
 }
 
-/** Dispatch animation — card sends away (like an envelope) */
+/** Dispatch — card sends away like a dispatched envelope */
 export const dispatch: Variants = {
   visible: { y: 0, opacity: 1, scale: 1 },
   exit: {
-    y: -60,
+    y: -80,
     opacity: 0,
-    scale: 0.95,
-    transition: { duration: TIMING.standard, ease: EASE_IN },
+    scale: 0.92,
+    transition: { duration: DURATION.normal, ease: EASE_EXIT },
   },
 }
 
-/** Slide right into pipeline column */
-export const slideRightDock: Variants = {
-  center: { x: 0 },
-  docked: {
-    x: 80,
-    transition: { duration: TIMING.standard, ease: EASE_OUT },
+/** Narrative text — appears with slight upward movement */
+export const narrativeText: Variants = {
+  hidden: { y: 8, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { duration: DURATION.slow, ease: EASE_ENTER },
+  },
+  exit: {
+    opacity: 0,
+    transition: { duration: DURATION.fast, ease: EASE_EXIT },
   },
 }
 
 // ─── Reduced Motion ───────────────────────────────────────────────
+// Brand rule: provide a DIFFERENT animation that serves the same
+// emotional beat — not a disabled state.
 
-/** Returns true if user prefers reduced motion */
 export function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined') return false
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
-/** Returns a crossfade-only transition when reduced motion is active */
-export function safeTransition(transition: Transition): Transition {
-  if (prefersReducedMotion()) {
-    return { duration: 0.3, ease: 'easeInOut' }
-  }
-  return transition
-}
-
-/** Returns static variants for reduced motion (no movement, just opacity) */
-export const reducedMotionFade: Variants = {
+/** Gentle fade alternative for reduced motion users */
+export const reducedFade: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.3 } },
   exit: { opacity: 0, transition: { duration: 0.2 } },

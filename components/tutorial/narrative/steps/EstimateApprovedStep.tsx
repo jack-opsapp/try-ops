@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Check } from 'lucide-react'
 import { OPSStyle, fontStyle } from '@/lib/styles/OPSStyle'
@@ -10,20 +10,18 @@ import { TutorialCrewAvatar } from '../components/TutorialCrewAvatar'
 import {
   CLIENT_NAME,
   PROJECT_TITLE,
-  LABOR_ITEMS,
   TASK_CARDS,
   CREW_AVATARS,
   STATUS_COLORS,
-  formatCurrency,
 } from '../NarrativeTutorialData'
 import {
-  cardEnterFromTop,
-  staggerContainer,
-  staggerItem,
-  fadeIn,
-  TIMING,
-  EASE_OUT,
-  prefersReducedMotion,
+  enterFromTop,
+  narrativeText,
+  staggerParent,
+  staggerChild,
+  fade,
+  DURATION,
+  EASE_ENTER,
 } from '../utils/animations'
 
 interface EstimateApprovedStepProps {
@@ -31,204 +29,208 @@ interface EstimateApprovedStepProps {
 }
 
 /**
- * Animation phases for the timed state machine.
- * This is the most complex step — the "holy shit" moment.
+ * Step 3: "Won — Tasks Auto-Generate"
  *
- * The estimate's labor items peel off and become task cards.
- * Crew avatars dock onto each card. The work organizes itself.
- * Zero duplicate entry. That's the sell.
+ * Emotional beat: ACHIEVEMENT
+ * User feels: surprised delight — "wait, it did that automatically?"
+ * Animation must: show the magical moment where an approved estimate
+ * becomes organized work. This is the "holy shit" moment.
+ *
+ * Narrative: "Approved. Tasks created. Zero re-entry."
+ * The user needs to UNDERSTAND what just happened — that they never
+ * have to re-type a single thing.
  */
-type AnimPhase =
-  | 'notification'    // Approval notification drops from top
-  | 'ghostEstimate'   // Ghost outline of estimate appears
-  | 'transforming'    // Labor items become task cards, material fades
-  | 'crewDocking'     // Crew avatars slide onto task cards
-  | 'settled'         // Cards in final vertical stack
-  | 'advanceable'     // Ready for auto-advance or click
-
 export function EstimateApprovedStep({ onAdvance }: EstimateApprovedStepProps) {
-  const [phase, setPhase] = useState<AnimPhase>('notification')
-  const reduced = typeof window !== 'undefined' && prefersReducedMotion()
+  const [phase, setPhase] = useState<'narrative' | 'notification' | 'tasks' | 'sellLine'>('narrative')
 
-  // Timed sequence — each phase triggers the next
-  useEffect(() => {
-    if (reduced) {
-      // Skip animation, show final state
-      setPhase('advanceable')
-      return
-    }
-
-    const timers: ReturnType<typeof setTimeout>[] = []
-
-    const schedule = (fn: () => void, delay: number) => {
-      timers.push(setTimeout(fn, delay))
-    }
-
-    schedule(() => setPhase('ghostEstimate'), 1500)
-    schedule(() => setPhase('transforming'), 2800)
-    schedule(() => setPhase('crewDocking'), 4200)
-    schedule(() => setPhase('settled'), 5500)
-    schedule(() => setPhase('advanceable'), 6500)
-
-    return () => timers.forEach(clearTimeout)
-  }, [reduced])
-
-  // Auto-advance after delay, or click fallback
-  useEffect(() => {
-    if (phase !== 'advanceable') return
-    const timer = setTimeout(onAdvance, TIMING.autoAdvanceDelay)
-    return () => clearTimeout(timer)
-  }, [phase, onAdvance])
-
-  const handleClick = useCallback(() => {
-    if (phase === 'settled' || phase === 'advanceable') {
-      onAdvance()
-    }
-  }, [phase, onAdvance])
-
-  const showNotification = phase === 'notification' || phase === 'ghostEstimate'
-  const showGhost = phase === 'ghostEstimate' || phase === 'transforming'
-  const showTaskCards = phase === 'transforming' || phase === 'crewDocking' || phase === 'settled' || phase === 'advanceable'
-  const showCrewAvatars = phase === 'crewDocking' || phase === 'settled' || phase === 'advanceable'
-  const isClickable = phase === 'settled' || phase === 'advanceable'
-
-  // Map crew names to avatar data
   const crewForTask = (crewName: string) =>
     CREW_AVATARS.find((c) => c.name === crewName) ?? CREW_AVATARS[0]
 
+  const handleClick = useCallback(() => {
+    if (phase === 'tasks' || phase === 'sellLine') onAdvance()
+  }, [phase, onAdvance])
+
   return (
     <div
-      className="flex flex-col items-center justify-center min-h-[400px] gap-6"
+      className="flex flex-col gap-6 min-h-[420px] justify-center"
       onClick={handleClick}
-      style={{ cursor: isClickable ? 'pointer' : 'default' }}
+      style={{ cursor: phase === 'tasks' || phase === 'sellLine' ? 'pointer' : 'default' }}
     >
-      {/* Approval notification */}
-      <AnimatePresence>
-        {showNotification && (
+      <AnimatePresence mode="wait">
+
+        {/* ─── Narrative ─── */}
+        {phase === 'narrative' && (
           <motion.div
-            key="notification"
-            className="w-full max-w-sm"
-            variants={cardEnterFromTop}
+            key="narrative"
+            className="flex flex-col gap-2"
+            variants={narrativeText}
             initial="hidden"
             animate="visible"
             exit="exit"
+            onAnimationComplete={() => {
+              requestAnimationFrame(() => setTimeout(() => setPhase('notification'), 1200))
+            }}
           >
-            <TutorialCard borderColor={`${STATUS_COLORS.success}40`}>
-              <div className="flex items-center gap-3">
-                <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: `${STATUS_COLORS.success}26` }}
-                >
-                  <Check size={16} color={STATUS_COLORS.success} strokeWidth={2.5} />
-                </div>
-                <div className="flex flex-col gap-0.5">
-                  <TutorialStatusBadge text="ESTIMATE APPROVED" color={STATUS_COLORS.success} />
-                  <span
-                    style={{
-                      ...fontStyle(OPSStyle.Typography.caption),
-                      color: OPSStyle.Colors.secondaryText,
-                    }}
-                  >
-                    {CLIENT_NAME} approved your estimate
-                  </span>
-                </div>
-              </div>
-            </TutorialCard>
+            <span className="uppercase tracking-widest" style={{ ...fontStyle(OPSStyle.Typography.smallCaption), color: OPSStyle.Colors.tertiaryText, letterSpacing: '0.2em' }}>
+              STEP 3
+            </span>
+            <span className="uppercase tracking-wide" style={{ ...fontStyle(OPSStyle.Typography.title), color: '#FFFFFF' }}>
+              Client approves. Work organizes itself.
+            </span>
+            <span style={{ ...fontStyle(OPSStyle.Typography.caption), color: OPSStyle.Colors.secondaryText, lineHeight: 1.5 }}>
+              The estimate gets approved — and every task, crew assignment, and schedule entry creates itself. You never re-enter anything.
+            </span>
           </motion.div>
         )}
-      </AnimatePresence>
 
-      {/* Ghost estimate — outline form, low opacity */}
-      <AnimatePresence>
-        {showGhost && (
+        {/* ─── Approval notification ─── */}
+        {phase === 'notification' && (
           <motion.div
-            key="ghost-estimate"
-            className="w-full max-w-sm"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 0.3, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.98 }}
-            transition={{ duration: TIMING.standard, ease: EASE_OUT }}
+            key="notification"
+            className="flex flex-col gap-5"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
           >
-            <div
-              className="p-4 rounded-lg"
-              style={{
-                border: `1px dashed ${OPSStyle.Colors.cardBorder}`,
-                backgroundColor: 'transparent',
+            {/* Approval card */}
+            <motion.div
+              variants={enterFromTop}
+              initial="hidden"
+              animate="visible"
+              onAnimationComplete={() => {
+                // After notification lands, show the task cards
+                requestAnimationFrame(() => setTimeout(() => setPhase('tasks'), 1800))
               }}
             >
-              <span style={{ ...fontStyle(OPSStyle.Typography.caption), color: OPSStyle.Colors.tertiaryText }}>
-                {PROJECT_TITLE} — {formatCurrency(12_000)}
-              </span>
-              <div className="flex flex-col gap-1.5 mt-2">
-                {LABOR_ITEMS.map((item) => (
-                  <div key={item.id} className="h-6 rounded-sm" style={{ backgroundColor: 'rgba(255,255,255,0.04)' }} />
-                ))}
-                {/* Material line — will fade */}
-                <div className="h-6 rounded-sm" style={{ backgroundColor: 'rgba(255,255,255,0.02)' }} />
-              </div>
-            </div>
+              <TutorialCard borderColor={`${STATUS_COLORS.success}40`}>
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: `${STATUS_COLORS.success}26` }}
+                  >
+                    <Check size={16} color={STATUS_COLORS.success} strokeWidth={2.5} />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <TutorialStatusBadge text="ESTIMATE APPROVED" color={STATUS_COLORS.success} />
+                    <span style={{ ...fontStyle(OPSStyle.Typography.caption), color: OPSStyle.Colors.secondaryText }}>
+                      {CLIENT_NAME} approved your estimate for {PROJECT_TITLE}
+                    </span>
+                  </div>
+                </div>
+              </TutorialCard>
+            </motion.div>
+
+            {/* "Generating tasks..." indicator */}
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8, duration: DURATION.slow }}
+              className="uppercase tracking-widest"
+              style={{ ...fontStyle(OPSStyle.Typography.smallCaption), color: OPSStyle.Colors.tertiaryText, letterSpacing: '0.15em' }}
+            >
+              GENERATING TASKS...
+            </motion.span>
           </motion.div>
         )}
-      </AnimatePresence>
 
-      {/* Task cards — emerge from the estimate */}
-      <AnimatePresence>
-        {showTaskCards && (
+        {/* ─── Task cards — the "holy shit" reveal ─── */}
+        {phase === 'tasks' && (
           <motion.div
-            key="task-cards"
-            className="w-full max-w-sm flex flex-col gap-2.5"
-            variants={staggerContainer}
+            key="tasks"
+            className="flex flex-col gap-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            onAnimationComplete={() => {
+              // Auto-advance after user has time to absorb
+              requestAnimationFrame(() => setTimeout(() => setPhase('sellLine'), 3000))
+            }}
+          >
+            {/* Context label — drives the "zero re-entry" message home */}
+            <div className="flex items-center justify-between">
+              <span className="uppercase tracking-widest" style={{ ...fontStyle(OPSStyle.Typography.smallCaption), color: OPSStyle.Colors.tertiaryText, letterSpacing: '0.15em' }}>
+                AUTO-GENERATED TASKS
+              </span>
+              <span style={{ ...fontStyle(OPSStyle.Typography.smallCaption), color: STATUS_COLORS.success }}>
+                FROM YOUR ESTIMATE
+              </span>
+            </div>
+
+            {/* Task cards stagger in — each one an individual work item */}
+            <motion.div
+              className="flex flex-col gap-2.5"
+              variants={staggerParent}
+              initial="hidden"
+              animate="visible"
+            >
+              {TASK_CARDS.map((task) => {
+                const crew = crewForTask(task.crew)
+                return (
+                  <motion.div key={task.id} variants={staggerChild}>
+                    <TutorialCard>
+                      <div className="flex items-center gap-3">
+                        {/* Task type color stripe */}
+                        <div
+                          className="w-1 self-stretch rounded-sm flex-shrink-0"
+                          style={{ backgroundColor: task.color }}
+                        />
+                        {/* Task info */}
+                        <div className="flex-1 flex flex-col gap-0.5">
+                          <span style={{ ...fontStyle(OPSStyle.Typography.bodyBold), color: '#FFFFFF' }}>
+                            {task.name}
+                          </span>
+                          <span style={{ ...fontStyle(OPSStyle.Typography.smallCaption), color: OPSStyle.Colors.secondaryText }}>
+                            {PROJECT_TITLE}
+                          </span>
+                        </div>
+                        {/* Crew assignment */}
+                        <motion.div
+                          className="flex items-center gap-1.5"
+                          initial={{ opacity: 0, x: 16 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.4, duration: DURATION.normal, ease: EASE_ENTER }}
+                        >
+                          <TutorialCrewAvatar name={crew.name} tint={crew.tint} size={28} />
+                          <span style={{ ...fontStyle(OPSStyle.Typography.smallCaption), color: OPSStyle.Colors.tertiaryText }}>
+                            {task.crew}
+                          </span>
+                        </motion.div>
+                      </div>
+                    </TutorialCard>
+                  </motion.div>
+                )
+              })}
+            </motion.div>
+
+            {/* Click hint */}
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 2, duration: DURATION.slow }}
+              className="uppercase tracking-widest"
+              style={{ ...fontStyle(OPSStyle.Typography.smallCaption), color: OPSStyle.Colors.tertiaryText }}
+            >
+              TAP ANYWHERE TO CONTINUE
+            </motion.span>
+          </motion.div>
+        )}
+
+        {/* ─── Sell line ─── */}
+        {phase === 'sellLine' && (
+          <motion.div
+            key="sellLine"
+            className="flex flex-col gap-2"
+            variants={narrativeText}
             initial="hidden"
             animate="visible"
+            onAnimationComplete={() => {
+              requestAnimationFrame(() => setTimeout(() => onAdvance(), 1500))
+            }}
           >
-            {TASK_CARDS.map((task) => {
-              const crew = crewForTask(task.crew)
-              return (
-                <motion.div key={task.id} variants={staggerItem}>
-                  <TutorialCard>
-                    <div className="flex items-center gap-3">
-                      {/* Task type color stripe */}
-                      <div
-                        className="w-1 self-stretch rounded-sm flex-shrink-0"
-                        style={{ backgroundColor: task.color }}
-                      />
-
-                      {/* Task info */}
-                      <div className="flex-1 flex flex-col gap-0.5">
-                        <span style={{ ...fontStyle(OPSStyle.Typography.bodyBold), color: '#FFFFFF' }}>
-                          {task.name}
-                        </span>
-                        <span style={{ ...fontStyle(OPSStyle.Typography.smallCaption), color: OPSStyle.Colors.secondaryText }}>
-                          {PROJECT_TITLE}
-                        </span>
-                      </div>
-
-                      {/* Crew avatar — slides in from right */}
-                      <AnimatePresence>
-                        {showCrewAvatars && (
-                          <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: TIMING.standard, ease: EASE_OUT }}
-                            className="flex items-center gap-1.5"
-                          >
-                            <TutorialCrewAvatar name={crew.name} tint={crew.tint} size={28} />
-                            <span
-                              style={{
-                                ...fontStyle(OPSStyle.Typography.smallCaption),
-                                color: OPSStyle.Colors.tertiaryText,
-                              }}
-                            >
-                              {task.crew}
-                            </span>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </TutorialCard>
-                </motion.div>
-              )
-            })}
+            <span className="uppercase tracking-wide" style={{ ...fontStyle(OPSStyle.Typography.subtitle), color: OPSStyle.Colors.primaryAccent, letterSpacing: '0.08em' }}>
+              Zero duplicate entry.
+            </span>
+            <span style={{ ...fontStyle(OPSStyle.Typography.caption), color: OPSStyle.Colors.secondaryText }}>
+              Estimate approved → tasks created → crew assigned. Automatically.
+            </span>
           </motion.div>
         )}
       </AnimatePresence>

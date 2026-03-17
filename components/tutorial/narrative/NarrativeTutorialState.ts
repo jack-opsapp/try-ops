@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { PHASES, PHASE_CONFIG, type Phase } from './NarrativeTutorialData'
 import { sendTutorialEvent } from './utils/analytics'
-import { TIMING } from './utils/animations'
+import { DURATION } from './utils/animations'
 
 interface NarrativeTutorialStore {
   // ─── State ───────────────────────────────────────────────────────
@@ -91,7 +91,7 @@ export const useNarrativeTutorialStore = create<NarrativeTutorialStore>((set, ge
         phaseStartTime: Date.now(),
         isTransitioning: false,
       })
-    }, TIMING.stepTransition * 1000)
+    }, DURATION.normal * 1000)
   },
 
   skip: () => {

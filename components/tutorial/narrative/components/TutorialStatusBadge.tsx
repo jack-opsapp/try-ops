@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { fontStyle, OPSStyle } from '@/lib/styles/OPSStyle'
-import { TIMING, EASE_OUT } from '../utils/animations'
+import { DURATION, EASE_ENTER } from '../utils/animations'
 
 interface TutorialStatusBadgeProps {
   text: string
@@ -34,7 +34,7 @@ export function TutorialStatusBadge({ text, color, animate = true }: TutorialSta
       <motion.span
         style={style}
         animate={{ color, backgroundColor: `${color}26`, borderColor: `${color}4D` }}
-        transition={{ duration: TIMING.fast, ease: EASE_OUT }}
+        transition={{ duration: DURATION.fast, ease: EASE_ENTER }}
       >
         {text}
       </motion.span>

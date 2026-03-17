@@ -1,204 +1,278 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Mail } from 'lucide-react'
 import { OPSStyle, fontStyle } from '@/lib/styles/OPSStyle'
 import { TutorialCard } from '../components/TutorialCard'
 import { TutorialStatusBadge } from '../components/TutorialStatusBadge'
 import { PerimeterShimmer } from '../components/PerimeterShimmer'
-import {
-  CLIENT_NAME,
-  PROJECT_TITLE,
-  STATUS_COLORS,
-} from '../NarrativeTutorialData'
-import {
-  cardEnterFromTop,
-  fadeIn,
-  TIMING,
-  EASE_OUT,
-  prefersReducedMotion,
-} from '../utils/animations'
+import { CLIENT_NAME, PROJECT_TITLE, STATUS_COLORS } from '../NarrativeTutorialData'
+import { enterFromTop, narrativeText, fade, DURATION, EASE_ENTER, EASE_EXIT } from '../utils/animations'
 
 interface LeadArrivesStepProps {
   onAdvance: () => void
 }
 
-type StepState = 'waiting' | 'cardVisible' | 'docked'
-
 /**
  * Step 1: "The Lead Arrives"
  *
- * Dark canvas. Empty. Still. Then — a notification card enters from the top
- * with a precise ease-out. Not a bounce. An arrival.
+ * Emotional beat: ENTRY
+ * User feels: skepticism, curiosity
+ * Animation must: counter skepticism with precision
  *
- * The user clicks the card. It slides right into a mini pipeline column.
- * The column materializes as the card docks. Brief pause. Next step.
+ * Narrative: The user sees explanatory text first ("A new lead just came in")
+ * THEN the card arrives with purpose. They click it. It docks into a
+ * pipeline column. A sell line reinforces the value.
  *
- * What this sells: Leads come to you. The system catches them.
+ * The user should think: "Wait — it catches leads automatically?"
  */
 export function LeadArrivesStep({ onAdvance }: LeadArrivesStepProps) {
-  const [state, setState] = useState<StepState>('waiting')
-  const [shimmerTrigger, setShimmerTrigger] = useState(false)
-  const reduced = typeof window !== 'undefined' && prefersReducedMotion()
-
-  // Card enters after a brief beat — the emptiness is intentional
-  useEffect(() => {
-    const delay = reduced ? 100 : 500
-    const timer = setTimeout(() => {
-      setState('cardVisible')
-      // Shimmer plays after card settles
-      setTimeout(() => setShimmerTrigger(true), reduced ? 100 : 400)
-    }, delay)
-    return () => clearTimeout(timer)
-  }, [reduced])
+  const [phase, setPhase] = useState<'narrative' | 'card' | 'docked' | 'sellLine'>('narrative')
+  const [shimmerFired, setShimmerFired] = useState(false)
 
   const handleCardClick = useCallback(() => {
-    if (state !== 'cardVisible') return
-    setState('docked')
-    // Brief pause to show the docking, then advance
-    setTimeout(() => onAdvance(), reduced ? 300 : 800)
-  }, [state, onAdvance, reduced])
+    if (phase !== 'card') return
+    setPhase('docked')
+  }, [phase])
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[400px] relative">
-      <AnimatePresence mode="wait">
-        {state === 'waiting' && (
-          <motion.div
-            key="empty"
-            className="w-full"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          />
-        )}
+    <div className="flex flex-col gap-6 min-h-[420px] justify-center">
 
-        {state === 'cardVisible' && (
+      {/* ─── Narrative text — appears first, sets context ─── */}
+      <AnimatePresence mode="wait">
+        {phase === 'narrative' && (
           <motion.div
-            key="card"
-            className="w-full max-w-sm cursor-pointer"
-            onClick={handleCardClick}
-            variants={cardEnterFromTop}
+            key="narrative"
+            className="flex flex-col gap-2"
+            variants={narrativeText}
             initial="hidden"
             animate="visible"
-            whileHover={{ scale: 1.01, transition: { duration: 0.15 } }}
-            whileTap={{ scale: 0.99 }}
+            exit="exit"
+            onAnimationComplete={() => {
+              // After narrative text is readable (~1.2s), bring in the card
+              const id = requestAnimationFrame(() => {
+                setTimeout(() => setPhase('card'), 1200)
+              })
+              return () => cancelAnimationFrame(id)
+            }}
           >
-            <TutorialCard
-              borderColor={`${OPSStyle.Colors.primaryAccent}40`}
+            <span
+              className="uppercase tracking-widest"
+              style={{
+                ...fontStyle(OPSStyle.Typography.smallCaption),
+                color: OPSStyle.Colors.tertiaryText,
+                letterSpacing: '0.2em',
+              }}
             >
-              {/* Shimmer wraps the card */}
-              <PerimeterShimmer
-                trigger={shimmerTrigger}
-                borderRadius={OPSStyle.Layout.cardCornerRadius}
-              />
-
-              <div className="flex flex-col gap-2">
-                {/* NEW LEAD badge — amber, demands attention */}
-                <TutorialStatusBadge text="NEW LEAD" color={STATUS_COLORS.warning} />
-
-                {/* Client name — the human */}
-                <span
-                  style={{
-                    ...fontStyle(OPSStyle.Typography.cardTitle),
-                    color: '#FFFFFF',
-                  }}
-                >
-                  {CLIENT_NAME}
-                </span>
-
-                {/* Project description */}
-                <span
-                  style={{
-                    ...fontStyle(OPSStyle.Typography.caption),
-                    color: OPSStyle.Colors.secondaryText,
-                  }}
-                >
-                  {PROJECT_TITLE}
-                </span>
-
-                {/* Source badge — sells the auto-detection */}
-                <div className="flex items-center gap-1.5 mt-1">
-                  <Mail size={12} color={OPSStyle.Colors.primaryAccent} strokeWidth={1.5} />
-                  <span
-                    className="uppercase"
-                    style={{
-                      ...fontStyle(OPSStyle.Typography.status),
-                      color: OPSStyle.Colors.primaryAccent,
-                    }}
-                  >
-                    GMAIL
-                  </span>
-                </div>
-              </div>
-            </TutorialCard>
+              STEP 1
+            </span>
+            <span
+              className="uppercase tracking-wide"
+              style={{
+                ...fontStyle(OPSStyle.Typography.title),
+                color: '#FFFFFF',
+              }}
+            >
+              A new lead just came in.
+            </span>
+            <span
+              style={{
+                ...fontStyle(OPSStyle.Typography.caption),
+                color: OPSStyle.Colors.secondaryText,
+                lineHeight: 1.5,
+              }}
+            >
+              OPS detects leads from your email automatically. No manual entry.
+            </span>
           </motion.div>
         )}
 
-        {state === 'docked' && (
+        {/* ─── Lead notification card ─── */}
+        {phase === 'card' && (
           <motion.div
-            key="docked"
-            className="w-full max-w-sm flex gap-3 items-start"
-            initial={{ opacity: 1 }}
+            key="card"
+            className="flex flex-col gap-4"
+            initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: DURATION.fast } }}
           >
-            {/* The card slides right and shrinks slightly */}
+            {/* Contextual label */}
+            <span
+              className="uppercase tracking-widest"
+              style={{
+                ...fontStyle(OPSStyle.Typography.smallCaption),
+                color: OPSStyle.Colors.tertiaryText,
+                letterSpacing: '0.15em',
+              }}
+            >
+              INCOMING LEAD
+            </span>
+
+            {/* The card — arrives from top with precision */}
             <motion.div
-              className="flex-1"
-              initial={{ x: 0, scale: 1 }}
-              animate={{ x: 40, scale: 0.92, opacity: 0.7 }}
-              transition={{ duration: TIMING.standard, ease: EASE_OUT }}
+              className="cursor-pointer"
+              variants={enterFromTop}
+              initial="hidden"
+              animate="visible"
+              onClick={handleCardClick}
+              onAnimationComplete={() => {
+                // Shimmer fires after card lands — earned, not gratuitous
+                setShimmerFired(true)
+              }}
+              whileHover={{ scale: 1.01, transition: { duration: 0.12 } }}
+              whileTap={{ scale: 0.99 }}
             >
               <TutorialCard borderColor={`${OPSStyle.Colors.primaryAccent}30`}>
-                <div className="flex flex-col gap-1.5">
-                  <TutorialStatusBadge text="NEW LEAD" color={STATUS_COLORS.warning} animate={false} />
+                <PerimeterShimmer trigger={shimmerFired} borderRadius={OPSStyle.Layout.cardCornerRadius} />
+
+                <div className="flex flex-col gap-2.5">
+                  <TutorialStatusBadge text="NEW LEAD" color={STATUS_COLORS.warning} />
+
                   <span style={{ ...fontStyle(OPSStyle.Typography.cardTitle), color: '#FFFFFF' }}>
                     {CLIENT_NAME}
                   </span>
-                  <span style={{ ...fontStyle(OPSStyle.Typography.smallCaption), color: OPSStyle.Colors.secondaryText }}>
+
+                  <span style={{ ...fontStyle(OPSStyle.Typography.caption), color: OPSStyle.Colors.secondaryText }}>
                     {PROJECT_TITLE}
                   </span>
+
+                  {/* Source badge — sells the auto-detection */}
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <Mail size={12} color={OPSStyle.Colors.primaryAccent} strokeWidth={1.5} />
+                    <span
+                      className="uppercase"
+                      style={{
+                        ...fontStyle(OPSStyle.Typography.status),
+                        color: OPSStyle.Colors.primaryAccent,
+                      }}
+                    >
+                      DETECTED FROM GMAIL
+                    </span>
+                  </div>
                 </div>
               </TutorialCard>
             </motion.div>
 
-            {/* Pipeline column materializes */}
-            <motion.div
-              className="flex flex-col items-center gap-1.5"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: TIMING.standard, ease: EASE_OUT, delay: 0.1 }}
-              style={{ width: 80 }}
+            {/* Interaction hint — subtle, not pushy */}
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8, duration: DURATION.slow }}
+              style={{
+                ...fontStyle(OPSStyle.Typography.smallCaption),
+                color: OPSStyle.Colors.tertiaryText,
+                letterSpacing: '0.1em',
+              }}
+              className="uppercase"
             >
-              {/* Column header stripe — RFQ color */}
-              <div
-                className="w-full rounded-sm"
-                style={{
-                  height: 2,
-                  backgroundColor: '#BCBCBC',
-                }}
-              />
-              {/* Column label */}
-              <span
-                className="uppercase tracking-widest"
-                style={{
-                  ...fontStyle(OPSStyle.Typography.status),
-                  color: 'rgba(255,255,255,0.4)',
-                  fontSize: 9,
-                }}
-              >
-                NEW LEAD
-              </span>
-              {/* Column body */}
-              <div
-                className="w-full rounded-sm"
-                style={{
-                  height: 80,
-                  backgroundColor: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                }}
-              />
-            </motion.div>
+              TAP THE LEAD TO CAPTURE IT
+            </motion.span>
+          </motion.div>
+        )}
+
+        {/* ─── Docked state — card shrinks, pipeline column appears ─── */}
+        {phase === 'docked' && (
+          <motion.div
+            key="docked"
+            className="flex flex-col gap-5"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: DURATION.fast }}
+            onAnimationComplete={() => {
+              // Show sell line briefly, then advance
+              requestAnimationFrame(() => {
+                setTimeout(() => setPhase('sellLine'), 600)
+              })
+            }}
+          >
+            {/* Mini pipeline visualization — card docked in first column */}
+            <div className="flex gap-2 items-start">
+              {/* Pipeline column with card */}
+              <div className="flex flex-col gap-1.5 flex-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-full h-[2px] rounded-full" style={{ backgroundColor: '#BCBCBC' }} />
+                </div>
+                <span
+                  className="uppercase tracking-widest"
+                  style={{ ...fontStyle(OPSStyle.Typography.status), color: 'rgba(255,255,255,0.35)', fontSize: 9 }}
+                >
+                  NEW LEAD
+                </span>
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: DURATION.normal, ease: EASE_ENTER }}
+                >
+                  <TutorialCard borderColor={`${STATUS_COLORS.warning}30`}>
+                    <div className="flex flex-col gap-1">
+                      <span style={{ ...fontStyle(OPSStyle.Typography.status), color: '#FFFFFF' }}>
+                        {CLIENT_NAME}
+                      </span>
+                      <span style={{ ...fontStyle(OPSStyle.Typography.smallCaption), color: OPSStyle.Colors.tertiaryText }}>
+                        {PROJECT_TITLE}
+                      </span>
+                    </div>
+                  </TutorialCard>
+                </motion.div>
+              </div>
+
+              {/* Empty pipeline columns — hint at the full pipeline */}
+              {['ESTIMATED', 'ACCEPTED', 'IN PROGRESS'].map((label, i) => (
+                <motion.div
+                  key={label}
+                  className="flex flex-col gap-1.5 flex-1"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 0.25 }}
+                  transition={{ delay: i * 0.1 + 0.2, duration: DURATION.normal }}
+                >
+                  <div className="h-[2px] rounded-full" style={{ backgroundColor: ['#B5A381', '#9DB582', '#8195B5'][i] }} />
+                  <span
+                    className="uppercase tracking-widest"
+                    style={{ ...fontStyle(OPSStyle.Typography.status), color: 'rgba(255,255,255,0.2)', fontSize: 8 }}
+                  >
+                    {label}
+                  </span>
+                  <div className="h-16 rounded-lg" style={{ backgroundColor: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }} />
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* ─── Sell line — the emotional payoff ─── */}
+        {phase === 'sellLine' && (
+          <motion.div
+            key="sellLine"
+            className="flex flex-col gap-2"
+            variants={narrativeText}
+            initial="hidden"
+            animate="visible"
+            onAnimationComplete={() => {
+              // Hold the sell line for 1.5s, then advance
+              requestAnimationFrame(() => {
+                setTimeout(() => onAdvance(), 1500)
+              })
+            }}
+          >
+            <span
+              className="uppercase tracking-wide"
+              style={{
+                ...fontStyle(OPSStyle.Typography.subtitle),
+                color: OPSStyle.Colors.primaryAccent,
+                letterSpacing: '0.08em',
+              }}
+            >
+              Captured. In your pipeline.
+            </span>
+            <span
+              style={{
+                ...fontStyle(OPSStyle.Typography.caption),
+                color: OPSStyle.Colors.secondaryText,
+              }}
+            >
+              No copy-paste. No missed leads. It just works.
+            </span>
           </motion.div>
         )}
       </AnimatePresence>

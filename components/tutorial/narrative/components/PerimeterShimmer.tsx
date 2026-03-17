@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { TIMING } from '../utils/animations'
+import { DURATION } from '../utils/animations'
 
 interface PerimeterShimmerProps {
   /** Set to true to trigger one shimmer pass. Changes in value re-trigger. */
@@ -39,7 +39,7 @@ export function PerimeterShimmer({
       setIsPlaying(true)
       const timer = setTimeout(
         () => setIsPlaying(false),
-        TIMING.shimmerDuration * 1000 + 100, // small buffer
+        DURATION.slow * 1000 + 100, // small buffer
       )
       return () => clearTimeout(timer)
     }
@@ -74,7 +74,7 @@ export function PerimeterShimmer({
             initial={{ rotate: 0 }}
             animate={{ rotate: 360 }}
             transition={{
-              duration: TIMING.shimmerDuration,
+              duration: DURATION.slow,
               ease: 'linear',
             }}
           />

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Check } from 'lucide-react'
 import { OPSStyle, fontStyle } from '@/lib/styles/OPSStyle'
@@ -19,14 +19,14 @@ import {
   formatCurrency,
 } from '../NarrativeTutorialData'
 import {
-  cardEnterFromTop,
-  staggerContainer,
-  staggerItem,
-  fadeIn,
+  narrativeText,
+  enterFromTop,
+  staggerParent,
+  staggerChild,
+  fade,
   dispatch,
-  TIMING,
-  EASE_OUT,
-  prefersReducedMotion,
+  DURATION,
+  EASE_ENTER,
 } from '../utils/animations'
 
 interface InvoiceAndPayStepProps {
@@ -34,220 +34,178 @@ interface InvoiceAndPayStepProps {
   onSkip: () => void
 }
 
-type StepPhase =
-  | 'projectCard'   // Completed project card shown
-  | 'invoice'       // Card transforms into invoice with line items
-  | 'sending'       // Invoice dispatches
-  | 'paid'          // Payment received notification + PAID stamp
-  | 'finalText'     // Staggered text reveal
-  | 'cta'           // GET STARTED button
-
 /**
  * Step 6: "Invoice & Get Paid"
  *
- * The full circle. Lead in, money out. Everything connected.
+ * Emotional beat: ACHIEVEMENT + COMMITMENT
+ * User feels: the full circle closing — lead in, money out
+ * Animation must: close the loop with weight and gravitas
  *
- * Project card → invoice → send → payment received → staggered text
- * revealing the complete lifecycle → CTA.
- *
- * The staggered text is the emotional climax:
+ * This is the emotional climax. The staggered text at the end is
+ * the moment where skepticism transforms to conviction:
  * LEAD. ESTIMATE. PROJECT. INVOICE. REVENUE. NO PAPERWORK.
+ *
+ * The CTA must feel earned — the user just watched their entire
+ * business lifecycle in under 90 seconds.
  */
 export function InvoiceAndPayStep({ onGetStarted, onSkip }: InvoiceAndPayStepProps) {
-  const [phase, setPhase] = useState<StepPhase>('projectCard')
-  const [shimmerTrigger, setShimmerTrigger] = useState(false)
+  const [phase, setPhase] = useState<'narrative' | 'invoice' | 'sending' | 'paid' | 'finalText' | 'cta'>('narrative')
+  const [shimmerFired, setShimmerFired] = useState(false)
   const [visibleLines, setVisibleLines] = useState(0)
-  const reduced = typeof window !== 'undefined' && prefersReducedMotion()
 
-  // Auto-progress from projectCard to invoice
-  useEffect(() => {
-    if (reduced) {
-      setPhase('cta')
-      return
-    }
-    const timer = setTimeout(() => setPhase('invoice'), 1200)
-    return () => clearTimeout(timer)
-  }, [reduced])
-
-  const handleSendInvoice = useCallback(() => {
-    if (phase !== 'invoice') return
-    setPhase('sending')
-
-    if (reduced) {
-      setPhase('paid')
-      setTimeout(() => {
-        setPhase('finalText')
-        setVisibleLines(7)
-        setTimeout(() => setPhase('cta'), 500)
-      }, 500)
-      return
-    }
-
-    // Invoice dispatches → beat → payment
-    setTimeout(() => {
-      setPhase('paid')
-      setShimmerTrigger(true)
-    }, 800)
-
-    // Payment holds → staggered text
-    setTimeout(() => {
-      setPhase('finalText')
-    }, 2500)
-  }, [phase, reduced])
-
-  // Staggered text reveal
+  // Staggered text reveal — each line appears after the previous
   useEffect(() => {
     if (phase !== 'finalText') return
-    if (reduced) {
-      setVisibleLines(7)
-      setTimeout(() => setPhase('cta'), 500)
-      return
+
+    const TOTAL_LINES = 7 // LEAD, ESTIMATE, PROJECT, INVOICE, REVENUE, (beat), NO PAPERWORK
+    let line = 0
+
+    const advance = () => {
+      line++
+      setVisibleLines(line)
+      if (line >= TOTAL_LINES) {
+        // All lines shown → show CTA after a beat
+        requestAnimationFrame(() => setTimeout(() => setPhase('cta'), 1000))
+      } else {
+        // Next line after interval (longer pause before "NO PAPERWORK")
+        const delay = line === 5 ? 800 : DURATION.text * 1000
+        requestAnimationFrame(() => setTimeout(advance, delay))
+      }
     }
 
-    const FINAL_LINES = [
-      'LEAD.',
-      'ESTIMATE.',
-      'PROJECT.',
-      'INVOICE.',
-      'REVENUE.',
-      '', // beat
-      'NO PAPERWORK.',
-    ]
+    // Start the reveal after a beat of dark canvas
+    requestAnimationFrame(() => setTimeout(advance, 600))
+  }, [phase])
 
-    let lineIndex = 0
-    const interval = setInterval(() => {
-      lineIndex++
-      setVisibleLines(lineIndex)
-      if (lineIndex >= FINAL_LINES.length) {
-        clearInterval(interval)
-        // Show CTA after last line
-        setTimeout(() => setPhase('cta'), 1000)
-      }
-    }, TIMING.textRevealInterval * 1000)
-
-    return () => clearInterval(interval)
-  }, [phase, reduced])
+  const handleSend = useCallback(() => {
+    if (phase !== 'invoice') return
+    setPhase('sending')
+  }, [phase])
 
   const FINAL_LINES = [
-    { text: 'LEAD.', color: OPSStyle.Colors.secondaryText, size: false },
-    { text: 'ESTIMATE.', color: OPSStyle.Colors.secondaryText, size: false },
-    { text: 'PROJECT.', color: OPSStyle.Colors.secondaryText, size: false },
-    { text: 'INVOICE.', color: OPSStyle.Colors.secondaryText, size: false },
-    { text: 'REVENUE.', color: '#FFFFFF', size: true },
-    { text: '', color: 'transparent', size: false }, // beat
-    { text: 'NO PAPERWORK.', color: OPSStyle.Colors.primaryAccent, size: false },
+    { text: 'LEAD.', color: OPSStyle.Colors.secondaryText, large: false },
+    { text: 'ESTIMATE.', color: OPSStyle.Colors.secondaryText, large: false },
+    { text: 'PROJECT.', color: OPSStyle.Colors.secondaryText, large: false },
+    { text: 'INVOICE.', color: OPSStyle.Colors.secondaryText, large: false },
+    { text: 'REVENUE.', color: '#FFFFFF', large: true },
+    { text: '', color: 'transparent', large: false }, // beat
+    { text: 'NO PAPERWORK.', color: OPSStyle.Colors.primaryAccent, large: false },
   ]
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[400px]">
+    <div className="flex flex-col gap-6 min-h-[420px] justify-center">
       <AnimatePresence mode="wait">
-        {/* Project card */}
-        {phase === 'projectCard' && (
+
+        {/* ─── Narrative ─── */}
+        {phase === 'narrative' && (
           <motion.div
-            key="project"
-            className="w-full max-w-sm"
-            variants={fadeIn}
+            key="narrative"
+            className="flex flex-col gap-2"
+            variants={narrativeText}
             initial="hidden"
             animate="visible"
             exit="exit"
+            onAnimationComplete={() => {
+              requestAnimationFrame(() => setTimeout(() => setPhase('invoice'), 1200))
+            }}
           >
-            <TutorialCard borderColor={`${STATUS_COLORS.success}40`}>
-              <div className="flex items-center justify-between">
-                <span style={{ ...fontStyle(OPSStyle.Typography.cardTitle), color: '#FFFFFF' }}>
-                  {PROJECT_TITLE}
-                </span>
-                <TutorialStatusBadge text="COMPLETE" color={STATUS_COLORS.success} />
-              </div>
-            </TutorialCard>
+            <span className="uppercase tracking-widest" style={{ ...fontStyle(OPSStyle.Typography.smallCaption), color: OPSStyle.Colors.tertiaryText, letterSpacing: '0.2em' }}>
+              STEP 6
+            </span>
+            <span className="uppercase tracking-wide" style={{ ...fontStyle(OPSStyle.Typography.title), color: '#FFFFFF' }}>
+              Invoice and get paid.
+            </span>
+            <span style={{ ...fontStyle(OPSStyle.Typography.caption), color: OPSStyle.Colors.secondaryText, lineHeight: 1.5 }}>
+              The project is complete. One tap to invoice — same line items, same totals. Full circle.
+            </span>
           </motion.div>
         )}
 
-        {/* Invoice */}
+        {/* ─── Invoice card ─── */}
         {phase === 'invoice' && (
           <motion.div
             key="invoice"
-            className="w-full max-w-sm"
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: TIMING.standard, ease: EASE_OUT }}
+            className="flex flex-col gap-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
           >
-            <TutorialCard>
-              <div className="flex flex-col gap-3">
-                {/* Invoice header */}
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-col gap-0.5">
-                    <TutorialStatusBadge text="INVOICE" color={OPSStyle.Colors.primaryAccent} />
-                    <span style={{ ...fontStyle(OPSStyle.Typography.smallCaption), color: OPSStyle.Colors.tertiaryText }}>
-                      {INVOICE_NUMBER}
-                    </span>
+            <span className="uppercase tracking-widest" style={{ ...fontStyle(OPSStyle.Typography.smallCaption), color: OPSStyle.Colors.tertiaryText, letterSpacing: '0.15em' }}>
+              INVOICE
+            </span>
+
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: DURATION.normal, ease: EASE_ENTER }}
+            >
+              <TutorialCard>
+                <div className="flex flex-col gap-3">
+                  {/* Invoice header */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-0.5">
+                      <TutorialStatusBadge text="INVOICE" color={OPSStyle.Colors.primaryAccent} />
+                      <span style={{ ...fontStyle(OPSStyle.Typography.smallCaption), color: OPSStyle.Colors.tertiaryText }}>
+                        {INVOICE_NUMBER}
+                      </span>
+                    </div>
+                    <div className="flex flex-col items-end gap-0.5">
+                      <span style={{ ...fontStyle(OPSStyle.Typography.bodyBold), color: '#FFFFFF' }}>{CLIENT_NAME}</span>
+                      <span style={{ ...fontStyle(OPSStyle.Typography.smallCaption), color: OPSStyle.Colors.tertiaryText }}>{PROJECT_TITLE}</span>
+                    </div>
                   </div>
-                  <span style={{ ...fontStyle(OPSStyle.Typography.caption), color: OPSStyle.Colors.secondaryText }}>
-                    {CLIENT_NAME}
-                  </span>
+
+                  {/* Same line items as the estimate — full circle traceability */}
+                  <motion.div className="flex flex-col gap-2" variants={staggerParent} initial="hidden" animate="visible" role="list">
+                    {LINE_ITEMS.map((item) => (
+                      <motion.div key={item.id} variants={staggerChild}>
+                        <TutorialLineItem item={item} />
+                      </motion.div>
+                    ))}
+                  </motion.div>
+
+                  <div className="h-px" style={{ backgroundColor: OPSStyle.Colors.cardBorder }} />
+
+                  <div className="flex items-baseline justify-between">
+                    <span className="uppercase tracking-wider" style={{ ...fontStyle(OPSStyle.Typography.caption), color: OPSStyle.Colors.secondaryText }}>TOTAL</span>
+                    <span style={{ ...fontStyle(OPSStyle.Typography.largeTitle), color: '#FFFFFF' }}>{formatCurrency(ESTIMATE_TOTAL)}</span>
+                  </div>
+
+                  <motion.button
+                    className="w-full cursor-pointer mt-1"
+                    onClick={handleSend}
+                    whileHover={{ scale: 1.02, filter: 'brightness(1.1)' }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ duration: 0.15 }}
+                    style={{
+                      ...fontStyle(OPSStyle.Typography.button),
+                      height: 48,
+                      backgroundColor: OPSStyle.Colors.primaryAccent,
+                      color: '#FFFFFF',
+                      border: `1px solid ${OPSStyle.Colors.primaryAccent}`,
+                      borderRadius: OPSStyle.Layout.buttonRadius,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.08em',
+                    }}
+                  >
+                    SEND INVOICE
+                  </motion.button>
                 </div>
-
-                {/* Line items — same as the estimate, full circle */}
-                <motion.div
-                  className="flex flex-col gap-2"
-                  variants={staggerContainer}
-                  initial="hidden"
-                  animate="visible"
-                  role="list"
-                >
-                  {LINE_ITEMS.map((item) => (
-                    <motion.div key={item.id} variants={staggerItem}>
-                      <TutorialLineItem item={item} />
-                    </motion.div>
-                  ))}
-                </motion.div>
-
-                {/* Divider */}
-                <div className="h-px" style={{ backgroundColor: OPSStyle.Colors.cardBorder }} />
-
-                {/* Total */}
-                <div className="flex items-baseline justify-between">
-                  <span style={{ ...fontStyle(OPSStyle.Typography.caption), color: OPSStyle.Colors.secondaryText }}>
-                    TOTAL
-                  </span>
-                  <span style={{ ...fontStyle(OPSStyle.Typography.largeTitle), color: '#FFFFFF' }}>
-                    {formatCurrency(ESTIMATE_TOTAL)}
-                  </span>
-                </div>
-
-                {/* Send Invoice button */}
-                <motion.button
-                  onClick={handleSendInvoice}
-                  className="w-full cursor-pointer mt-1"
-                  whileHover={{ scale: 1.02, filter: 'brightness(1.1)' }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ duration: 0.15 }}
-                  style={{
-                    ...fontStyle(OPSStyle.Typography.button),
-                    height: 48,
-                    backgroundColor: OPSStyle.Colors.primaryAccent,
-                    color: '#FFFFFF',
-                    border: `1px solid ${OPSStyle.Colors.primaryAccent}`,
-                    borderRadius: OPSStyle.Layout.buttonRadius,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                  }}
-                >
-                  SEND INVOICE
-                </motion.button>
-              </div>
-            </TutorialCard>
+              </TutorialCard>
+            </motion.div>
           </motion.div>
         )}
 
-        {/* Sending — dispatch animation */}
+        {/* ─── Dispatching ─── */}
         {phase === 'sending' && (
           <motion.div
             key="sending"
-            className="w-full max-w-sm"
             variants={dispatch}
             initial="visible"
             animate="exit"
+            onAnimationComplete={() => {
+              // Beat of silence, then payment
+              requestAnimationFrame(() => setTimeout(() => setPhase('paid'), 600))
+            }}
           >
             <TutorialCard>
               <div className="opacity-60">
@@ -259,21 +217,22 @@ export function InvoiceAndPayStep({ onGetStarted, onSkip }: InvoiceAndPayStepPro
           </motion.div>
         )}
 
-        {/* Payment received */}
+        {/* ─── Payment received ─── */}
         {phase === 'paid' && (
           <motion.div
             key="paid"
-            className="w-full max-w-sm relative"
-            variants={cardEnterFromTop}
+            className="flex flex-col gap-4"
+            variants={enterFromTop}
             initial="hidden"
             animate="visible"
-            exit="exit"
+            onAnimationComplete={() => {
+              setShimmerFired(true)
+              // Hold payment card, then transition to final text
+              requestAnimationFrame(() => setTimeout(() => setPhase('finalText'), 2500))
+            }}
           >
             <TutorialCard borderColor={`${STATUS_COLORS.success}40`}>
-              <PerimeterShimmer
-                trigger={shimmerTrigger}
-                borderRadius={OPSStyle.Layout.cardCornerRadius}
-              />
+              <PerimeterShimmer trigger={shimmerFired} borderRadius={OPSStyle.Layout.cardCornerRadius} />
               <div className="flex flex-col gap-3">
                 <div className="flex items-center gap-3">
                   <div
@@ -282,7 +241,7 @@ export function InvoiceAndPayStep({ onGetStarted, onSkip }: InvoiceAndPayStepPro
                   >
                     <Check size={16} color={STATUS_COLORS.success} strokeWidth={2.5} />
                   </div>
-                  <div className="flex flex-col gap-0.5">
+                  <div className="flex flex-col gap-1">
                     <TutorialStatusBadge text="PAYMENT RECEIVED" color={STATUS_COLORS.success} />
                     <span style={{ ...fontStyle(OPSStyle.Typography.caption), color: OPSStyle.Colors.secondaryText }}>
                       {CLIENT_NAME} — {formatCurrency(ESTIMATE_TOTAL)}
@@ -291,7 +250,7 @@ export function InvoiceAndPayStep({ onGetStarted, onSkip }: InvoiceAndPayStepPro
                 </div>
 
                 {/* PAID stamp — crisp, no fanfare */}
-                <div className="flex justify-center py-2">
+                <div className="flex justify-start py-1">
                   <span
                     className="uppercase"
                     style={{
@@ -311,32 +270,32 @@ export function InvoiceAndPayStep({ onGetStarted, onSkip }: InvoiceAndPayStepPro
           </motion.div>
         )}
 
-        {/* Final text reveal + CTA */}
+        {/* ─── Final text reveal — the emotional climax ─── */}
         {(phase === 'finalText' || phase === 'cta') && (
           <motion.div
             key="final"
-            className="w-full max-w-sm flex flex-col items-start gap-1"
-            variants={fadeIn}
+            className="flex flex-col gap-1.5 w-full"
+            variants={fade}
             initial="hidden"
             animate="visible"
           >
-            {/* Staggered text — each line appears one at a time */}
-            <div className="flex flex-col gap-1 mb-8 w-full">
+            {/* Staggered text lines */}
+            <div className="flex flex-col gap-1 mb-8">
               {FINAL_LINES.map((line, i) => (
                 <motion.div
                   key={i}
-                  initial={{ opacity: 0, y: 8 }}
+                  initial={{ opacity: 0, y: 6 }}
                   animate={{
                     opacity: i < visibleLines ? 1 : 0,
-                    y: i < visibleLines ? 0 : 8,
+                    y: i < visibleLines ? 0 : 6,
                   }}
-                  transition={{ duration: TIMING.standard, ease: EASE_OUT }}
+                  transition={{ duration: DURATION.normal, ease: EASE_ENTER }}
                 >
                   {line.text && (
                     <span
                       className="uppercase tracking-wide"
                       style={{
-                        ...fontStyle(line.size ? OPSStyle.Typography.largeTitle : OPSStyle.Typography.title),
+                        ...fontStyle(line.large ? OPSStyle.Typography.largeTitle : OPSStyle.Typography.title),
                         color: line.color,
                         letterSpacing: '0.08em',
                       }}
@@ -348,14 +307,14 @@ export function InvoiceAndPayStep({ onGetStarted, onSkip }: InvoiceAndPayStepPro
               ))}
             </div>
 
-            {/* CTA */}
+            {/* CTA — appears after all text is revealed */}
             <AnimatePresence>
               {phase === 'cta' && (
                 <motion.div
                   className="w-full"
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: TIMING.standard, ease: EASE_OUT }}
+                  transition={{ duration: DURATION.normal, ease: EASE_ENTER }}
                 >
                   <TutorialCTAButton
                     primaryLabel="GET STARTED"

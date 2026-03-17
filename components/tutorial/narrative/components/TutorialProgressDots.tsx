@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import { OPSStyle } from '@/lib/styles/OPSStyle'
 import { TOTAL_STEPS } from '../NarrativeTutorialData'
-import { TIMING, EASE_OUT } from '../utils/animations'
+import { DURATION, EASE_ENTER } from '../utils/animations'
 
 interface TutorialProgressDotsProps {
   currentStep: number
@@ -31,7 +31,7 @@ export function TutorialProgressDots({ currentStep }: TutorialProgressDotsProps)
             className="rounded-full"
             style={{ width: 6, height: 6 }}
             animate={{ backgroundColor: fill }}
-            transition={{ duration: TIMING.fast, ease: EASE_OUT }}
+            transition={{ duration: DURATION.fast, ease: EASE_ENTER }}
           />
         )
       })}

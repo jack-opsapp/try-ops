@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { OPSStyle, fontStyle } from '@/lib/styles/OPSStyle'
-import { fadeIn } from '../utils/animations'
+import { fade } from '../utils/animations'
 
 interface TutorialCTAButtonProps {
   primaryLabel: string
@@ -24,7 +24,7 @@ export function TutorialCTAButton({
   return (
     <motion.div
       className="flex flex-col items-center gap-3 w-full"
-      variants={fadeIn}
+      variants={fade}
       initial="hidden"
       animate="visible"
     >
