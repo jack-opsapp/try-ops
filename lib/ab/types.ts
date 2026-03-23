@@ -6,7 +6,7 @@ export const HeroPropsSchema = z.object({
   subtext: z.string(),
   primaryCtaLabel: z.string(),
   secondaryCtaLabel: z.string(),
-  heroMode: z.enum(['animation', 'image']).optional(),
+  heroMode: z.enum(['animation', 'image', 'phone3d']).optional(),
   heroImageSrc: z.string().optional(),
 })
 

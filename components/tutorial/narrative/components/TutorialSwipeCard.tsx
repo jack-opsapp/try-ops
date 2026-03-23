@@ -4,7 +4,7 @@ import { useCallback, useRef } from 'react'
 import { motion, useMotionValue, useTransform, type PanInfo } from 'framer-motion'
 import { OPSStyle, fontStyle } from '@/lib/styles/OPSStyle'
 import { TutorialSwipeStamp } from './TutorialSwipeStamp'
-import { SPRING_SETTLE, EASE_ENTER } from '../utils/animations'
+import { EASE_ENTER } from '../utils/animations'
 import type { ReviewCard } from '../NarrativeTutorialData'
 
 const SWIPE_THRESHOLD = 120

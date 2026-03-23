@@ -55,7 +55,7 @@ export function Carousel({ children, gap = 16, className = '', startIndex = 0 }:
     setActiveIndex(wrapped)
     controls.start({
       x: -wrapped * (cardWidth + gap),
-      transition: { type: 'spring', stiffness: 300, damping: 30 },
+      transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] },
     })
   }
 

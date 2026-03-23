@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { TypewriterText } from '@/components/ui/TypewriterText'
 
-const spring = { type: 'spring' as const, stiffness: 120, damping: 18 }
+const EASE_ENTER = [0.16, 1, 0.3, 1] as const
 
 // Completed status color from OPSStyle.Colors.status.completed
 const COMPLETED_COLOR = '#B58289'
@@ -16,9 +16,9 @@ export function HeroAnimation() {
 
     // === CARD BUILDING (compressed ~40%) ===
     timeouts.push(setTimeout(() => setPhase(1), 100))    // Card 1 outline draws
-    timeouts.push(setTimeout(() => setPhase(2), 400))    // Card 1 content springs in
+    timeouts.push(setTimeout(() => setPhase(2), 400))    // Card 1 content enters
     timeouts.push(setTimeout(() => setPhase(3), 700))    // Card 2 outline draws
-    timeouts.push(setTimeout(() => setPhase(4), 1000))   // Card 2 content springs in
+    timeouts.push(setTimeout(() => setPhase(4), 1000))   // Card 2 content enters
     timeouts.push(setTimeout(() => setPhase(5), 1300))   // Card 3 outline draws
     timeouts.push(setTimeout(() => setPhase(6), 1600))   // Card 3 content + checkmarks cascade
 
@@ -171,7 +171,7 @@ export function HeroAnimation() {
                       transition={{ duration: 0.5, ease: 'easeInOut' }}
                     />
 
-                    {/* Content rows — spring in */}
+                    {/* Content rows — enter with purpose */}
                     {shouldShowContent(ci) && (
                       <>
                         {/* Title line */}
@@ -185,7 +185,7 @@ export function HeroAnimation() {
                           strokeLinecap="round"
                           initial={{ opacity: 0, x1: cx + 10 - 15, x2: cx + 10 - 15 }}
                           animate={{ opacity: 0.8, x1: cx + 10, x2: cx + 10 + card.titleW }}
-                          transition={{ ...spring, delay: 0 }}
+                          transition={{ duration: 0.3, ease: EASE_ENTER, delay: 0 }}
                         />
 
                         {/* Address line */}
@@ -199,7 +199,7 @@ export function HeroAnimation() {
                           strokeLinecap="round"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 0.35 }}
-                          transition={{ ...spring, delay: 0.06 }}
+                          transition={{ duration: 0.3, ease: EASE_ENTER, delay: 0.06 }}
                         />
 
                         {/* Crew dots */}
@@ -214,7 +214,7 @@ export function HeroAnimation() {
                             fill="none"
                             initial={{ opacity: 0, scale: 0 }}
                             animate={{ opacity: 0.5, scale: 1 }}
-                            transition={{ ...spring, delay: 0.12 + di * 0.05 }}
+                            transition={{ duration: 0.3, ease: EASE_ENTER, delay: 0.12 + di * 0.05 }}
                           />
                         ))}
 
@@ -229,7 +229,7 @@ export function HeroAnimation() {
                           strokeLinecap="round"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 0.25 }}
-                          transition={{ ...spring, delay: 0.2 }}
+                          transition={{ duration: 0.3, ease: EASE_ENTER, delay: 0.2 }}
                         />
                       </>
                     )}
@@ -240,9 +240,8 @@ export function HeroAnimation() {
                         initial={{ opacity: 0, scale: 0.3 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{
-                          type: 'spring',
-                          stiffness: 200,
-                          damping: 15,
+                          duration: 0.25,
+                          ease: EASE_ENTER,
                           delay: ci * 0.2,
                         }}
                       >
@@ -285,9 +284,9 @@ export function HeroAnimation() {
                   style={{ transformOrigin: `${folderCenterX}px ${folderCenterY}px` }}
                   transition={{
                     opacity: { duration: 0.3 },
-                    scale: { type: 'spring', stiffness: 150, damping: 15 },
+                    scale: { duration: 0.35, ease: EASE_ENTER },
                     rotate: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
-                    x: { type: 'spring', stiffness: 100, damping: 16 },
+                    x: { duration: 0.4, ease: EASE_ENTER },
                   }}
                 >
                   {/* Folder body — top-left corner 0 radius (tab connects there), other corners 4px */}
@@ -336,7 +335,7 @@ export function HeroAnimation() {
                     scale: phase >= 12 ? 0.4 : 1,
                   }}
                   style={{ transformOrigin: `${invoiceBaseX + invoiceW / 2}px ${invoiceBaseY + invoiceH / 2}px` }}
-                  transition={{ type: 'spring', stiffness: 120, damping: 16 }}
+                  transition={{ duration: 0.35, ease: EASE_ENTER }}
                 >
                   {/* Document body with dog-ear */}
                   <path
@@ -399,7 +398,7 @@ export function HeroAnimation() {
                       initial={{ opacity: 0, scale: 0.3 }}
                       animate={{ opacity: 1, scale: 1 }}
                       style={{ transformOrigin: `${invoiceBaseX + invoiceW / 2}px ${invoiceBaseY + invoiceH / 2 - 4}px` }}
-                      transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+                      transition={{ duration: 0.25, ease: EASE_ENTER }}
                     >
                       <circle
                         cx={invoiceBaseX + invoiceW / 2}
@@ -443,7 +442,7 @@ export function HeroAnimation() {
                         className="font-mohave text-[15px] lg:text-[18px] uppercase tracking-[0.08em] text-ops-text-primary font-medium"
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1.25, opacity: 1 }}
-                        transition={{ type: 'spring', stiffness: 150, damping: 12 }}
+                        transition={{ duration: 0.3, ease: EASE_ENTER }}
                       >
                         {textInfo.text}
                       </motion.span>

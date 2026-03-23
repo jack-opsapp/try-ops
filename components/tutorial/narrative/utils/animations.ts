@@ -23,20 +23,19 @@ export const DURATION = {
   text: 0.5,       // Between staggered text lines (finale)
 } as const
 
-// ─── Spring Configs ────────────────────────────────────────────────
-// Brand rule: dampingFraction >= 0.75. No visible oscillation.
-// Springs only where physical weight serves the interaction.
+// ─── Decisive Transitions ──────────────────────────────────────────
+// Brand rule: no spring physics. Things arrive and stop. No settling.
 
-export const SPRING_SETTLE: Transition = {
-  type: 'spring',
-  stiffness: 400,
-  damping: 30,   // high damping = lands without bounce
+/** Snappy settle — card drops, element snaps to position */
+export const SETTLE: Transition = {
+  duration: DURATION.fast,
+  ease: EASE_ENTER,
 }
 
-export const SPRING_CARD: Transition = {
-  type: 'spring',
-  stiffness: 300,
-  damping: 25,
+/** Card appearance — slightly more deliberate than settle */
+export const CARD_ENTER: Transition = {
+  duration: DURATION.normal,
+  ease: EASE_ENTER,
 }
 
 // ─── Reusable Variants ─────────────────────────────────────────────

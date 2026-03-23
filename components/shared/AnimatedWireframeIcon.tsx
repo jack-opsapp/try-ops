@@ -11,7 +11,7 @@ interface AnimatedIconProps {
 // ─── Group Text Hell ────────────────────────────────────────────
 // 3 speech bubbles appear sequentially. Before each new bubble,
 // a "..." typing indicator pulses, then "?" confusion pops in,
-// then the next message springs into view. After all 3: chaotic jitter.
+// then the next message snaps into view. After all 3: chaotic jitter.
 export function AnimatedTangledMessages({ isActive, size = 48 }: AnimatedIconProps) {
   const [phase, setPhase] = useState(0)
 
@@ -79,7 +79,7 @@ export function AnimatedTangledMessages({ isActive, size = 48 }: AnimatedIconPro
       <motion.g
         style={{ transformOrigin: '18px 14px' }}
         animate={{ opacity: showBubble1 ? 1 : 0, scale: showBubble1 ? 1 : 0.5 }}
-        transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
       >
         <motion.g animate={jitter(1)}>
           <path d="M6 6 h24 a3 3 0 0 1 3 3 v10 a3 3 0 0 1 -3 3 h-18 l-4 4 v-4 h-2 a3 3 0 0 1 -3 -3 v-10 a3 3 0 0 1 3 -3 z" />
@@ -119,7 +119,7 @@ export function AnimatedTangledMessages({ isActive, size = 48 }: AnimatedIconPro
           textAnchor="middle"
           initial={{ opacity: 0, scale: 0.3 }}
           animate={{ opacity: 0.7, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 12 }}
+          transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
         >
           ?
         </motion.text>
@@ -129,7 +129,7 @@ export function AnimatedTangledMessages({ isActive, size = 48 }: AnimatedIconPro
       <motion.g
         style={{ transformOrigin: '42px 28px' }}
         animate={{ opacity: showBubble2 ? 1 : 0, scale: showBubble2 ? 1 : 0.5 }}
-        transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
       >
         <motion.g animate={jitter(-1.2)}>
           <path d="M28 20 h26 a3 3 0 0 1 3 3 v10 a3 3 0 0 1 -3 3 h-2 v4 l-4 -4 h-20 a3 3 0 0 1 -3 -3 v-10 a3 3 0 0 1 3 -3 z" />
@@ -169,7 +169,7 @@ export function AnimatedTangledMessages({ isActive, size = 48 }: AnimatedIconPro
           textAnchor="middle"
           initial={{ opacity: 0, scale: 0.3 }}
           animate={{ opacity: 0.7, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 12 }}
+          transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
         >
           ?
         </motion.text>
@@ -179,7 +179,7 @@ export function AnimatedTangledMessages({ isActive, size = 48 }: AnimatedIconPro
       <motion.g
         style={{ transformOrigin: '15px 46px' }}
         animate={{ opacity: showBubble3 ? 1 : 0, scale: showBubble3 ? 1 : 0.5 }}
-        transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
       >
         <motion.g animate={jitter(0.8)}>
           <path d="M4 38 h22 a3 3 0 0 1 3 3 v10 a3 3 0 0 1 -3 3 h-16 l-4 4 v-4 h-2 a3 3 0 0 1 -3 -3 v-10 a3 3 0 0 1 3 -3 z" />
@@ -225,7 +225,7 @@ export function AnimatedTangledMessages({ isActive, size = 48 }: AnimatedIconPro
 // Starts as a clean card with 2 lines. On activate: panels, sidebars,
 // headers, toggles, and charts cascade in — overwhelming the UI.
 export function AnimatedDashboardOverload({ isActive, size = 48 }: AnimatedIconProps) {
-  const spring = { type: 'spring' as const, stiffness: 120, damping: 12 }
+  const enterTransition = { duration: 0.3, ease: [0.16, 1, 0.3, 1] as const }
 
   // Elements that overwhelm the simple UI on activate — slower cascade
   const clutter = [
@@ -287,7 +287,7 @@ export function AnimatedDashboardOverload({ isActive, size = 48 }: AnimatedIconP
               ? {
                   opacity: [0, 0.6],
                   scale: [0.95, 1],
-                  transition: { ...spring, delay: item.delay },
+                  transition: { ...enterTransition, delay: item.delay },
                 }
               : { opacity: 0, scale: 0.95 }
           }
@@ -298,11 +298,11 @@ export function AnimatedDashboardOverload({ isActive, size = 48 }: AnimatedIconP
 }
 
 // ─── Tool Sprawl ────────────────────────────────────────────────
-// 4 distinct tool icons clustered tight. On activate: they spring
+// 4 distinct tool icons clustered tight. On activate: they drift
 // apart in different directions, $ signs fade into the gaps.
 export function AnimatedScatteredApps({ isActive, size = 48 }: AnimatedIconProps) {
   const [driftPhase, setDriftPhase] = useState(0)
-  const spring = { type: 'spring' as const, stiffness: 80, damping: 12 }
+  const enterTransition = { duration: 0.35, ease: [0.16, 1, 0.3, 1] as const }
 
   useEffect(() => {
     if (!isActive) {
@@ -402,10 +402,10 @@ export function AnimatedScatteredApps({ isActive, size = 48 }: AnimatedIconProps
                   x: tool.dx * driftMult,
                   y: tool.dy * driftMult,
                   transition: driftPhase >= 1
-                    ? { type: 'spring' as const, stiffness: 30, damping: 14 }
-                    : { ...spring, delay: i * 0.12 },
+                    ? { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const }
+                    : { ...enterTransition, delay: i * 0.12 },
                 }
-              : { x: 0, y: 0, transition: spring }
+              : { x: 0, y: 0, transition: enterTransition }
           }
         >
           {tool.icon}
@@ -432,9 +432,8 @@ export function AnimatedScatteredApps({ isActive, size = 48 }: AnimatedIconProps
                   scale: [0.3, d.finalScale],
                   rotate: [0, d.rotate],
                   transition: {
-                    type: 'spring' as const,
-                    stiffness: 120,
-                    damping: 10,
+                    duration: 0.35,
+                    ease: [0.16, 1, 0.3, 1] as const,
                     delay: d.delay,
                   },
                 }

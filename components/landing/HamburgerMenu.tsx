@@ -95,7 +95,7 @@ export function HamburgerMenu({ onDownloadClick, onTryClick }: HamburgerMenuProp
               initial={{ x: 280 }}
               animate={{ x: 0 }}
               exit={{ x: 280 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
               className="fixed top-0 right-0 bottom-0 z-[1060] w-[280px] bg-ops-background/95 backdrop-blur-md border-l border-ops-border flex flex-col"
             >
               <div className="flex-1 pt-20 px-8">

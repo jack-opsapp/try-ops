@@ -8,6 +8,9 @@ export interface ActiveVariant {
 }
 
 export async function fetchActiveVariant(slot: 'a' | 'b'): Promise<ActiveVariant> {
+  // Force seed config for local phone3d testing — remove before deploy
+  if (process.env.NODE_ENV === 'development') return fallback()
+
   try {
     const supabase = getABSupabase() as any // eslint-disable-line @typescript-eslint/no-explicit-any
 

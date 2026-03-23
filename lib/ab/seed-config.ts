@@ -9,7 +9,7 @@ export const SEED_CONFIG_A: VariantConfig = {
         subtext: "Free to start. No training required. Your crew opens OPS, sees their jobs, and gets to work. Built by a contractor who couldn't find software his crew would use.",
         primaryCtaLabel: 'DOWNLOAD FREE - iOS',
         secondaryCtaLabel: 'TRY IT FIRST',
-        heroMode: 'animation',
+        heroMode: 'phone3d',
       },
     },
     {
