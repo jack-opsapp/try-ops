@@ -407,6 +407,27 @@ export function useAnalytics() {
     [track]
   )
 
+  const trackCrewInviteOpened = useCallback(
+    (companyId: string) => {
+      track('crew_invite_opened', { company_id: companyId })
+    },
+    [track]
+  )
+
+  const trackCrewInviteSent = useCallback(
+    (companyId: string, count: number, methods: string[]) => {
+      track('crew_invite_sent', { company_id: companyId, invite_count: count, methods })
+    },
+    [track]
+  )
+
+  const trackCrewInviteSkipped = useCallback(
+    (companyId: string) => {
+      track('crew_invite_skipped', { company_id: companyId })
+    },
+    [track]
+  )
+
   return {
     track,
     trackTriageDecision,
@@ -446,5 +467,9 @@ export function useAnalytics() {
     // Deep link diagnostics
     trackDeepLinkAttempt,
     trackDeepLinkFallback,
+    // Crew invite
+    trackCrewInviteOpened,
+    trackCrewInviteSent,
+    trackCrewInviteSkipped,
   }
 }
