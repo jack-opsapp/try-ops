@@ -103,6 +103,75 @@ function rr(w: number, h: number, r: number): Shape {
   return shape;
 }
 
+// --- Rounded rect with USB-C port notch cut into the bottom center ---
+// The notch goes from the outer bottom edge inward by `notchH` (= frame band width),
+// creating a real opening in the frame for the charging port.
+// Small corner radii on the notch for realistic machined edges.
+function rrWithPortNotch(
+  w: number, h: number, r: number,
+  notchW: number, notchH: number, notchR: number,
+): Shape {
+  const hw = w / 2, hh = h / 2, cr = Math.min(r, hw, hh);
+  const nhw = notchW / 2;
+  const nr = Math.min(notchR, nhw, notchH / 2);
+  const k = 0.6;
+  const kc = cr * k;
+  const shape = new Shape();
+
+  // Start at bottom-left (after corner), go clockwise
+  shape.moveTo(-hw + cr, -hh);
+
+  // Bottom edge — left side up to notch
+  shape.lineTo(-nhw - nr, -hh);
+
+  // Notch left corner (small radius turn into the notch)
+  shape.quadraticCurveTo(-nhw, -hh, -nhw, -hh + nr);
+
+  // Notch left wall going up
+  shape.lineTo(-nhw, -hh + notchH - nr);
+
+  // Notch top-left corner
+  shape.quadraticCurveTo(-nhw, -hh + notchH, -nhw + nr, -hh + notchH);
+
+  // Notch ceiling
+  shape.lineTo(nhw - nr, -hh + notchH);
+
+  // Notch top-right corner
+  shape.quadraticCurveTo(nhw, -hh + notchH, nhw, -hh + notchH - nr);
+
+  // Notch right wall going down
+  shape.lineTo(nhw, -hh + nr);
+
+  // Notch right corner (turn back onto bottom edge)
+  shape.quadraticCurveTo(nhw, -hh, nhw + nr, -hh);
+
+  // Bottom edge — right side from notch to corner
+  shape.lineTo(hw - cr, -hh);
+
+  // Bottom-right corner
+  shape.bezierCurveTo(hw - cr + kc, -hh, hw, -hh + cr - kc, hw, -hh + cr);
+
+  // Right edge
+  shape.lineTo(hw, hh - cr);
+
+  // Top-right corner
+  shape.bezierCurveTo(hw, hh - cr + kc, hw - cr + kc, hh, hw - cr, hh);
+
+  // Top edge
+  shape.lineTo(-hw + cr, hh);
+
+  // Top-left corner
+  shape.bezierCurveTo(-hw + cr - kc, hh, -hw, hh - cr + kc, -hw, hh - cr);
+
+  // Left edge
+  shape.lineTo(-hw, -hh + cr);
+
+  // Bottom-left corner
+  shape.bezierCurveTo(-hw, -hh + cr - kc, -hw + cr - kc, -hh, -hw + cr, -hh);
+
+  return shape;
+}
+
 // --- Apple logo from real SVG path data ---
 // Parses the official Apple Inc. logo SVG path into Three.js Shapes.
 // The SVG has two subpaths: body (with bite) and leaf.
@@ -172,7 +241,12 @@ export default function PhoneModel({ screenRef }: PhoneModelProps) {
     return geo;
   }, []);
 
-  // Frame band with beveled edges — creates visible chamfer that catches light
+  // Frame band — split into main body + port-notched bottom strip.
+  // The main body is the full frame ring extruded to full depth.
+  // A separate bottom strip uses rrWithPortNotch so the USB-C cutout
+  // only exists in the thin bottom portion, not the full Z-depth.
+
+  // Main frame — full ring, full depth, beveled
   const frameBandGeo = useMemo(() => {
     const outer = rr(PHONE_WIDTH, PHONE_HEIGHT, CORNER_RADIUS);
     const inner = rr(
@@ -189,6 +263,11 @@ export default function PhoneModel({ screenRef }: PhoneModelProps) {
       bevelSegments: 3,
     });
   }, []);
+
+  // USB-C port dimensions
+  const PORT_W = 7.0 * S;
+  const PORT_H = 1.6 * S;
+  const PORT_R = 0.5 * S;
 
   const glassW = PHONE_WIDTH - FRAME_BAND * 2;
   const glassH = PHONE_HEIGHT - FRAME_BAND * 2;
@@ -226,7 +305,8 @@ export default function PhoneModel({ screenRef }: PhoneModelProps) {
 
   // Bottom details
   const speakerDotGeo = useMemo(() => new CylinderGeometry(0.5 * S, 0.5 * S, 0.3 * S, 8), []);
-  const portGeo = useMemo(() => new ShapeGeometry(rr(6.5 * S, 2.0 * S, 1.0 * S)), []);
+
+  // (Port is built from boxGeometry inline — no pre-computed geo needed)
 
   // Earpiece
   const earpieceGeo = useMemo(() => new ShapeGeometry(rr(9.0 * S, 1.0 * S, 0.5 * S)), []);
@@ -440,14 +520,41 @@ export default function PhoneModel({ screenRef }: PhoneModelProps) {
         </RoundedBox>
       </group>
 
-      {/* ====== BOTTOM EDGE ====== */}
+      {/* ====== BOTTOM EDGE — USB-C port + speaker grilles ====== */}
       <group position={[0, -PHONE_HEIGHT / 2, 0]}>
-        {/* ====== EASTER EGG — Engraved text cut into the bottom edge ======
+        {/* USB-C port — dark rounded rect flush with the bottom edge.
+            Positioned just outside the frame surface so it's always
+            visible and reads as a port opening. */}
+        <mesh position={[0, -0.003, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <shapeGeometry args={[rr(PORT_W, PORT_H, PORT_R)]} />
+          <meshBasicMaterial color="#030303" side={DoubleSide} />
+        </mesh>
+
+        {/* Speaker grille — left cluster (wider spacing, offset from port) */}
+        {[-4, -3, -2].map((i) => (
+          <mesh key={`spkL${i}`} geometry={speakerDotGeo}
+            position={[(i * 3.0) * S, -0.003, 0]}
+            rotation={[Math.PI / 2, 0, 0]}>
+            <meshBasicMaterial color="#060606" />
+          </mesh>
+        ))}
+
+        {/* Speaker grille — right cluster (wider spacing, offset from port) */}
+        {[2, 3, 4].map((i) => (
+          <mesh key={`spkR${i}`} geometry={speakerDotGeo}
+            position={[(i * 3.0) * S, -0.003, 0]}
+            rotation={[Math.PI / 2, 0, 0]}>
+            <meshBasicMaterial color="#060606" />
+          </mesh>
+        ))}
+      </group>
+
+      {/* ====== TOP EDGE — Easter egg engraving ====== */}
+      <group position={[0, PHONE_HEIGHT / 2, 0]}>
+        {/* Engraved text cut into the top edge.
             Text3D creates real extruded geometry with depth (0.4mm).
-            Positioned so it protrudes outward from the frame surface —
-            the extruded faces catch light like real machined grooves.
             Dark color simulates the shadow inside the engraving. */}
-        <Center precise position={[0, -0.005, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <Center precise position={[0, 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <Text3D
             font="https://cdn.jsdelivr.net/npm/three@0.169.0/examples/fonts/helvetiker_regular.typeface.json"
             size={1.4 * S}
@@ -469,12 +576,6 @@ export default function PhoneModel({ screenRef }: PhoneModelProps) {
           </Text3D>
         </Center>
       </group>
-
-      {/* ====== TOP EDGE ====== */}
-      <mesh position={[0, PHONE_HEIGHT / 2, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.4 * S, 0.4 * S, 0.2 * S, 8]} />
-        <meshBasicMaterial color="#060606" />
-      </mesh>
     </group>
   );
 }
