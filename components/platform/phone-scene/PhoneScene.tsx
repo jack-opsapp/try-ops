@@ -173,7 +173,7 @@ function PhoneSceneContent({ isVisible }: PhoneSceneContentProps) {
         target={[0, 0, 0]}
         onChange={() => invalidate()}
         // Mobile: two-finger drag to orbit, one finger passes through to page scroll
-        touches={{ ONE: TOUCH.NONE, TWO: TOUCH.ROTATE }}
+        touches={{ ONE: undefined as unknown as number, TWO: TOUCH.ROTATE }}
       />
     </>
   );
