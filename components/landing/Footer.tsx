@@ -81,10 +81,10 @@ export function Footer() {
             </h4>
             <ul className="space-y-2">
               {[
-                { label: 'About', href: 'https://opsapp.co/about' },
-                { label: 'Support', href: 'https://opsapp.co/support' },
-                { label: 'Privacy Policy', href: '#' },
-                { label: 'Terms of Service', href: '#' },
+                { label: 'About', href: 'https://opsapp.co/company' },
+                { label: 'Support', href: 'https://opsapp.co/resources' },
+                { label: 'Privacy Policy', href: 'https://opsapp.co/legal?page=privacy' },
+                { label: 'Terms of Service', href: 'https://opsapp.co/legal?page=terms' },
               ].map((link) => (
                 <li key={link.label}>
                   <a
@@ -107,7 +107,7 @@ export function Footer() {
               {[
                 { label: 'App Store', href: 'https://apps.apple.com/us/app/ops-job-crew-management/id6746662078' },
                 { label: 'Web App', href: 'https://try.opsapp.co/tutorial-intro' },
-                { label: 'Instagram', href: 'https://instagram.com/ops.app' },
+                { label: 'Instagram', href: 'https://instagram.com/opsapp.co' },
                 { label: 'LinkedIn', href: 'https://linkedin.com/company/opsapp' },
               ].map((link) => (
                 <li key={link.label}>
@@ -140,10 +140,10 @@ export function Footer() {
             </p>
           </div>
           <div className="flex gap-4">
-            <a href="#" className="font-mohave text-[12px] text-ops-text-secondary hover:text-white transition-colors">
+            <a href="https://opsapp.co/legal?page=privacy" className="font-mohave text-[12px] text-ops-text-secondary hover:text-white transition-colors">
               Privacy
             </a>
-            <a href="#" className="font-mohave text-[12px] text-ops-text-secondary hover:text-white transition-colors">
+            <a href="https://opsapp.co/legal?page=terms" className="font-mohave text-[12px] text-ops-text-secondary hover:text-white transition-colors">
               Terms
             </a>
           </div>
