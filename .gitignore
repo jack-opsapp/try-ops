@@ -31,3 +31,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local reference artifacts and archived projects
+_archive/
+FINAL Landing page COPY.txt
