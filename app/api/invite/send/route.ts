@@ -90,7 +90,7 @@ export async function POST(request: Request) {
 
     // Derive public logo URL from the request origin
     const origin = new URL(request.url).origin
-    const logoUrl = `${origin}/images/ops-logo-white.png`
+    const logoUrl = `${origin}/brand/ops-lockup-email.png`
 
     const emails: string[] = []
     const phones: string[] = []

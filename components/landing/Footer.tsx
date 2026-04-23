@@ -28,7 +28,7 @@ export function Footer() {
           {/* Logo + tagline */}
           <div className="lg:flex-1">
             <Image
-              src="/images/ops-logo-white.png"
+              src="/brand/ops-mark.svg"
               alt="OPS"
               width={60}
               height={24}
@@ -129,7 +129,7 @@ export function Footer() {
         <div className="border-t border-white/10 mt-10 pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Image
-              src="/images/ops-logo-white.png"
+              src="/brand/ops-mark.svg"
               alt="OPS"
               width={36}
               height={14}
