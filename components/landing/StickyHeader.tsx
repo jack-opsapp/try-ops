@@ -37,7 +37,7 @@ export function StickyHeader({ onDownloadClick, onTryClick }: StickyHeaderProps)
               className="flex-shrink-0 text-ops-text-primary"
               aria-label="OPS — scroll to top"
             >
-              <OpsMark className="h-5 w-auto" title="" />
+              <OpsMark className="h-12 w-auto" title="" />
             </button>
 
             <div className="flex items-center gap-3">

@@ -28,7 +28,7 @@ export function Footer() {
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
           {/* Logo + tagline — full lockup for brand moment, inherits text-ops-text-primary */}
           <div className="lg:flex-1 text-ops-text-primary">
-            <OpsLockup className="h-8 w-auto mb-3" />
+            <OpsLockup className="h-12 w-auto mb-3" />
             <p className="font-mono text-[14px] text-ops-text-secondary italic">
               Built by trades, for trades.
             </p>
@@ -123,7 +123,7 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-white/10 mt-10 pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3 text-ops-text-secondary">
-            <OpsMark className="h-[14px] w-auto opacity-50" title="" />
+            <OpsMark className="h-6 w-auto opacity-50" title="" />
             <p className="font-mono text-[12px]">
               &copy; 2026 OPS. All rights reserved.
             </p>
