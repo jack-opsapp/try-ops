@@ -22,10 +22,10 @@ function FeatureCard({ feature }: { feature: FeatureType }) {
       <h3 className="font-mohave font-medium text-[20px] uppercase text-ops-gray-50 mb-4">
         {feature.title}
       </h3>
-      <p className="font-kosugi text-[16px] text-ops-gray-200 leading-relaxed mb-3">
+      <p className="font-mono text-[16px] text-ops-gray-200 leading-relaxed mb-3">
         {feature.copy}
       </p>
-      <p className="font-kosugi text-[16px] text-ops-text-secondary leading-relaxed">
+      <p className="font-mono text-[16px] text-ops-text-secondary leading-relaxed">
         <span className="text-ops-gray-100 font-medium">Why it matters:</span> {feature.why}
       </p>
     </div>
@@ -37,7 +37,7 @@ export function SolutionSection({ heading, features }: SolutionSectionProps) {
     <section id="solution" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
       <div className="max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10">
         <motion.p
-          className="font-kosugi text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary mb-4"
+          className="font-mono text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary mb-4"
           {...fadeInUp}
         >
           [ THE SOLUTION ]

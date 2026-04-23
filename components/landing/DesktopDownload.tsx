@@ -65,7 +65,7 @@ export function DesktopDownload({ heading }: z.infer<typeof DesktopDownloadProps
                 className="w-full h-full object-contain"
               />
             </div>
-            <p className="font-kosugi text-[14px] text-ops-text-secondary mt-3">
+            <p className="font-mono text-[14px] text-ops-text-secondary mt-3">
               Scan with your iPhone
             </p>
           </div>
@@ -89,7 +89,7 @@ export function DesktopDownload({ heading }: z.infer<typeof DesktopDownloadProps
                   placeholder="(555) 123-4567"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="bg-ops-card border border-ops-border rounded-ops-sm px-4 py-3 font-kosugi text-ops-body text-ops-text-primary w-[240px] focus:border-ops-accent focus:outline-none transition-colors placeholder:text-ops-text-tertiary"
+                  className="bg-ops-card border border-ops-border rounded-ops-sm px-4 py-3 font-mono text-ops-body text-ops-text-primary w-[240px] focus:border-ops-accent focus:outline-none transition-colors placeholder:text-ops-text-tertiary"
                 />
                 <button
                   onClick={handleSend}
@@ -100,12 +100,12 @@ export function DesktopDownload({ heading }: z.infer<typeof DesktopDownloadProps
                 </button>
               </div>
               {status === 'sent' && (
-                <p className="font-kosugi text-[14px] text-ops-gray-200 mt-2">
+                <p className="font-mono text-[14px] text-ops-gray-200 mt-2">
                   Check your phone for the download link!
                 </p>
               )}
               {status === 'error' && (
-                <p className="font-kosugi text-[14px] text-ops-error mt-2">
+                <p className="font-mono text-[14px] text-ops-error mt-2">
                   Something went wrong. Try again.{errorDetail && ` (${errorDetail})`}
                 </p>
               )}

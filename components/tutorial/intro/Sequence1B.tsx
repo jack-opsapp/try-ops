@@ -179,7 +179,7 @@ export function Sequence1B({ onComplete, skipToEnd }: Sequence1BProps) {
                         </div>
 
                         {/* Crew names */}
-                        <span className="font-kosugi text-[12px]">
+                        <span className="font-mono text-[12px]">
                           {task.crew.map(m => m.name).join(', ')}
                         </span>
 
@@ -191,7 +191,7 @@ export function Sequence1B({ onComplete, skipToEnd }: Sequence1BProps) {
                             <line x1="8" y1="2" x2="8" y2="6" strokeWidth="2" />
                             <line x1="3" y1="10" x2="21" y2="10" strokeWidth="2" />
                           </svg>
-                          <span className="font-kosugi text-[12px]">{task.date}</span>
+                          <span className="font-mono text-[12px]">{task.date}</span>
                         </div>
                       </div>
                     </div>

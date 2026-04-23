@@ -34,14 +34,14 @@ export function Footer() {
               height={24}
               className="object-contain mb-3"
             />
-            <p className="font-kosugi text-[14px] text-ops-text-secondary italic">
+            <p className="font-mono text-[14px] text-ops-text-secondary italic">
               Built by trades, for trades.
             </p>
           </div>
 
           {/* Product links */}
           <div>
-            <h4 className="font-kosugi text-[11px] uppercase tracking-[0.15em] text-ops-text-secondary mb-4">
+            <h4 className="font-mono text-[11px] uppercase tracking-[0.15em] text-ops-text-secondary mb-4">
               PRODUCT
             </h4>
             <ul className="space-y-2">
@@ -76,7 +76,7 @@ export function Footer() {
 
           {/* Company links */}
           <div>
-            <h4 className="font-kosugi text-[11px] uppercase tracking-[0.15em] text-ops-text-secondary mb-4">
+            <h4 className="font-mono text-[11px] uppercase tracking-[0.15em] text-ops-text-secondary mb-4">
               COMPANY
             </h4>
             <ul className="space-y-2">
@@ -100,7 +100,7 @@ export function Footer() {
 
           {/* Connect links */}
           <div>
-            <h4 className="font-kosugi text-[11px] uppercase tracking-[0.15em] text-ops-text-secondary mb-4">
+            <h4 className="font-mono text-[11px] uppercase tracking-[0.15em] text-ops-text-secondary mb-4">
               CONNECT
             </h4>
             <ul className="space-y-2">
@@ -135,7 +135,7 @@ export function Footer() {
               height={14}
               className="object-contain opacity-50"
             />
-            <p className="font-kosugi text-[12px] text-ops-text-secondary">
+            <p className="font-mono text-[12px] text-ops-text-secondary">
               &copy; 2026 OPS. All rights reserved.
             </p>
           </div>

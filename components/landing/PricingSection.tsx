@@ -124,13 +124,13 @@ function PricingCard({ tier, onCTAClick }: { tier: typeof tiers[number]; onCTACl
       </div>
 
       {/* Best for */}
-      <p className="font-kosugi text-[11px] md:text-[12px] text-ops-gray-400 italic mb-4 md:mb-6">
+      <p className="font-mono text-[11px] md:text-[12px] text-ops-gray-400 italic mb-4 md:mb-6">
         Best for: {tier.bestFor}
       </p>
 
       <ul className="space-y-1 md:space-y-2 mb-5 md:mb-8 flex-1">
         {tier.features.map((feature) => (
-          <li key={feature} className="font-kosugi text-[13px] md:text-[14px] text-ops-gray-200 leading-6 md:leading-7">
+          <li key={feature} className="font-mono text-[13px] md:text-[14px] text-ops-gray-200 leading-6 md:leading-7">
             &#8226; {feature}
           </li>
         ))}
@@ -152,7 +152,7 @@ export function PricingSection({ heading, subtext }: PricingSectionProps) {
     <section id="pricing" className="py-6 lg:py-[120px] snap-start snap-always">
       <div className="max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10">
         <motion.p
-          className="font-kosugi text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary mb-4"
+          className="font-mono text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary mb-4"
           {...fadeInUp}
         >
           [ PLANS ]
@@ -165,7 +165,7 @@ export function PricingSection({ heading, subtext }: PricingSectionProps) {
         </motion.h2>
 
         <motion.p
-          className="font-kosugi text-[14px] lg:text-[16px] text-ops-gray-300 mb-4 lg:mb-16"
+          className="font-mono text-[14px] lg:text-[16px] text-ops-gray-300 mb-4 lg:mb-16"
           {...fadeInUp}
         >
           {subtext ?? 'No credit card. No commitment. Cancel anytime.'}
@@ -199,7 +199,7 @@ export function PricingSection({ heading, subtext }: PricingSectionProps) {
 
         {/* Callout */}
         <motion.p
-          className="font-kosugi text-[13px] md:text-[14px] text-ops-gray-300 mt-4 lg:mt-12 max-w-[700px]"
+          className="font-mono text-[13px] md:text-[14px] text-ops-gray-300 mt-4 lg:mt-12 max-w-[700px]"
           {...fadeInUp}
         >
           After your free trial, pick the plan that fits your crew size. All plans include the same features &mdash; you only pay based on how many people you&apos;re managing.

@@ -6,7 +6,7 @@ export default function SignupError({ reset }: { reset: () => void }) {
       <h1 className="font-mohave text-[28px] font-semibold text-text-primary uppercase tracking-wide">
         SOMETHING WENT WRONG
       </h1>
-      <p className="font-kosugi text-[13px] text-text-tertiary mt-2 mb-6">
+      <p className="font-mono text-[13px] text-text-tertiary mt-2 mb-6">
         We hit a snag. Let&apos;s try that again.
       </p>
       <button

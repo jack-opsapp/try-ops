@@ -89,7 +89,7 @@ export function HeroAnimation() {
   }
 
   // Folder is completed color during invoice cycle, reverts to white on close-out
-  const folderStroke = phase >= 9 && phase < 13 ? COMPLETED_COLOR : '#E5E5E5'
+  const folderStroke = phase >= 9 && phase < 13 ? COMPLETED_COLOR : '#EDEDED'
 
   // Folder shifts left when invoice is out
   const folderXOffset = phase >= 10 && phase < 12 ? -35 : 0
@@ -162,7 +162,7 @@ export function HeroAnimation() {
                       width={cardW}
                       height={cardH}
                       rx={cardR}
-                      stroke="#E5E5E5"
+                      stroke="#EDEDED"
                       strokeWidth="1.5"
                       fill="none"
                       strokeDasharray={cardPerimeter}
@@ -180,7 +180,7 @@ export function HeroAnimation() {
                           y1={cy + 12}
                           x2={cx + 10 + card.titleW}
                           y2={cy + 12}
-                          stroke="#E5E5E5"
+                          stroke="#EDEDED"
                           strokeWidth="2.5"
                           strokeLinecap="round"
                           initial={{ opacity: 0, x1: cx + 10 - 15, x2: cx + 10 - 15 }}
@@ -194,7 +194,7 @@ export function HeroAnimation() {
                           y1={cy + 21}
                           x2={cx + 10 + card.addrW}
                           y2={cy + 21}
-                          stroke="#E5E5E5"
+                          stroke="#EDEDED"
                           strokeWidth="1.5"
                           strokeLinecap="round"
                           initial={{ opacity: 0 }}
@@ -209,7 +209,7 @@ export function HeroAnimation() {
                             cx={cx + 14 + di * 9}
                             cy={cy + 31}
                             r="3"
-                            stroke="#E5E5E5"
+                            stroke="#EDEDED"
                             strokeWidth="1"
                             fill="none"
                             initial={{ opacity: 0, scale: 0 }}
@@ -224,7 +224,7 @@ export function HeroAnimation() {
                           y1={cy + 31}
                           x2={cx + 14 + card.crewCount * 9 + 4 + card.dateW}
                           y2={cy + 31}
-                          stroke="#E5E5E5"
+                          stroke="#EDEDED"
                           strokeWidth="1"
                           strokeLinecap="round"
                           initial={{ opacity: 0 }}
@@ -249,14 +249,14 @@ export function HeroAnimation() {
                           cx={cx + cardW - 14}
                           cy={cy + cardH / 2}
                           r="7"
-                          stroke="#E5E5E5"
+                          stroke="#EDEDED"
                           strokeWidth="1.5"
                           fill="none"
                           opacity="0.6"
                         />
                         <motion.path
                           d={`M${cx + cardW - 18} ${cy + cardH / 2} l2.5 3 l5 -6`}
-                          stroke="#E5E5E5"
+                          stroke="#EDEDED"
                           strokeWidth="1.5"
                           strokeLinecap="round"
                           strokeLinejoin="round"

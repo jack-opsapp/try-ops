@@ -43,7 +43,7 @@ export function ClosingCTA({ headline, subtext, primaryCtaLabel, secondaryCtaLab
         </motion.h2>
 
         <motion.p
-          className="font-kosugi text-[18px] text-ops-gray-200 mb-10 max-w-[600px]"
+          className="font-mono text-[18px] text-ops-gray-200 mb-10 max-w-[600px]"
           {...fadeInUp}
           transition={{ ...fadeInUp.transition, delay: 0.1 }}
         >
@@ -68,7 +68,7 @@ export function ClosingCTA({ headline, subtext, primaryCtaLabel, secondaryCtaLab
 
         {/* Trust line */}
         <motion.p
-          className="font-kosugi text-[12px] text-ops-gray-400"
+          className="font-mono text-[12px] text-ops-gray-400"
           {...fadeInUp}
           transition={{ ...fadeInUp.transition, delay: 0.25 }}
         >

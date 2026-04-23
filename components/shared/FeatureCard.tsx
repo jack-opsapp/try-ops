@@ -29,18 +29,18 @@ export function FeatureCard({ icon, title, description, forLine, bullets, childr
         {title}
       </h3>
       {bullets && bullets.length > 0 ? (
-        <ul className="font-kosugi text-ops-body text-ops-text-secondary leading-relaxed mb-4 space-y-1">
+        <ul className="font-mono text-ops-body text-ops-text-secondary leading-relaxed mb-4 space-y-1">
           {bullets.map((bullet, i) => (
             <li key={i}>&#8226; {bullet}</li>
           ))}
         </ul>
       ) : (
-        <p className="font-kosugi text-ops-body text-ops-text-secondary leading-relaxed mb-4">
+        <p className="font-mono text-ops-body text-ops-text-secondary leading-relaxed mb-4">
           {description}
         </p>
       )}
       {forLine && (
-        <p className="font-kosugi text-ops-label text-ops-text-secondary italic">
+        <p className="font-mono text-ops-label text-ops-text-secondary italic">
           {forLine}
         </p>
       )}

@@ -21,7 +21,7 @@ export function FounderQuote({ quote, name, title }: FounderQuoteProps) {
           className="border-l-2 border-ops-border-emphasis pl-6 lg:pl-8"
           {...fadeInUp}
         >
-          <p className="font-kosugi text-[18px] lg:text-[22px] text-ops-gray-200 leading-relaxed mb-4 max-w-[560px]">
+          <p className="font-mono text-[18px] lg:text-[22px] text-ops-gray-200 leading-relaxed mb-4 max-w-[560px]">
             &ldquo;{quote}&rdquo;
           </p>
           <p className="font-mohave font-medium text-[14px] lg:text-[16px] text-ops-gray-400 uppercase tracking-wider">

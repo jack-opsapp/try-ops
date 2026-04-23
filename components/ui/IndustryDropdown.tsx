@@ -99,7 +99,7 @@ export function IndustryDropdown({ value, onChange }: IndustryDropdownProps) {
 
   return (
     <div ref={dropdownRef} className="relative" onKeyDown={handleKeyDown}>
-      <label className="font-kosugi text-caption-sm text-text-secondary uppercase tracking-widest mb-0.5 block">
+      <label className="font-mono text-caption-sm text-text-secondary uppercase tracking-widest mb-0.5 block">
         [industry]
       </label>
       <button
@@ -209,7 +209,7 @@ export function IndustryDropdown({ value, onChange }: IndustryDropdownProps) {
               );
             })}
             {filtered.length === 0 && (
-              <p className="px-2 py-2 font-kosugi text-caption text-text-tertiary" role="status">
+              <p className="px-2 py-2 font-mono text-caption text-text-tertiary" role="status">
                 No industries match &quot;{search}&quot;
               </p>
             )}

@@ -209,7 +209,7 @@ export function AccountTypeScreen() {
       <div className="relative z-10 flex flex-col items-center justify-end flex-1 pb-12 px-6 pointer-events-none">
         {/* Welcome line */}
         <div className="absolute top-8 left-0 right-0 text-center">
-          <p className="font-kosugi text-[11px] text-text-disabled tracking-wider">
+          <p className="font-mono text-[11px] text-text-disabled tracking-wider">
             [welcome,{" "}
             <span className="text-text-secondary">
               {signupStore.firstName || "there"}
@@ -223,7 +223,7 @@ export function AccountTypeScreen() {
           <h1 className="font-mohave text-[28px] font-semibold uppercase tracking-wide text-text-primary">
             HOW ARE YOU USING OPS?
           </h1>
-          <p className="font-kosugi text-[12px] text-text-tertiary mt-1">
+          <p className="font-mono text-[12px] text-text-tertiary mt-1">
             [choose one to get started]
           </p>
         </div>
@@ -268,7 +268,7 @@ export function AccountTypeScreen() {
                 className="mb-4 animate-fade-in"
                 style={{ animationDelay: "200ms" }}
               >
-                <label className="font-kosugi text-[10px] text-text-tertiary uppercase tracking-widest block mb-2">
+                <label className="font-mono text-[10px] text-text-tertiary uppercase tracking-widest block mb-2">
                   crew code
                 </label>
                 <div className="flex gap-2">
@@ -297,7 +297,7 @@ export function AccountTypeScreen() {
                 </div>
 
                 {codeError && (
-                  <p className="font-kosugi text-[11px] text-ops-error mt-2">
+                  <p className="font-mono text-[11px] text-ops-error mt-2">
                     {codeError}
                   </p>
                 )}
@@ -317,7 +317,7 @@ export function AccountTypeScreen() {
                       <p className="font-mohave text-[14px] font-semibold text-text-primary">
                         {companyPreview.name}
                       </p>
-                      <p className="font-kosugi text-[10px] text-text-tertiary">
+                      <p className="font-mono text-[10px] text-text-tertiary">
                         [you'll join as unassigned until a role is set]
                       </p>
                     </div>

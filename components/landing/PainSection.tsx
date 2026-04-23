@@ -49,12 +49,12 @@ function HoverPainCard({ card, delay }: { card: CardType; delay: number }) {
         <h3 className="font-mohave font-medium text-[18px] uppercase text-ops-gray-50 mb-4">
           {card.title}
         </h3>
-        <ul className="font-kosugi text-[16px] text-ops-text-secondary leading-relaxed mb-4 space-y-1">
+        <ul className="font-mono text-[16px] text-ops-text-secondary leading-relaxed mb-4 space-y-1">
           {card.bullets.map((bullet, i) => (
             <li key={i}>&#8226; {bullet}</li>
           ))}
         </ul>
-        <p className="font-kosugi text-[14px] text-ops-gray-200 italic">
+        <p className="font-mono text-[14px] text-ops-gray-200 italic">
           {card.forLine}
         </p>
       </div>
@@ -90,7 +90,7 @@ export function PainSection({ heading, cards }: PainSectionProps) {
     <section ref={sectionRef} id="pain" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
       <div className="max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10">
         <motion.p
-          className="font-kosugi text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary mb-4"
+          className="font-mono text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary mb-4"
           {...fadeInUp}
         >
           [ THE PROBLEM ]
@@ -147,12 +147,12 @@ export function PainSection({ heading, cards }: PainSectionProps) {
                       key={card.id}
                       className="bg-ops-card border border-ops-border rounded-ops-card p-6"
                     >
-                      <ul className="font-kosugi text-[14px] text-ops-text-secondary leading-relaxed space-y-1 mb-3">
+                      <ul className="font-mono text-[14px] text-ops-text-secondary leading-relaxed space-y-1 mb-3">
                         {card.bullets.map((bullet, i) => (
                           <li key={i}>&#8226; {bullet}</li>
                         ))}
                       </ul>
-                      <p className="font-kosugi text-[12px] text-ops-gray-300 italic">
+                      <p className="font-mono text-[12px] text-ops-gray-300 italic">
                         {card.forLine}
                       </p>
                     </div>
@@ -174,7 +174,7 @@ export function PainSection({ heading, cards }: PainSectionProps) {
           className="border-t-2 border-ops-gray-500 pt-6 mt-6 lg:mt-16"
           {...fadeInUp}
         >
-          <p className="font-kosugi text-[18px] text-ops-gray-100 max-w-[700px]">
+          <p className="font-mono text-[18px] text-ops-gray-100 max-w-[700px]">
             One app. Your crew opens it and knows what to do.{' '}
             <span className="inline-block">No manual.</span>{' '}
             <span className="inline-block">No training.</span>{' '}

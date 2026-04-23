@@ -52,21 +52,43 @@
   font-display: swap;
 }
 
+/* JetBrains Mono — numbers, timestamps, // prefixes, [brackets], micro labels.
+ * Replaces Kosugi (deprecated 2026-04-17). */
 @font-face {
-  font-family: 'Kosugi';
-  src: url('/fonts/Kosugi-Regular.ttf') format('truetype');
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/JetBrainsMono-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Bebas Neue';
-  src: url('/fonts/BebasNeue-Regular.ttf') format('truetype');
-  font-weight: 400;
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/JetBrainsMono-Medium.ttf') format('truetype');
+  font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/JetBrainsMono-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Cake Mono Light 300 — OPS uppercase display voice (page titles, buttons, badges).
+ * Spec v2 rule: always weight 300 in product UI, never 400/700. */
+@font-face {
+  font-family: 'Cake Mono';
+  src: url('/fonts/CakeMono-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Bebas Neue deprecated 2026-04-17 and removed from /public/fonts. */
 
 html {
   scroll-behavior: smooth;
@@ -82,7 +104,7 @@ html {
 body {
   font-family: 'Mohave', sans-serif;
   background-color: #000000;
-  color: #E5E5E5;
+  color: #EDEDED;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -100,7 +122,7 @@ body {
 }
 
 ::selection {
-  background: rgba(89, 119, 148, 0.4);
+  background: rgba(111, 148, 176, 0.4);
 }
 
 /* Input autofill override for dark theme */
@@ -108,8 +130,8 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0 1000px #000000 inset;
-  -webkit-text-fill-color: #E5E5E5;
-  caret-color: #E5E5E5;
+  -webkit-text-fill-color: #EDEDED;
+  caret-color: #EDEDED;
 }
 
 /* Tutorial keyframe animations */
@@ -135,9 +157,9 @@ input:-webkit-autofill:focus {
 }
 
 @keyframes tutorial-pulse-ring {
-  0% { box-shadow: 0 0 0 0 rgba(89, 119, 148, 0.5); }
-  70% { box-shadow: 0 0 0 8px rgba(89, 119, 148, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(89, 119, 148, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(111, 148, 176, 0.5); }
+  70% { box-shadow: 0 0 0 8px rgba(111, 148, 176, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(111, 148, 176, 0); }
 }
 
 @keyframes cardShimmer {

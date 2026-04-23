@@ -10,7 +10,7 @@ export default function TutorialError({ reset }: { reset: () => void }) {
       <h1 className="font-mohave text-[28px] font-semibold text-text-primary uppercase tracking-wide">
         SOMETHING WENT WRONG
       </h1>
-      <p className="font-kosugi text-[13px] text-text-tertiary mt-2 mb-6">
+      <p className="font-mono text-[13px] text-text-tertiary mt-2 mb-6">
         The tutorial hit a snag.
       </p>
       <div className="flex gap-3">

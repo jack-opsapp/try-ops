@@ -161,10 +161,10 @@ export default function ReadyPage() {
               <div key={benefit}>
                 {/* iOS: HStack(spacing: 12) with "→" + text, .padding(.vertical, 12) */}
                 <div className="flex items-center gap-3 py-3">
-                  <span className="font-kosugi text-ops-caption text-ops-text-tertiary">
+                  <span className="font-mono text-ops-caption text-ops-text-tertiary">
                     →
                   </span>
-                  <span className="font-kosugi text-ops-caption text-ops-text-primary">
+                  <span className="font-mono text-ops-caption text-ops-text-primary">
                     {benefit}
                   </span>
                 </div>
@@ -181,7 +181,7 @@ export default function ReadyPage() {
 
           {/* iOS: "SEE PLANS" button with chevron.right — links to pricing */}
           <a href="/#pricing" className="flex items-center gap-2">
-            <span className="font-kosugi font-normal text-ops-caption text-ops-text-secondary">
+            <span className="font-mono font-normal text-ops-caption text-ops-text-secondary">
               SEE PLANS
             </span>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-ops-text-tertiary">
@@ -190,12 +190,12 @@ export default function ReadyPage() {
           </a>
 
           {/* User-requested: "Upgrade anytime." */}
-          <p className="font-kosugi text-ops-caption text-ops-text-secondary mt-6">
+          <p className="font-mono text-ops-caption text-ops-text-secondary mt-6">
             Upgrade anytime.
           </p>
 
           {/* User-requested: Contact message */}
-          <p className="font-kosugi text-ops-small text-ops-text-tertiary mt-4 leading-relaxed">
+          <p className="font-mono text-ops-small text-ops-text-tertiary mt-4 leading-relaxed">
             Get in touch with me if you have any trouble, or if the app is missing any features you need:{' '}
             <a
               href="mailto:jack@opsapp.co"

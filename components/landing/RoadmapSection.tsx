@@ -28,7 +28,7 @@ function RoadmapRow({ text, variant }: { text: string; variant: 'built' | 'indev
       </span>
 
       <span
-        className={`font-kosugi text-[13px] md:text-[15px] flex-1 ${
+        className={`font-mono text-[13px] md:text-[15px] flex-1 ${
           variant === 'built'
             ? 'text-ops-gray-400 line-through'
             : variant === 'indev'
@@ -76,7 +76,7 @@ function AccordionHeader({
         <span className="font-mohave font-medium text-[10px] uppercase tracking-wider text-ops-gray-300">
           {label}
         </span>
-        <span className="font-kosugi text-[10px] text-ops-gray-400 ml-2">
+        <span className="font-mono text-[10px] text-ops-gray-400 ml-2">
           &mdash; {description}
         </span>
       </div>
@@ -101,7 +101,7 @@ function CategoryHeader({ label, description }: { label: string; description: st
       <span className="font-mohave font-medium text-[10px] md:text-[11px] uppercase tracking-wider text-ops-gray-300">
         {label}
       </span>
-      <span className="font-kosugi text-[10px] md:text-[11px] text-ops-gray-400 ml-2">
+      <span className="font-mono text-[10px] md:text-[11px] text-ops-gray-400 ml-2">
         &mdash; {description}
       </span>
     </div>
@@ -121,7 +121,7 @@ export function RoadmapSection({ heading, builtItems, inDevItems, roadmapItems }
     <section id="roadmap" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
       <div className="max-w-[700px] mx-auto px-6 md:px-6 lg:px-10">
         <motion.p
-          className="font-kosugi text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary mb-4"
+          className="font-mono text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary mb-4"
           {...fadeInUp}
         >
           [ THE ROADMAP ]
@@ -134,7 +134,7 @@ export function RoadmapSection({ heading, builtItems, inDevItems, roadmapItems }
         </motion.h2>
 
         <motion.p
-          className="font-kosugi text-[13px] lg:text-[16px] text-ops-gray-300 mb-4 lg:mb-12"
+          className="font-mono text-[13px] lg:text-[16px] text-ops-gray-300 mb-4 lg:mb-12"
           {...fadeInUp}
         >
           Every feature gets built based on what real crews actually need. Not what looks good in a demo.

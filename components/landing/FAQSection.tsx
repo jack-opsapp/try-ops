@@ -21,7 +21,7 @@ export function FAQSection({ heading, faqs, onFAQToggle }: FAQSectionProps) {
     <section id="faq" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
       <div className="w-full max-w-[900px] mx-auto px-6 md:px-6 lg:px-10">
         <motion.p
-          className="font-kosugi text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary mb-4"
+          className="font-mono text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary mb-4"
           {...fadeInUp}
         >
           [ FAQ ]

@@ -23,8 +23,8 @@ export const COLORS = {
   captionLine: 'rgba(255, 255, 255, 0.30)', // tertiaryText mapped — boosted
 
   // Accent
-  accent: '#597794',                          // primaryAccent
-  accentGlow: 'rgba(89, 119, 148, 0.3)',     // For pin radial glow
+  accent: '#6F94B0',                          // primaryAccent
+  accentGlow: 'rgba(111, 148, 176, 0.3)',     // For pin radial glow
 
   // Status/stage colors (kanban columns, task borders)
   stageEstimated: '#8195B5',                  // Pipeline "Quoting" blue

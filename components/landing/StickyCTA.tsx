@@ -64,7 +64,7 @@ export function StickyCTA({ onDownloadClick, onTryClick }: StickyCTAProps) {
             onClick={onDownloadClick}
             className="flex-1 border border-ops-border rounded-ops-card px-4 py-3 flex items-center justify-center gap-2 ultra-thin-material"
             style={{
-              backgroundColor: 'rgba(89, 119, 148, 0.2)',
+              backgroundColor: 'rgba(111, 148, 176, 0.2)',
             }}
           >
             <svg className="w-4 h-4 text-ops-text-primary flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">

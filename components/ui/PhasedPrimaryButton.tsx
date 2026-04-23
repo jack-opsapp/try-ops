@@ -63,8 +63,8 @@ export function PhasedPrimaryButton({
           style={{
             backgroundColor:
               isEnabled && !isLoading
-                ? '#597794'
-                : 'rgba(89, 119, 148, 0.5)',
+                ? '#6F94B0'
+                : 'rgba(111, 148, 176, 0.5)',
             opacity: containerVisible ? 1 : 0,
             transform: containerVisible ? 'translateY(0)' : 'translateY(20px)',
             // CSS spring approximation

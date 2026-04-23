@@ -134,7 +134,7 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
   // Show type indicator for each input
   const getTypeIndicator = (value: string) => {
     const type = detectType(value.trim())
-    if (type === 'email') return { label: 'EMAIL', color: '#597794' }
+    if (type === 'email') return { label: 'EMAIL', color: '#6F94B0' }
     if (type === 'phone') return { label: 'SMS', color: '#A5B368' }
     return null
   }
@@ -176,7 +176,7 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
             className="p-4 rounded-ops border border-ops-border bg-ops-surface"
           >
             <div className="flex items-center justify-between mb-2">
-              <p className="font-kosugi text-ops-caption text-ops-text-tertiary">
+              <p className="font-mono text-ops-caption text-ops-text-tertiary">
                 CREW CODE
               </p>
               <button onClick={handleCopy} className="flex items-center gap-1.5">
@@ -185,7 +185,7 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-ops-success">
                       <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                    <span className="font-kosugi text-ops-caption text-ops-success">COPIED</span>
+                    <span className="font-mono text-ops-caption text-ops-success">COPIED</span>
                   </>
                 ) : (
                   <>
@@ -193,12 +193,12 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
                       <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="2" />
                       <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" strokeWidth="2" />
                     </svg>
-                    <span className="font-kosugi text-ops-caption text-ops-accent">COPY</span>
+                    <span className="font-mono text-ops-caption text-ops-accent">COPY</span>
                   </>
                 )}
               </button>
             </div>
-            <span className="font-kosugi font-medium text-ops-caption text-ops-text-primary tracking-[2px]">
+            <span className="font-mono font-medium text-ops-caption text-ops-text-primary tracking-[2px]">
               [{companyCode}]
             </span>
           </div>
@@ -248,7 +248,7 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
               {/* Divider with label */}
               <div className="flex items-center gap-3">
                 <div className="flex-1 h-px bg-ops-border" />
-                <span className="font-kosugi text-ops-caption text-ops-text-tertiary">
+                <span className="font-mono text-ops-caption text-ops-text-tertiary">
                   EMAIL OR PHONE
                 </span>
                 <div className="flex-1 h-px bg-ops-border" />
@@ -271,7 +271,7 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
                       />
                       {indicator && (
                         <span
-                          className="absolute right-3 top-1/2 -translate-y-1/2 font-kosugi text-[10px] font-medium px-1.5 py-0.5 rounded"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[10px] font-medium px-1.5 py-0.5 rounded"
                           style={{ color: indicator.color, backgroundColor: `${indicator.color}20` }}
                         >
                           {indicator.label}
@@ -307,27 +307,27 @@ function InviteSheet({ companyName, companyCode, companyId, onClose }: InviteShe
 
           {/* Send error */}
           {sendError && (
-            <p className="font-kosugi text-ops-caption text-ops-error">
+            <p className="font-mono text-ops-caption text-ops-error">
               {sendError}
             </p>
           )}
 
           {/* Sent confirmation */}
           {sentContacts.length > 0 && (
-            <p className="font-kosugi text-ops-caption text-ops-success">
+            <p className="font-mono text-ops-caption text-ops-success">
               Invite sent to {sentContacts.join(', ')}
             </p>
           )}
 
           {/* How it works */}
           <div>
-            <p className="font-kosugi font-medium text-ops-caption text-ops-text-secondary mb-2">
+            <p className="font-mono font-medium text-ops-caption text-ops-text-secondary mb-2">
               HOW IT WORKS
             </p>
             <div className="space-y-1">
-              <p className="font-kosugi text-ops-caption text-ops-text-tertiary">1. They download OPS (free)</p>
-              <p className="font-kosugi text-ops-caption text-ops-text-tertiary">2. They tap &quot;Join a Crew&quot;</p>
-              <p className="font-kosugi text-ops-caption text-ops-text-tertiary">3. They enter the code above</p>
+              <p className="font-mono text-ops-caption text-ops-text-tertiary">1. They download OPS (free)</p>
+              <p className="font-mono text-ops-caption text-ops-text-tertiary">2. They tap &quot;Join a Crew&quot;</p>
+              <p className="font-mono text-ops-caption text-ops-text-tertiary">3. They enter the code above</p>
             </div>
           </div>
         </div>
@@ -413,7 +413,7 @@ export default function CompanyCodePage() {
                       </svg>
                     )}
                     <span
-                      className={`font-kosugi font-medium text-ops-caption tracking-[2px] transition-colors duration-200 ${copied ? 'text-ops-success' : 'text-ops-text-primary'}`}
+                      className={`font-mono font-medium text-ops-caption tracking-[2px] transition-colors duration-200 ${copied ? 'text-ops-success' : 'text-ops-text-primary'}`}
                     >
                       {copied ? 'CODE COPIED' : `[${companyCode}]`}
                     </span>
@@ -422,7 +422,7 @@ export default function CompanyCodePage() {
               </button>
             )}
 
-            <p className="font-kosugi text-ops-caption text-ops-text-tertiary">
+            <p className="font-mono text-ops-caption text-ops-text-tertiary">
               Share this with your crew so they can join.
             </p>
           </div>
@@ -454,7 +454,7 @@ export default function CompanyCodePage() {
       <div className="flex-1" />
 
       {/* Info text */}
-      <p className="px-10 font-kosugi text-ops-caption text-ops-text-tertiary pb-6">
+      <p className="px-10 font-mono text-ops-caption text-ops-text-tertiary pb-6">
         You&apos;ll find this code in Settings anytime.
       </p>
 

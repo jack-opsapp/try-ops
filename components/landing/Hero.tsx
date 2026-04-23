@@ -91,7 +91,7 @@ export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel, he
               </motion.h1>
 
               <motion.p
-                className="font-kosugi text-[14px] lg:text-[20px] text-ops-gray-200 leading-relaxed max-w-[500px] mb-8"
+                className="font-mono text-[14px] lg:text-[20px] text-ops-gray-200 leading-relaxed max-w-[500px] mb-8"
                 {...fadeInUp}
                 transition={{ ...fadeInUp.transition, delay: 0.1 }}
               >
@@ -127,7 +127,7 @@ export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel, he
 
               {/* Trust line */}
               <motion.p
-                className="font-kosugi text-[12px] text-ops-gray-400"
+                className="font-mono text-[12px] text-ops-gray-400"
                 {...fadeInUp}
                 transition={{ ...fadeInUp.transition, delay: 0.25 }}
               >
@@ -144,7 +144,7 @@ export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel, he
           animate={{ opacity: [0, 0.6, 0.6, 0] }}
           transition={{ duration: 5, times: [0, 0.15, 0.7, 1], delay: 3 }}
         >
-          <p className="font-kosugi text-[11px] text-ops-gray-400 tracking-wider uppercase whitespace-nowrap">
+          <p className="font-mono text-[11px] text-ops-gray-400 tracking-wider uppercase whitespace-nowrap">
             Use two fingers to orbit
           </p>
         </motion.div>
@@ -185,7 +185,7 @@ export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel, he
             </motion.h1>
 
             <motion.p
-              className="font-kosugi text-[14px] lg:text-[20px] text-ops-gray-200 leading-relaxed max-w-[500px] mb-8"
+              className="font-mono text-[14px] lg:text-[20px] text-ops-gray-200 leading-relaxed max-w-[500px] mb-8"
               {...fadeInUp}
               transition={{ ...fadeInUp.transition, delay: 0.1 }}
             >
@@ -221,7 +221,7 @@ export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel, he
 
             {/* Trust line */}
             <motion.p
-              className="font-kosugi text-[12px] text-ops-gray-400"
+              className="font-mono text-[12px] text-ops-gray-400"
               {...fadeInUp}
               transition={{ ...fadeInUp.transition, delay: 0.25 }}
             >

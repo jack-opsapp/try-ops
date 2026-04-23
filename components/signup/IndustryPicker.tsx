@@ -91,7 +91,7 @@ export function IndustryPicker({
               </button>
             ))}
             {filtered.length === 0 && (
-              <p className="px-4 py-3 font-kosugi text-ops-caption text-ops-text-tertiary">
+              <p className="px-4 py-3 font-mono text-ops-caption text-ops-text-tertiary">
                 No trades found
               </p>
             )}

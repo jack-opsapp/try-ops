@@ -117,7 +117,7 @@ function VideoPlaceholder({ durationMs }: { durationMs: number }) {
           <path d="M8 5v14l11-7L8 5z" fill="currentColor" />
         </svg>
       </div>
-      <p className="font-kosugi text-ops-small text-ops-text-tertiary text-center">
+      <p className="font-mono text-ops-small text-ops-text-tertiary text-center">
         Video placeholder ({(durationMs / 1000).toFixed(0)}s)
       </p>
     </div>

@@ -103,7 +103,7 @@ export default function TutorialStepPage() {
 
         {/* Description */}
         <PhasedContent delay={step.title.length * 30 + 200} key={`desc-${step.id}`}>
-          <p className="font-kosugi text-ops-body text-ops-text-secondary mb-8">
+          <p className="font-mono text-ops-body text-ops-text-secondary mb-8">
             {step.description}
           </p>
         </PhasedContent>

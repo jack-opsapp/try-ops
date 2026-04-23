@@ -24,7 +24,7 @@ import type { ScreenDrawParams } from './types';
 
 // --- Fonts ---
 const MOHAVE = 'Mohave, sans-serif';
-const KOSUGI = 'Kosugi, sans-serif';
+const KOSUGI = 'JetBrains Mono, monospace';
 
 // --- Scale: iPhone ~393pt → canvas 750px ---
 const S = 750 / 393;

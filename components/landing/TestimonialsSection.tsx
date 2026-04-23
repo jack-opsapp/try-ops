@@ -23,7 +23,7 @@ const founderQuote = {
 
 type Testimonial = z.infer<typeof TestimonialsSectionPropsSchema>['testimonials'][number]
 
-const GLOW_COLOR = 'rgba(89, 119, 148, 0.8)'
+const GLOW_COLOR = 'rgba(111, 148, 176, 0.8)'
 const GLOW_DURATION = 0.8
 
 function TestimonialCard({ testimonial: t }: { testimonial: Testimonial }) {
@@ -63,7 +63,7 @@ function TestimonialCard({ testimonial: t }: { testimonial: Testimonial }) {
       onMouseEnter={triggerGlow}
       onClick={triggerGlow}
     >
-      <p className="font-kosugi text-[16px] text-ops-gray-200 leading-relaxed flex-1 mb-6">
+      <p className="font-mono text-[16px] text-ops-gray-200 leading-relaxed flex-1 mb-6">
         &ldquo;{t.quote}&rdquo;
       </p>
       <div>
@@ -71,11 +71,11 @@ function TestimonialCard({ testimonial: t }: { testimonial: Testimonial }) {
           {t.name}
         </p>
         {t.location ? (
-          <p className="font-kosugi text-[12px] text-ops-gray-400">
+          <p className="font-mono text-[12px] text-ops-gray-400">
             {t.trade}, {t.location}
           </p>
         ) : (
-          <p className="font-kosugi text-[12px] text-ops-gray-400">
+          <p className="font-mono text-[12px] text-ops-gray-400">
             {t.trade}
           </p>
         )}
@@ -104,7 +104,7 @@ function TestimonialCard({ testimonial: t }: { testimonial: Testimonial }) {
               strokeDasharray={`${dashLength} ${perimeter - dashLength}`}
               strokeLinecap="round"
               style={{
-                filter: `drop-shadow(0 0 6px ${GLOW_COLOR}) drop-shadow(0 0 14px rgba(89, 119, 148, 0.4))`,
+                filter: `drop-shadow(0 0 6px ${GLOW_COLOR}) drop-shadow(0 0 14px rgba(111, 148, 176, 0.4))`,
               }}
               initial={{ strokeDashoffset: perimeter }}
               animate={{ strokeDashoffset: 0 }}
@@ -127,7 +127,7 @@ export function TestimonialsSection({ heading, testimonials }: TestimonialsSecti
     <section id="testimonials" className="min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
       <div className="max-w-[1200px] mx-auto px-6 md:px-6 lg:px-10">
         <motion.p
-          className="font-kosugi text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary mb-4"
+          className="font-mono text-[11px] uppercase tracking-[0.2em] text-ops-text-secondary mb-4"
           {...fadeInUp}
         >
           [ THE TRADES ]

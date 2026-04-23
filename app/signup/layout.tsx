@@ -104,7 +104,7 @@ export default function SignupLayout({
             />
             {/* Brand mark */}
             <div className="absolute bottom-8 left-8 z-10">
-              <p className="font-bebas text-[40px] tracking-[0.2em] text-white/90 leading-none">
+              <p className="font-cakemono text-[40px] tracking-[0.2em] text-white/90 leading-none">
                 OPS
               </p>
               <p className="font-mohave text-body-sm text-white/50 mt-1">

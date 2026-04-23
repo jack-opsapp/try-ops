@@ -114,13 +114,13 @@ export default function CompanyDetailsPage() {
 
       {/* Step indicator + skip */}
       <div className="flex items-center justify-between mb-6">
-        <span className="font-kosugi text-caption-sm text-text-tertiary uppercase tracking-widest">
+        <span className="font-mono text-caption-sm text-text-tertiary uppercase tracking-widest">
           [step 2 of 2]
         </span>
         <button
           type="button"
           onClick={handleSkip}
-          className="font-kosugi text-caption-sm text-text-tertiary uppercase tracking-widest hover:text-text-secondary transition-colors"
+          className="font-mono text-caption-sm text-text-tertiary uppercase tracking-widest hover:text-text-secondary transition-colors"
         >
           Skip for now
         </button>
@@ -130,7 +130,7 @@ export default function CompanyDetailsPage() {
       <h1 className="font-mohave text-heading text-text-primary uppercase tracking-wide">
         YOUR COMPANY
       </h1>
-      <p className="font-kosugi text-caption text-text-tertiary mt-1 mb-6">
+      <p className="font-mono text-caption text-text-tertiary mt-1 mb-6">
         [this shapes your command center]
       </p>
 
@@ -140,7 +140,7 @@ export default function CompanyDetailsPage() {
 
         {/* Team Size */}
         <div role="group" aria-label="Team Size">
-          <label className="font-kosugi text-caption-sm text-text-secondary uppercase tracking-widest mb-1.5 block">
+          <label className="font-mono text-caption-sm text-text-secondary uppercase tracking-widest mb-1.5 block">
             [team size]
           </label>
           <div className="flex gap-1.5">
@@ -157,7 +157,7 @@ export default function CompanyDetailsPage() {
 
         {/* Years in Business */}
         <div role="group" aria-label="Years in Business">
-          <label className="font-kosugi text-caption-sm text-text-secondary uppercase tracking-widest mb-1.5 block">
+          <label className="font-mono text-caption-sm text-text-secondary uppercase tracking-widest mb-1.5 block">
             [years in business]
           </label>
           <div className="flex gap-1.5">

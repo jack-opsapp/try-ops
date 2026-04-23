@@ -31,7 +31,7 @@ export function OPSInput({
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-2">
-        <label className="font-kosugi text-ops-caption text-ops-text-secondary uppercase tracking-wider">
+        <label className="font-mono text-ops-caption text-ops-text-secondary uppercase tracking-wider">
           {label}
           {required && <span className="text-ops-error ml-1">*</span>}
         </label>
@@ -39,7 +39,7 @@ export function OPSInput({
           <button
             type="button"
             onClick={rightAction.onClick}
-            className="font-kosugi text-ops-small text-ops-accent hover:text-ops-accent/80 transition-colors"
+            className="font-mono text-ops-small text-ops-accent hover:text-ops-accent/80 transition-colors"
           >
             {rightAction.label}
           </button>
@@ -62,7 +62,7 @@ export function OPSInput({
         `}
       />
       {error && (
-        <p className="mt-1 font-kosugi text-ops-small text-ops-error">
+        <p className="mt-1 font-mono text-ops-small text-ops-error">
           {error}
         </p>
       )}

@@ -19,7 +19,7 @@ export function Button({
   className = '',
   fullWidth = false,
 }: ButtonProps) {
-  const base = `font-kosugi uppercase tracking-[0.15em] text-xs rounded-[3px] cursor-pointer inline-flex items-center justify-center gap-2 ${fullWidth ? 'w-full' : ''}`
+  const base = `font-mono uppercase tracking-[0.15em] text-xs rounded-[3px] cursor-pointer inline-flex items-center justify-center gap-2 ${fullWidth ? 'w-full' : ''}`
 
   const variants = {
     primary:

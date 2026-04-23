@@ -46,7 +46,7 @@ const STATUS_COLORS = {
 
 // --- Font constants ---
 const MOHAVE = 'Mohave, sans-serif';
-const KOSUGI = 'Kosugi, sans-serif';
+const KOSUGI = 'JetBrains Mono, monospace';
 
 // --- Column data (from ref-jobboard-1.png: Accepted expanded) ---
 interface KanbanColumn {

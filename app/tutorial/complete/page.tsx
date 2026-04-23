@@ -28,7 +28,7 @@ export default function TutorialCompletePage() {
         </h1>
 
         <PhasedContent delay={1200}>
-          <p className="font-kosugi text-ops-body text-ops-text-secondary mb-12">
+          <p className="font-mono text-ops-body text-ops-text-secondary mb-12">
             Set up your company and start managing real projects.
           </p>
         </PhasedContent>

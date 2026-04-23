@@ -69,13 +69,13 @@ export default function DownloadPage() {
       <div className="max-w-md w-full text-center space-y-8">
         {/* Header */}
         <div>
-          <p className="font-bebas text-[32px] tracking-[0.2em] text-white/90 leading-none mb-4">
+          <p className="font-cakemono text-[32px] tracking-[0.2em] text-white/90 leading-none mb-4">
             OPS
           </p>
           <h1 className="font-mohave text-[28px] font-semibold text-text-primary uppercase tracking-wide">
             YOU&apos;RE ALL SET.
           </h1>
-          <p className="font-kosugi text-[13px] text-text-tertiary mt-2">
+          <p className="font-mono text-[13px] text-text-tertiary mt-2">
             {isIOS
               ? 'Download the app to get started, or continue on the web.'
               : 'Continue on the web dashboard, or grab the iOS app.'}

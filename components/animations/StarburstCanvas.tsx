@@ -151,7 +151,7 @@ const DRAG_SENSITIVITY = 0.005;  // radians per pixel
 const SPRING_DECAY = 0.96;       // per-frame, ~60fps → settles in ~2s
 const DRAG_THRESHOLD = 3;        // pixels before drag activates
 
-const ACCENT = { r: 89, g: 119, b: 148 };  // #597794
+const ACCENT = { r: 111, g: 148, b: 176 };  // #6F94B0
 const ORANGE = { r: 214, g: 138, b: 52 };  // #D68A34
 const GREY = { r: 100, g: 100, b: 100 };   // #646464
 

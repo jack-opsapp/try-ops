@@ -50,14 +50,14 @@ export function PhasedOnboardingHeader({
       {/* Subtitle with space reservation */}
       {subtitle && (
         <div className="relative">
-          <p className="font-kosugi text-ops-body text-transparent select-none">
+          <p className="font-mono text-ops-body text-transparent select-none">
             {subtitle}
           </p>
           {isAtLeast('subtitleTyping') && (
             <span className="absolute inset-0">
               <TypewriterText
                 text={subtitle}
-                className="font-kosugi text-ops-body text-ops-text-secondary"
+                className="font-mono text-ops-body text-ops-text-secondary"
                 typingSpeed={33}
                 onComplete={() => {
                   // iOS: 0.4s delay then advance to contentFadeIn

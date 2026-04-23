@@ -25,7 +25,7 @@ import type { ScreenDrawParams } from './types';
 
 // --- Fonts (loaded by next/font/google on the page) ---
 const MOHAVE = 'Mohave, sans-serif';
-const KOSUGI = 'Kosugi, sans-serif';
+const KOSUGI = 'JetBrains Mono, monospace';
 
 // --- Pete's avatar — loaded once at module level ---
 let avatarImg: HTMLImageElement | null = null;
@@ -365,7 +365,7 @@ export function drawHomeScreen({ ctx, width, height, progress }: ScreenDrawParam
   const badgeY = cardY + cardH - 56;
   // Badge fill + border stroke
   drawRoundedRect(ctx, badgeX, badgeY, badgeW, badgeH, LAYOUT.smallRadius,
-    'rgba(89, 119, 148, 0.30)', 'rgba(89, 119, 148, 0.10)', contentP);
+    'rgba(111, 148, 176, 0.30)', 'rgba(111, 148, 176, 0.10)', contentP);
   // Badge text
   drawText(ctx, 'DIAGNOSTIC', badgeX + badgeW / 2, badgeY + badgeH / 2,
     `24px ${KOSUGI}`, COLORS.accent, contentP, 'center');

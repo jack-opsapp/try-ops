@@ -110,13 +110,13 @@ export default function ProfilePage() {
 
       {/* Step indicator + skip */}
       <div className="flex items-center justify-between mb-6">
-        <span className="font-kosugi text-caption-sm text-text-tertiary uppercase tracking-widest">
+        <span className="font-mono text-caption-sm text-text-tertiary uppercase tracking-widest">
           [step 1 of 2]
         </span>
         <button
           type="button"
           onClick={handleSkip}
-          className="font-kosugi text-caption-sm text-text-tertiary uppercase tracking-widest hover:text-text-secondary transition-colors"
+          className="font-mono text-caption-sm text-text-tertiary uppercase tracking-widest hover:text-text-secondary transition-colors"
         >
           Skip for now
         </button>
@@ -126,7 +126,7 @@ export default function ProfilePage() {
       <h1 className="font-mohave text-heading text-text-primary uppercase tracking-wide">
         ABOUT YOU
       </h1>
-      <p className="font-kosugi text-caption text-text-tertiary mt-1 mb-6">
+      <p className="font-mono text-caption text-text-tertiary mt-1 mb-6">
         [the name behind the operation]
       </p>
 

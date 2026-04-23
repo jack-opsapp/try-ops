@@ -34,7 +34,7 @@ import type { ScreenDrawParams } from './types';
 
 // --- Fonts (loaded by next/font/google on the page) ---
 const MOHAVE = 'Mohave, sans-serif';
-const KOSUGI = 'Kosugi, sans-serif';
+const KOSUGI = 'JetBrains Mono, monospace';
 
 // --- Scale factor: iOS 393pt screen → 750px canvas ---
 const S = 750 / 393; // ≈ 1.908

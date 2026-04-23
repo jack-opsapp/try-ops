@@ -193,7 +193,7 @@ export default function CredentialsPage() {
     <div className="w-full">
       {/* Mobile logo — hidden on desktop (hero has brand mark) */}
       <div className="lg:hidden mb-8">
-        <p className="font-bebas text-[36px] tracking-[0.2em] text-white/90 leading-none">
+        <p className="font-cakemono text-[36px] tracking-[0.2em] text-white/90 leading-none">
           OPS
         </p>
       </div>
@@ -241,7 +241,7 @@ export default function CredentialsPage() {
         {/* Divider */}
         <div className="flex items-center gap-4 py-1">
           <div className="flex-1 h-px bg-border" />
-          <span className="font-kosugi text-caption-sm text-text-tertiary uppercase tracking-widest">
+          <span className="font-mono text-caption-sm text-text-tertiary uppercase tracking-widest">
             or
           </span>
           <div className="flex-1 h-px bg-border" />
@@ -342,13 +342,13 @@ export default function CredentialsPage() {
 
         {/* Toggle login/signup */}
         <p className="pt-2">
-          <span className="font-kosugi text-caption text-text-tertiary">
+          <span className="font-mono text-caption text-text-tertiary">
             {isLoginMode ? "Don't have an account? " : "Already have an account? "}
           </span>
           <button
             type="button"
             onClick={toggleMode}
-            className="font-kosugi text-caption text-ops-accent hover:text-ops-accent-hover transition-colors"
+            className="font-mono text-caption text-ops-accent hover:text-ops-accent-hover transition-colors"
           >
             {isLoginMode ? "Sign up" : "Sign in"}
           </button>

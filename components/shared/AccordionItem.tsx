@@ -57,7 +57,7 @@ export function AccordionItem({ question, answer, onToggle }: AccordionItemProps
             transition={{ duration: 0.3, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <p className="font-kosugi text-ops-caption lg:text-ops-body text-ops-text-secondary leading-relaxed px-4 pb-4 lg:px-6 lg:pb-6">
+            <p className="font-mono text-ops-caption lg:text-ops-body text-ops-text-secondary leading-relaxed px-4 pb-4 lg:px-6 lg:pb-6">
               {answer}
             </p>
           </motion.div>

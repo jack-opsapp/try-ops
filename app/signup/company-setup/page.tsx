@@ -85,7 +85,7 @@ export default function CompanySetupPage() {
                 <button
                   type="button"
                   onClick={() => setOfficeEmail(userEmail)}
-                  className="font-kosugi text-ops-caption text-ops-accent hover:text-ops-accent/80 transition-colors"
+                  className="font-mono text-ops-caption text-ops-accent hover:text-ops-accent/80 transition-colors"
                 >
                   Use mine
                 </button>
@@ -108,7 +108,7 @@ export default function CompanySetupPage() {
                 <button
                   type="button"
                   onClick={() => setOfficePhone(userPhone)}
-                  className="font-kosugi text-ops-caption text-ops-accent hover:text-ops-accent/80 transition-colors"
+                  className="font-mono text-ops-caption text-ops-accent hover:text-ops-accent/80 transition-colors"
                 >
                   Use mine
                 </button>

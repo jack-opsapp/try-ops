@@ -106,7 +106,7 @@ export function HamburgerMenu({ onDownloadClick, onTryClick }: HamburgerMenuProp
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.1 + i * 0.05, duration: 0.3 }}
                     onClick={() => scrollTo(section.id)}
-                    className="block w-full text-left font-kosugi text-[14px] uppercase tracking-[0.15em] text-ops-gray-200 hover:text-white py-4 border-b border-white/10 transition-colors"
+                    className="block w-full text-left font-mono text-[14px] uppercase tracking-[0.15em] text-ops-gray-200 hover:text-white py-4 border-b border-white/10 transition-colors"
                   >
                     {section.label}
                   </motion.button>
@@ -122,13 +122,13 @@ export function HamburgerMenu({ onDownloadClick, onTryClick }: HamburgerMenuProp
               >
                 <button
                   onClick={() => { close(); onDownloadClick() }}
-                  className="w-full bg-white text-[#0A0A0A] font-kosugi text-xs uppercase tracking-[0.15em] rounded-[3px] px-6 py-3 hover:bg-white/90 transition-all"
+                  className="w-full bg-white text-[#0A0A0A] font-mono text-xs uppercase tracking-[0.15em] rounded-[3px] px-6 py-3 hover:bg-white/90 transition-all"
                 >
                   DOWNLOAD FREE
                 </button>
                 <button
                   onClick={() => { close(); onTryClick() }}
-                  className="w-full bg-transparent border border-ops-gray-300 text-ops-gray-200 font-kosugi text-xs uppercase tracking-[0.15em] rounded-[3px] px-6 py-3 hover:border-white hover:text-white transition-all"
+                  className="w-full bg-transparent border border-ops-gray-300 text-ops-gray-200 font-mono text-xs uppercase tracking-[0.15em] rounded-[3px] px-6 py-3 hover:border-white hover:text-white transition-all"
                 >
                   TRY IT FIRST
                 </button>

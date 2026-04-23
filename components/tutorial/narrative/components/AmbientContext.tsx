@@ -99,7 +99,7 @@ function GhostedMetricCard({ label, value }: { label: string; value: string }) {
     >
       <span
         className="uppercase tracking-widest"
-        style={{ fontFamily: 'var(--font-kosugi)', fontSize: 9, color: 'rgba(255,255,255,0.25)' }}
+        style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'rgba(255,255,255,0.25)' }}
       >
         {label}
       </span>
@@ -118,7 +118,7 @@ function GhostedCalendarGrid() {
       {/* Day headers */}
       <div className="flex gap-1 mb-1">
         {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
-          <div key={i} className="flex-1 text-center" style={{ fontFamily: 'var(--font-kosugi)', fontSize: 8, color: 'rgba(255,255,255,0.15)' }}>
+          <div key={i} className="flex-1 text-center" style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: 'rgba(255,255,255,0.15)' }}>
             {d}
           </div>
         ))}
@@ -207,7 +207,7 @@ function GhostedInvoiceTable() {
           <span
             key={h}
             className="flex-1 uppercase tracking-widest"
-            style={{ fontFamily: 'var(--font-kosugi)', fontSize: 8, color: 'rgba(255,255,255,0.18)' }}
+            style={{ fontFamily: 'var(--font-mono)', fontSize: 8, color: 'rgba(255,255,255,0.18)' }}
           >
             {h}
           </span>
