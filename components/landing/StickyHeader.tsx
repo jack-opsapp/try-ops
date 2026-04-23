@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import Image from 'next/image'
+import { OpsMark } from '@/components/brand/OpsMark'
 import { Button } from '@/components/shared/Button'
 
 interface StickyHeaderProps {
@@ -34,15 +34,10 @@ export function StickyHeader({ onDownloadClick, onTryClick }: StickyHeaderProps)
           <div className="max-w-[1200px] mx-auto px-4 md:px-6 lg:px-10 h-full flex items-center justify-between">
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="flex-shrink-0"
+              className="flex-shrink-0 text-ops-text-primary"
+              aria-label="OPS — scroll to top"
             >
-              <Image
-                src="/brand/ops-mark.svg"
-                alt="OPS"
-                width={48}
-                height={20}
-                className="object-contain"
-              />
+              <OpsMark className="h-5 w-auto" title="" />
             </button>
 
             <div className="flex items-center gap-3">

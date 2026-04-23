@@ -1,7 +1,8 @@
 'use client'
 
-import Image from 'next/image'
 import { motion } from 'framer-motion'
+import { OpsLockup } from '@/components/brand/OpsLockup'
+import { OpsMark } from '@/components/brand/OpsMark'
 
 export function Footer() {
   const scrollTo = (id: string) => {
@@ -25,15 +26,9 @@ export function Footer() {
         viewport={{ once: true, amount: 0.2 }}
       >
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-20">
-          {/* Logo + tagline */}
-          <div className="lg:flex-1">
-            <Image
-              src="/brand/ops-mark.svg"
-              alt="OPS"
-              width={60}
-              height={24}
-              className="object-contain mb-3"
-            />
+          {/* Logo + tagline — full lockup for brand moment, inherits text-ops-text-primary */}
+          <div className="lg:flex-1 text-ops-text-primary">
+            <OpsLockup className="h-8 w-auto mb-3" />
             <p className="font-mono text-[14px] text-ops-text-secondary italic">
               Built by trades, for trades.
             </p>
@@ -127,15 +122,9 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div className="border-t border-white/10 mt-10 pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Image
-              src="/brand/ops-mark.svg"
-              alt="OPS"
-              width={36}
-              height={14}
-              className="object-contain opacity-50"
-            />
-            <p className="font-mono text-[12px] text-ops-text-secondary">
+          <div className="flex items-center gap-3 text-ops-text-secondary">
+            <OpsMark className="h-[14px] w-auto opacity-50" title="" />
+            <p className="font-mono text-[12px]">
               &copy; 2026 OPS. All rights reserved.
             </p>
           </div>
