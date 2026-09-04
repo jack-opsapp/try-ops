@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { isProductionAnalyticsRequestUrl } from '@/lib/analytics/production-boundary'
 
 const SUPABASE_URL = 'https://ijeekuhbatykdomumfjx.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqZWVrdWhiYXR5a2RvbXVtZmp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyNzM2MTgsImV4cCI6MjA4Njg0OTYxOH0.pXYn9WRpVkWSJg2vHw2fjw8RsAmytnRGwEjb2Jwrn-c'
@@ -40,6 +41,10 @@ async function logToSupabase(payload: {
 
 export async function POST(request: Request) {
   try {
+    if (!isProductionAnalyticsRequestUrl(request.url)) {
+      return NextResponse.json({ success: true, skipped: true })
+    }
+
     const body = await request.json()
     const { stepDuration, totalTime, variant, phase, phaseIndex, action, flowType, sessionId } = body
 

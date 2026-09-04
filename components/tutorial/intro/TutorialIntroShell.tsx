@@ -10,6 +10,7 @@ import { Seq2Archive } from './Seq2Archive'
 import { Seq3Tasks } from './Seq3Tasks'
 import { Seq3Invoice } from './Seq3Invoice'
 import { Seq3Finale } from './Seq3Finale'
+import { shouldCollectProductionAnalytics } from '@/lib/analytics/production-boundary'
 
 const PHASES = ['seq1', 'seq1b', 'seq1c', 'seq2statuses', 'seq2archive', 'seq3tasks', 'seq3invoice', 'seq3finale'] as const
 type Phase = (typeof PHASES)[number]
@@ -91,6 +92,8 @@ export function TutorialIntroShell() {
   const phase = PHASES[phaseIndex]
 
   const postTutorialLog = useCallback((durations: string[]) => {
+    if (!shouldCollectProductionAnalytics()) return
+
     const totalTime = Date.now() - totalStartRef.current
     fetch('/api/tutorial-log', {
       method: 'POST',

@@ -1,6 +1,8 @@
 // Fire-and-forget analytics for the narrative tutorial.
 // Uses the existing /api/tutorial-log route for Supabase + Bubble compat.
 
+import { shouldCollectProductionAnalytics } from '@/lib/analytics/production-boundary'
+
 const FLOW_TYPE = 'leadToRevenue'
 const VARIANT = 'narrative'
 
@@ -15,6 +17,8 @@ interface AnalyticsEvent {
 
 /** POST a single event to the tutorial-log API route. Never throws. */
 export function sendTutorialEvent(event: AnalyticsEvent): void {
+  if (!shouldCollectProductionAnalytics()) return
+
   fetch('/api/tutorial-log', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
