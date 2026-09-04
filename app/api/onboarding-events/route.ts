@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServiceRoleClient } from '@/lib/supabase/server-client'
+import { isProductionAnalyticsRequestUrl } from '@/lib/analytics/production-boundary'
 
 export async function POST(req: NextRequest) {
   try {
+    if (!isProductionAnalyticsRequestUrl(req.url)) {
+      return NextResponse.json({ ok: true, skipped: true })
+    }
+
     const body = await req.json()
     const { eventType, userId, variant, decision, step, metadata } = body
 

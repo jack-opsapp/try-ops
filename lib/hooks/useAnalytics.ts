@@ -3,6 +3,7 @@
 import { useCallback } from 'react'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { getDeviceType } from '@/lib/utils/device-detection'
+import { shouldCollectProductionAnalytics } from '@/lib/analytics/production-boundary'
 
 declare global {
   interface Window {
@@ -21,6 +22,8 @@ export function useAnalytics() {
 
   const track = useCallback(
     (eventName: string, params?: Record<string, unknown>) => {
+      if (!shouldCollectProductionAnalytics()) return
+
       gtag('event', eventName, {
         variant: variant || 'unknown',
         ...params,
