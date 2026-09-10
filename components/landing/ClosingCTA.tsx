@@ -10,7 +10,7 @@ import { getTutorialRoute } from '@/lib/utils/tutorial-routes'
 
 type ClosingCTAProps = z.infer<typeof ClosingCTAPropsSchema>
 
-const APP_STORE_URL = 'https://apps.apple.com/us/app/ops-job-crew-management/id6746662078'
+import { useCtaHandlers } from '@/lib/landing/cta-mode'
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -20,18 +20,12 @@ const fadeInUp = {
 }
 
 export function ClosingCTA({ headline, subtext, primaryCtaLabel, secondaryCtaLabel }: ClosingCTAProps) {
-  const router = useRouter()
-
-  const handleDownloadClick = () => {
-    trackABClick('ClosingCTA', 'download_btn')
-    window.open(APP_STORE_URL, '_blank')
-  }
-
-  const handleTryClick = () => {
-    trackABClick('ClosingCTA', 'try_btn')
-    const variant = document.cookie.split(';').find(c => c.trim().startsWith('ops_variant='))?.split('=')[1]?.trim() || 'a'
-    router.push(getTutorialRoute(variant))
-  }
+  const { mode: ctaMode, primary: handleDownloadClick, secondary: handleTryClick } =
+    useCtaHandlers('ClosingCTA')
+  const trustLine =
+    ctaMode === 'web-signup'
+      ? 'Free for 30 days \u00b7 No credit card \u00b7 Every feature, every tier'
+      : 'Get started for free \u00b7 No credit card \u00b7 No training required'
   return (
     <section id="closing" className="bg-ops-card min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
       <div className="max-w-[700px] mx-auto px-6 md:px-6 lg:px-10">
@@ -61,9 +55,11 @@ export function ClosingCTA({ headline, subtext, primaryCtaLabel, secondaryCtaLab
             </svg>
             {primaryCtaLabel}
           </Button>
+          {handleTryClick && (
           <Button variant="outline" onClick={handleTryClick} className="max-w-[280px] w-full">
             {secondaryCtaLabel}
           </Button>
+          )}
         </motion.div>
 
         {/* Trust line */}
@@ -72,7 +68,7 @@ export function ClosingCTA({ headline, subtext, primaryCtaLabel, secondaryCtaLab
           {...fadeInUp}
           transition={{ ...fadeInUp.transition, delay: 0.25 }}
         >
-          Get started for free &middot; No credit card &middot; No training required
+          {trustLine}
         </motion.p>
       </div>
     </section>
