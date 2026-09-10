@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useCallback } from 'react'
+import { MotionConfig } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { useOnboardingStore } from '@/lib/stores/onboarding-store'
 import { useAnalytics } from '@/lib/hooks/useAnalytics'
@@ -13,6 +14,7 @@ import { SectionTracker } from '@/components/ab/SectionTracker'
 import { SECTION_REGISTRY } from '@/lib/ab/registry'
 import { trackABClick } from '@/lib/ab/track-click'
 import { getTutorialRoute } from '@/lib/utils/tutorial-routes'
+import { CtaModeProvider, WEB_SIGNUP_URL, type CtaMode } from '@/lib/landing/cta-mode'
 import type { VariantConfig } from '@/lib/ab/types'
 
 const APP_STORE_URL = 'https://apps.apple.com/us/app/ops-job-crew-management/id6746662078'
@@ -20,9 +22,15 @@ const APP_STORE_URL = 'https://apps.apple.com/us/app/ops-job-crew-management/id6
 interface Props {
   config: VariantConfig
   variantId: string
+  /**
+   * `app-store` is the organic page. `web-signup` is a paid landing page: one
+   * CTA, straight to the web signup, no tutorial detour and no second choice.
+   */
+  ctaMode?: CtaMode
 }
 
-export function LandingPageClient({ config, variantId }: Props) {
+export function LandingPageClient({ config, variantId, ctaMode = 'app-store' }: Props) {
+  const webSignup = ctaMode === 'web-signup'
   const router = useRouter()
   const { trackLandingPageView } = useAnalytics()
   const setUTMData = useOnboardingStore((s) => s.setUTMData)
@@ -87,13 +95,15 @@ export function LandingPageClient({ config, variantId }: Props) {
   // ── CTA handlers ──────────────────────────────────────────────────────────
 
   const handleDownloadClick = useCallback(() => {
-    trackABClick('HamburgerMenu', 'download_btn')
-    if (isMobile()) {
+    trackABClick('HamburgerMenu', webSignup ? 'signup_btn' : 'download_btn')
+    if (webSignup) {
+      window.location.href = WEB_SIGNUP_URL
+    } else if (isMobile()) {
       window.location.href = APP_STORE_URL
     } else {
       document.getElementById('desktop-download')?.scrollIntoView({ behavior: 'smooth' })
     }
-  }, [])
+  }, [webSignup])
 
   const handleTryClick = useCallback(() => {
     trackABClick('HamburgerMenu', 'try_btn')
@@ -103,13 +113,15 @@ export function LandingPageClient({ config, variantId }: Props) {
   }, [setTutorialStartTime, router])
 
   const handleStickyDownloadClick = useCallback(() => {
-    trackABClick('StickyCTA', 'download_btn')
-    if (isMobile()) {
+    trackABClick('StickyCTA', webSignup ? 'signup_btn' : 'download_btn')
+    if (webSignup) {
+      window.location.href = WEB_SIGNUP_URL
+    } else if (isMobile()) {
       window.location.href = APP_STORE_URL
     } else {
       document.getElementById('desktop-download')?.scrollIntoView({ behavior: 'smooth' })
     }
-  }, [])
+  }, [webSignup])
 
   const handleStickyTryClick = useCallback(() => {
     trackABClick('StickyCTA', 'try_btn')
@@ -121,6 +133,11 @@ export function LandingPageClient({ config, variantId }: Props) {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
+    // globals.css already zeroes CSS animations under prefers-reduced-motion,
+    // but Framer animates inline in JS and never saw that rule. `reducedMotion
+    // = "user"` is what actually honours the setting on these pages.
+    <MotionConfig reducedMotion="user">
+    <CtaModeProvider mode={ctaMode}>
     <main className="relative bg-ops-background min-h-screen snap-y snap-mandatory overflow-y-auto overflow-x-hidden h-screen md:h-auto md:overflow-visible md:snap-none">
       {/* Ambient edge glows */}
       <div className="pointer-events-none fixed inset-0 z-[990]">
@@ -142,12 +159,13 @@ export function LandingPageClient({ config, variantId }: Props) {
 
       <HamburgerMenu
         onDownloadClick={handleDownloadClick}
-        onTryClick={handleTryClick}
+        onTryClick={webSignup ? undefined : handleTryClick}
       />
 
       <StickyCTA
         onDownloadClick={handleStickyDownloadClick}
-        onTryClick={handleStickyTryClick}
+        onTryClick={webSignup ? undefined : handleStickyTryClick}
+        primaryLabel={webSignup ? 'START FREE' : undefined}
       />
 
       {config.sections.map((section, i) => {
@@ -171,5 +189,7 @@ export function LandingPageClient({ config, variantId }: Props) {
 
       <Footer />
     </main>
+    </CtaModeProvider>
+    </MotionConfig>
   )
 }

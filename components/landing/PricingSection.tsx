@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { Button } from '@/components/shared/Button'
 import { Carousel } from '@/components/shared/Carousel'
 import { PricingSectionPropsSchema } from '@/lib/ab/types'
+import { useCtaHandlers } from '@/lib/landing/cta-mode'
 
 type PricingSectionProps = z.infer<typeof PricingSectionPropsSchema>
 
@@ -144,9 +145,7 @@ function PricingCard({ tier, onCTAClick }: { tier: typeof tiers[number]; onCTACl
 }
 
 export function PricingSection({ heading, subtext }: PricingSectionProps) {
-  function handleDownloadClick() {
-    window.open('https://apps.apple.com/us/app/ops-job-crew-management/id6746662078', '_blank')
-  }
+  const { primary: handleDownloadClick } = useCtaHandlers('PricingSection')
 
   return (
     <section id="pricing" className="py-6 lg:py-[120px] snap-start snap-always">

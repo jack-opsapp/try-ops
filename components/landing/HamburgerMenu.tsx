@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 interface HamburgerMenuProps {
   onDownloadClick: () => void
-  onTryClick: () => void
+  /** Omitted on a paid page: the menu offers the one action too. */
+  onTryClick?: () => void
 }
 
 const sections = [
@@ -124,14 +125,16 @@ export function HamburgerMenu({ onDownloadClick, onTryClick }: HamburgerMenuProp
                   onClick={() => { close(); onDownloadClick() }}
                   className="w-full bg-white text-[#0A0A0A] font-mono text-xs uppercase tracking-[0.15em] rounded-[3px] px-6 py-3 hover:bg-white/90 transition-all"
                 >
-                  DOWNLOAD FREE
+                  {onTryClick ? 'DOWNLOAD FREE' : 'START FREE'}
                 </button>
-                <button
-                  onClick={() => { close(); onTryClick() }}
-                  className="w-full bg-transparent border border-ops-gray-300 text-ops-gray-200 font-mono text-xs uppercase tracking-[0.15em] rounded-[3px] px-6 py-3 hover:border-white hover:text-white transition-all"
-                >
-                  TRY IT FIRST
-                </button>
+                {onTryClick && (
+                  <button
+                    onClick={() => { close(); onTryClick() }}
+                    className="w-full bg-transparent border border-ops-gray-300 text-ops-gray-200 font-mono text-xs uppercase tracking-[0.15em] rounded-[3px] px-6 py-3 hover:border-white hover:text-white transition-all"
+                  >
+                    TRY IT FIRST
+                  </button>
+                )}
               </motion.div>
             </motion.nav>
           </>

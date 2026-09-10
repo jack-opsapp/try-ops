@@ -19,7 +19,7 @@ const PhoneSceneWrapper = dynamic(
 
 type HeroProps = z.infer<typeof HeroPropsSchema>
 
-const APP_STORE_URL = 'https://apps.apple.com/us/app/ops-job-crew-management/id6746662078'
+import { useCtaHandlers } from '@/lib/landing/cta-mode'
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -56,19 +56,16 @@ function HeroVisual({ mode, imageSrc }: { mode: 'animation' | 'image' | 'phone3d
 }
 
 export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel, heroMode, heroImageSrc }: HeroProps) {
-  const router = useRouter()
   const mode = heroMode ?? 'animation'
-
-  const handleDownloadClick = () => {
-    trackABClick('Hero', 'download_btn')
-    window.open(APP_STORE_URL, '_blank')
-  }
-
-  const handleTryClick = () => {
-    trackABClick('Hero', 'try_btn')
-    const variant = document.cookie.split(';').find(c => c.trim().startsWith('ops_variant='))?.split('=')[1]?.trim() || 'a'
-    router.push(getTutorialRoute(variant))
-  }
+  // On a paid page there is one button and it goes to the web signup.
+  const { mode: ctaMode, primary: handleDownloadClick, secondary: handleTryClick } =
+    useCtaHandlers('Hero')
+  // A paid page promises only what this session can verify: the trial length,
+  // the card it does not ask for, and that no feature is held back.
+  const trustLine =
+    ctaMode === 'web-signup'
+      ? 'Free for 30 days \u00b7 No credit card \u00b7 Every feature, every tier'
+      : 'Get started for free \u00b7 No credit card \u00b7 Rated 5.0\u2605'
 
   // ── Phone3D layout: phone is a full background, text overlays on top ──
   if (mode === 'phone3d') {
@@ -110,11 +107,12 @@ export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel, he
                   fullWidth
                   className="sm:w-auto"
                 >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                  {ctaMode !== 'web-signup' && (<svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-                  </svg>
+                  </svg>)}
                   {primaryCtaLabel}
                 </Button>
+                {handleTryClick && (
                 <Button
                   variant="outline"
                   onClick={handleTryClick}
@@ -123,6 +121,7 @@ export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel, he
                 >
                   {secondaryCtaLabel}
                 </Button>
+                )}
               </motion.div>
 
               {/* Trust line */}
@@ -131,7 +130,7 @@ export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel, he
                 {...fadeInUp}
                 transition={{ ...fadeInUp.transition, delay: 0.25 }}
               >
-                Get started for free &middot; No credit card &middot; Rated 5.0&#9733;
+                {trustLine}
               </motion.p>
             </div>
           </div>
@@ -204,11 +203,12 @@ export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel, he
                 fullWidth
                 className="sm:w-auto"
               >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                {ctaMode !== 'web-signup' && (<svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-                </svg>
+                </svg>)}
                 {primaryCtaLabel}
               </Button>
+              {handleTryClick && (
               <Button
                 variant="outline"
                 onClick={handleTryClick}
@@ -217,6 +217,7 @@ export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel, he
               >
                 {secondaryCtaLabel}
               </Button>
+              )}
             </motion.div>
 
             {/* Trust line */}
@@ -225,7 +226,7 @@ export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel, he
               {...fadeInUp}
               transition={{ ...fadeInUp.transition, delay: 0.25 }}
             >
-              Get started for free &middot; No credit card &middot; Rated 5.0&#9733;
+              {trustLine}
             </motion.p>
           </div>
 
