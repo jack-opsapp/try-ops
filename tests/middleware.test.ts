@@ -79,7 +79,15 @@ describe("middleware first-touch cookie", () => {
 
   it("matches the paid landing paths on day one", () => {
     expect(config.matcher).toEqual(
-      expect.arrayContaining(["/", "/job-management", "/scheduling", "/quotes-invoices", "/compare/:path*"])
+      expect.arrayContaining(["/", "/job-management", "/compare/:path*", "/for/:path*"])
     );
+  });
+
+  it("no longer matches the two pages measured demand killed", () => {
+    // /scheduling and /quotes-invoices were planned before the keyword pull.
+    // Every term behind them has zero volume, so neither page nor ad group
+    // exists and the matcher should not claim otherwise.
+    expect(config.matcher).not.toContain("/scheduling");
+    expect(config.matcher).not.toContain("/quotes-invoices");
   });
 });
