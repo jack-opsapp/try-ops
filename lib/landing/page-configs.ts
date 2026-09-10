@@ -262,7 +262,7 @@ const cleaning = trade({
     {
       question: 'Does it handle recurring cleans?',
       answer:
-        'Yes. Set the job once and it comes back on schedule, with the same crew and the same notes attached.',
+        'Yes. Set the visit once and it comes back on schedule, with the same crew assigned.',
     },
     FAQ_SMALL,
     FAQ_TRIAL,
@@ -286,7 +286,7 @@ const landscaping = trade({
     {
       question: 'Does it handle recurring maintenance?',
       answer:
-        'Yes. Set the property once and it comes back on schedule, with the same crew and the same notes attached.',
+        'Yes. Set the visit once and it comes back on schedule, with the same crew assigned.',
     },
     FAQ_SMALL,
     FAQ_TRIAL,
@@ -310,7 +310,7 @@ const roofing = trade({
     {
       question: 'Can I quote from the app?',
       answer:
-        'Yes. Build the quote on site, send it before you leave, and turn it into a job when it comes back signed.',
+        'Yes. Build the quote in OPS, send it to the client, and turn it into a job once they approve it.',
     },
     FAQ_SMALL,
     FAQ_TRIAL,
