@@ -76,10 +76,12 @@ export const config = {
     '/tutorial-interactive',
     '/signup/:path*',
     '/download',
-    // Paid landing pages (Phase 2 creates them; the cookie must be there on day one).
+    // Paid landing pages — one per Google ad group. The first-touch cookie has
+    // to be written on arrival or the click id never reaches the signup.
+    // /scheduling and /quotes-invoices are gone: measured demand showed the
+    // terms behind them have no volume, so those ad groups were never built.
     '/job-management',
-    '/scheduling',
-    '/quotes-invoices',
     '/compare/:path*',
+    '/for/:path*',
   ],
 }

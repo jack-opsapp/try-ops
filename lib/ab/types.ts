@@ -82,6 +82,13 @@ export const StarburstPropsSchema = z.object({
   rightText: z.string().optional(),
 })
 
+// CompareTable: the rival's figures are quoted in the component from their own
+// published pricing page, so a config only names which rival to compare.
+export const CompareTablePropsSchema = z.object({
+  rival: z.enum(['jobber', 'housecall-pro', 'servicetitan']),
+  heading: z.string().optional(),
+})
+
 export const FounderQuotePropsSchema = z.object({
   quote: z.string(),
   name: z.string(),
@@ -102,6 +109,7 @@ export const SECTION_TYPES = [
   'InlineSignupForm',
   'Starburst',
   'FounderQuote',
+  'CompareTable',
 ] as const
 
 export type SectionType = typeof SECTION_TYPES[number]
@@ -119,6 +127,7 @@ export const SectionSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('InlineSignupForm'), props: InlineSignupFormPropsSchema }),
   z.object({ type: z.literal('Starburst'), props: StarburstPropsSchema }),
   z.object({ type: z.literal('FounderQuote'), props: FounderQuotePropsSchema }),
+  z.object({ type: z.literal('CompareTable'), props: CompareTablePropsSchema }),
 ])
 
 export const VariantConfigSchema = z.object({
