@@ -2,9 +2,14 @@
 
 import { motion } from 'framer-motion'
 import { OpsLockup } from '@/components/brand/OpsLockup'
+import { useCtaMode, WEB_SIGNUP_URL } from '@/lib/landing/cta-mode'
 import { OpsMark } from '@/components/brand/OpsMark'
 
 export function Footer() {
+  // On a paid page every outbound link is a click someone paid for. The App
+  // Store cannot report a conversion back against a Google click id, and the
+  // tutorial is a detour, so both become the one destination this page is for.
+  const webSignup = useCtaMode() === 'web-signup'
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -44,7 +49,9 @@ export function Footer() {
                 { label: 'Features', action: () => scrollTo('solution') },
                 { label: 'Pricing', action: () => scrollTo('pricing') },
                 { label: 'Roadmap', action: () => scrollTo('roadmap') },
-                { label: 'Download', href: 'https://apps.apple.com/us/app/ops-job-crew-management/id6746662078' },
+                webSignup
+                  ? { label: 'Start free', href: WEB_SIGNUP_URL }
+                  : { label: 'Download', href: 'https://apps.apple.com/us/app/ops-job-crew-management/id6746662078' },
               ].map((link) => (
                 <li key={link.label}>
                   {link.href ? (
@@ -100,8 +107,12 @@ export function Footer() {
             </h4>
             <ul className="space-y-2">
               {[
-                { label: 'App Store', href: 'https://apps.apple.com/us/app/ops-job-crew-management/id6746662078' },
-                { label: 'Web App', href: 'https://try.opsapp.co/tutorial-intro' },
+                ...(webSignup
+                  ? [{ label: 'Start free', href: WEB_SIGNUP_URL }]
+                  : [
+                      { label: 'App Store', href: 'https://apps.apple.com/us/app/ops-job-crew-management/id6746662078' },
+                      { label: 'Web App', href: 'https://try.opsapp.co/tutorial-intro' },
+                    ]),
                 { label: 'Instagram', href: 'https://instagram.com/opsapp.co' },
                 { label: 'LinkedIn', href: 'https://linkedin.com/company/opsapp' },
               ].map((link) => (
