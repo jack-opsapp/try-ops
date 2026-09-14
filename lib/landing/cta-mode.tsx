@@ -4,7 +4,6 @@ import { createContext, useContext, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { trackABClick } from '@/lib/ab/track-click'
 import { getTutorialRoute } from '@/lib/utils/tutorial-routes'
-import { isMobile } from '@/lib/utils/device-detection'
 
 /**
  * Where a landing page's call to action goes.
@@ -66,16 +65,13 @@ export function useCtaHandlers(section: string): CtaHandlers {
   const router = useRouter()
 
   const primary = useCallback(() => {
-    trackABClick(section, mode === 'web-signup' ? 'signup_btn' : 'download_btn')
+    try { trackABClick(section, mode === 'web-signup' ? 'signup_btn' : 'download_btn') } catch { /* Optional diagnostics must not block navigation. */ }
     if (mode === 'web-signup') {
       window.location.href = WEB_SIGNUP_URL
       return
     }
-    if (isMobile()) {
-      window.location.href = APP_STORE_URL
-    } else {
-      document.getElementById('desktop-download')?.scrollIntoView({ behavior: 'smooth' })
-    }
+    // An optional page section must never be a prerequisite for navigation.
+    window.location.href = APP_STORE_URL
   }, [mode, section])
 
   const secondary = useCallback(() => {

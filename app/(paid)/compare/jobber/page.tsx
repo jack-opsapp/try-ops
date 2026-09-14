@@ -6,8 +6,7 @@ const SLUG = 'compare/jobber' as const
 
 export const metadata: Metadata = {
   title: 'OPS vs Jobber — the prices, side by side',
-  description:
-    'Both prices read from the published pricing pages and labelled with the currency they are billed in. Decide from the numbers.',
+  description: 'Job details, crew scheduling and project photos for trades crews. Plans from $90 CAD/month. Try OPS free for 30 days. No credit card.',
   alternates: { canonical: 'https://try.opsapp.co/compare/jobber' },
 }
 

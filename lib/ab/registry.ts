@@ -1,16 +1,17 @@
 import type React from 'react'
+import dynamic from 'next/dynamic'
 import { Hero } from '@/components/landing/Hero'
-import { PainSection } from '@/components/landing/PainSection'
+const PainSection = dynamic(() => import('@/components/landing/PainSection').then(module => module.PainSection))
 import { SolutionSection } from '@/components/landing/SolutionSection'
-import { TestimonialsSection } from '@/components/landing/TestimonialsSection'
-import { RoadmapSection } from '@/components/landing/RoadmapSection'
+const TestimonialsSection = dynamic(() => import('@/components/landing/TestimonialsSection').then(module => module.TestimonialsSection))
+const RoadmapSection = dynamic(() => import('@/components/landing/RoadmapSection').then(module => module.RoadmapSection))
 import { PricingSection } from '@/components/landing/PricingSection'
 import { FAQSection } from '@/components/landing/FAQSection'
 import { ClosingCTA } from '@/components/landing/ClosingCTA'
-import { DesktopDownload } from '@/components/landing/DesktopDownload'
-import { InlineSignupForm } from '@/components/landing/InlineSignupForm'
-import { Starburst } from '@/components/landing/Starburst'
-import { FounderQuote } from '@/components/landing/FounderQuote'
+const DesktopDownload = dynamic(() => import('@/components/landing/DesktopDownload').then(module => module.DesktopDownload))
+const InlineSignupForm = dynamic(() => import('@/components/landing/InlineSignupForm').then(module => module.InlineSignupForm))
+const Starburst = dynamic(() => import('@/components/landing/Starburst').then(module => module.Starburst))
+const FounderQuote = dynamic(() => import('@/components/landing/FounderQuote').then(module => module.FounderQuote))
 import { CompareTable } from '@/components/landing/CompareTable'
 import type { SectionType } from '@/lib/ab/types'
 

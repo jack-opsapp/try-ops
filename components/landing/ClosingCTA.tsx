@@ -1,76 +1,9 @@
 'use client'
-
-import { motion } from 'framer-motion'
-import { useRouter } from 'next/navigation'
 import type { z } from 'zod'
 import type { ClosingCTAPropsSchema } from '@/lib/ab/types'
-import { Button } from '@/components/shared/Button'
-import { trackABClick } from '@/lib/ab/track-click'
-import { getTutorialRoute } from '@/lib/utils/tutorial-routes'
+import { APPROVED_OFFER } from '@/lib/landing/content-registry'
+import { PrimaryAction } from './PrimaryAction'
 
-type ClosingCTAProps = z.infer<typeof ClosingCTAPropsSchema>
-
-import { useCtaHandlers } from '@/lib/landing/cta-mode'
-
-const fadeInUp = {
-  initial: { opacity: 0, y: 20 },
-  whileInView: { opacity: 1, y: 0 },
-  transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
-  viewport: { once: true, amount: 0.2 },
-}
-
-export function ClosingCTA({ headline, subtext, primaryCtaLabel, secondaryCtaLabel }: ClosingCTAProps) {
-  const { mode: ctaMode, primary: handleDownloadClick, secondary: handleTryClick } =
-    useCtaHandlers('ClosingCTA')
-  const trustLine =
-    ctaMode === 'web-signup'
-      ? 'Free for 30 days \u00b7 No credit card \u00b7 Every feature, every tier'
-      : 'Get started for free \u00b7 No credit card \u00b7 No training required'
-  return (
-    <section id="closing" className="bg-ops-card min-h-[100svh] flex flex-col justify-center py-6 lg:py-[120px] snap-start snap-always">
-      <div className="max-w-[700px] mx-auto px-6 md:px-6 lg:px-10">
-        <motion.h2
-          className="font-mohave font-bold text-[40px] lg:text-[56px] text-ops-gray-50 uppercase leading-[1.1] tracking-[0.05em] mb-6"
-          {...fadeInUp}
-        >
-          {headline}
-        </motion.h2>
-
-        <motion.p
-          className="font-mono text-[18px] text-ops-gray-200 mb-10 max-w-[600px]"
-          {...fadeInUp}
-          transition={{ ...fadeInUp.transition, delay: 0.1 }}
-        >
-          {subtext}
-        </motion.p>
-
-        <motion.div
-          className="flex flex-col sm:flex-row gap-4 mb-4"
-          {...fadeInUp}
-          transition={{ ...fadeInUp.transition, delay: 0.2 }}
-        >
-          <Button variant="primary" onClick={handleDownloadClick} className="max-w-[280px] w-full">
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-            </svg>
-            {primaryCtaLabel}
-          </Button>
-          {handleTryClick && (
-          <Button variant="outline" onClick={handleTryClick} className="max-w-[280px] w-full">
-            {secondaryCtaLabel}
-          </Button>
-          )}
-        </motion.div>
-
-        {/* Trust line */}
-        <motion.p
-          className="font-mono text-[12px] text-ops-gray-400"
-          {...fadeInUp}
-          transition={{ ...fadeInUp.transition, delay: 0.25 }}
-        >
-          {trustLine}
-        </motion.p>
-      </div>
-    </section>
-  )
+export function ClosingCTA({ headline, subtext }: z.infer<typeof ClosingCTAPropsSchema>) {
+  return <section id="closing" className="landing-section landing-closing"><div className="landing-container"><p className="landing-label">PUT IT TO WORK</p><h2>{headline}</h2><p>{subtext}</p><PrimaryAction section="ClosingCTA" /><p className="offer-note"><span className="landing-number">{APPROVED_OFFER.trialDays}</span> days free. No credit card.</p></div></section>
 }

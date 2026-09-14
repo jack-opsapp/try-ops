@@ -6,8 +6,7 @@ const SLUG = 'for/cleaning' as const
 
 export const metadata: Metadata = {
   title: 'Cleaning business software for the crew on the route',
-  description:
-    'The route, the crew, the photos and the invoice in one app. Every feature on every plan. 30 days free, no credit card.',
+  description: 'Job details, crew scheduling and project photos for trades crews. Plans from $90 CAD/month. Try OPS free for 30 days. No credit card.',
   alternates: { canonical: 'https://try.opsapp.co/for/cleaning' },
 }
 

@@ -1,16 +1,17 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { APPROVED_OFFER } from '@/lib/landing/content-registry'
 import { AnalyticsProvider } from '@/components/layout/AnalyticsProvider'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://try.opsapp.co'),
   title: 'OPS — Job Management Your Crew Will Actually Use | Try Free',
   description:
-    'The job management app your crew will actually use. Crew scheduling, project tracking, photo documentation, and invoicing for service-based businesses and trades crews. No training required. Free to start.',
+    'Job management for trades crews. Keep the address, schedule, job notes and photos together. Try OPS free for 30 days. No credit card.',
   openGraph: {
     title: 'OPS — Job Management Your Crew Will Actually Use',
     description:
-      'Crew scheduling, project tracking, photo docs. Built by trades for field crews. No training required. Free to start.',
+      'Job details, crew scheduling and project photos. Try OPS free for 30 days. No credit card.',
     url: 'https://try.opsapp.co',
     siteName: 'OPS',
     type: 'website',
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'OPS — Job Management Your Crew Will Actually Use',
     description:
-      'Crew scheduling, project tracking, photo docs. Built by trades for field crews. Free to start.',
+      'Job details, crew scheduling and project photos. Try OPS free for 30 days. No credit card.',
   },
   alternates: {
     canonical: 'https://try.opsapp.co',
@@ -44,20 +45,21 @@ const jsonLd = {
   applicationCategory: 'BusinessApplication',
   operatingSystem: 'iOS, Web',
   url: 'https://opsapp.co',
-  description: 'Field-first job management app for service-based businesses and trades crews and field crews. Project tracking, crew scheduling, photo documentation, invoicing. No training required.',
+  description: 'Job management for trades crews on web and iPhone. A 30-day trial requires no credit card. Paid plans are billed monthly in Canadian dollars; taxes are additional.',
   offers: {
     '@type': 'AggregateOffer',
-    lowPrice: '0',
-    highPrice: '190',
-    priceCurrency: 'USD',
-    offerCount: '4',
+    lowPrice: String(APPROVED_OFFER.plans[0].monthly),
+    highPrice: String(APPROVED_OFFER.plans[2].monthly),
+    priceCurrency: APPROVED_OFFER.currency,
+    offerCount: String(APPROVED_OFFER.plans.length),
+    url: 'https://opsapp.co/plans',
   },
   creator: {
     '@type': 'Organization',
     name: 'OPS',
     url: 'https://opsapp.co',
   },
-  featureList: 'Project Management, Crew Scheduling, Photo Documentation, Job Board, Client Management, Invoicing, Offline Mode',
+  featureList: 'Project Management, Crew Scheduling, Photo Documentation, Job Board, Client Management',
 }
 
 export default function RootLayout({

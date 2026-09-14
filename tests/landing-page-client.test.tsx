@@ -1,99 +1,75 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { LandingPageClient } from '@/components/ab/LandingPageClient'
-import { PAID_PAGE_CONFIGS, paidVariantId } from '@/lib/landing/page-configs'
-import type { VariantConfig } from '@/lib/ab/types'
+import { PrimaryAction } from '@/components/landing/PrimaryAction'
+import { ProductProof } from '@/components/landing/ProductProof'
+import { ComparisonPreview } from '@/components/landing/CompareTable'
+import { CtaModeProvider, APP_STORE_URL, WEB_SIGNUP_URL } from '@/lib/landing/cta-mode'
+import { PAID_PAGE_CONFIGS } from '@/lib/landing/page-configs'
+import { isComparisonCurrent, COMPARISON_VALID_UNTIL } from '@/lib/landing/content-registry'
+import { trackABClick } from '@/lib/ab/track-click'
 
-/**
- * The single-CTA rule, held permanently.
- *
- * A paid page that shows an App Store button sends a click we paid for to a
- * destination that cannot record the conversion, and a paid page with two
- * buttons splits the one decision it exists to ask for.
- */
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: vi.fn(), prefetch: vi.fn(), replace: vi.fn() }),
-}))
-vi.mock('@/lib/hooks/useAnalytics', () => ({
-  useAnalytics: () => ({ trackLandingPageView: vi.fn() }),
-}))
-vi.mock('@/lib/stores/onboarding-store', () => ({
-  useOnboardingStore: (selector: (s: Record<string, unknown>) => unknown) =>
-    selector({ setUTMData: vi.fn(), setTutorialStartTime: vi.fn() }),
-}))
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }))
+vi.mock('@/lib/hooks/useAnalytics', () => ({ useAnalytics: () => ({ trackLandingPageView: vi.fn() }) }))
+vi.mock('@/lib/stores/onboarding-store', () => ({ useOnboardingStore: (selector: (s: Record<string, unknown>) => unknown) => selector({ setUTMData: vi.fn(), setTutorialStartTime: vi.fn() }) }))
 vi.mock('@/lib/ab/track-click', () => ({ trackABClick: vi.fn() }))
-
-const simple: VariantConfig = {
-  sections: [PAID_PAGE_CONFIGS['job-management'].sections[0]],
-}
 
 beforeEach(() => {
   vi.stubGlobal('fetch', vi.fn(async () => new Response('{}')))
-  vi.stubGlobal('IntersectionObserver', class {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-  })
+  vi.stubGlobal('IntersectionObserver', class { observe() {} unobserve() {} disconnect() {} })
 })
+afterEach(() => { cleanup(); vi.useRealTimers(); vi.restoreAllMocks(); vi.unstubAllGlobals() })
 
-const linkHrefs = () =>
-  Array.from(document.querySelectorAll('a')).map((a) => a.getAttribute('href') ?? '')
+const simple = { sections: [PAID_PAGE_CONFIGS['job-management'].sections[0]] }
 
-describe('LandingPageClient in web-signup mode', () => {
-  it('offers no App Store destination anywhere on the page', () => {
-    render(
-      <LandingPageClient
-        config={simple}
-        variantId={paidVariantId('job-management')}
-        ctaMode="web-signup"
-      />
-    )
+describe('landing actions', () => {
+  it('defaults root to the same web signup action as paid pages', () => {
+    render(<LandingPageClient config={simple} variantId="a" />)
+    expect(screen.getAllByRole('link', { name: 'START MY FREE TRIAL' }).every(link => link.getAttribute('href') === WEB_SIGNUP_URL)).toBe(true)
     expect(document.body.innerHTML).not.toContain('apps.apple.com')
-    expect(linkHrefs().join(' ')).not.toContain('apps.apple.com')
-  })
-
-  it('shows one call to action in the hero, not two', () => {
-    render(
-      <LandingPageClient
-        config={simple}
-        variantId={paidVariantId('job-management')}
-        ctaMode="web-signup"
-      />
-    )
-    // Both hero layouts (mobile and desktop) render; each contributes one
-    // primary button and, in this mode, no secondary.
-    expect(screen.queryAllByRole('button', { name: /try it/i })).toHaveLength(0)
-    expect(screen.getAllByRole('button', { name: /start free/i }).length).toBeGreaterThan(0)
-  })
-
-  it('promises only what the trial actually is', () => {
-    render(
-      <LandingPageClient
-        config={simple}
-        variantId={paidVariantId('job-management')}
-        ctaMode="web-signup"
-      />
-    )
     expect(document.body.textContent).toContain('No credit card')
-    expect(document.body.textContent).not.toContain('Rated 5.0')
+    expect(document.body.textContent).not.toMatch(/Rated 5.0|free forever/)
+    expect(document.querySelector('main')?.className).toBe('landing-page')
+  })
+
+  it('keeps native navigation uncancelled when click telemetry throws', () => {
+    vi.mocked(trackABClick).mockImplementationOnce(() => { throw new Error('Storage unavailable') })
+    render(<CtaModeProvider mode="web-signup"><PrimaryAction section="Hero" /></CtaModeProvider>)
+    const action = screen.getByRole('link', { name: 'START MY FREE TRIAL' })
+    let wasCancelled: boolean | undefined
+    // Prevent JSDOM leaving only after observing whether the app cancelled navigation.
+    document.addEventListener('click', event => { wasCancelled = event.defaultPrevented; event.preventDefault() }, { once: true })
+    fireEvent.click(action)
+    expect(wasCancelled).toBe(false)
+    expect(action.getAttribute('href')).toBe(WEB_SIGNUP_URL)
+  })
+
+  it('gives the legacy download a real App Store href without any download section', () => {
+    render(<CtaModeProvider mode="app-store"><PrimaryAction section="Hero" /></CtaModeProvider>)
+    expect(screen.getByRole('link', { name: 'DOWNLOAD FOR iOS' }).getAttribute('href')).toBe(APP_STORE_URL)
+  })
+
+  it('switches actual product proof and preserves a full-size image destination', () => {
+    render(<ProductProof />)
+    fireEvent.click(screen.getByRole('button', { name: 'Job board' }))
+    expect(screen.getByRole('button', { name: 'Job board' }).getAttribute('aria-pressed')).toBe('true')
+    expect(screen.getByRole('img', { name: /job board/i }).getAttribute('src')).toContain('ios-job-board')
+    expect(screen.getByRole('link', { name: /view full screenshot/i }).getAttribute('href')).toBe('/images/product/ios-job-board.png')
   })
 })
 
-describe('LandingPageClient in app-store mode', () => {
-  it('keeps the organic page exactly as it was', () => {
-    const { unmount } = render(<LandingPageClient config={simple} variantId="a" />)
-    const organicButtons = screen.getAllByRole('button', { name: /start free/i }).length
-    const organicHtml = document.body.innerHTML
-    expect(document.body.textContent).toContain('Rated 5.0')
-    expect(organicHtml).toContain('apps.apple.com')
-    unmount()
-
-    render(
-      <LandingPageClient config={simple} variantId="paid" ctaMode="web-signup" />
-    )
-    // Same hero, one fewer button per layout: the secondary is gone.
-    expect(screen.getAllByRole('button', { name: /start free/i }).length).toBeLessThan(
-      organicButtons
-    )
+describe('comparison claim freshness', () => {
+  it('rejects time before verification, invalid time and the exact expiry boundary', () => {
+    expect(isComparisonCurrent('jobber', Date.parse('2026-09-13T23:59:59Z'))).toBe(false)
+    expect(isComparisonCurrent('jobber', NaN)).toBe(false)
+    expect(isComparisonCurrent('jobber', Date.parse(COMPARISON_VALID_UNTIL))).toBe(false)
+  })
+  it('removes a rival price while an already-open page crosses its expiry', () => {
+    vi.useFakeTimers(); vi.setSystemTime(new Date('2026-10-13T23:59:30Z'))
+    render(<ComparisonPreview rival="jobber" />)
+    expect(document.body.textContent).toContain('$199')
+    act(() => { vi.advanceTimersByTime(60_000) })
+    expect(document.body.textContent).not.toMatch(/\$199|\$189/)
+    expect(screen.getByRole('link', { name: 'Check current price' })).toBeTruthy()
   })
 })

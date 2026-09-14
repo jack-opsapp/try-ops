@@ -6,8 +6,7 @@ const SLUG = 'job-management' as const
 
 export const metadata: Metadata = {
   title: 'Job management software your crew will actually use',
-  description:
-    'Jobs, schedule, quotes and invoices in one app for trades crews of one to ten. Every feature on every plan. 30 days free, no credit card.',
+  description: 'Job details, crew scheduling and project photos for trades crews. Plans from $90 CAD/month. Try OPS free for 30 days. No credit card.',
   alternates: { canonical: 'https://try.opsapp.co/job-management' },
 }
 

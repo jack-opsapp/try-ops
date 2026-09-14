@@ -1,3 +1,6 @@
+@import './ops-tokens.css';
+@import './landing.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -94,12 +97,7 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Desktop scroll-snap on the document (mobile snap lives on <main>) */
-@media (min-width: 768px) {
-  html {
-    scroll-snap-type: y proximity;
-  }
-}
+/* Acquisition pages use natural document scrolling. */
 
 body {
   font-family: 'Mohave', sans-serif;
