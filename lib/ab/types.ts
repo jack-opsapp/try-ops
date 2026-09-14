@@ -6,8 +6,9 @@ export const HeroPropsSchema = z.object({
   subtext: z.string(),
   primaryCtaLabel: z.string(),
   secondaryCtaLabel: z.string(),
-  heroMode: z.enum(['animation', 'image', 'phone3d']).optional(),
+  heroMode: z.enum(['animation', 'image', 'phone3d', 'product-proof']).optional(),
   heroImageSrc: z.string().optional(),
+  comparisonRival: z.enum(['jobber', 'housecall-pro', 'servicetitan']).optional(),
 })
 
 export const PainSectionPropsSchema = z.object({
