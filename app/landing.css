@@ -32,9 +32,9 @@
 .header-content nav > a:first-child { min-height: calc(var(--unit) * 6); display: inline-flex; align-items: center; }
 .header-content nav { display: flex; align-items: center; gap: calc(var(--unit) * 3); font-family: var(--font-mohave); font-size: var(--landing-body); }
 .landing-header nav > a:first-child { text-decoration: none; }
-.landing-button { display: inline-flex; justify-content: center; align-items: center; gap: var(--unit); min-height: calc(var(--unit) * 6); padding: calc(var(--unit) * 1.5) calc(var(--unit) * 3); border: var(--landing-hairline) solid var(--ops-accent); border-radius: var(--r-btn); background: transparent; color: var(--ops-accent) !important; font: 300 var(--landing-small)/1.4 var(--font-cakemono); text-transform: uppercase; text-decoration: none; text-align: center; cursor: pointer; transition: background var(--d-hover) var(--ease-smooth), color var(--d-hover) var(--ease-smooth); }
-.landing-button:hover { background: var(--ops-accent); color: var(--bg) !important; }
-.landing-button-secondary { border-color: var(--line); color: var(--text-2) !important; }
+.landing-button { display: inline-flex; justify-content: center; align-items: center; gap: var(--unit); min-height: calc(var(--unit) * 6); padding: calc(var(--unit) * 1.5) calc(var(--unit) * 3); border: var(--landing-hairline) solid var(--ops-accent); border-radius: var(--r-btn); background: var(--ops-accent); color: var(--bg) !important; font: 300 calc(var(--unit) * 2)/1.4 var(--font-cakemono); text-transform: uppercase; text-decoration: none; text-align: center; cursor: pointer; transition: background var(--d-hover) var(--ease-smooth), color var(--d-hover) var(--ease-smooth); }
+.landing-button:hover { background: var(--ops-accent-hover); border-color: var(--ops-accent-hover); color: var(--bg) !important; }
+.landing-button-secondary { background: transparent; border-color: var(--line); color: var(--text-2) !important; }
 .landing-button-secondary:hover { background: var(--surface-hover); color: var(--text) !important; }
 .landing-hero { padding-block: calc(var(--unit) * 7) calc(var(--unit) * 8); }
 .hero-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: calc(var(--unit) * 8); align-items: center; }
