@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
+import { APPROVED_TESTIMONIALS } from '@/lib/landing/content-registry'
 import { VariantConfigSchema } from '@/lib/ab/types'
 import { PAID_PAGE_CONFIGS, paidVariantId, type PaidPageSlug } from '@/lib/landing/page-configs'
 
@@ -88,16 +89,10 @@ describe('paid landing page configs', () => {
     }
   })
 
-  it('invents no testimonial: every quote is attributed to a named person', () => {
+  it('contains no customer endorsements without an approved original source', () => {
+    expect(Object.keys(APPROVED_TESTIMONIALS)).toHaveLength(0)
     for (const [slug, config] of entries)
-      for (const section of config.sections) {
-        if (section.type !== 'TestimonialsSection') continue
-        for (const t of (section.props as { testimonials: Array<{ name: string; trade: string; location: string }> }).testimonials) {
-          expect(t.name, slug).toMatch(/\S/)
-          expect(t.trade, slug).toMatch(/\S/)
-          expect(t.location, slug).toMatch(/\S/)
-        }
-      }
+      expect(config.sections.filter(section => section.type === 'TestimonialsSection'), slug).toHaveLength(0)
   })
 
   it('has a route file for every config, and a config for every route', () => {
@@ -109,15 +104,11 @@ describe('paid landing page configs', () => {
     }
   })
 
-  it('matches the ad account: every ad group’s landing page exists here', () => {
+  it('matches the dated ad-account fixture: every landing destination exists', () => {
     // The blueprint is the source of truth for which pages paid traffic hits.
     // A URL there with no page here is an ad pointing at a 404.
-    const blueprint = JSON.parse(
-      readFileSync('../ops-web-ads-engine-p2/config/ads/blueprint.json', 'utf8')
-    ) as { campaigns: Array<{ adGroups: Array<{ finalUrl: string }> }> }
-    const urls = new Set(
-      blueprint.campaigns.flatMap((c) => c.adGroups.map((g) => g.finalUrl))
-    )
+    const fixture = JSON.parse(readFileSync('tests/fixtures/paid-destinations.json', 'utf8')) as { urls: string[] }
+    const urls = new Set(fixture.urls)
     const slugs = new Set(entries.map(([slug]) => `https://try.opsapp.co/${slug}`))
     for (const url of Array.from(urls)) {
       if (url === 'https://try.opsapp.co/') continue // the brand ad group lands on the home page

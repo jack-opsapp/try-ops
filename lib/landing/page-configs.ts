@@ -1,338 +1,73 @@
-import type { VariantConfig } from '@/lib/ab/types'
+import type { SectionEntry, VariantConfig } from '@/lib/ab/types'
+import { APPROVED_CTA_LABELS, COMPARISON_VALID_UNTIL, type ComparisonRival } from './content-registry'
 
-/**
- * The paid landing pages — one per Google ad group, each answering the exact
- * question its searcher typed.
- *
- * These are fixed configs, not A/B variants. The rotating experiment stays on
- * `/`; a paid page has to hold still so its cost per trial means something.
- *
- * Section order is deliberate and the same everywhere: the headline answers
- * the search, the price answers the next question before it is asked, and one
- * CTA repeats down the page. The compare pages put the arithmetic before
- * everything else, because a person searching "jobber pricing" wants a number,
- * not a pitch.
- *
- * `TestimonialsSection` appears only where a real, named customer said
- * something relevant. Nothing here is invented, and no page carries a quote
- * that does not fit its subject.
- */
-
-const FOUNDER = {
-  type: 'FounderQuote' as const,
-  props: {
-    quote:
-      "I scaled a deck and railing business from 0 to $1.6M in 4 years. Tried Jobber, ServiceTitan, Housecall Pro. None of them worked the way my crew actually works. So I built OPS.",
-    name: 'Jack',
-    title: 'Founder',
-  },
-}
-
-const PRICING = {
-  type: 'PricingSection' as const,
-  props: {
-    heading: 'THE PRICE IS ON THIS PAGE.',
-    subtext:
-      'Every plan has every feature. You pay for crew size, nothing else. 30 days free, no credit card.',
-  },
-}
-
-/** The three things that decide whether a crew keeps using it. */
-const CORE_FEATURES = [
-  {
-    title: 'NO TRAINING REQUIRED',
-    copy: 'Your crew opens it once. They see their jobs. They know where to go. If they can send a text, they can use OPS.',
-    why: 'Software the crew will not open is money you spend twice — once on the tool, again on the phone calls it was meant to end.',
-  },
-  {
-    title: 'WORKS WITHOUT SIGNAL',
-    copy: 'Basements, crawlspaces, rural sites, rooftops. OPS keeps working offline and syncs the moment the phone reconnects.',
-    why: 'Your crew is not always in range. A tool that needs bars is a tool that fails on the days it matters.',
-  },
-  {
-    title: 'ONE PRICE FOR THE CREW',
-    copy: 'Every feature is on every plan. You pay for how many people you are managing, and nothing is held back for a bigger tier.',
-    why: 'Per-seat billing charges you for hiring. Tiered features charge you twice for the same product.',
-  },
+const hero = (headline: string, subtext: string, comparisonRival?: ComparisonRival): SectionEntry => ({
+  type: 'Hero', props: { headline, subtext, primaryCtaLabel: APPROVED_CTA_LABELS.webTrial, secondaryCtaLabel: '', heroMode: 'product-proof', ...(comparisonRival ? { comparisonRival } : {}) },
+})
+const pricing: SectionEntry = { type: 'PricingSection', props: { heading: 'THE RIGHT SIZE FOR YOUR CREW.', subtext: 'Choose by team size. Job management, scheduling and photo documentation are included in every plan.' } }
+const closing: SectionEntry = { type: 'ClosingCTA', props: { headline: 'START WITH THE NEXT JOB.', subtext: 'Add the job. Invite your crew. Put the plan in their hands.', primaryCtaLabel: APPROVED_CTA_LABELS.webTrial, secondaryCtaLabel: '' } }
+const solution = (features: Array<{ title: string; copy: string; why: string }>): SectionEntry => ({ type: 'SolutionSection', props: { heading: 'LESS CHASING. MORE WORK DONE.', features } })
+const coreFeatures = [
+  { title: 'STOP REPEATING THE PLAN.', copy: 'The address, job notes and crew assignment stay with the job. Open the schedule and see what is coming up.', why: 'The day does not have to start with “where am I going?”' },
+  { title: 'KEEP PHOTOS WITH THE JOB.', copy: 'Progress shots and site photos belong with the work. Find them in the project when you need them.', why: 'The right record, without searching the group chat.' },
+  { title: 'START WITH ONE JOB.', copy: 'Set up the next job and invite the people doing it. Use the trial to see how OPS fits your working day.', why: 'Make the decision with your crew on real work.' },
 ]
+const trial = { question: 'What do I get in the free trial?', answer: 'Use OPS for 30 days with up to 10 people. No credit card is required to start. After the trial, choose a paid plan to keep using OPS.' }
+const devices = { question: 'Where can my crew use OPS?', answer: 'Start your account on the web. Your crew can use OPS for iPhone in the field. There is no native Android app available. Web signup and shared updates need an internet connection.' }
+const switching = { question: 'How should I bring my crew across?', answer: 'Start with the next job and the people doing it. Keep your existing records while you try the workflow. If you need to import data, check the available options with support before committing to a move.' }
+const faq = (questions: Array<{ question: string; answer: string }>): SectionEntry => ({ type: 'FAQSection', props: { heading: 'BEFORE YOU START.', faqs: questions } })
 
-const cta = (headline: string, subtext: string) => ({
-  type: 'ClosingCTA' as const,
-  props: {
-    headline,
-    subtext,
-    primaryCtaLabel: 'START FREE',
-    // Never rendered in web-signup mode — the single-CTA rule removes the
-    // second button — but the schema requires the field.
-    secondaryCtaLabel: 'START FREE',
-  },
-})
+export const GENERAL_CONFIG: VariantConfig = { sections: [
+  hero('JOB MANAGEMENT YOUR CREW WILL ACTUALLY USE', 'Put the address, schedule, job notes and photos in one place. Your crew knows what to do. You stop chasing updates.'),
+  solution(coreFeatures), pricing,
+  faq([trial, devices, switching, { question: 'How do I know my crew will use it?', answer: 'Try OPS together on a real job. The schedule and job details give them a clear place to start. The trial gives you time to decide whether it works for your crew.' }]), closing,
+] }
 
-const hero = (headline: string, subtext: string) => ({
-  type: 'Hero' as const,
-  props: {
-    headline,
-    subtext,
-    primaryCtaLabel: 'START FREE',
-    secondaryCtaLabel: 'START FREE',
-    heroMode: 'phone3d' as const,
-  },
-})
-
-const faq = (faqs: Array<{ question: string; answer: string }>) => ({
-  type: 'FAQSection' as const,
-  props: { heading: 'THE QUESTIONS WORTH ASKING', faqs },
-})
-
-const solution = (features: typeof CORE_FEATURES) => ({
-  type: 'SolutionSection' as const,
-  props: { features },
-})
-
-/** Shared FAQ answers, so no page contradicts another. */
-const FAQ_TRIAL = {
-  question: 'What does the trial actually give me?',
-  answer:
-    'Everything, for 30 days, without a credit card. Not a demo account and not a cut-down version — the same product a paying crew runs on. If your crew has not opened it by week two, you have your answer and it cost you nothing.',
-}
-const FAQ_SWITCH = {
-  question: 'How long does switching take?',
-  answer:
-    'A morning. You bring your clients, jobs and quotes across, and your crew starts on the next job. We have not built an import for every tool yet, so if yours is missing, say so and we will move the data for you.',
-}
-const FAQ_SMALL = {
-  question: 'We are only three people. Is this overkill?',
-  answer:
-    'Three people is who it was built for. OPS starts at $90 a month for a crew of three, with every feature. It is the ten-person tools that get heavy, not this one.',
+function compare(rival: ComparisonRival, headline: string, subtext: string, fit: string): VariantConfig {
+  return { sections: [hero(headline, subtext, rival), pricing, solution(coreFeatures), faq([
+    { question: 'How should I compare the prices?', answer: 'Compare the number of people, billing commitment and features you need. OPS prices are in Canadian dollars. The published US prices are not converted. Taxes, payment fees and optional add-ons can affect your final bill.' },
+    { question: 'Will OPS replace everything I use today?', answer: fit }, switching, trial, devices,
+  ]), closing] }
 }
 
-// ─── The pages ───────────────────────────────────────────────────────────────
-
-const jobManagement: VariantConfig = {
-  sections: [
-    hero(
-      'JOB MANAGEMENT YOUR CREW WILL ACTUALLY USE',
-      'Jobs, schedule, quotes and invoices in one app. Your crew opens it and knows where to go. 30 days free, no credit card.'
-    ),
-    PRICING,
-    FOUNDER,
-    solution(CORE_FEATURES),
-    faq([
-      FAQ_TRIAL,
-      {
-        question: 'What if my crew will not use it?',
-        answer:
-          'That is the only question that matters, and it is why the trial is 30 days with no card. Open it with them on a Monday. If they are still texting you by Friday, we have not earned it.',
-      },
-      FAQ_SMALL,
-    ]),
-    cta(
-      'START WITH THE NEXT JOB.',
-      'Free for 30 days. No credit card. Every feature, every tier.'
-    ),
-  ],
+function trade(headline: string, subtext: string, feature: typeof coreFeatures[number], question: { question: string; answer: string }): VariantConfig {
+  return { sections: [hero(headline, subtext), solution([feature, coreFeatures[1], coreFeatures[2]]), pricing, faq([question, trial, devices, switching]), closing] }
 }
 
-const compare = (options: {
-  rival: 'jobber' | 'housecall-pro' | 'servicetitan'
-  headline: string
-  subtext: string
-  faqs: Array<{ question: string; answer: string }>
-  testimonial?: {
-    quote: string
-    name: string
-    trade: string
-    location: string
-  }
-}): VariantConfig => ({
-  sections: [
-    hero(options.headline, options.subtext),
-    // The arithmetic comes first: this page is answering a price search.
-    { type: 'CompareTable' as const, props: { rival: options.rival } },
-    PRICING,
-    solution(CORE_FEATURES),
-    ...(options.testimonial
-      ? [
-          {
-            type: 'TestimonialsSection' as const,
-            props: {
-              heading: 'FROM SOMEONE WHO MADE THE MOVE',
-              testimonials: [options.testimonial],
-            },
-          },
-        ]
-      : []),
-    FOUNDER,
-    faq(options.faqs),
-    cta(
-      'THE PRICE IS THE PRICE.',
-      'Free for 30 days. No credit card. Every feature, every tier.'
-    ),
-  ],
-})
-
-const jobber = compare({
-  rival: 'jobber',
-  headline: 'SEE WHAT JOBBER COSTS. THEN SEE OURS.',
-  subtext:
-    'Both prices are published, side by side, in the currency each is billed in. Read it and decide.',
-  testimonial: {
-    quote:
-      'I came to OPS from Jobber. We went from our crew ignoring the app, to being excited to use it.',
-    name: 'Ryan M.',
-    trade: 'HVAC',
-    location: 'Fraser Valley',
-  },
-  faqs: [
-    FAQ_SWITCH,
-    {
-      question: 'Is OPS just a cheaper Jobber?',
-      answer:
-        'No, and it would be a bad reason to switch. Jobber is a bigger product with more surface area. OPS is built so a crew of one to ten actually opens it every day, and everything it does is on every plan. If you need the surface area, Jobber is the better buy.',
-    },
-    FAQ_TRIAL,
-  ],
-})
-
-const housecallPro = compare({
-  rival: 'housecall-pro',
-  headline: 'HOUSECALL PRO’S PRICE, NEXT TO OURS',
-  subtext:
-    'Read from their pricing page, not from memory. Both prices are labelled with the currency they are billed in.',
-  faqs: [
-    FAQ_SWITCH,
-    {
-      question: 'What about the sixth person?',
-      answer:
-        'That is where the two prices separate. Housecall Pro publishes $100 US a month for each user past five. OPS moves you to the plan that covers up to ten, and the feature list does not change.',
-    },
-    FAQ_TRIAL,
-  ],
-})
-
-const serviceTitan = compare({
-  rival: 'servicetitan',
-  headline: 'SERVICETITAN WILL NOT SHOW YOU A PRICE',
-  subtext:
-    'Ours is on this page. Built for crews of one to ten, with no rollout, no onboarding fee and no sales call.',
-  faqs: [
-    {
-      question: 'Is OPS a real replacement for ServiceTitan?',
-      answer:
-        'For a crew of one to ten, yes. For a hundred technicians and a call centre, no, and we will say so rather than sell you something that does not fit. ServiceTitan is built for a size of business OPS is not trying to serve.',
-    },
-    FAQ_SWITCH,
-    FAQ_TRIAL,
-  ],
-})
-
-const trade = (options: {
-  headline: string
-  subtext: string
-  features: typeof CORE_FEATURES
-  faqs: Array<{ question: string; answer: string }>
-}): VariantConfig => ({
-  sections: [
-    hero(options.headline, options.subtext),
-    PRICING,
-    FOUNDER,
-    solution(options.features),
-    faq(options.faqs),
-    cta(
-      'START WITH TOMORROW’S SCHEDULE.',
-      'Free for 30 days. No credit card. Every feature, every tier.'
-    ),
-  ],
-})
-
-const cleaning = trade({
-  headline: 'RUN EVERY CLEAN FROM ONE APP',
-  subtext:
-    'The route, the crew, the photos and the invoice in one place. 30 days free, no credit card.',
-  features: [
-    {
-      title: 'THE WHOLE ROUTE, ONE SCREEN',
-      copy: 'Every stop, who is on it and what it needs, in the order the day happens. Your crew reads it once and drives.',
-      why: 'Group texts and printed schedules lose stops. A crew that has to ask where they are going has already lost the morning.',
-    },
-    CORE_FEATURES[1],
-    CORE_FEATURES[2],
-  ],
-  faqs: [
-    {
-      question: 'Does it handle recurring cleans?',
-      answer:
-        'Yes. Set the visit once and it comes back on schedule, with the same crew assigned.',
-    },
-    FAQ_SMALL,
-    FAQ_TRIAL,
-  ],
-})
-
-const landscaping = trade({
-  headline: 'EVERY PROPERTY, EVERY CREW, ONE APP',
-  subtext:
-    'The route, the crew, the photos and the invoice in one place. 30 days free, no credit card.',
-  features: [
-    {
-      title: 'THE DAY, IN THE ORDER IT HAPPENS',
-      copy: 'Every property, who is on it and what it needs, before the trailer leaves the yard.',
-      why: 'A route that lives in one person’s head stops the day that person is off.',
-    },
-    CORE_FEATURES[1],
-    CORE_FEATURES[2],
-  ],
-  faqs: [
-    {
-      question: 'Does it handle recurring maintenance?',
-      answer:
-        'Yes. Set the visit once and it comes back on schedule, with the same crew assigned.',
-    },
-    FAQ_SMALL,
-    FAQ_TRIAL,
-  ],
-})
-
-const roofing = trade({
-  headline: 'RUN EVERY ROOF FROM ONE APP',
-  subtext:
-    'Quote it, schedule it, photograph it, invoice it. All from the same app your crew already has open.',
-  features: [
-    {
-      title: 'PHOTOS LAND ON THE JOB',
-      copy: 'Tear-off, deck, flashing, finish. Every photo attaches to the job and stays there for the warranty call three years from now.',
-      why: 'Photos in a camera roll are not a record. When a client questions the work, you need the file, not a search.',
-    },
-    CORE_FEATURES[1],
-    CORE_FEATURES[2],
-  ],
-  faqs: [
-    {
-      question: 'Can I quote from the app?',
-      answer:
-        'Yes. Build the quote in OPS, send it to the client, and turn it into a job once they approve it.',
-    },
-    FAQ_SMALL,
-    FAQ_TRIAL,
-  ],
-})
-
-/**
- * Route slug → config. The keys match the ad groups' final URLs in
- * `ops-web/config/ads/blueprint.json`; a page missing from here is an ad
- * pointing at a 404, so the test asserts both lists agree.
- */
 export const PAID_PAGE_CONFIGS = {
-  'job-management': jobManagement,
-  'compare/jobber': jobber,
-  'compare/housecall-pro': housecallPro,
-  'compare/servicetitan': serviceTitan,
-  'for/cleaning': cleaning,
-  'for/landscaping': landscaping,
-  'for/roofing': roofing,
+  'job-management': GENERAL_CONFIG,
+  'compare/jobber': compare('jobber', 'JOBBER OR OPS. SEE WHAT FITS YOUR CREW.', 'Start with the price for five people. Then look at the job screen your crew will use.', 'If Jobber already works for your crew, keep that in the decision. Try your essential jobs, scheduling and photo workflow in OPS before switching. Check any integration you rely on separately.'),
+  'compare/housecall-pro': compare('housecall-pro', 'HOUSECALL PRO OR OPS. YOUR CREW, YOUR CALL.', 'Compare the price for five people, with the billing terms in plain sight.', 'List the tools your business relies on, including payments and integrations. Try the jobs, scheduling and photo workflow with your crew. Do not assume identical features because the prices are side by side.'),
+  'compare/servicetitan': compare('servicetitan', 'SERVICETITAN ALTERNATIVE. A CLEAR PRICE FOR YOUR CREW.', 'OPS publishes plans for up to ten people. Start with the numbers, then try it on a real job.', 'ServiceTitan and OPS have different scopes. If you need call-centre operations or a particular enterprise integration, confirm that requirement first. Test your daily crew workflow before replacing an established system.'),
+  'for/cleaning': trade('EVERY CLEAN. A CLEAR PLAN FOR YOUR CREW.', 'Put the property address, visit notes and assigned crew with each job. Keep the photos there too.', { title: 'SEND THE CREW WITH THE DETAILS.', copy: 'Put access instructions and the work to be done in the job notes. Assign the crew and schedule the visit.', why: 'Less back-and-forth before the first clean.' }, { question: 'Can I keep instructions for each property?', answer: 'Yes. Keep the address and job notes with the project, and add site photos. Check the scheduled work with your crew before the visit.' }),
+  'for/landscaping': trade('EVERY PROPERTY. A CLEAR PLAN FOR YOUR CREW.', 'Know which property is next, who is on the job and what needs doing before the trailer leaves the yard.', { title: 'PUT THE PROPERTY ON THE PLAN.', copy: 'Schedule the work, assign the crew and keep site instructions on the job. Progress photos stay with the project.', why: 'The plan travels with the people doing the work.' }, { question: 'Can I organize work across several properties?', answer: 'Yes. Keep each project’s address, notes, scheduled tasks and photos together. Use the schedule to review what is planned across your properties.' }),
+  'for/roofing': trade('EVERY ROOF. A CLEAR PLAN FOR YOUR CREW.', 'The address, work schedule, job notes and site photos together. Less chasing updates from the ground.', { title: 'KEEP THE RECORD WITH THE ROOF.', copy: 'Add tear-off, flashing and finish photos to the project. Keep the job notes alongside the work your crew is doing.', why: 'Find the record when a client asks about the job.' }, { question: 'Can I keep progress photos with each roof?', answer: 'Yes. Add site photos to the project so they stay with that job. Your team’s access follows the permissions set in OPS.' }),
 } as const satisfies Record<string, VariantConfig>
 
 export type PaidPageSlug = keyof typeof PAID_PAGE_CONFIGS
-
-/** The variant id every paid page reports its events under. */
 export const paidVariantId = (slug: PaidPageSlug): string => `paid:${slug}`
+
+export interface ApprovedSection {
+  section: SectionEntry
+  factIds: string[]
+  validUntil: string | null
+}
+
+/** Exact approved sections. A change to any section requires a new content version. */
+export const APPROVED_SECTIONS: Record<string, ApprovedSection> = {}
+for (const [route, config] of Object.entries({ general: GENERAL_CONFIG, ...PAID_PAGE_CONFIGS })) {
+  for (const section of config.sections) {
+    const id = `${route.replaceAll('/', '.')}.${section.type}`
+    APPROVED_SECTIONS[id] = {
+      section,
+      factIds: ['jobs.details', 'jobs.schedule', 'jobs.photos', 'access.web-ios', 'setup.next-job', 'offer.trial-monthly-cad.v1'],
+      validUntil: section.type === 'Hero' && 'comparisonRival' in section.props ? COMPARISON_VALID_UNTIL : null,
+    }
+  }
+}
+// One deliberately narrow future hypothesis; never enrolled automatically.
+APPROVED_SECTIONS['general.Hero.crew-plan'] = {
+  section: hero('YOUR CREW KNOWS THE PLAN. YOU GET BACK TO WORK.', 'Job management for trades crews. Put the address, schedule, job notes and photos in one place.'),
+  factIds: ['jobs.details', 'jobs.schedule', 'jobs.photos'], validUntil: null,
+}
+export const APPROVED_SECTION_CONTENT = Object.fromEntries(Object.entries(APPROVED_SECTIONS).map(([id, entry]) => [id, entry.section]))

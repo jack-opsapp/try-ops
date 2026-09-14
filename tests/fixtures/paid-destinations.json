@@ -1,0 +1,15 @@
+{
+  "source": "ops-web-ads-engine-p2/config/ads/blueprint.json",
+  "sourceSha256": "de30cefd607e272ec1573d0a2e4042bb2deebd3f1caf95344767da4b911efda0",
+  "checkedAt": "2026-09-14",
+  "urls": [
+    "https://try.opsapp.co/",
+    "https://try.opsapp.co/compare/housecall-pro",
+    "https://try.opsapp.co/compare/jobber",
+    "https://try.opsapp.co/compare/servicetitan",
+    "https://try.opsapp.co/for/cleaning",
+    "https://try.opsapp.co/for/landscaping",
+    "https://try.opsapp.co/for/roofing",
+    "https://try.opsapp.co/job-management"
+  ]
+}
