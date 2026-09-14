@@ -1,4 +1,6 @@
+// @vitest-environment node
 import React from 'react'
+import { createRequire } from 'node:module'
 import { describe, expect, it, vi } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { CtaModeProvider } from '@/lib/landing/cta-mode'
@@ -9,8 +11,10 @@ import { SEED_CONFIG_A } from '@/lib/ab/seed-config'
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }))
 
+const { JSDOM } = createRequire(import.meta.url)('jsdom') as { JSDOM: new (html: string) => { window: { document: Document } } }
+
 function documentFor(node: React.ReactNode) {
-  return new DOMParser().parseFromString(renderToStaticMarkup(<CtaModeProvider mode="web-signup">{node}</CtaModeProvider>), 'text/html')
+  return new JSDOM(renderToStaticMarkup(<CtaModeProvider mode="web-signup">{node}</CtaModeProvider>)).window.document
 }
 
 describe('landing conversion contract', () => {
