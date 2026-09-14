@@ -219,14 +219,20 @@ begin
  r:=public.drain_tryops_health_notifications(u,c,20);
  if (r->>'delivered')::integer<>1 then raise exception 'rail delivery failed: %',r;end if;
  select notification_id into receipt from public.tryops_health_notifications where dedupe_key='health-fixture';
- if receipt is null or not exists(select 1 from public.notifications where id=receipt and user_id=u::text and company_id=c::text and type='tryops_experiment_health' and persistent=true and action_url='/admin/analytics' and title<>'UNTRUSTED TITLE') then raise exception 'rail recipient/content receipt mismatch';end if;
- -- A lost delivery receipt can reconcile even after the operator read/resolved it.
- update public.notifications set is_read=true,resolved_at=now() where id=receipt;
+ if receipt is null or not exists(select 1 from public.notifications where id=receipt and user_id=u::text and company_id=c::text and type='tryops_experiment_health' and persistent=false and action_url='/admin/analytics' and title<>'UNTRUSTED TITLE') then raise exception 'rail recipient/content receipt mismatch';end if;
+ -- Mirror NotificationService.dismissAllDismissible: the UI only permits
+ -- standard alerts, and the service scopes unread/nonpersistent rows to actor/company.
+ update public.notifications set is_read=true,resolved_at=now()
+ where user_id=u::text and company_id=c::text and is_read=false and persistent=false;
+ if not found then raise exception 'standard alert cannot be dismissed through real rail predicate';end if;
+ if exists(select 1 from public.notifications where user_id=u::text and company_id=c::text and is_read=false) then raise exception 'acknowledged alert still unread in rail';end if;
+ -- Losing the delivery receipt must not recreate or reopen an acknowledged alert.
  update public.tryops_health_notifications set delivered_at=null,notification_id=null where dedupe_key='health-fixture';
  perform public.drain_tryops_health_notifications(u,c,20);
  if (select count(*) from public.notifications)<>1 then raise exception 'resolved rail replay duplicated';end if;
  if (select notification_id from public.tryops_health_notifications where dedupe_key='health-fixture')<>receipt then raise exception 'lost exact receipt';end if;
- raise notice 'PASS: actual notification helper, exact recipient, fixed copy/action, atomic durable receipt, dedupe after read/resolution';
+ if not exists(select 1 from public.notifications where id=receipt and persistent=false and is_read=true and resolved_at is not null) then raise exception 'replay reopened acknowledged alert';end if;
+ raise notice 'PASS: standard dismissible notification; actual rail dismissal predicate; exact recipient/fixed copy; durable dedupe preserves acknowledgement';
 end $$;
 rollback;
 
@@ -247,7 +253,9 @@ begin
  -- Simulate the next scheduled due run after a transient persistence failure.
  update public.tryops_health_notifications set next_attempt_at=now();
  r:=public.drain_tryops_health_notifications(u,c,20);
- if r->>'delivered'<>'1' or r->>'pending'<>'0' or (select count(*) from public.notifications where action_url is null)<>1 then raise exception 'delivery recovery failed: %',r;end if;
- raise notice 'PASS: invalid nonadmin recipient; notification failure stays pending; retry creates exactly one receipt without unauthorized admin link';
+ if r->>'delivered'<>'1' or r->>'pending'<>'0' or (select count(*) from public.notifications where action_url is null and persistent=false)<>1 then raise exception 'delivery recovery failed: %',r;end if;
+ update public.notifications set is_read=true,resolved_at=now() where user_id=u::text and company_id=c::text and is_read=false and persistent=false;
+ if not found then raise exception 'actionless standard alert cannot be dismissed';end if;
+ raise notice 'PASS: invalid nonadmin recipient; notification failure stays pending; retry creates one dismissible actionless receipt';
 end $$;
 rollback;

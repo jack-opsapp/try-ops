@@ -105,7 +105,8 @@ begin
    body:=case n.reason when 'winner_pending_publication' then 'A trial result is ready. Publication requires review.' when 'completed_cohort_changed' then 'Business evidence changed after this result was recorded.' when 'signup_staging_failed' then 'A signup could not be linked. Hold this experiment result for review.' when 'collection_failed' then 'Landing measurement is incomplete. Hold this experiment result for review.' else 'The experiment worker could not finish. Review the recorded run before continuing.' end;
    select id into receipt from public.notifications where user_id=p_user_id::text and company_id=p_company_id::text and type='tryops_experiment_health' and dedupe_key='tryops-health:v1:'||n.dedupe_key;
    if receipt is null then
-    select notification_id into receipt from public.create_notification_if_new_with_identity(p_user_id,p_company_id,'tryops_experiment_health',title,body,true,case when can_open then '/admin/analytics' else null end,case when can_open then 'Review' else null end,null,null,'tryops-health:v1:'||n.dedupe_key);
+    -- Review alerts use the standard rail acknowledgement/dismissal lifecycle.
+    select notification_id into receipt from public.create_notification_if_new_with_identity(p_user_id,p_company_id,'tryops_experiment_health',title,body,false,case when can_open then '/admin/analytics' else null end,case when can_open then 'Review' else null end,null,null,'tryops-health:v1:'||n.dedupe_key);
    end if;
    if receipt is null then raise exception 'Notification receipt unavailable';end if;
    update public.tryops_health_notifications set delivered_at=now(),notification_id=receipt,attempts=attempts+1,last_error=null where dedupe_key=n.dedupe_key;
@@ -148,7 +149,7 @@ begin
  end if;
  eid:=x.experiment_id;
  insert into public.tryops_collection_failures(idempotency_key,experiment_id,assignment_id,reason) values(p_key,eid,x.id,p_reason) on conflict do nothing;
- insert into public.tryops_health_notifications(dedupe_key,reason,payload) values('tryops:'||coalesce(eid::text,'unknown')||':'||p_reason,p_reason,jsonb_build_object('title','Experiment measurement needs review','persistent',true,'actionUrl','/admin/analytics','actionLabel','Review','experimentId',eid)) on conflict do nothing;
+ insert into public.tryops_health_notifications(dedupe_key,reason,payload) values('tryops:'||coalesce(eid::text,'unknown')||':'||p_reason,p_reason,jsonb_build_object('title','Experiment measurement needs review','persistent',false,'actionUrl','/admin/analytics','actionLabel','Review','experimentId',eid)) on conflict do nothing;
  return jsonb_build_object('status','recorded');
 end $$;
 -- Existing OPS rail can drain this service-only durable outbox. Nothing sends externally.
@@ -304,7 +305,7 @@ begin
  cross join lateral(values('activated',m.activated_at),('paid',m.first_paid_at)) v(milestone,occurred_at)
  where v.occurred_at is not null on conflict do nothing;
  insert into public.tryops_health_notifications(dedupe_key,reason,payload)
- select 'tryops:completed-cohort:'||e.id::text,'completed_cohort_changed',jsonb_build_object('title','Experiment evidence changed','persistent',true,'actionUrl','/admin/analytics','actionLabel','Review','experimentId',e.id)
+ select 'tryops:completed-cohort:'||e.id::text,'completed_cohort_changed',jsonb_build_object('title','Experiment evidence changed','persistent',false,'actionUrl','/admin/analytics','actionLabel','Review','experimentId',e.id)
  from public.tryops_experiments e where e.decision is not null and e.decision->'cohort'->'arms' is distinct from public.tryops_cohort(e.id)->'arms'
  on conflict do nothing;
  return jsonb_build_object('status','reconciled','attempted',attempted);
@@ -336,7 +337,7 @@ begin
  if not found then raise exception 'Stale run';end if;
  if p_error is not null then
  insert into public.tryops_health_notifications(dedupe_key,run_id,reason,payload)
- values('tryops:'||p_error||':'||current_date::text,p_run_id,p_error,jsonb_build_object('title','Experiment needs attention','persistent',true,'actionUrl','/admin/analytics','actionLabel','Review','reason',p_error)) on conflict do nothing;
+ values('tryops:'||p_error||':'||current_date::text,p_run_id,p_error,jsonb_build_object('title','Experiment needs attention','persistent',false,'actionUrl','/admin/analytics','actionLabel','Review','reason',p_error)) on conflict do nothing;
  end if;
  update public.tryops_routes set lease_token=null,lease_until=null where route='/' and lease_token=p_lease_token;
  return jsonb_build_object('status',case when p_error is null then 'succeeded' else 'failed' end);
@@ -432,7 +433,7 @@ begin
  if p_decision->>'status' not in ('inconclusive','invalid','retain_control','promote_challenger') or p_decision->'cohort' is null then raise exception 'Invalid decision';end if;
  update public.tryops_experiments set state=case when p_decision->>'status' in ('inconclusive','invalid') then p_decision->>'status' else 'completed' end,decision=p_decision,decided_at=now() where id=e.id;
  if p_decision->>'status'='promote_challenger' then
- insert into public.tryops_health_notifications(dedupe_key,reason,payload) values('tryops:winner-review:'||e.id::text,'winner_pending_publication',jsonb_build_object('title','Experiment ready for review','persistent',true,'actionUrl','/admin/analytics','actionLabel','Review','experimentId',e.id)) on conflict do nothing;
+ insert into public.tryops_health_notifications(dedupe_key,reason,payload) values('tryops:winner-review:'||e.id::text,'winner_pending_publication',jsonb_build_object('title','Experiment ready for review','persistent',false,'actionUrl','/admin/analytics','actionLabel','Review','experimentId',e.id)) on conflict do nothing;
  end if;
  return p_decision;
 end $$;
