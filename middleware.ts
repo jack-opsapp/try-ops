@@ -1,4 +1,7 @@
+import { withinLandingDeadline } from '@/lib/ab/landing-deadline'
 import { NextResponse } from 'next/server'
+import { ASSIGNMENT_COOKIE, VISITOR_COOKIE, MAX_AGE_SECONDS, hashIdentity, isOpaqueToken, newOpaqueToken, isEligibleRequest } from '@/lib/ab/identity'
+import { getABSupabase } from '@/lib/ab/supabase'
 import type { NextRequest } from 'next/server'
 import {
   FIRST_TOUCH_COOKIE_NAME,
@@ -42,8 +45,39 @@ function attachFirstTouch(request: NextRequest, response: NextResponse): NextRes
   return response
 }
 
-export function middleware(request: NextRequest) {
-  const response = NextResponse.next()
+export async function middleware(request: NextRequest) {
+  const forwarded=new Headers(request.headers)
+  forwarded.delete('x-tryops-excluded')
+  const eligible=isEligibleRequest(request.nextUrl,request.headers)
+  if(!eligible)forwarded.set('x-tryops-excluded','1')
+  let newToken:string|undefined,newVisitor:string|undefined
+  if(eligible && process.env.AB_EXPERIMENTS_ENABLED==='true') {
+    try {
+      const assigned=await withinLandingDeadline(async signal=>{
+      const existing=request.cookies.get(ASSIGNMENT_COOKIE)?.value
+      const db=getABSupabase()
+      const resolved=isOpaqueToken(existing)?await db.rpc('resolve_tryops_assignment',{p_token_hash:await hashIdentity(existing),p_route:'/'}).abortSignal(signal):null
+      if(!resolved?.data&&!resolved?.error) {
+        const visitor=request.cookies.get(VISITOR_COOKIE)?.value
+        const identity=isOpaqueToken(visitor)?visitor:newOpaqueToken()
+        const token=newOpaqueToken()
+        const {data,error}=await db.rpc('assign_tryops_experiment',{p_visitor_hash:await hashIdentity(identity),p_token_hash:await hashIdentity(token),p_route:'/'}).abortSignal(signal)
+        if(!error&&data?.status==='assigned')return {token,visitor:isOpaqueToken(visitor)?undefined:identity}
+      }
+      return undefined
+      })
+      newToken=assigned?.token;newVisitor=assigned?.visitor
+    }catch{forwarded.set('x-tryops-excluded','1');console.error('[tryops] assignment_unavailable')}
+  }
+  if(newToken) {
+    const cookieParts=(forwarded.get('cookie')??'').split(';').filter(c=>!c.trim().startsWith(ASSIGNMENT_COOKIE+'='))
+    cookieParts.push(ASSIGNMENT_COOKIE+'='+newToken)
+    forwarded.set('cookie',cookieParts.join('; '))
+  }
+  const response = NextResponse.next({request:{headers:forwarded}})
+  if(newToken)response.cookies.set(ASSIGNMENT_COOKIE,newToken,{maxAge:MAX_AGE_SECONDS,path:'/',domain:'.opsapp.co',sameSite:'lax',secure:true,httpOnly:true})
+  if(newVisitor)response.cookies.set(VISITOR_COOKIE,newVisitor,{maxAge:MAX_AGE_SECONDS,path:'/',sameSite:'lax',secure:true,httpOnly:true})
+  if(request.nextUrl.searchParams.has('variant')||request.nextUrl.searchParams.has('preview')||request.nextUrl.searchParams.has('qa'))response.cookies.set('ops_qa','1',{maxAge:86400,path:'/',sameSite:'lax',httpOnly:true})
   const variantParam = request.nextUrl.searchParams.get('variant')
   const existingCookie = request.cookies.get('ops_variant')?.value
 

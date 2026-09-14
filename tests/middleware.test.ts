@@ -14,13 +14,13 @@ function setCookies(response: Response): string[] {
   return single ? [single] : [];
 }
 
-describe("middleware first-touch cookie", () => {
-  it("writes the shared first-touch cookie on .opsapp.co with the Google click id", () => {
+describe("middleware first-touch cookie", async () => {
+  it("writes the shared first-touch cookie on .opsapp.co with the Google click id", async () => {
     const request = new NextRequest(
       "https://try.opsapp.co/?gclid=abc&utm_source=google&utm_medium=cpc",
       { headers: { referer: "https://www.google.com/" } }
     );
-    const response = middleware(request);
+    const response = await middleware(request);
     const cookies = setCookies(response);
     const firstTouch = cookies.find((c) => c.startsWith("__ops_first_touch="));
     expect(firstTouch).toBeDefined();
@@ -44,18 +44,18 @@ describe("middleware first-touch cookie", () => {
     expect(payload.anonymous_id).toMatch(/^[0-9a-f-]{36}$/);
   });
 
-  it("captures gbraid and wbraid the same way", () => {
-    const response = middleware(new NextRequest("https://try.opsapp.co/scheduling?gbraid=gb1&wbraid=wb1"));
+  it("captures gbraid and wbraid the same way", async () => {
+    const response = await middleware(new NextRequest("https://try.opsapp.co/scheduling?gbraid=gb1&wbraid=wb1"));
     const firstTouch = setCookies(response).find((c) => c.startsWith("__ops_first_touch="))!;
     const payload = JSON.parse(decodeURIComponent(firstTouch.split(";")[0].slice("__ops_first_touch=".length)));
     expect(payload).toMatchObject({ landing_path: "/scheduling", gbraid: "gb1", wbraid: "wb1" });
   });
 
-  it("does not rewrite an existing first touch", () => {
-    const first = middleware(new NextRequest("https://try.opsapp.co/?gclid=first"));
+  it("does not rewrite an existing first touch", async () => {
+    const first = await middleware(new NextRequest("https://try.opsapp.co/?gclid=first"));
     const firstCookie = setCookies(first).find((c) => c.startsWith("__ops_first_touch="))!;
     const value = firstCookie.split(";")[0].slice("__ops_first_touch=".length);
-    const second = middleware(
+    const second = await middleware(
       new NextRequest("https://try.opsapp.co/?gclid=second", {
         headers: { cookie: `__ops_first_touch=${value}; ops_variant=a` },
       })
@@ -63,27 +63,27 @@ describe("middleware first-touch cookie", () => {
     expect(setCookies(second).find((c) => c.startsWith("__ops_first_touch="))).toBeUndefined();
   });
 
-  it("omits the dotted domain outside opsapp.co so localhost keeps working", () => {
-    const response = middleware(new NextRequest("http://localhost:3000/?gclid=abc"));
+  it("omits the dotted domain outside opsapp.co so localhost keeps working", async () => {
+    const response = await middleware(new NextRequest("http://localhost:3000/?gclid=abc"));
     const firstTouch = setCookies(response).find((c) => c.startsWith("__ops_first_touch="))!;
     expect(firstTouch).toBeDefined();
     expect(firstTouch).not.toMatch(/Domain=/i);
     expect(firstTouch).not.toMatch(/Secure/i);
   });
 
-  it("keeps the A/B variant cookie behaviour", () => {
-    const response = middleware(new NextRequest("https://try.opsapp.co/?variant=b"));
+  it("keeps the A/B variant cookie behaviour", async () => {
+    const response = await middleware(new NextRequest("https://try.opsapp.co/?variant=b"));
     const variant = setCookies(response).find((c) => c.startsWith("ops_variant="));
     expect(variant).toMatch(/^ops_variant=b;/);
   });
 
-  it("matches the paid landing paths on day one", () => {
+  it("matches the paid landing paths on day one", async () => {
     expect(config.matcher).toEqual(
       expect.arrayContaining(["/", "/job-management", "/compare/:path*", "/for/:path*"])
     );
   });
 
-  it("no longer matches the two pages measured demand killed", () => {
+  it("no longer matches the two pages measured demand killed", async () => {
     // /scheduling and /quotes-invoices were planned before the keyword pull.
     // Every term behind them has zero volume, so neither page nor ad group
     // exists and the matcher should not claim otherwise.

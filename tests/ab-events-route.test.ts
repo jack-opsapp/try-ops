@@ -86,18 +86,14 @@ describe('fixed-page telemetry', () => {
 })
 
 describe('real A/B experiments', () => {
-  it.each([
-    ['page_view', 'increment_visitor_count'], ['signup_complete', 'increment_signup_count'],
-    ['element_click', null],
-  ])('preserves %s and its existing counter behavior', async (event_type, rpc) => {
-    expect((await send({ variant_id: experimentId, session_id: 'experiment-visit', event_type })).status).toBe(200)
-    expect(ledger[0].table).toBe('ab_events')
-    expect(ledger[0].row).toMatchObject({ variant_id: experimentId, session_id: 'experiment-visit', event_type })
-    expect(requests.filter((r) => r.path.includes('/rpc/'))).toEqual(rpc ? [{ path: `/rest/v1/rpc/${rpc}`, body: { variant_id: experimentId } }] : [])
+  it.each(['page_view','signup_complete','element_click'])('rejects unsigned browser %s instead of legacy counter writes',async(event_type)=>{
+    expect((await send({variant_id:experimentId,session_id:'visit',event_type})).status).toBe(event_type==='signup_complete'?400:401)
+    expect(requests).toHaveLength(0)
   })
 })
 
 describe('collection boundary', () => {
+  it('rejects diagnostics beyond SQL bounds without poisoning collection',async()=>{for(const field of ['section_name','element_id'])expect((await send({variant_id:experimentId,session_id:'visit',event_type:'section_view',[field]:'x'.repeat(81)})).status).toBe(400);expect(requests).toHaveLength(0)})
   it.each(['localhost', 'try-example.vercel.app', 'try.opsapp.co.example.com'])('does not collect from %s', async (host) => {
     const response = await send({ variant_id: 'paid:job-management', session_id: 'preview', event_type: 'page_view' }, host)
     expect(await response.json()).toEqual({ ok: true, skipped: true })
