@@ -150,9 +150,6 @@ export function LandingPageClient({ config, variantId, assignmentId, ctaMode = '
             assignmentId={assignmentId}
             isInterstitial={isInterstitial}
           >
-            {i > 0 && !isInterstitial && (
-              <div className="border-t border-ops-border-emphasis mx-6 md:mx-6 lg:mx-10" />
-            )}
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             <Component {...(section.props as any)} />
           </SectionTracker>
