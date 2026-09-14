@@ -151,4 +151,3 @@ begin
   return query select v_notification_id, false, v_incident_version;
 end;
 $function$
-

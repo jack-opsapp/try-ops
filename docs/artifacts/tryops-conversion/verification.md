@@ -1,0 +1,9 @@
+# Local conversion rebuild verification — 2026-09-14
+
+Production source15495a1 matches reviewed owner ea1d423. PM reran137tests/14files; full Next build/typecheck and43staticpages passed. Final root and seven-route phone/desktop/browser proof was independently inspected. OPS-Web conversion source818e1aefc is integrated on fetched main adc336307; PM reran94tests/7files and16changed TypeScript files with0diagnostics. Independent QA found no unresolved defect in reviewed scope after eight findings and two PM regression corrections.
+
+Local SQL proof includes121mixedpendingbindings,1000assignments, eight concurrent workers and same-key replay, explicit winner promotion and rollback, and real notification-helper failure/retry/dedupe. The separate reviewer database fixture rolled back its changes and confirmed all22function bodies match the migration. Migration SHA256 is8bd0fe40f9beab1a1a9693264263efc91a8c74d8d5d90fce10995351f043d493.
+
+Full session evidence is retained at `/Users/jacksonsweet/Projects/OPS/docs/artifacts/tryops-conversion-build-2026-09-14/`; its release-readiness.md and qa/review-final.md record exact source, runtime and artifact identities. Web route evidence is committed in its own docs/artifacts/tryops-attribution/. Local test fixtures remain under tests/sql and tests/. The final trailing blank-line cleanup in an existing-helper fixture changes no SQL behavior.
+
+See ../../experiments/operations.md, contract.md and statistical-method.md for operation and release contracts. This is local acceptance only. No production migration, source push/deploy, experiment enrollment, ad-spend change or paid model call occurred. The initial study covers root only; local A/A protocol proof does not claim a live identical-arm study. Existing daily worker cadence and unresolved total-outage measurement limits are explicit in the runbook. Production price mapping and authenticated/business canary remain release checks.
