@@ -1,81 +1,23 @@
 'use client'
-
-import { useEffect, useRef } from 'react'
-
-interface Props {
-  children: React.ReactNode
-  sectionName: string
-  variantId: string
-  isInterstitial?: boolean
-}
-
-export function SectionTracker({ children, sectionName, variantId, isInterstitial }: Props) {
-  const ref = useRef<HTMLDivElement>(null)
-  const entryTimeRef = useRef<number | null>(null)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          entryTimeRef.current = Date.now()
-        } else if (entryTimeRef.current !== null) {
-          const dwell_ms = Date.now() - entryTimeRef.current
-          entryTimeRef.current = null
-          fireEvent('section_view', { section_name: sectionName, dwell_ms })
-        }
-      },
-      { threshold: 0.3 }
-    )
-
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [sectionName, variantId])
-
-  function fireEvent(eventType: string, extra: Record<string, unknown> = {}) {
-    const sessionId = sessionStorage.getItem('ops_ab_session') ?? ''
-    const utmParams = getUTMParams()
-    fetch('/api/ab-events', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        variant_id: variantId,
-        session_id: sessionId,
-        event_type: eventType,
-        device_type: getDeviceType(),
-        referrer: document.referrer || null,
-        ...utmParams,
-        ...extra,
-      }),
-      keepalive: true,
-    }).catch(() => {}) // fire-and-forget
+import { useEffect,useRef } from 'react'
+import { sendDiagnostic } from '@/lib/ab/client-events'
+import { VisibleDwell } from '@/lib/ab/visible-dwell'
+interface Props {children:React.ReactNode;sectionName:string;variantId:string;assignmentId?:string;isInterstitial?:boolean}
+export function SectionTracker({children,sectionName,variantId,assignmentId}:Props) {
+ const ref=useRef<HTMLDivElement>(null)
+ useEffect(()=>{
+  const el=ref.current;if(!el)return
+  const dwell=new VisibleDwell();let inView=false,seen=false
+  const update=(exit=false)=>{
+   const visible=!exit&&inView&&document.visibilityState==='visible'
+   if(visible&&!seen){seen=true;sendDiagnostic(variantId,assignmentId,'section_view',{section_name:sectionName})}
+   const elapsed=dwell.update(visible,performance.now())
+   if(elapsed>0)sendDiagnostic(variantId,assignmentId,'section_dwell',{section_name:sectionName,dwell_ms:elapsed})
   }
-
-  return (
-    <div
-      ref={ref}
-      style={isInterstitial ? { scrollSnapAlign: 'none' } : undefined}
-    >
-      {children}
-    </div>
-  )
-}
-
-function getDeviceType(): 'mobile' | 'tablet' | 'desktop' {
-  const w = window.innerWidth
-  if (w < 768) return 'mobile'
-  if (w < 1024) return 'tablet'
-  return 'desktop'
-}
-
-function getUTMParams() {
-  if (typeof window === 'undefined') return {}
-  const params = new URLSearchParams(window.location.search)
-  return {
-    utm_source: params.get('utm_source'),
-    utm_medium: params.get('utm_medium'),
-    utm_campaign: params.get('utm_campaign'),
-  }
+  const observer=new IntersectionObserver(([entry])=>{inView=entry.isIntersecting;update()},{threshold:.3})
+  const visibility=()=>update(),exit=()=>update(true)
+  observer.observe(el);document.addEventListener('visibilitychange',visibility);window.addEventListener('pagehide',exit)
+  return ()=>{exit();observer.disconnect();document.removeEventListener('visibilitychange',visibility);window.removeEventListener('pagehide',exit)}
+ },[sectionName,variantId,assignmentId])
+ return <div ref={ref}>{children}</div>
 }

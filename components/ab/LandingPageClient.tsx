@@ -12,6 +12,7 @@ import { StickyCTA } from '@/components/landing/StickyCTA'
 import { Footer } from '@/components/landing/Footer'
 import { SectionTracker } from '@/components/ab/SectionTracker'
 import { SECTION_REGISTRY } from '@/lib/ab/registry'
+import { sendDiagnostic } from '@/lib/ab/client-events'
 import { trackABClick } from '@/lib/ab/track-click'
 import { getTutorialRoute } from '@/lib/utils/tutorial-routes'
 import { CtaModeProvider, WEB_SIGNUP_URL, type CtaMode } from '@/lib/landing/cta-mode'
@@ -22,6 +23,7 @@ const APP_STORE_URL = 'https://apps.apple.com/us/app/ops-job-crew-management/id6
 interface Props {
   config: VariantConfig
   variantId: string
+  assignmentId?: string
   /**
    * `app-store` is the organic page. `web-signup` is a paid landing page: one
    * CTA, straight to the web signup, no tutorial detour and no second choice.
@@ -29,7 +31,7 @@ interface Props {
   ctaMode?: CtaMode
 }
 
-export function LandingPageClient({ config, variantId, ctaMode = 'app-store' }: Props) {
+export function LandingPageClient({ config, variantId, assignmentId, ctaMode = 'web-signup' }: Props) {
   const webSignup = ctaMode === 'web-signup'
   const router = useRouter()
   const { trackLandingPageView } = useAnalytics()
@@ -38,13 +40,11 @@ export function LandingPageClient({ config, variantId, ctaMode = 'app-store' }: 
 
   // Capture UTM params, fire page_view to A/B event API, and fire GA page view
   useEffect(() => {
-    // Resolve session ID inline to avoid race with a separate useEffect
-    const existingId = sessionStorage.getItem('ops_ab_session')
-    const sid = existingId ?? crypto.randomUUID()
-    if (!existingId) sessionStorage.setItem('ops_ab_session', sid)
-
-    // Persist variantId so signup flow can attribute the conversion
-    sessionStorage.setItem('ops_ab_variant', variantId)
+    try {
+      sessionStorage.setItem('ops_ab_variant',variantId)
+      if(assignmentId)sessionStorage.setItem('ops_ab_assignment',assignmentId)
+      else sessionStorage.removeItem('ops_ab_assignment')
+    }catch{}
 
     const params = new URLSearchParams(window.location.search)
     const utmSource = params.get('utm_source')
@@ -74,23 +74,12 @@ export function LandingPageClient({ config, variantId, ctaMode = 'app-store' }: 
       utm_content: utmContent,
     })
 
-    // A/B event: page_view
-    const deviceType = window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop'
-    fetch('/api/ab-events', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        variant_id: variantId,
-        session_id: sid,
-        event_type: 'page_view',
-        device_type: deviceType,
-        referrer,
-        utm_source: utmSource,
-        utm_medium: utmMedium,
-        utm_campaign: utmCampaign,
-      }),
-    }).catch(() => {}) // fire-and-forget
-  }, [variantId, setUTMData, trackLandingPageView])
+    sendDiagnostic(variantId,assignmentId,'page_view')
+    let exposed=false
+    const expose=()=>{if(!exposed&&assignmentId&&document.visibilityState==='visible'){exposed=true;sendDiagnostic(variantId,assignmentId,'exposure')}}
+    expose();document.addEventListener('visibilitychange',expose)
+    return ()=>document.removeEventListener('visibilitychange',expose)
+  }, [variantId, assignmentId, setUTMData, trackLandingPageView])
 
   // ── CTA handlers ──────────────────────────────────────────────────────────
 
@@ -101,7 +90,7 @@ export function LandingPageClient({ config, variantId, ctaMode = 'app-store' }: 
     } else if (isMobile()) {
       window.location.href = APP_STORE_URL
     } else {
-      document.getElementById('desktop-download')?.scrollIntoView({ behavior: 'smooth' })
+      window.location.href = APP_STORE_URL
     }
   }, [webSignup])
 
@@ -119,7 +108,7 @@ export function LandingPageClient({ config, variantId, ctaMode = 'app-store' }: 
     } else if (isMobile()) {
       window.location.href = APP_STORE_URL
     } else {
-      document.getElementById('desktop-download')?.scrollIntoView({ behavior: 'smooth' })
+      window.location.href = APP_STORE_URL
     }
   }, [webSignup])
 
@@ -138,25 +127,7 @@ export function LandingPageClient({ config, variantId, ctaMode = 'app-store' }: 
     // = "user"` is what actually honours the setting on these pages.
     <MotionConfig reducedMotion="user">
     <CtaModeProvider mode={ctaMode}>
-    <main className="relative bg-ops-background min-h-screen snap-y snap-mandatory overflow-y-auto overflow-x-hidden h-screen md:h-auto md:overflow-visible md:snap-none">
-      {/* Ambient edge glows */}
-      <div className="pointer-events-none fixed inset-0 z-[990]">
-        <div className="absolute -top-[200px] -left-[200px] w-[600px] h-[600px] rounded-full bg-ops-accent/[0.04] blur-[120px]" />
-        <div className="absolute -top-[100px] -right-[200px] w-[500px] h-[500px] rounded-full bg-ops-accent/[0.03] blur-[100px]" />
-        <div className="absolute -bottom-[200px] -left-[100px] w-[500px] h-[500px] rounded-full bg-ops-accent/[0.03] blur-[100px]" />
-        <div className="absolute -bottom-[100px] -right-[200px] w-[400px] h-[400px] rounded-full bg-ops-accent/[0.04] blur-[120px]" />
-      </div>
-
-      {/* Noise texture overlay */}
-      <div className="noise-overlay">
-        <svg>
-          <filter id="noise">
-            <feTurbulence type="fractalNoise" baseFrequency="0.80" numOctaves="4" stitchTiles="stitch" />
-          </filter>
-          <rect width="100%" height="100%" filter="url(#noise)" />
-        </svg>
-      </div>
-
+    <main className="landing-page">
       <HamburgerMenu
         onDownloadClick={handleDownloadClick}
         onTryClick={webSignup ? undefined : handleTryClick}
@@ -165,7 +136,7 @@ export function LandingPageClient({ config, variantId, ctaMode = 'app-store' }: 
       <StickyCTA
         onDownloadClick={handleStickyDownloadClick}
         onTryClick={webSignup ? undefined : handleStickyTryClick}
-        primaryLabel={webSignup ? 'START FREE' : undefined}
+        primaryLabel={webSignup ? 'START MY FREE TRIAL' : undefined}
       />
 
       {config.sections.map((section, i) => {
@@ -176,6 +147,7 @@ export function LandingPageClient({ config, variantId, ctaMode = 'app-store' }: 
             key={`${section.type}-${i}`}
             sectionName={section.type}
             variantId={variantId}
+            assignmentId={assignmentId}
             isInterstitial={isInterstitial}
           >
             {i > 0 && !isInterstitial && (
