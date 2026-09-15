@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { DemoExperience } from '@/components/demo/DemoExperience'
 import DemoPage from '@/app/demo/page'
 import DemoError from '@/app/demo/error'
+import { renderToString } from 'react-dom/server'
 
 beforeEach(() => {
   sessionStorage.clear()
@@ -12,6 +13,13 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.restoreAllMocks() })
 
 describe('the visitor sample job', () => {
+  it('shows a neutral server state while saved progress is being restored', () => {
+    const html = renderToString(<DemoExperience />)
+    expect(html).toContain('Opening the plan.')
+    expect(html).not.toContain('Ready to assign')
+    expect(html).toContain('href="/demo/start-trial"')
+    expect(html).toContain('Exit demo')
+  })
   it.each([['/for/roofing', '/for/roofing'], ['https://example.com', '/'], ['//example.com', '/']])('exits safely from %s', async (from, destination) => {
     render(await DemoPage({ searchParams: Promise.resolve({ from }) }))
     expect(screen.getByRole('link', { name: 'Exit demo' }).getAttribute('href')).toBe(destination)

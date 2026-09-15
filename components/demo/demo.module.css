@@ -108,8 +108,12 @@
 @keyframes detail-fade { from { opacity: 0; } to { opacity: 1; } }
 @media (max-width: 359px) {
   .demo { --m-canvas-x: var(--m-card-inset); --demo-heading: 24px; }
-  .guide { margin-bottom: var(--m-card-inset); }
+  .stage { padding-top: 0; }
+  .guide { margin-bottom: var(--unit); }
   .context { padding-top: var(--unit); padding-bottom: var(--unit); }
+  .crew, .task { padding-top: var(--unit); padding-bottom: var(--unit); }
+  .identity h2 { margin-bottom: calc(var(--unit) / 2); }
+  .schedule { margin-top: calc(var(--unit) / 2); }
 }
 @media (min-width: 900px) {
   .header { padding: var(--m-card-inset) calc(var(--unit) * 5.5); }
@@ -123,4 +127,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .demo .detail { animation: detail-fade var(--d-hover) var(--ease-smooth) !important; }
+}
+@media (max-height: 480px) {
+  .actionDock { position: static; }
 }

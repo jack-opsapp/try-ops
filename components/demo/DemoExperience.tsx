@@ -25,6 +25,7 @@ function Arrow({ back = false }: { back?: boolean }) {
 /** A local sample only. The real funnel client owns every outbound diagnostic. */
 export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
   const [state, setState] = useState<DemoState>(initialDemoState)
+  const [ready, setReady] = useState(false)
   const current = useRef(state)
   const [resumed, setResumed] = useState(false)
   const [photoFailed, setPhotoFailed] = useState(false)
@@ -58,6 +59,7 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
     const restored = readDemoState(() => window.sessionStorage)
     current.current = restored.state
     setState(restored.state)
+    setReady(true)
     setResumed(restored.resumed)
     if (!restored.available) reportError('storage_unavailable')
     try { window.history.replaceState({ ...window.history.state, opsDemoStep: restored.state.step }, '') } catch { /* Browser navigation restrictions do not block the demo. */ }
@@ -114,6 +116,19 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
     } else report(command, next.step)
   }
 
+  if (!ready) return <div className={styles.demo}>
+    <header className={styles.header}>
+      <span role="img" aria-label="OPS" className={styles.logo} />
+      <a className={styles.quiet} href={exitHref}>Exit demo</a>
+    </header>
+    <main className={styles.recovery} aria-busy="true">
+      <p className={styles.label}>SAMPLE JOB</p>
+      <h1 className={styles.headline}>Your sample job.</h1>
+      <p className={styles.description} role="status">Opening the plan.</p>
+      <a className={styles.trialLink} href={signupHref}>Start my free trial</a>
+    </main>
+  </div>
+
   const completed = state.progress === 'completed'
   const copy = COPY[state.step]
   const signup = () => report('signup_clicked', state.step)
@@ -149,7 +164,7 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
             </div>
 
             <div className={styles.identity}>
-              <h2>Cedar siding repair</h2>
+              <h2>Siding repair</h2>
               <p className={styles.address}>184 Cedar Lane</p>
               <div className={styles.schedule}><span>Tomorrow</span><span className={styles.time}>8:00 AM</span></div>
             </div>
