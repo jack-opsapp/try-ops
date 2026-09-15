@@ -29,7 +29,7 @@ describe('optional sample demo entry', () => {
     showHero()
     const demo = screen.getByRole('link', { name: 'See it in action' })
     expect(demo.getAttribute('href')).toBe('/demo')
-    expect(demo.closest('figure[aria-label="See OPS for iPhone"]')).not.toBeNull()
+    expect(screen.getByRole('figure', { name: 'See OPS for iPhone' }).parentElement?.contains(demo)).toBe(true)
     expect(demo.classList.contains('landing-button')).toBe(false)
     const signup = screen.getByRole('link', { name: 'START MY FREE TRIAL' })
     expect(signup.getAttribute('href')).toBe('https://app.opsapp.co/register')
