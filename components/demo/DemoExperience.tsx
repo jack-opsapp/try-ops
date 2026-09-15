@@ -195,7 +195,7 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
                       <div className={styles.note}><span className={styles.label}>JOB NOTE</span><p>Use the side gate. Replacement panels are stacked beside the shed.</p></div>
                       <figure className={styles.photo}>
                         {photoFailed ? <div className={styles.photoFallback}><span>Sample photo unavailable.</span><span>The job details still work.</span></div> :
-                          <Image src="/images/demo/site-siding-damage.jpg" width={1200} height={655} sizes="(max-width: 600px) calc(100vw - 72px), 480px" alt="Damaged metal siding to replace; site reference before work" onError={() => { setPhotoFailed(true); reportError('asset_unavailable') }} />}
+                          <Image priority src="/images/demo/site-siding-damage.jpg" width={1200} height={655} sizes="(max-width: 600px) calc(100vw - 72px), 480px" alt="Damaged metal siding to replace; site reference before work" onError={() => { setPhotoFailed(true); reportError('asset_unavailable') }} />}
                         <figcaption>Site reference · before work</figcaption>
                       </figure>
                     </div>
