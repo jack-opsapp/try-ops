@@ -131,3 +131,7 @@
 @media (max-height: 480px) {
   .actionDock { position: static; }
 }
+@media (max-height: 700px) {
+  .demo[data-demo-step='crew'] .actionDock,
+  .demo[data-demo-step='complete'] .actionDock { position: static; }
+}
