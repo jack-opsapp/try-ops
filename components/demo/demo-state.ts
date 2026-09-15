@@ -33,8 +33,9 @@ export function restoreDemoState(raw: string | null): DemoState {
     const value: unknown = JSON.parse(raw ?? 'null')
     if (!value || typeof value !== 'object') return initialDemoState()
     const { version, step, progress } = value as Record<string, unknown>
-    if (version !== DEMO_VERSION || !['assign', 'crew', 'complete'].includes(String(step))
-      || !['unassigned', 'assigned', 'completed'].includes(String(progress))
+    if (version !== DEMO_VERSION || typeof step !== 'string' || typeof progress !== 'string'
+      || !['assign', 'crew', 'complete'].includes(step)
+      || !['unassigned', 'assigned', 'completed'].includes(progress)
       || (step === 'crew' && progress === 'unassigned')
       || (step === 'complete' && progress !== 'completed')) return initialDemoState()
     return { version: DEMO_VERSION, step: step as DemoStep, progress: progress as DemoState['progress'] }

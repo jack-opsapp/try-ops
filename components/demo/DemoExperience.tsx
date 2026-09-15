@@ -61,8 +61,7 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
     setResumed(restored.resumed)
     if (!restored.available) reportError('storage_unavailable')
     try { window.history.replaceState({ ...window.history.state, opsDemoStep: restored.state.step }, '') } catch { /* Browser navigation restrictions do not block the demo. */ }
-    report('started', restored.state.step)
-    if (restored.state.step === 'crew') report('crew_viewed', 'crew')
+    if (!restored.resumed) report('started', 'assign')
   }, [report, reportError])
 
   useEffect(() => {
@@ -79,7 +78,7 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
       setState(next)
       setResumed(false)
       persist(next)
-      report('back', next.step)
+      if (STEPS.indexOf(next.step) < STEPS.indexOf(previous.step)) report('back', next.step)
     }
     window.addEventListener('popstate', onPopState)
     return () => window.removeEventListener('popstate', onPopState)

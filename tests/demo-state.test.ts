@@ -36,6 +36,8 @@ describe('sample job state', () => {
   })
   it.each([
     null, '{broken', '{}', 'null', '[]',
+    '{"version":"crew-job-v1","step":["crew"],"progress":"assigned"}',
+    '{"version":"crew-job-v1","step":"crew","progress":["assigned"]}',
     '{"version":"old","step":"complete","progress":"completed"}',
     '{"version":"crew-job-v1","step":"complete","progress":"unassigned"}',
     '{"version":"crew-job-v1","step":"crew","progress":"unassigned"}',

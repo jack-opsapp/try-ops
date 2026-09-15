@@ -47,6 +47,7 @@
 .quiet:hover { color: var(--text); background: var(--surface-hover); }
 .quiet:active { background: var(--surface-active); }
 .stage { max-width: calc(var(--unit) * 62); margin: auto; padding: var(--unit) var(--m-canvas-x) max(var(--m-section-gap), env(safe-area-inset-bottom)); }
+.recovery { max-width: calc(var(--unit) * 62); margin: auto; padding: calc(var(--unit) * 6) var(--m-canvas-x); }
 .guide { margin-bottom: var(--m-section-gap); }
 .eyebrow { display: none; }
 .headline { font-family: var(--font-cakemono); font-weight: var(--demo-light); font-size: var(--demo-heading); line-height: var(--demo-heading-height); text-transform: uppercase; letter-spacing: var(--font-cakemono-tracking); margin: 0; text-wrap: balance; }
