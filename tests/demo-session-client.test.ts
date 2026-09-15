@@ -1,7 +1,18 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { createDemoDelivery } from '../lib/demo/client'
 
 describe('shared demo session establishment', () => {
+  it('bounds a session response whose headers arrive but body never finishes', async () => {
+    vi.useFakeTimers()
+    try {
+      let attempts=0
+      const transport=createDemoDelivery(async()=>{attempts++;return new Response(new ReadableStream(),{status:200})},async()=>{})
+      const pending=transport.initialize()
+      await vi.advanceTimersByTimeAsync(5000)
+      expect(await pending).toBe('unavailable')
+      expect(attempts).toBe(3)
+    } finally { vi.useRealTimers() }
+  })
   it('coalesces StrictMode/effect and rapid event races into one successful session request', async () => {
     const requests: string[]=[]
     const transport=createDemoDelivery(async (url) => {

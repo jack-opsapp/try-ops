@@ -26,11 +26,14 @@ export async function deliverDemoEvent(
 
 /** A hard deadline also covers implementations that ignore AbortController. */
 async function sendWithDeadline(send: typeof fetch, input: RequestInfo | URL, init: RequestInit): Promise<Response> {
+  return withDeliveryDeadline(signal => send(input, { ...init, signal }))
+}
+async function withDeliveryDeadline<T>(operation: (signal: AbortSignal | undefined) => Promise<T>): Promise<T> {
   const controller = typeof AbortController === 'undefined' ? undefined : new AbortController()
   let timer: ReturnType<typeof setTimeout> | undefined
   try {
     return await Promise.race([
-      send(input, { ...init, signal: controller?.signal }),
+      operation(controller?.signal),
       new Promise<never>((_, reject) => { timer = setTimeout(() => { controller?.abort(); reject(new Error('timeout')) }, 1500) }),
     ])
   } finally { clearTimeout(timer) }
@@ -45,13 +48,16 @@ export function createDemoDelivery(
   async function establish(): Promise<DemoDelivery> {
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
-        const response = await sendWithDeadline(send, '/api/demo/session', {
-          method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: '{}',
+        const { response, data } = await withDeliveryDeadline(async signal => {
+          const response = await send('/api/demo/session', {
+          method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: '{}', signal,
+          })
+          const data = response.ok && response.status !== 204 ? await response.json() : null
+          return { response, data }
         })
         if (response.status === 204) return 'excluded'
         if (response.ok) {
-          const data = await response.json()
-          if (data.status === 'ready') return 'recorded'
+          if (data?.status === 'ready') return 'recorded'
         } else if (response.status < 500 && response.status !== 429 && response.status !== 409) return 'rejected'
       } catch { /* Privacy, offline and server failures are optional diagnostics. */ }
       if (attempt < 2) await pause(150 * (attempt + 1))
