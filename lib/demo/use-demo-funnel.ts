@@ -1,28 +1,27 @@
 'use client'
 
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect } from 'react'
 import { DEMO_SIGNUP_HREF, type DemoEvent } from './contracts'
-import { deliverDemoEvent } from './client'
+import { createDemoDelivery } from './client'
 import { shouldCollectProductionAnalytics } from '@/lib/analytics/production-boundary'
+
+// Document-scoped, so React StrictMode remounts cannot race two bearer creations.
+let delivery: ReturnType<typeof createDemoDelivery> | undefined
+const getDelivery = () => delivery ??= createDemoDelivery()
 
 /** Call track at semantic action boundaries. Never await it to advance the demo. */
 export function useDemoFunnel() {
-  const ready = useRef<Promise<unknown>>(Promise.resolve())
-  const pending = useRef(0)
   useEffect(() => {
     if (!shouldCollectProductionAnalytics()) return
-    ready.current = fetch('/api/demo/session', {
-      method: 'POST', credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' }, body: '{}',
-      signal: AbortSignal.timeout(1500),
+    void getDelivery().initialize().then(result => {
+      if (result === 'unavailable') console.warn('[demo] session_unavailable')
     }).catch(() => undefined)
   }, [])
   const track = useCallback((event: DemoEvent): void => {
-    if (!shouldCollectProductionAnalytics() || pending.current >= 32) return
-    pending.current++
-    void ready.current.then(() => deliverDemoEvent(event)).then(result => {
-      if (result === 'unavailable') console.warn('[demo] collection_unavailable')
-    }).catch(() => undefined).finally(() => { pending.current-- })
+    if (!shouldCollectProductionAnalytics()) return
+    void getDelivery().track(event).then(result => {
+      if (result === 'session_unavailable' || result === 'unavailable' || result === 'rejected') console.warn('[demo] collection_failure', { reason: result })
+    }).catch(() => undefined)
   }, [])
   return { signupHref: DEMO_SIGNUP_HREF, track }
 }
