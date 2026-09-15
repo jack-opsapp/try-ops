@@ -78,6 +78,8 @@ export async function middleware(request: NextRequest) {
   if(newToken)response.cookies.set(ASSIGNMENT_COOKIE,newToken,{maxAge:MAX_AGE_SECONDS,path:'/',domain:'.opsapp.co',sameSite:'lax',secure:true,httpOnly:true})
   if(newVisitor)response.cookies.set(VISITOR_COOKIE,newVisitor,{maxAge:MAX_AGE_SECONDS,path:'/',sameSite:'lax',secure:true,httpOnly:true})
   if(request.nextUrl.searchParams.has('variant')||request.nextUrl.searchParams.has('preview')||request.nextUrl.searchParams.has('qa'))response.cookies.set('ops_qa','1',{maxAge:86400,path:'/',sameSite:'lax',httpOnly:true})
+  // Demo visits capture first touch without the retired tutorial split.
+  if (request.nextUrl.pathname.startsWith('/demo')) return attachFirstTouch(request, response)
   const variantParam = request.nextUrl.searchParams.get('variant')
   const existingCookie = request.cookies.get('ops_variant')?.value
 
@@ -110,6 +112,7 @@ export const config = {
     '/tutorial-interactive',
     '/signup/:path*',
     '/download',
+    '/demo/:path*',
     // Paid landing pages — one per Google ad group. The first-touch cookie has
     // to be written on arrival or the click id never reaches the signup.
     // /scheduling and /quotes-invoices are gone: measured demand showed the
