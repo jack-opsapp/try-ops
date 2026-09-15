@@ -51,7 +51,7 @@ describe('sample job state', () => {
     const assigned = transitionDemo(initialDemoState(), 'assign')
     expect(saveDemoState(() => storage, assigned)).toBe(true)
     expect(readDemoState(() => storage)).toEqual({ state: assigned, available: true, resumed: true })
-    expect([...values.values()][0]).not.toContain('Cedar')
+    expect(Array.from(values.values())[0]).not.toContain('Cedar')
   })
   it('works when reading or writing browser storage throws', () => {
     const blocked = () => { throw new Error('Storage blocked') }

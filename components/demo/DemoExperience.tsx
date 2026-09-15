@@ -1,17 +1,29 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import Image from 'next/image'
+import { LazyMotion, domMax, m } from 'framer-motion'
 import { useDemoFunnel } from '@/lib/demo/use-demo-funnel'
 import { type DemoEvent, type DemoStep } from '@/lib/demo/contracts'
 import { initialDemoState, readDemoState, saveDemoState, transitionDemo, type DemoCommand, type DemoState } from './demo-state'
 import styles from './demo.module.css'
 
 const COPY = {
-  assign: { title: 'Put tomorrow’s job in their hands.', description: 'Assign the sample crew. See their plan.' },
-  crew: { title: 'The plan is in their hands.', description: 'Try marking the sample task done.' },
-  complete: { title: 'See what’s done.', description: 'Your crew updates the task. You see the progress.' },
+  assign: { title: 'Put the plan\nin their hands.', description: 'Assign the sample crew. See their plan.' },
+  crew: { title: 'The plan. On site.', description: 'Try marking the sample task done.' },
+  complete: { title: 'Done on site.\nSeen in the office.', description: 'Your crew updates the task. You see the progress.' },
 } as const
+// DESIGN.md motion: position only, --d-flip and canonical easing.
+const HANDOFF = { duration: 0.35, ease: [0.22, 1, 0.36, 1] as const }
+const REDUCED_QUERY = '(prefers-reduced-motion: reduce)'
+function subscribeMotion(listener: () => void) {
+  const media = window.matchMedia?.(REDUCED_QUERY)
+  media?.addEventListener('change', listener)
+  return () => media?.removeEventListener('change', listener)
+}
+function reducedSnapshot() { return window.matchMedia?.(REDUCED_QUERY).matches ?? false }
+function serverMotionSnapshot() { return true }
+
 const STEPS: DemoStep[] = ['assign', 'crew', 'complete']
 
 function Check({ className = '' }: { className?: string }) {
@@ -24,9 +36,11 @@ function Arrow({ back = false }: { back?: boolean }) {
 
 /** A local sample only. The real funnel client owns every outbound diagnostic. */
 export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
+  const reducedMotion = useSyncExternalStore(subscribeMotion, reducedSnapshot, serverMotionSnapshot)
   const [state, setState] = useState<DemoState>(initialDemoState)
   const [ready, setReady] = useState(false)
   const current = useRef(state)
+  const [handoff, setHandoff] = useState(false)
   const [resumed, setResumed] = useState(false)
   const [photoFailed, setPhotoFailed] = useState(false)
   const [direction, setDirection] = useState<'forward' | 'back'>('forward')
@@ -76,6 +90,7 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
       const next = { ...previous, step: requested as DemoStep }
       current.current = next
       focusNext.current = true
+      setHandoff(true)
       setDirection(STEPS.indexOf(next.step) < STEPS.indexOf(previous.step) ? 'back' : 'forward')
       setState(next)
       setResumed(false)
@@ -99,6 +114,7 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
     if (next === previous) return
     current.current = next // Rapid repeated clicks see the new state before React paints.
     focusNext.current = true
+    setHandoff(true)
     setDirection(command === 'back' || command === 'restart' ? 'back' : 'forward')
     setState(next)
     setResumed(false)
@@ -137,21 +153,24 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
     : state.step === 'crew' ? 'Crew plan open. Address, job note and site reference are available.' : 'Sample job ready to assign.'
 
   return (
-    <div className={styles.demo} data-demo-step={state.step}>
+    <div className={styles.demo} data-demo-step={state.step} data-direction={direction} data-handoff={handoff}>
       <header className={styles.header}>
         <span role="img" aria-label="OPS" className={styles.logo} />
         <a className={styles.quiet} href={exitHref} onClick={() => report('exit', state.step)}>Exit demo</a>
       </header>
 
-      <main className={styles.stage}>
+      <LazyMotion features={domMax} strict>
+      <main className={styles.stage} data-motion={reducedMotion ? 'reduced' : 'full'}>
         <section className={styles.guide} aria-labelledby="demo-heading">
-          <div className={styles.eyebrow}>A JOB. A CREW. A CLEAR PLAN.</div>
-          <h1 id="demo-heading" ref={heading} tabIndex={-1} className={styles.headline}>{copy.title}</h1>
-          <p className={styles.description}>{copy.description}</p>
+          <div>
+            <div className={styles.eyebrow}>A JOB. A CREW. A CLEAR PLAN.</div>
+            <h1 id="demo-heading" ref={heading} tabIndex={-1} className={styles.headline}>{copy.title}</h1>
+            <p className={styles.description}>{copy.description}</p>
+          </div>
           <ol className={styles.steps} aria-label="Demo progress">
             {STEPS.map((step, index) => <li key={step} aria-current={state.step === step ? 'step' : undefined}>
               <span className={styles.stepNumber}>0{index + 1}</span>
-              <span>{['Assign', 'Crew', 'Done'][index]}</span>
+              <span>{['Owner', 'Crew', 'Owner'][index]}<small>{['Assign the job', 'Work the plan', 'See the update'][index]}</small></span>
             </li>)}
           </ol>
         </section>
@@ -162,46 +181,38 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
               <span key={state.step} className={styles.contextName}>{state.step === 'crew' ? 'CREW’S VIEW · PETE' : 'OWNER’S VIEW'}</span>
               <span className={styles.sample}>SAMPLE JOB</span>
             </div>
-
-            <div className={styles.identity}>
-              <h2>Siding repair</h2>
-              <p className={styles.address}>184 Cedar Lane</p>
-              <div className={styles.schedule}><span>Tomorrow</span><span className={styles.time}>8:00 AM</span></div>
-            </div>
-
-            <div className={styles.crew}>
-              <div className={styles.avatars} aria-hidden="true"><span>P</span><span>N</span></div>
-              <div><span className={styles.crewNames}>Pete + Nick</span><span className={styles.crewStatus}>{state.progress === 'unassigned' ? 'Ready to assign' : 'Assigned crew'}</span></div>
-              {state.progress !== 'unassigned' && <Check className={styles.assignedCheck} />}
-            </div>
-
-            <div key={state.step} className={styles.detail} data-direction={direction}>
-              {state.step === 'complete' ? (
-                <div className={styles.receipt}>
-                  <div className={styles.receiptTitle}><Check /><span>SAMPLE TASK COMPLETE</span></div>
+            {/* Layout follows role; only the persistent identity/task translate.
+                No exit queue: removed controls disappear in the same state commit. */}
+            <div className={styles.workspace} data-role={state.step === 'crew' ? 'crew' : 'owner'}>
+              <m.div layout={reducedMotion ? false : 'position'} transition={{ layout: HANDOFF }} className={styles.identity}>
+                <h2>Siding repair</h2>
+                <p className={styles.address}>184 Cedar Lane</p>
+              </m.div>
+              <div key={`schedule-${state.step}`} className={styles.schedule}>
+                <span className={styles.label}>Tomorrow</span>
+                {state.step === 'crew' && <span className={styles.fieldCrew}>Pete + Nick</span>}
+                <span className={styles.time}>8:00 <small>AM</small></span>
+              </div>
+              {state.step === 'crew' && <figure className={styles.photo} key="site-reference">
+                {photoFailed ? <div className={styles.photoFallback}><span>Sample photo unavailable.</span><span>The job details still work.</span></div> :
+                  <Image priority src="/images/demo/site-siding-damage.jpg" width={1200} height={655} sizes="(min-width: 1000px) 640px, (min-width: 700px) 600px, calc(100vw - 40px)" alt="Damaged metal siding to replace; site reference before work" onError={() => { setPhotoFailed(true); reportError('asset_unavailable') }} />}
+                <figcaption>Site reference · before work</figcaption>
+              </figure>}
+              {state.step === 'crew' && <div className={styles.note}><span className={styles.label}>JOB NOTE</span><p>Use the side gate. Replacement panels are stacked beside the shed.</p></div>}
+              <m.div layout={reducedMotion ? false : 'position'} transition={{ layout: HANDOFF }} className={styles.task} data-complete={completed}>
+                {completed && <div className={styles.taskMarker} aria-hidden="true"><Check /></div>}
+                <div className={styles.taskContent}>
+                  <span className={styles.label}>{state.step === 'complete' ? 'SAMPLE TASK COMPLETE' : 'TASK'}</span>
                   <h3>Replace damaged siding panels</h3>
-                  <p>Pete marked the task done.</p>
-                  <div className={styles.ownerUpdate}><span>Task status</span><span className={styles.done}>COMPLETED</span></div>
+                  {completed && state.step !== 'complete' && <span className={styles.done}>COMPLETED</span>}
+                  {state.step === 'complete' && <p className={styles.ownerUpdate}>Pete marked the task done.</p>}
                 </div>
-              ) : (
-                <>
-                  <div className={styles.task}>
-                    <span className={styles.label}>TASK</span>
-                    <h3>Replace damaged siding panels</h3>
-                    {completed && <span className={styles.done}>COMPLETED</span>}
-                  </div>
-                  {state.step === 'crew' && (
-                    <div className={styles.crewDetails}>
-                      <div className={styles.note}><span className={styles.label}>JOB NOTE</span><p>Use the side gate. Replacement panels are stacked beside the shed.</p></div>
-                      <figure className={styles.photo}>
-                        {photoFailed ? <div className={styles.photoFallback}><span>Sample photo unavailable.</span><span>The job details still work.</span></div> :
-                          <Image priority src="/images/demo/site-siding-damage.jpg" width={1200} height={655} sizes="(max-width: 600px) calc(100vw - 72px), 480px" alt="Damaged metal siding to replace; site reference before work" onError={() => { setPhotoFailed(true); reportError('asset_unavailable') }} />}
-                        <figcaption>Site reference · before work</figcaption>
-                      </figure>
-                    </div>
-                  )}
-                </>
-              )}
+              </m.div>
+              {state.step !== 'crew' && <div key={`crew-${state.step}`} className={styles.crew}>
+                <div className={styles.avatars} aria-hidden="true"><span>P</span><span>N</span></div>
+                <div><span className={styles.crewNames}>Pete + Nick</span><span className={styles.crewStatus}>{state.progress === 'unassigned' ? 'Ready to assign' : 'Assigned crew'}</span></div>
+                {state.progress !== 'unassigned' && <Check className={styles.assignedCheck} />}
+              </div>}
             </div>
           </article>
 
@@ -222,6 +233,7 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
           {resumed && <p className={styles.resume}>Sample demo resumed.</p>}
         </div>
       </main>
+      </LazyMotion>
       <div className={styles.srOnly} role="status" aria-live="polite" aria-atomic="true">{announcement}</div>
     </div>
   )

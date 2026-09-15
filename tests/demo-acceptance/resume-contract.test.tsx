@@ -50,7 +50,7 @@ describe('independent persisted-demo acceptance', () => {
     ])
     for (const event of events) expect(parseDemoEvent({ ...event, version: DEMO_VERSION,
       eventId: 'bc2f9060-d8fa-41b1-a7da-8357b0625042' })).not.toBeNull()
-    fireEvent.click(screen.getByRole('button', { name: 'Back', exact: true }))
+    fireEvent.click(screen.getByRole('button', { name: 'Back' }))
     fireEvent.click(screen.getByRole('button', { name: 'View completion' }))
     expect(diagnostics.track.mock.calls.filter(([event]) => event.action === 'task_completed')).toHaveLength(1)
   })
