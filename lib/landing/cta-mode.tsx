@@ -75,14 +75,8 @@ export function useCtaHandlers(section: string): CtaHandlers {
   }, [mode, section])
 
   const secondary = useCallback(() => {
-    trackABClick(section, 'try_btn')
-    const variant =
-      document.cookie
-        .split(';')
-        .find((c) => c.trim().startsWith('ops_variant='))
-        ?.split('=')[1]
-        ?.trim() || 'a'
-    router.push(getTutorialRoute(variant))
+    try { trackABClick(section, 'try_btn') } catch { /* Optional diagnostics. */ }
+    router.push(getTutorialRoute('a'))
   }, [router, section])
 
   return { mode, primary, secondary: mode === 'web-signup' ? null : secondary }

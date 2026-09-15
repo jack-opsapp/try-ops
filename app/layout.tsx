@@ -70,7 +70,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <script src="https://accounts.google.com/gsi/client" async defer />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
