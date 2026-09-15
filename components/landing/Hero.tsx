@@ -21,10 +21,12 @@ export function Hero({ headline, subtext, comparisonRival }: HeroProps) {
         {comparisonRival && <ComparisonPreview rival={comparisonRival} />}
         <div className="hero-actions"><PrimaryAction section="Hero" />{secondary && <button type="button" className="landing-button landing-button-secondary" onClick={secondary}>{APPROVED_CTA_LABELS.tutorial}</button>}</div>
         <p className="hero-offer"><span className="landing-number">{APPROVED_OFFER.trialDays}</span> days free. No credit card.</p>
+      </div>
+      <ProductProof />
+      <div className="hero-price-details">
         <p className="hero-price">Plans from <span className="landing-number">${APPROVED_OFFER.plans[0].monthly} {APPROVED_OFFER.currency}/month</span> for up to <span className="landing-number">{APPROVED_OFFER.plans[0].seats}</span> people.</p>
         <a className="hero-details-link" href="#pricing">See all crew sizes</a>
       </div>
-      <ProductProof />
     </div>
   </section>
 }
