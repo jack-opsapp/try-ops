@@ -14,9 +14,6 @@ export function ProductProof() {
   const demoHref = demoDestination({ from: pathname ?? undefined })
   return <div className="product-proof">
     <div className="proof-heading"><span className="landing-label">IN YOUR CREW’S HANDS</span><a className="proof-full-link" href={screen.src} target="_blank" rel="noreferrer">View full screenshot<span className="sr-only"> of {view === 'ios.schedule' ? 'the schedule' : 'the job board'}</span></a></div>
-    <a className="proof-demo-link" href={demoHref} onClick={() => {
-      try { trackABClick('Hero', 'demo_link') } catch { /* Optional diagnostics never cancel native navigation. */ }
-    }}>{APPROVED_CTA_LABELS.demo}</a>
     <figure className="proof-stage" aria-label="See OPS for iPhone">
       <div className="proof-screen"><Image src={screen.src} alt={screen.alt} width={screen.width} height={screen.height} sizes="(max-width: 800px) calc(100vw - 48px), (max-width: 1280px) 44vw, 536px" priority /></div>
       <figcaption>
@@ -28,5 +25,8 @@ export function ProductProof() {
       <button type="button" aria-pressed={view === 'ios.schedule'} onClick={() => setView('ios.schedule')}>Schedule</button>
       <button type="button" aria-pressed={view === 'ios.job-board'} onClick={() => setView('ios.job-board')}>Job board</button>
     </div>
+    <a className="proof-demo-link" href={demoHref} onClick={() => {
+      try { trackABClick('Hero', 'demo_link') } catch { /* Optional diagnostics never cancel native navigation. */ }
+    }}>{APPROVED_CTA_LABELS.demo}</a>
   </div>
 }
