@@ -46,6 +46,7 @@
 .hero-details-link { display: inline-block; margin-top: calc(var(--unit) * 1.5); font: 400 var(--landing-small)/1.5 var(--font-mohave); text-decoration: underline; }
 .product-proof { margin: 0; width: 100%; max-width: calc(var(--unit) * 50); justify-self: end; }
 .proof-heading { display: flex; justify-content: space-between; gap: var(--unit); margin-bottom: calc(var(--unit) * 1.5); }
+.proof-demo-link { display: inline-flex; align-items: center; min-height: calc(var(--unit) * 5.5); margin-bottom: var(--unit); font: 400 var(--landing-body)/1.5 var(--font-mohave); text-decoration: underline; }
 .proof-options { display: flex; border: var(--landing-hairline) solid var(--line); border-radius: var(--r-btn); margin-bottom: calc(var(--unit) * 2); }
 .proof-options button { min-height: calc(var(--unit) * 6); flex: 1; padding: calc(var(--unit) * 1.5) var(--unit); background: transparent; color: var(--text-2); font: 400 var(--landing-body)/1.2 var(--font-mohave); transition: background var(--d-hover) var(--ease-smooth); border-radius: var(--r-btn); }
 .proof-options button[aria-pressed='true'] { color: var(--text); background: var(--surface-active); }

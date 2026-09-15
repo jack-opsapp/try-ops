@@ -9,7 +9,7 @@ import { PAID_PAGE_CONFIGS } from '@/lib/landing/page-configs'
 import { isComparisonCurrent, COMPARISON_VALID_UNTIL } from '@/lib/landing/content-registry'
 import { trackABClick } from '@/lib/ab/track-click'
 
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }))
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }), usePathname: () => '/' }))
 vi.mock('@/lib/hooks/useAnalytics', () => ({ useAnalytics: () => ({ trackLandingPageView: vi.fn() }) }))
 vi.mock('@/lib/stores/onboarding-store', () => ({ useOnboardingStore: (selector: (s: Record<string, unknown>) => unknown) => selector({ setUTMData: vi.fn(), setTutorialStartTime: vi.fn() }) }))
 vi.mock('@/lib/ab/track-click', () => ({ trackABClick: vi.fn() }))

@@ -9,7 +9,7 @@ import { PricingSection } from '@/components/landing/PricingSection'
 import { PAID_PAGE_CONFIGS } from '@/lib/landing/page-configs'
 import { SEED_CONFIG_A } from '@/lib/ab/seed-config'
 
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }))
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }), usePathname: () => '/' }))
 
 const { JSDOM } = createRequire(import.meta.url)('jsdom') as { JSDOM: new (html: string) => { window: { document: Document } } }
 

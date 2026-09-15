@@ -50,7 +50,8 @@ describe('paid landing page configs', () => {
 
   it.each(entries)('%s asks for exactly one thing', (slug, config) => {
     // One Hero and one ClosingCTA — the sticky bar repeats the same action, and
-    // web-signup mode strips every secondary button.
+    // web-signup mode strips every competing primary/secondary CTA button.
+    // Product proof may offer a quiet native sample-demo link; it never replaces signup.
     const types = config.sections.map((s) => s.type)
     expect(types.filter((t) => t === 'Hero'), slug).toHaveLength(1)
     expect(types.filter((t) => t === 'ClosingCTA'), slug).toHaveLength(1)

@@ -2,13 +2,21 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { APPROVED_IMAGES } from '@/lib/landing/content-registry'
+import { usePathname } from 'next/navigation'
+import { APPROVED_CTA_LABELS, APPROVED_IMAGES } from '@/lib/landing/content-registry'
+import { demoDestination } from '@/lib/demo/navigation'
+import { trackABClick } from '@/lib/ab/track-click'
 
 export function ProductProof() {
   const [view, setView] = useState<'ios.schedule' | 'ios.job-board'>('ios.schedule')
   const screen = APPROVED_IMAGES[view]
+  const pathname = usePathname()
+  const demoHref = demoDestination({ from: pathname ?? undefined })
   return <figure className="product-proof" aria-label="See OPS for iPhone">
     <div className="proof-heading"><span className="landing-label">IN YOUR CREW’S HANDS</span><span className="landing-label">OPS / iPHONE</span></div>
+    <a className="proof-demo-link" href={demoHref} onClick={() => {
+      try { trackABClick('Hero', 'demo_link') } catch { /* Optional diagnostics never cancel native navigation. */ }
+    }}>{APPROVED_CTA_LABELS.demo}</a>
     <div className="proof-options" aria-label="Product screenshots">
       <button type="button" aria-pressed={view === 'ios.schedule'} onClick={() => setView('ios.schedule')}>Schedule</button>
       <button type="button" aria-pressed={view === 'ios.job-board'} onClick={() => setView('ios.job-board')}>Job board</button>

@@ -1,5 +1,5 @@
 /** Approved product facts. A generator selects references; it cannot add claims. */
-export const CONTENT_REGISTRY_VERSION = 'tryops-content:2026-09-14.v1'
+export const CONTENT_REGISTRY_VERSION = 'tryops-content:2026-09-14.v2'
 export const CONTENT_CHECKED_AT = '2026-09-14'
 
 export const APPROVED_OFFER = {
@@ -24,6 +24,7 @@ export const APPROVED_CTA_LABELS = {
   webTrial: 'START MY FREE TRIAL',
   appStore: 'DOWNLOAD FOR iOS',
   tutorial: 'TRY THE TUTORIAL',
+  demo: 'See it in action',
 } as const
 
 export const APPROVED_CAPABILITIES = {
