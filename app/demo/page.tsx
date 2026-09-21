@@ -4,7 +4,7 @@ import { safeDemoExit, type LegacySearch } from '@/lib/demo/navigation'
 
 export const metadata: Metadata = {
   title: 'Try a sample job | OPS',
-  description: 'Assign a sample crew, see their job details, and mark a task done. Try OPS for 30 days. No credit card.',
+  description: 'Follow one sample job from customer email to site visit, crew work, and completion photos in OPS. Try free for 30 days. No credit card.',
   alternates: { canonical: 'https://try.opsapp.co/demo' },
   robots: { index: false, follow: true },
 }

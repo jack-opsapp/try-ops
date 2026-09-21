@@ -1,0 +1,27 @@
+TRY OPS DEMO — final integrated verification
+Worktree: /Users/jacksonsweet/Projects/OPS/.worktrees/tryops-demo-integration
+Date: 2026-09-21
+Test run started: 09:48:01 America/Vancouver
+
+Command:
+/Users/jacksonsweet/.nvm/versions/node/v22.23.2/bin/node node_modules/vitest/vitest.mjs run --reporter=dot
+Result: PASS — exit 0
+Test files: 30 passed / 30
+Tests: 274 passed / 274
+Duration: 3.51 seconds
+
+Command:
+/Users/jacksonsweet/.nvm/versions/node/v22.23.2/bin/node node_modules/typescript/bin/tsc --noEmit --incremental false
+Result: PASS — exit 0; no errors
+
+Final regression coverage added:
+- Original visit scope/access remain in the linked visit record; project/task Notes remain empty.
+- Scene changes and Back reset the page scroll position.
+- Entering Record payment focuses its h2; cancel/save returns focus to Invoice h2.
+- Photo identity survives responsive image size changes and every lifecycle handoff.
+
+Existing lifecycle coverage also passes: prerequisite guards, repeated actions, malformed saved state, refresh/back, Nick-only assignment, exact posted note/photo, external payment recording, native signup under storage/analytics failures, reduced motion, and unchanged collector/API contracts.
+
+Informational output: existing Vitest environmentMatchGlobs deprecation and outdated Browserslist database warnings. Expected availability fallback logs were emitted by the failure-path tests. No test or type-check failure.
+
+No build, commit, deployment, browser operation, or production data write performed in this verification pass.

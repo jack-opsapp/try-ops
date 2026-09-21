@@ -1,0 +1,139 @@
+/* Imported canonical tokens: app/globals.css -> app/ops-tokens.css.
+   Anatomy: native LeadDetailView, LeadSiteVisitBanner, InvoiceDetailView.
+   Size aliases below trace to DESIGN.md type roles / MOBILE.md body + targets. */
+.scene {
+  --ib-hairline: calc(var(--unit) / 8);
+  --ib-micro: calc(var(--unit) * 1.375);
+  --ib-body: calc(var(--unit) * 1.875);
+  --ib-title: calc(var(--unit) * 2.75);
+  --ib-data: calc(var(--unit) * 2.5);
+  --ib-touch: calc(var(--unit) * 5.5);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  color: var(--text);
+  background: var(--bg);
+  font-family: var(--font-mohave);
+  font-size: var(--ib-body);
+  line-height: 1.45;
+}
+.content { display: grid; gap: calc(var(--unit) * 2.5); padding: calc(var(--unit) * 2); }
+.content p, .content h3, .content dl, .content dd { margin: 0; }
+.content svg { width: calc(var(--unit) * 2); height: calc(var(--unit) * 2); flex: 0 0 auto; }
+.bookingBanner {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--unit) * 1.5);
+  width: 100%;
+  min-height: var(--ib-touch);
+  padding: calc(var(--unit) * 1.5);
+  color: var(--text);
+  text-align: left;
+  background: var(--glass);
+  border: var(--ib-hairline) solid var(--tan-line);
+  border-radius: var(--r-panel);
+  cursor: pointer;
+}
+.bookingBanner > span { display: grid; gap: calc(var(--unit) / 2); flex: 1; min-width: 0; }
+.bookingBanner strong { font: 400 var(--ib-micro)/1.4 var(--font-mono); color: var(--tan); letter-spacing: .08em; }
+.bookingBanner > span > span { font: 400 var(--ib-micro)/1.5 var(--font-mono); }
+.bookingBanner > svg:first-child { color: var(--tan); width: calc(var(--unit) * 2.5); height: calc(var(--unit) * 2.5); }
+.bookingBanner:hover { background: var(--surface-hover); }
+.identity { display: grid; gap: var(--unit); }
+.idLine { display: flex; align-items: center; gap: var(--unit); color: var(--text-3); font: 400 var(--ib-micro)/1.4 var(--font-mono); }
+.idLine > span { color: var(--text-mute); }
+.identity h3 { font: 300 var(--ib-title)/1.15 var(--font-cakemono); text-transform: uppercase; }
+.identity > p { color: var(--text-2); }
+.separator { color: var(--text-3); }
+.address { display: flex; gap: var(--unit); align-items: center; color: var(--text-2); font: 400 var(--ib-micro)/1.5 var(--font-mono); }
+.facts { display: grid; grid-template-columns: 1fr 1fr; border-top: var(--ib-hairline) solid var(--line); border-bottom: var(--ib-hairline) solid var(--line); }
+.facts > div { display: grid; align-content: start; gap: var(--unit); padding: calc(var(--unit) * 1.5) 0; }
+.facts > div + div { border-left: var(--ib-hairline) solid var(--line); padding-left: calc(var(--unit) * 2); }
+.facts dt, .appointmentDetails dt, .totals dt, .receiptFields dt { font: 400 var(--ib-micro)/1.4 var(--font-mono); color: var(--text-3); text-transform: uppercase; }
+.facts dd { display: flex; align-items: center; gap: var(--unit); min-height: calc(var(--unit) * 4.5); }
+.summary { color: var(--text-2); font-size: var(--ib-body); line-height: 1.5; }
+.correspondence { border: var(--ib-hairline) solid var(--line); border-radius: var(--r-panel); overflow: hidden; }
+.threadTitle { display: flex; align-items: center; gap: var(--unit); padding: calc(var(--unit) * 1.5); border-bottom: var(--ib-hairline) solid var(--line); background: var(--surface-input); }
+.threadTitle > span:first-of-type { flex: 1; min-width: 0; }
+.messageCount { color: var(--text-3); font: 400 var(--ib-micro)/1.4 var(--font-mono); white-space: nowrap; }
+.messages { display: grid; margin: 0; padding: 0; list-style: none; }
+.message { padding: calc(var(--unit) * 1.5); }
+.message + .message { border-top: var(--ib-hairline) solid var(--line); }
+.message p { margin-top: calc(var(--unit) / 2); color: var(--text-2); font-size: var(--ib-body); line-height: 1.5; }
+.messageHeader { display: flex; align-items: baseline; justify-content: space-between; gap: var(--unit); }
+.messageHeader strong { font-weight: 500; }
+.messageHeader time { color: var(--text-3); font: 400 var(--ib-micro)/1.4 var(--font-mono); white-space: nowrap; }
+.outbound { background: var(--surface-input); }
+.systemEntry { display: flex; align-items: flex-start; gap: var(--unit); color: var(--text-3); font-size: var(--ib-body); }
+.systemEntry svg { margin-top: calc(var(--unit) / 4); }
+.appointment { display: flex; align-items: center; gap: calc(var(--unit) * 2); padding-bottom: calc(var(--unit) * 2); border-bottom: var(--ib-hairline) solid var(--line); }
+.calendarDate { display: grid; text-align: center; flex-shrink: 0; min-width: calc(var(--unit) * 9); padding: var(--unit) calc(var(--unit) * 1.5); border: var(--ib-hairline) solid var(--tan-line); border-radius: var(--r-panel); background: var(--tan-soft); color: var(--tan); font: 400 var(--ib-micro)/1.4 var(--font-mono); }
+.calendarDate strong { font-size: calc(var(--unit) * 4); font-weight: 400; }
+.appointmentBody { display: grid; gap: var(--unit); min-width: 0; }
+.appointmentBody h3 { font: 300 calc(var(--unit) * 2.25)/1.25 var(--font-cakemono); text-transform: uppercase; }
+.appointmentBody > p:last-child { color: var(--text-2); }
+.appointmentTime { font: 500 var(--ib-data)/1.2 var(--font-mono); }
+.appointmentDetails { display: grid; }
+.appointmentDetails > div { display: grid; grid-template-columns: calc(var(--unit) * 12) minmax(0,1fr); align-items: center; gap: var(--unit); padding: calc(var(--unit) * 1.5) 0; }
+.appointmentDetails > div + div { border-top: var(--ib-hairline) solid var(--line); }
+.appointmentDetails dd { display: flex; align-items: center; flex-wrap: wrap; gap: var(--unit); min-width: 0; overflow-wrap: anywhere; }
+.disclosure { border: var(--ib-hairline) solid var(--line); border-radius: var(--r-panel); }
+.disclosure summary { display: flex; align-items: center; justify-content: space-between; gap: var(--unit); padding: calc(var(--unit) * 1.5); min-height: var(--ib-touch); cursor: pointer; list-style: none; }
+.disclosure summary::-webkit-details-marker { display: none; }
+.disclosure[open] summary > svg { transform: rotate(90deg); }
+.disclosure .correspondence { border: 0; border-top: var(--ib-hairline) solid var(--line); border-radius: 0; }
+.visitDay { display: grid; gap: var(--unit); padding: calc(var(--unit) * 1.5); background: var(--surface-input); border-radius: var(--r-item); }
+.visitDay p { color: var(--text-2); }
+.invoiceIdentity { display: grid; gap: var(--unit); }
+.invoiceIdentity h3 { font: 400 var(--ib-title)/1.2 var(--font-mono); }
+.invoiceIdentity p { color: var(--text-2); }
+.invoiceAmount { font: 500 var(--ib-data)/1.3 var(--font-mono); }
+.secondaryLine { display: block; flex-basis: 100%; color: var(--text-3); font-size: var(--ib-micro); }
+.lineItems { display: grid; border-top: var(--ib-hairline) solid var(--line); }
+.lineItems > div { display: flex; align-items: baseline; justify-content: space-between; gap: var(--unit); padding: calc(var(--unit) * 1.5) 0; border-bottom: var(--ib-hairline) solid var(--line); }
+.lineItems small { display: block; color: var(--text-3); font: 400 var(--ib-micro)/1.5 var(--font-mono); }
+.lineItems strong { font: 400 calc(var(--unit) * 1.625)/1.5 var(--font-mono); }
+.totals { display: grid; gap: calc(var(--unit) * 1.5); }
+.totals > div { display: flex; align-items: center; justify-content: space-between; gap: var(--unit); }
+.totals dd { font: 400 calc(var(--unit) * 1.625)/1.4 var(--font-mono); }
+.totals .balance { padding-top: calc(var(--unit) * 1.5); border-top: var(--ib-hairline) solid var(--line); }
+.balance dt { color: var(--text); }
+.balance dd { font-size: var(--ib-data); }
+.balance[data-paid=true] dd { color: var(--olive); }
+.paymentHistory { display: flex; align-items: center; gap: var(--unit); padding: calc(var(--unit) * 1.5); border: var(--ib-hairline) solid var(--olive-line); border-radius: var(--r-panel); background: var(--olive-soft); }
+.paymentHistory > svg { color: var(--olive); }
+.paymentHistory > div { display: grid; flex: 1; }
+.paymentHistory strong { font-weight: 500; }
+.paymentHistory > div > span { color: var(--text-2); font-size: var(--ib-micro); }
+.paymentHistory > span { font: 400 calc(var(--unit) * 1.625)/1.4 var(--font-mono); color: var(--olive); }
+.finePrint { color: var(--text-2); font-size: var(--ib-body); line-height: 1.5; }
+.textAction { min-height: var(--ib-touch); padding: var(--unit); color: var(--text-2); background: transparent; border: 0; font: 400 var(--ib-micro)/1.4 var(--font-mono); text-transform: uppercase; cursor: pointer; }
+.textAction:hover { color: var(--text); background: var(--surface-hover); }
+.paymentContext { display: flex; align-items: center; justify-content: space-between; gap: var(--unit); padding: calc(var(--unit) * 1.5); border: var(--ib-hairline) solid var(--line); border-radius: var(--r-panel); font: 400 var(--ib-micro)/1.5 var(--font-mono); }
+.paymentContext > span:last-child { color: var(--text-2); }
+.receivedNotice { display: flex; align-items: flex-start; gap: var(--unit); }
+.receivedNotice svg { color: var(--olive); margin-top: calc(var(--unit) / 2); }
+.receiptFields { display: grid; gap: calc(var(--unit) * 2); }
+.receiptFields > div { display: grid; gap: var(--unit); }
+.receiptFields dd { padding: calc(var(--unit) * 1.5); border: var(--ib-hairline) solid var(--line); border-radius: var(--r-btn); background: var(--surface-input); }
+.receiptAmount { font: 400 calc(var(--unit) * 4)/1.3 var(--font-mono); }
+.accounting { border-top: var(--ib-hairline) solid var(--line); }
+.accountingTrigger { display: flex; align-items: center; justify-content: space-between; gap: var(--unit); width: 100%; min-height: var(--ib-touch); padding: calc(var(--unit) * 1.5) 0; color: var(--text-2); background: transparent; border: 0; font: 400 var(--ib-body)/1.4 var(--font-mohave); text-align: left; cursor: pointer; }
+.accountingTrigger:hover { color: var(--text); }
+.accountingTrigger[aria-expanded=true] > svg { transform: rotate(90deg); }
+.accountingPicker { display: grid; gap: calc(var(--unit) * 1.5); padding-bottom: var(--unit); }
+.accountingPicker fieldset { display: grid; gap: var(--unit); margin: 0; padding: 0; border: 0; }
+.accountingPicker legend { padding: 0 0 var(--unit); color: var(--text-3); font: 400 var(--ib-micro)/1.5 var(--font-mono); text-transform: uppercase; }
+.providerOption { position: relative; display: flex; align-items: center; gap: var(--unit); min-height: var(--ib-touch); padding: calc(var(--unit) * 1.5); color: var(--text-2); border: var(--ib-hairline) solid var(--line); border-radius: var(--r-btn); background: var(--surface-input); cursor: pointer; }
+.providerOption[data-selected=true] { color: var(--text); background: var(--surface-active); }
+.providerOption > span { flex: 1; }
+.providerOption input { appearance: none; width: calc(var(--unit) * 2); height: calc(var(--unit) * 2); margin: 0; border: var(--ib-hairline) solid var(--text-3); border-radius: 50%; }
+.providerOption input:checked { border: calc(var(--unit) / 2) solid var(--text); }
+.providerOption:focus-within { outline: calc(var(--unit) / 4) solid var(--ops-accent); outline-offset: calc(var(--unit) / 4); }
+.accountingPicker p { color: var(--text-2); }
+.previewNote { font: 400 var(--ib-micro)/1.5 var(--font-mono); color: var(--text-3); }
+.accountingPicker .textAction { justify-self: start; padding-left: 0; }
+.paidFooter { display: flex; align-items: center; gap: var(--unit); min-height: var(--ib-touch); color: var(--olive); text-transform: uppercase; font: 300 calc(var(--unit) * 1.75)/1.3 var(--font-cakemono); }
+.paidFooter svg { width: calc(var(--unit) * 2.5); height: calc(var(--unit) * 2.5); }
+.paidFooter strong { margin-left: auto; font: 400 var(--ib-micro)/1.5 var(--font-mono); }
+.bookingBanner:focus-visible, .disclosure summary:focus-visible, .textAction:focus-visible, .accountingTrigger:focus-visible { outline: calc(var(--unit) / 4) solid var(--ops-accent); outline-offset: calc(var(--unit) / 2); }

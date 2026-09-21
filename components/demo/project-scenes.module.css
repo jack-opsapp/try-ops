@@ -1,0 +1,150 @@
+/* Native ProjectDetails / ActivityTab geometry. Canonical colors and role
+   tokens are imported by app/globals.css -> ops-tokens.css. Local dimensions
+   derive from OPSStyle spacing3=16, spacing4=24, 44pt controls, title22. */
+.project {
+  --project-touch: calc(var(--unit) * 5.5);
+  --project-title: calc(var(--unit) * 2.75);
+  --project-body: calc(var(--unit) * 2);
+  --project-meta: calc(var(--unit) * 1.375);
+  --project-icon: calc(var(--unit) * 2.5);
+  --project-hairline: calc(var(--unit) / 8);
+  color: var(--text);
+  background: var(--bg);
+  font: 400 var(--project-body)/1.45 var(--font-mohave);
+  min-width: 0;
+}
+.project button { cursor: pointer; }
+.project button:disabled { cursor: default; }
+.project button:focus-visible, .project summary:focus-visible, .project textarea:focus-visible, .panel:focus-visible { outline: calc(var(--project-hairline) * 2) solid var(--ops-accent); outline-offset: calc(var(--unit) / 2); }
+.project svg { width: var(--project-icon); height: var(--project-icon); flex-shrink: 0; stroke-width: 1.5; }
+.header { padding: calc(var(--unit) * 2) calc(var(--unit) * 2.5); }
+.navLine { display: flex; align-items: center; justify-content: space-between; gap: var(--unit); min-height: var(--project-touch); margin-bottom: var(--unit); }
+.navLine > span, .recordLabel, .selectedLabel, .galleryHeading { font: 400 var(--project-meta)/1.4 var(--font-mono); color: var(--text-3); text-transform: uppercase; letter-spacing: .08em; }
+.selectedTask { display: flex; align-items: center; gap: calc(var(--unit) / 2); min-height: var(--project-touch); color: var(--text-2); background: transparent; border: 0; padding: 0; text-align: left; }
+.selectedTask svg { width: calc(var(--unit) * 2); height: calc(var(--unit) * 2); }
+.taskBadges { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: calc(var(--unit) / 2); }
+.header h2 { font: 300 var(--project-title)/1.15 var(--font-cakemono); text-transform: uppercase; margin: 0; }
+.header > p { font: 400 var(--project-meta)/1.5 var(--font-mono); color: var(--text-2); text-transform: uppercase; margin: var(--unit) 0; }
+.location { display: flex; align-items: center; gap: calc(var(--unit) / 2); color: var(--text-3); font: 400 var(--project-meta)/1.4 var(--font-mono); }
+.location svg { width: calc(var(--unit) * 2); height: calc(var(--unit) * 2); }
+.tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0 calc(var(--unit) * 2); border-bottom: var(--project-hairline) solid var(--line); }
+.tabs button { position: relative; min-height: var(--project-touch); padding: var(--unit) calc(var(--unit) / 2); border: 0; background: transparent; color: var(--text-3); font: 400 var(--project-meta)/1 var(--font-mono); text-transform: uppercase; letter-spacing: .08em; }
+.tabs button::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: calc(var(--project-hairline) * 2); background: var(--text); transform: scaleX(0); transition: transform var(--d-panel) var(--ease-smooth); }
+.tabs button[aria-selected=true] { color: var(--text); }
+.tabs button[aria-selected=true]::after { transform: scaleX(1); }
+.panel { padding: calc(var(--unit) * 2); min-width: 0; }
+.activity, .details { display: grid; gap: calc(var(--unit) * 2); }
+.gallery { min-width: 0; }
+.galleryHeading { display: flex; justify-content: space-between; gap: var(--unit); margin-bottom: var(--unit); }
+.photoRail { display: flex; align-items: stretch; gap: var(--unit); overflow-x: auto; padding-bottom: calc(var(--unit) / 2); }
+.galleryTile { flex: 0 0 calc(var(--unit) * 9); width: calc(var(--unit) * 9); height: calc(var(--unit) * 9); padding: 0; border: var(--project-hairline) solid var(--glass-border); border-radius: var(--r-item); background: var(--glass); overflow: hidden; }
+.galleryTile img { width: 100%; height: 100%; border-radius: 0; object-fit: cover; }
+.visitRecord, .crewPost, .composer { background: var(--glass); border: var(--project-hairline) solid var(--glass-border); border-radius: var(--r-panel); overflow: hidden; }
+.visitRecord summary { display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: var(--unit); list-style: none; cursor: pointer; padding: calc(var(--unit) * 2); }
+.visitRecord summary::-webkit-details-marker { display: none; }
+.recordText { min-width: 0; }
+.recordText > div { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--unit); }
+.recordText strong, .author strong { font-weight: 500; }
+.recordText time, .author time, .recordText > span { font: 400 var(--project-meta)/1.5 var(--font-mono); color: var(--text-3); }
+.recordSummary { grid-column: 1/-1; display: flex; justify-content: space-between; align-items: center; gap: var(--unit); color: var(--text-2); font: 400 var(--project-meta)/1.5 var(--font-mono); text-transform: uppercase; padding-top: var(--unit); }
+.recordSummary svg { transition: transform var(--d-panel) var(--ease-smooth); }
+.visitRecord[open] .recordSummary svg { transform: rotate(90deg); }
+.recordBody { padding: 0 calc(var(--unit) * 2) calc(var(--unit) * 2); border-top: var(--project-hairline) solid var(--line); }
+.recordLabel { margin: calc(var(--unit) * 2) 0; }
+.recordFields { display: grid; gap: var(--unit); margin: 0; }
+.recordFields > div { display: grid; grid-template-columns: calc(var(--unit) * 7) 1fr; gap: var(--unit); }
+.recordFields dt, .document dt, .taskDetail dt { font: 400 var(--project-meta)/1.5 var(--font-mono); color: var(--text-3); text-transform: uppercase; }
+.recordFields dd, .document dd, .taskDetail dd { margin: 0; min-width: 0; }
+.numeric { font-family: var(--font-mono); font-size: var(--project-meta); font-feature-settings: 'tnum' 1, 'zero' 1; }
+.recordChecks { display: grid; gap: var(--unit); padding: calc(var(--unit) * 2) 0; color: var(--text-2); }
+.recordChecks span { display: flex; align-items: center; gap: var(--unit); }
+.recordChecks svg { color: var(--olive); width: calc(var(--unit) * 2); height: calc(var(--unit) * 2); }
+.recordPhoto, .completionPhoto { display: block; width: 100%; padding: 0; border: 0; background: transparent; border-radius: var(--r-item); overflow: hidden; }
+.crewPost { animation: post-arrive var(--d-page) var(--ease-smooth) both; }
+.author { display: flex; align-items: center; gap: var(--unit); padding: calc(var(--unit) * 2) calc(var(--unit) * 2) 0; }
+.author > div { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--unit); flex: 1; }
+.postText { margin: calc(var(--unit) * 1.5) calc(var(--unit) * 2); font-size: calc(var(--unit) * 2.25); line-height: 1.45; overflow-wrap: anywhere; }
+.completionPhoto { width: calc(var(--unit) * 10); height: calc(var(--unit) * 10); margin: 0 calc(var(--unit) * 2) calc(var(--unit) * 2); }
+.completionPhoto img { width: 100%; height: 100%; border-radius: 0; object-fit: cover; }
+.detailsAction { width: 100%; }
+.document { margin: 0; padding: 0 calc(var(--unit) * 2); background: var(--glass); border: var(--project-hairline) solid var(--glass-border); border-radius: var(--r-panel); }
+.document > div { display: grid; grid-template-columns: calc(var(--unit) * 9) 1fr; align-items: start; gap: var(--unit); padding: calc(var(--unit) * 1.5) 0; border-bottom: var(--project-hairline) solid var(--line); }
+.document > div:last-child { border-bottom: 0; }
+.document dt { padding-top: calc(var(--unit) / 2); }
+.document dd > span:not([class]) { display: block; color: var(--text-3); }
+.crewNames { display: flex; align-items: center; flex-wrap: wrap; gap: calc(var(--unit) / 2); }
+.crewNames > span[aria-label] { width: calc(var(--unit) * 3.5); height: calc(var(--unit) * 3.5); font-size: var(--project-meta); }
+.tasks { background: var(--glass); border: var(--project-hairline) solid var(--glass-border); border-radius: var(--r-panel); overflow: hidden; }
+.taskRow { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: var(--unit); text-align: left; background: transparent; color: var(--text); border: 0; border-bottom: var(--project-hairline) solid var(--line); padding: calc(var(--unit) * 2); min-height: calc(var(--unit) * 8); }
+button.taskRow:hover { background: var(--surface-hover); }
+.taskName { display: flex; flex-wrap: wrap; gap: calc(var(--unit) / 2); min-width: 0; }
+.taskName > span:last-child:not(:first-child) { flex-basis: 100%; color: var(--text-3); font: 400 var(--project-meta)/1.5 var(--font-mono); padding-top: calc(var(--unit) / 2); }
+.taskDate { display: flex; align-items: center; gap: calc(var(--unit) / 2); font: 400 var(--project-meta)/1.5 var(--font-mono); text-transform: uppercase; color: var(--text-3); }
+.taskSource { color: var(--text-3); }
+.taskDetail { padding: calc(var(--unit) * 2); border-bottom: var(--project-hairline) solid var(--line); background: var(--surface-input); }
+.taskDetail > p { margin: 0 0 calc(var(--unit) * 2); }
+.taskDetail dl { margin: 0 0 calc(var(--unit) * 2); }
+.taskDetail dl > div { display: grid; grid-template-columns: calc(var(--unit) * 7.25) minmax(0,1fr); align-items: center; gap: var(--unit); padding: calc(var(--unit) / 2) 0; }
+.taskDetail dl > div:first-child dd { font: 400 var(--project-meta)/1.5 var(--font-mono); }
+.assignTeam { display: inline-flex; align-items: center; gap: var(--unit); min-height: var(--project-touch); padding: var(--unit) calc(var(--unit) * 1.5); border: var(--project-hairline) solid var(--line); border-radius: var(--r-btn); background: var(--surface-hover); color: var(--text-2); font: 400 var(--project-meta)/1.4 var(--font-mono); text-transform: uppercase; }
+.assignTeam svg { width: calc(var(--unit) * 2); height: calc(var(--unit) * 2); transition: transform var(--d-panel) var(--ease-smooth); }
+.assignTeam[aria-expanded=true] svg { transform: rotate(90deg); }
+.teamPicker { margin-top: calc(var(--unit) * 2); border: var(--project-hairline) solid var(--line); border-radius: var(--r-panel); background: var(--surface); overflow: hidden; animation: post-arrive var(--d-panel) var(--ease-smooth) both; }
+.teamCommit { display: grid; grid-template-columns: 1fr 1fr; gap: calc(var(--unit) * 1.25); padding: calc(var(--unit) * 1.25) calc(var(--unit) * 1.75); }
+.teamMember { display: flex; align-items: center; gap: calc(var(--unit) * 1.25); min-height: var(--project-touch); width: 100%; padding: var(--unit) calc(var(--unit) * 1.75); border: 0; border-top: var(--project-hairline) solid var(--line); background: transparent; color: var(--text-3); text-align: left; }
+.teamMember[aria-pressed=true] { color: var(--text); }
+.teamMember:hover { background: var(--surface-hover); }
+.teamMember > span[aria-label] { width: calc(var(--unit) * 4); height: calc(var(--unit) * 4); }
+.teamMember > span:last-child { display: grid; gap: var(--project-hairline); }
+.teamMember strong { font: 400 var(--project-body)/1.4 var(--font-mohave); color: var(--text); }
+.teamMember > span:last-child > span { font: 400 var(--project-meta)/1.4 var(--font-mono); text-transform: uppercase; color: var(--text-3); }
+.assignedFeedback { display: flex; align-items: center; gap: var(--unit); padding: calc(var(--unit) * 2); margin: 0; color: var(--olive); }
+.composer { padding: calc(var(--unit) * 2); }
+.composeAuthor { display: flex; align-items: center; gap: var(--unit); margin-bottom: calc(var(--unit) * 1.5); color: var(--text-2); }
+.noteLabel { display: block; font: 400 var(--project-meta)/1.5 var(--font-mono); color: var(--text-3); text-transform: uppercase; margin-bottom: var(--unit); }
+.composer textarea { display: block; width: 100%; box-sizing: border-box; min-height: calc(var(--unit) * 12); padding: calc(var(--unit) * 1.5); border: var(--project-hairline) solid var(--line); border-radius: var(--r-btn); background: var(--surface-input); color: var(--text); font: 400 calc(var(--unit) * 2.25)/1.45 var(--font-mohave); resize: vertical; }
+.composeActions { display: flex; align-items: center; justify-content: space-between; gap: var(--unit); padding-top: var(--unit); }
+.attachButton { display: flex; align-items: center; gap: var(--unit); min-height: var(--project-touch); padding: 0; border: 0; background: transparent; color: var(--text-2); font: 400 var(--project-meta)/1.5 var(--font-mono); text-align: left; }
+.attachButton:disabled { color: var(--olive); }
+.composeHelp { margin: var(--unit) 0 0; color: var(--text-3); }
+.attachedPhoto { display: flex; align-items: center; gap: var(--unit); margin-bottom: calc(var(--unit) * 2); }
+.attachedPhoto img { width: calc(var(--unit) * 10); height: calc(var(--unit) * 8); }
+.attachedPhoto > span { display: flex; align-items: center; gap: calc(var(--unit) / 2); color: var(--olive); font: 400 var(--project-meta)/1.5 var(--font-mono); }
+.composerEntry { display: flex; align-items: center; gap: var(--unit); width: 100%; min-height: calc(var(--unit) * 7); padding: calc(var(--unit) * 1.5); border: var(--project-hairline) solid var(--glass-border); border-radius: var(--r-panel); background: var(--glass); color: var(--text-3); font: 400 var(--project-body)/1.5 var(--font-mohave); text-align: left; }
+.composerEntry span { flex: 1; }
+.composerContext summary { cursor: pointer; list-style: none; box-sizing: border-box; }
+.composerContext summary::-webkit-details-marker { display: none; }
+.composerContext > p { margin: var(--unit) 0 0; padding-inline: calc(var(--unit) * 1.5); color: var(--text-3); }
+.actionDock { position: sticky; bottom: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: calc(var(--unit) * 2); padding: calc(var(--unit) * 2); padding-bottom: calc(var(--unit) * 2 + env(safe-area-inset-bottom, 0px)); border-top: var(--project-hairline) solid var(--line); background: var(--bg-panel); }
+.actionDock > button { min-height: calc(var(--unit) * 6.5); }
+.selectedLabel { display: grid; gap: calc(var(--unit) / 2); }
+.selectedLabel > span { color: var(--text); font: 400 var(--project-body)/1.3 var(--font-mohave); text-transform: none; letter-spacing: 0; }
+.completedStatus { display: flex; align-items: center; gap: var(--unit); color: var(--olive); font: 400 var(--project-meta)/1.4 var(--font-mono); }
+.expenseEmpty { padding: calc(var(--unit) * 3) calc(var(--unit) * 2); background: var(--glass); border: var(--project-hairline) solid var(--glass-border); border-radius: var(--r-panel); }
+.expenseEmpty > svg { color: var(--text-3); }
+.expenseEmpty h3 { font: 300 calc(var(--unit) * 2.25)/1.4 var(--font-cakemono); text-transform: uppercase; margin: calc(var(--unit) * 2) 0 var(--unit); }
+.expenseEmpty p { color: var(--text-2); margin: var(--unit) 0; }
+.expenseEmpty .expenseContext { color: var(--text-3); padding-top: calc(var(--unit) * 2); border-top: var(--project-hairline) solid var(--line); margin-top: calc(var(--unit) * 2); }
+.photoDialog { box-sizing: border-box; background: var(--bg-panel); color: var(--text); border: var(--project-hairline) solid var(--glass-border); border-radius: var(--r-modal); padding: calc(var(--unit) * 2); width: min(calc(100vw - var(--unit) * 4), calc(var(--unit) * 95)); max-width: calc(100vw - var(--unit) * 4); max-height: calc(100dvh - var(--unit) * 4); overflow-y: auto; }
+.photoDialog > img { display: block; width: 100%; height: auto; max-height: calc(100dvh - var(--unit) * 26); object-fit: contain; }
+.photoDialog::backdrop { background: var(--glass-dense); backdrop-filter: blur(calc(var(--unit) / 2)); }
+.viewerHeader { display: flex; align-items: center; justify-content: space-between; gap: var(--unit); margin-bottom: var(--unit); font: 400 var(--project-meta)/1.5 var(--font-mono); text-transform: uppercase; }
+.viewerHeader button { display: grid; place-items: center; width: var(--project-touch); height: var(--project-touch); color: var(--text); border: var(--project-hairline) solid var(--line); border-radius: var(--r-btn); background: var(--surface-input); }
+.photoDialog > p { font: 400 var(--project-body)/1.5 var(--font-mohave); margin: calc(var(--unit) * 2) 0 0; overflow-wrap: anywhere; }
+@keyframes post-arrive { from { opacity: 0; transform: translateY(var(--unit)); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 360px) {
+  .header { padding-inline: calc(var(--unit) * 2); }
+  .panel { padding-inline: calc(var(--unit) * 1.5); }
+  .visitRecord summary { grid-template-columns: auto minmax(0,1fr); }
+  .visitRecord summary > span:last-of-type { grid-column: 2; }
+  .taskDate { flex-direction: column; align-items: flex-end; }
+  .actionDock { gap: var(--unit); }
+  .actionDock > button { padding-inline: var(--unit); }
+  .completedStatus { font-size: var(--project-meta); }
+  .navLine { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tabs button::after, .recordSummary svg, .assignTeam svg { transition: opacity var(--d-hover) linear; }
+  .crewPost, .teamPicker { animation: post-fade var(--d-hover) linear both; }
+}
+@keyframes post-fade { from { opacity: 0; } to { opacity: 1; } }
