@@ -103,13 +103,29 @@
 .approvalNote > svg { width: var(--visit-icon); height: var(--visit-icon); flex-shrink: 0; color: var(--olive); }
 .approvalNote .sectionLabel { color: var(--olive); }
 .approvalNote p { margin-block: calc(var(--unit) / 2); }
+.scopeConfirmation { display: flex; align-items: center; gap: calc(var(--unit) * 1.5); min-height: var(--visit-control); margin-top: var(--unit); padding: var(--unit); border: var(--visit-hairline) solid var(--line); border-radius: var(--r-btn); background: var(--surface-input); cursor: pointer; }
+.scopeConfirmation input { appearance: none; flex: 0 0 auto; display: grid; place-content: center; width: calc(var(--unit) * 2.75); height: calc(var(--unit) * 2.75); margin: 0; border: var(--visit-hairline) solid var(--text-3); border-radius: var(--r-chip); background: transparent; cursor: pointer; }
+.scopeConfirmation input:checked { border-color: var(--olive); background: var(--olive-soft); }
+.scopeConfirmation input:checked::before { content: ''; width: calc(var(--unit) * 1.25); height: calc(var(--unit) * .75); border-left: calc(var(--visit-hairline) * 2) solid var(--olive); border-bottom: calc(var(--visit-hairline) * 2) solid var(--olive); transform: translateY(calc(var(--visit-hairline) * -1)) rotate(-45deg); }
+.scopeConfirmation input:focus-visible { outline: calc(var(--visit-hairline) * 2) solid var(--ops-accent); outline-offset: calc(var(--visit-hairline) * 3); }
+.visitArrival { display: flex; align-items: flex-start; gap: calc(var(--unit) * 1.5); padding: calc(var(--unit) * 2); border: var(--visit-hairline) solid var(--olive-line); border-radius: var(--r-panel); background: var(--olive-soft); animation: evidenceArrives var(--d-page) var(--ease-smooth) both; }
+.visitArrival > svg { width: var(--visit-icon); height: var(--visit-icon); flex-shrink: 0; color: var(--olive); }
+.visitArrival .sectionLabel { color: var(--olive); }
+.visitArrival p { margin-top: calc(var(--unit) / 2); }
+.toolEntry { display: grid; gap: var(--unit); padding-block: calc(var(--unit) * 2); border-top: var(--visit-hairline) solid var(--line); border-bottom: var(--visit-hairline) solid var(--line); }
+.toolEntry p { color: var(--text-2); }
+.toolButton { display: flex; justify-content: center; align-items: center; gap: var(--unit); min-height: var(--visit-control); padding: var(--unit) calc(var(--unit) * 1.5); border: var(--visit-hairline) solid var(--line); border-radius: var(--r-btn); background: var(--surface-input); color: var(--text-2); cursor: pointer; font: 300 calc(var(--unit) * 1.75) / 1.4 var(--font-cakemono); text-transform: uppercase; }
+.toolButton:hover { background: var(--surface-hover); color: var(--text); }
+.toolButton:focus-visible { outline: calc(var(--visit-hairline) * 2) solid var(--ops-accent); outline-offset: calc(var(--visit-hairline) * 3); }
+.toolButton svg { width: calc(var(--unit) * 2.5); height: calc(var(--unit) * 2.5); }
+.nextRecord { display: grid; gap: calc(var(--unit) / 2); padding-top: calc(var(--unit) * 2); border-top: var(--visit-hairline) solid var(--line); color: var(--text-2); }
 @keyframes evidenceArrives { from { opacity: 0; transform: translateY(var(--unit)); } to { opacity: 1; transform: translateY(0); } }
 @keyframes evidenceFade { from { opacity: 0; } to { opacity: 1; } }
 @media (max-width: 760px) {
   .captureToolbar, .footer { padding-bottom: calc(var(--unit) * 1.5 + env(safe-area-inset-bottom, 0px)); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .evidence, .lineDescription { animation: evidenceFade var(--d-hover) linear both; }
+  .evidence, .lineDescription, .visitArrival { animation: evidenceFade var(--d-hover) linear both; }
   .lead summary > svg, .breakdownButton svg { transition: none; }
 }
 @media (max-width: 360px) {

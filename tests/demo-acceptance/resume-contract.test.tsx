@@ -11,13 +11,18 @@ const diagnostics = vi.hoisted(() => ({ track: vi.fn() }))
 vi.mock('@/lib/demo/use-demo-funnel', () => ({
   useDemoFunnel: () => ({ signupHref: '/demo/start-trial', track: diagnostics.track }),
 }))
-const actions: LifecycleAction[] = [
-  { type: 'OPEN_BOOKING' }, { type: 'START_VISIT' }, { type: 'ADD_SITE_PHOTO' },
-  { type: 'REVIEW_VISIT' }, { type: 'COMPLETE_VISIT' }, { type: 'APPROVE_ESTIMATE' },
-  { type: 'ASSIGN_CREW' }, { type: 'VIEW_CREW' }, { type: 'COMPLETE_TASK' },
+const crewActions: LifecycleAction[] = [
+  { type: 'SELECT_ROLE', role: 'crew' }, { type: 'COMPLETE_TASK' },
   { type: 'OPEN_COMPOSER' }, { type: 'ADD_COMPLETION_PHOTO' }, { type: 'POST_NOTE' },
 ]
-function snapshot(stop: LifecycleAction['type']) {
+const operatorActions: LifecycleAction[] = [
+  { type: 'SELECT_ROLE', role: 'operator' }, { type: 'OPEN_BOOKING' },
+  { type: 'ASSIGN_VISIT', member: 'Nick' }, { type: 'COMPLETE_VISIT' },
+  { type: 'SEND_ESTIMATE' }, { type: 'APPROVE_ESTIMATE' },
+  { type: 'ASSIGN_CREW', members: ['Pete'] }, { type: 'ADVANCE_WORKDAY' },
+  { type: 'OPEN_BILLING' }, { type: 'CREATE_INVOICE' },
+]
+function snapshot(actions: LifecycleAction[], stop: LifecycleAction['type']) {
   let state = initialLifecycleState()
   for (const action of actions) {
     state = lifecycleReducer(state, action)
@@ -47,30 +52,54 @@ describe('independent persisted-demo acceptance', () => {
     expect(restoreDemoState(JSON.stringify({ version: 'crew-job-v1', ...fields }))).toEqual(initialDemoState())
   })
 
-  it.each(['VIEW_CREW', 'POST_NOTE'] as const)('restores %s without reporting invented actions', action => {
-    sessionStorage.setItem(LIFECYCLE_STORAGE_KEY, JSON.stringify(snapshot(action)))
+  it.each(['SELECT_ROLE', 'POST_NOTE'] as const)('restores Crew %s without reporting invented actions', action => {
+    sessionStorage.setItem(LIFECYCLE_STORAGE_KEY, JSON.stringify(snapshot(crewActions, action)))
     render(<DemoExperience />)
     expect(screen.getByText('Your sample job is where you left it.')).toBeTruthy()
-    if (action === 'VIEW_CREW') expect(screen.getByRole('button', { name: 'Complete' })).toBeTruthy()
-    else expect(screen.getByRole('article', { name: "Pete's completion update" })).toBeTruthy()
+    if (action === 'SELECT_ROLE') expect(screen.getByRole('button', { name: 'Complete' })).toBeTruthy()
+    else expect(screen.getByRole('article', { name: 'Your completion update' })).toBeTruthy()
     for (const event of events()) expectCollectorAccepts(event)
     expect(events().filter(event => ['started', 'job_assigned', 'crew_viewed', 'task_completed'].includes(event.action))).toEqual([])
   })
 
-  it('keeps diagnostic action boundaries compatible with the unchanged collector', () => {
+  it.each(['ADVANCE_WORKDAY', 'CREATE_INVOICE'] as const)('restores Operator %s without reporting incoming fixture work as visitor actions', action => {
+    sessionStorage.setItem(LIFECYCLE_STORAGE_KEY, JSON.stringify(snapshot(operatorActions, action)))
     render(<DemoExperience />)
-    click('Open booked visit'); click('Start site visit'); click('Photo'); click('Done')
-    click('Complete visit'); click('Mark approved')
+    expect(screen.getByText('Your sample job is where you left it.')).toBeTruthy()
+    expect(screen.getByText('YOU · OPERATOR')).toBeTruthy()
+    if (action === 'ADVANCE_WORKDAY') expect(screen.getByRole('article', { name: "Pete's completion update" })).toBeTruthy()
+    else expect(screen.getByRole('link', { name: 'Start my free trial' })).toBeTruthy()
+    expect(events().filter(event => ['started', 'job_assigned', 'crew_viewed', 'task_completed'].includes(event.action))).toEqual([])
+    for (const event of events()) expectCollectorAccepts(event)
+  })
+
+  it('reports only actual Operator assignment without inventing crew actions', () => {
+    render(<DemoExperience />)
+    click('Choose Operator'); click('Assign site visit'); click('Select Mike'); click('Assign to Mike')
+    click('Review estimate'); click('Send estimate'); click('Mark approved')
     fireEvent.click(screen.getByRole('tab', { name: 'details' }))
-    click('Open patio installation task'); click('Assign team to this task'); click('Pete'); click('Done')
-    click('View crew on the workday'); click('Complete')
+    click('Open resurfacing task'); click('Assign team to this task'); click('Select Pete'); click('Done')
+    click('See the completed work')
     expect(events().map(event => [event.action, event.step])).toEqual([
-      ['started', 'assign'], ['job_assigned', 'assign'], ['crew_viewed', 'crew'], ['task_completed', 'complete'],
+      ['started', 'assign'], ['job_assigned', 'assign'],
+    ])
+    for (const event of events()) expectCollectorAccepts(event)
+    click('Back'); click('See the completed work'); click('Review billing'); click('Create invoice')
+    expect(events().filter(event => event.action === 'job_assigned')).toHaveLength(1)
+    expect(events().filter(event => ['crew_viewed', 'task_completed'].includes(event.action))).toEqual([])
+  })
+
+  it('reports Crew entry and completion once, without counting prepared assignment as a visitor action', () => {
+    render(<DemoExperience />)
+    click('Choose Crew'); click('Complete')
+    expect(events().map(event => [event.action, event.step])).toEqual([
+      ['started', 'assign'], ['crew_viewed', 'crew'], ['task_completed', 'complete'],
     ])
     for (const event of events()) expectCollectorAccepts(event)
     click('Post a photo update'); click('Attach completion photo'); click('Post crew update')
     click('Back'); click('Post crew update')
     expect(events().filter(event => event.action === 'task_completed')).toHaveLength(1)
+    expect(events().filter(event => event.action === 'job_assigned')).toEqual([])
     for (const event of events()) expectCollectorAccepts(event)
   })
 })

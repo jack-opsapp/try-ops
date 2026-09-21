@@ -1,0 +1,58 @@
+/* Canonical OPS tokens are imported first by app/globals.css. SVG coordinates
+   express drawing geometry, while every interface dimension derives from tokens. */
+.tool {
+  --spec-line: calc(var(--unit) / 8);
+  --spec-label: calc(var(--unit) * 1.375);
+  --spec-control: calc(var(--unit) * 5.5);
+  min-width: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 400 calc(var(--unit) * 2) / 1.45 var(--font-mohave);
+}
+.tool > header { position: sticky; top: 0; z-index: 3; background: var(--bg-panel); }
+.tool h3, .tool p, .tool figure, .tool dl, .tool dd { margin: 0; }
+.backButton { display: grid; place-items: center; width: var(--spec-control); height: var(--spec-control); border: 0; border-radius: var(--r-btn); background: transparent; color: var(--text-2); cursor: pointer; }
+.backButton svg { width: calc(var(--unit) * 2.5); height: calc(var(--unit) * 2.5); }
+.backButton:hover { background: var(--surface-hover); color: var(--text); }
+.backButton:focus-visible, .widthOptions button:focus-visible, .assumptions summary:focus-visible { outline: calc(var(--spec-line) * 2) solid var(--ops-accent); outline-offset: calc(var(--spec-line) * 3); }
+.body { display: grid; gap: calc(var(--unit) * 2); padding: calc(var(--unit) * 2.5); }
+.intro h3 { font: 500 calc(var(--unit) * 2.75) / 1.2 var(--font-mohave); }
+.intro p { margin-top: calc(var(--unit) / 2); color: var(--text-2); }
+.drawing { overflow: hidden; border: var(--spec-line) solid var(--line); border-radius: var(--r-panel); background: var(--bg-panel); }
+.drawingHeader { display: flex; justify-content: space-between; gap: var(--unit); padding: calc(var(--unit) * 1.5); color: var(--text-3); border-bottom: var(--spec-line) solid var(--line); font: 400 var(--spec-label) / 1.4 var(--font-mono); text-transform: uppercase; }
+.drawingCanvas { position: relative; }
+.preview { width: 100%; height: auto; display: block; }
+.gridLine { stroke: var(--line); stroke-width: var(--spec-line); }
+.footprint { fill: var(--surface-active); }
+.supports { fill: none; stroke: var(--text-3); stroke-width: calc(var(--spec-line) * 3); }
+.frontEdge { fill: var(--bg-card); stroke: var(--text-3); stroke-width: var(--spec-line); }
+.sideEdge { fill: var(--bg-elevated); stroke: var(--text-3); stroke-width: var(--spec-line); }
+.deckSurface { fill: var(--bg-card); stroke: var(--text-2); stroke-width: var(--spec-line); }
+.boardLine { stroke: var(--text-3); stroke-width: calc(var(--spec-line) / 2); }
+.dimensionLine { stroke: var(--text-3); stroke-width: var(--spec-line); }
+.dimensionLabel { position: absolute; transform: translate(-50%, -50%); color: var(--text-2); white-space: nowrap; font: 400 var(--spec-label) var(--font-mono); font-feature-settings: 'tnum' 1, 'zero' 1; }
+.geometry { animation: drawing-change var(--d-page) var(--ease-smooth) both; transform-origin: center; }
+.drawing figcaption { padding: var(--unit) calc(var(--unit) * 1.5); border-top: var(--spec-line) solid var(--line); font: 400 var(--spec-label) / 1.4 var(--font-mono); color: var(--text-3); }
+.widthControl { margin: 0; padding: 0; min-width: 0; border: 0; }
+.widthControl legend { display: flex; align-items: center; gap: var(--unit); padding: 0 0 var(--unit); font: 400 var(--spec-label) / 1.5 var(--font-mono); text-transform: uppercase; color: var(--text-2); }
+.widthControl legend svg { width: calc(var(--unit) * 2); height: calc(var(--unit) * 2); }
+.widthOptions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--unit); }
+.widthOptions button { min-height: var(--spec-control); border: var(--spec-line) solid var(--line); border-radius: var(--r-btn); background: var(--surface-input); color: var(--text-2); font: 400 calc(var(--unit) * 1.75) / 1.4 var(--font-mono); cursor: pointer; transition: background var(--d-hover) var(--ease-smooth), color var(--d-hover) var(--ease-smooth); }
+.widthOptions button:hover { background: var(--surface-hover); }
+.widthOptions button[aria-pressed=true] { background: var(--surface-active); color: var(--text); border-color: var(--text-3); }
+.takeoff { border-top: var(--spec-line) solid var(--line); padding-top: calc(var(--unit) * 2); }
+.takeoff dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: calc(var(--unit) * 2); }
+.takeoff dt { font: 400 var(--spec-label) / 1.5 var(--font-mono); text-transform: uppercase; color: var(--text-3); }
+.takeoff dd { display: flex; align-items: baseline; flex-wrap: wrap; column-gap: var(--unit); font: 400 calc(var(--unit) * 3) / 1.7 var(--font-mono); font-feature-settings: 'tnum' 1, 'zero' 1; }
+.takeoff dd span { font-size: var(--spec-label); color: var(--text-2); }
+.assumptions { margin-top: var(--unit); color: var(--text-3); }
+.assumptions summary { min-height: var(--spec-control); display: flex; align-items: center; cursor: pointer; text-decoration: underline; text-underline-offset: calc(var(--unit) / 2); font: 400 var(--spec-label) / 1.5 var(--font-mono); }
+.assumptions p { color: var(--text-2); }
+.limit { padding-left: calc(var(--unit) * 1.5); border-left: calc(var(--spec-line) * 2) solid var(--line); color: var(--text-2); }
+.footer { position: sticky; bottom: 0; z-index: 2; padding: calc(var(--unit) * 1.5) calc(var(--unit) * 2); background: var(--bg-panel); border-top: var(--spec-line) solid var(--line); }
+.footer > button { width: 100%; min-height: calc(var(--unit) * 6.5); }
+@keyframes drawing-change { from { opacity: .35; transform: translateY(calc(var(--unit) / 2)); } to { opacity: 1; transform: translateY(0); } }
+@keyframes drawing-fade { from { opacity: .35; } to { opacity: 1; } }
+@media (max-width: 760px) { .footer { padding-bottom: calc(var(--unit) * 1.5 + env(safe-area-inset-bottom, 0px)); } }
+@media (max-width: 360px) { .body { padding: calc(var(--unit) * 2); } }
+@media (prefers-reduced-motion: reduce) { .geometry { animation: drawing-fade var(--d-hover) linear both; } .widthOptions button { transition: none; } }

@@ -1,0 +1,54 @@
+/* Canonical tokens are imported first by app/globals.css -> ops-tokens.css.
+   These tutorial components inherit the demo's native-size type and line tokens. */
+.roleScene { display:grid; gap:calc(var(--unit)*3); padding:calc(var(--unit)*3) calc(var(--unit)*2); }
+.roleHeading h2 { margin:0; color:var(--text); font:300 var(--demo-type-page)/1.15 var(--font-cakemono); text-transform:uppercase; }
+.roleHeading p { margin:var(--unit) 0 0; color:var(--text-2); font:400 var(--demo-type-body)/1.45 var(--font-mohave); }
+.roleChoices { display:grid; gap:calc(var(--unit)*2); }
+.roleCard { position:relative; display:flex; align-items:flex-start; gap:calc(var(--unit)*2); padding:calc(var(--unit)*2); width:100%; min-width:0; text-align:left; border:var(--demo-line) solid var(--glass-border); border-radius:var(--r-panel); background:var(--glass); color:var(--text); cursor:pointer; transition:background var(--d-hover) var(--ease-smooth),border-color var(--d-hover) var(--ease-smooth); }
+.roleCard:hover { background:var(--surface-active); border-color:var(--text-3); }
+.roleCard:active { background:var(--surface-hover); }
+.roleCard:focus-visible,.characterCard:focus-visible { outline:calc(var(--demo-line)*2) solid var(--ops-accent); outline-offset:calc(var(--demo-line)*3); }
+.roleSymbol { display:grid; flex-shrink:0; place-items:center; width:calc(var(--unit)*5); height:calc(var(--unit)*5); color:var(--text-2); }
+.roleSymbol svg { width:calc(var(--unit)*4); height:calc(var(--unit)*4); stroke-width:1.5; }
+.roleInfo { display:grid; flex:1; min-width:0; gap:var(--unit); }
+.roleName { font:300 var(--demo-type-page)/1.2 var(--font-cakemono); text-transform:uppercase; }
+.roleDescription { color:var(--text-2); font:400 var(--demo-type-body)/1.35 var(--font-mohave); }
+.responsibilities { display:grid; gap:calc(var(--unit)/2); padding-top:var(--unit); border-top:var(--demo-line) solid var(--line); font:400 var(--demo-type-button)/1.4 var(--font-mohave); color:var(--text-3); }
+.roleArrow { position:absolute; top:calc(var(--unit)*2); right:calc(var(--unit)*2); width:calc(var(--unit)*2); height:calc(var(--unit)*2); color:var(--text-3); }
+.roleName { padding-right:calc(var(--unit)*3); }
+.roleFootnote { margin:0; color:var(--text-3); font:400 var(--demo-type-small)/1.5 var(--font-mohave); }
+.characterCard { display:grid; gap:calc(var(--unit)*1.5); width:100%; min-width:0; padding:calc(var(--unit)*2); margin:0; text-align:left; color:var(--text); background:var(--glass); border:var(--demo-line) solid var(--glass-border); border-radius:var(--r-panel); }
+button.characterCard { cursor:pointer; transition:background var(--d-hover) var(--ease-smooth),border-color var(--d-hover) var(--ease-smooth); }
+button.characterCard:hover { background:var(--surface-hover); border-color:var(--text-3); }
+button.characterCard:active,.characterCard[data-selected=true] { background:var(--surface-active); border-color:var(--text-3); }
+.characterHeader { display:flex; align-items:center; gap:calc(var(--unit)*1.5); }
+.characterIdentity { display:grid; gap:calc(var(--unit)/2); flex:1; min-width:0; }
+.characterName { font:500 var(--demo-type-body)/1.1 var(--font-mohave); }
+.characterPosition { color:var(--text-3); font:400 var(--demo-type-label)/1.4 var(--font-mono); }
+.characterSelection,.characterChevron { flex-shrink:0; width:calc(var(--unit)*2.5); height:calc(var(--unit)*2.5); }
+.characterSelection { color:var(--olive); }
+.characterChevron { color:var(--text-3); }
+.characterStats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--unit); padding-top:calc(var(--unit)*1.5); border-top:var(--demo-line) solid var(--line); }
+.characterStats > span { display:flex; flex-direction:column; justify-content:space-between; gap:var(--unit); min-width:0; }
+.statLabel { color:var(--text-3); font:400 var(--demo-type-label)/1.35 var(--font-mohave); }
+.statNumber { color:var(--text); font:400 var(--demo-type-small)/1.3 var(--font-mono); font-feature-settings:'tnum' 1,'zero' 1; }
+.statTask { color:var(--text); font:400 var(--demo-type-button)/1.3 var(--font-mohave); }
+.sampleHistory { font:400 var(--demo-type-label)/1.3 var(--font-mohave); color:var(--text-3); }
+.characterCard[data-compact=true] { padding:calc(var(--unit)*1.5); }
+.featureCallout { display:flex; align-items:flex-start; gap:calc(var(--unit)*1.5); padding:calc(var(--unit)*1.5) calc(var(--unit)*2); border:var(--demo-line) solid var(--line); border-radius:var(--r-item); background:var(--surface-input); color:var(--text-2); }
+.featureCallout > svg { flex-shrink:0; width:calc(var(--unit)*2); height:calc(var(--unit)*2); margin-top:calc(var(--demo-line)*2); }
+.featureCallout > div { min-width:0; }
+.featureLabel { margin:0; color:var(--text-2); font:300 var(--demo-type-label)/1.5 var(--font-cakemono); text-transform:uppercase; }
+.featureDetail { margin:calc(var(--unit)/2) 0 0; color:var(--text-3); font:400 var(--demo-type-button)/1.4 var(--font-mohave); }
+.featureExtra { margin-top:var(--unit); }
+.betaRequest { display:flex; align-items:center; flex-wrap:wrap; gap:0 calc(var(--unit)*1.5); }
+.betaRequest a { display:inline-flex; align-items:center; min-height:var(--demo-touch); color:var(--text); font:400 var(--demo-type-button)/1.3 var(--font-mohave); text-decoration:underline; text-underline-offset:calc(var(--unit)/2); }
+.betaRequest span { color:var(--text-3); font:400 var(--demo-type-label)/1.35 var(--font-mohave); }
+@media (max-width:360px) {
+  .roleCard { gap:var(--unit); }
+  .roleSymbol { width:calc(var(--unit)*4); }
+  .roleScene { gap:calc(var(--unit)*2); }
+}
+@media (prefers-reduced-motion:reduce) {
+  .roleCard,button.characterCard { transition:none; }
+}

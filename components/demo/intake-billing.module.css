@@ -137,3 +137,8 @@
 .paidFooter svg { width: calc(var(--unit) * 2.5); height: calc(var(--unit) * 2.5); }
 .paidFooter strong { margin-left: auto; font: 400 var(--ib-micro)/1.5 var(--font-mono); }
 .bookingBanner:focus-visible, .disclosure summary:focus-visible, .textAction:focus-visible, .accountingTrigger:focus-visible { outline: calc(var(--unit) / 4) solid var(--ops-accent); outline-offset: calc(var(--unit) / 2); }
+
+.assignmentRoster { display:grid; gap:calc(var(--unit)*1.5); }
+.billableTasks { display:grid; gap:var(--unit); }
+.billableTasks p { display:flex; align-items:center; gap:var(--unit); color:var(--text-2); }
+.billableTasks svg { width:calc(var(--unit)*2); height:calc(var(--unit)*2); color:var(--olive); }

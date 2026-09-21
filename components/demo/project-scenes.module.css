@@ -89,7 +89,7 @@ button.taskRow:hover { background: var(--surface-hover); }
 .assignTeam { display: inline-flex; align-items: center; gap: var(--unit); min-height: var(--project-touch); padding: var(--unit) calc(var(--unit) * 1.5); border: var(--project-hairline) solid var(--line); border-radius: var(--r-btn); background: var(--surface-hover); color: var(--text-2); font: 400 var(--project-meta)/1.4 var(--font-mono); text-transform: uppercase; }
 .assignTeam svg { width: calc(var(--unit) * 2); height: calc(var(--unit) * 2); transition: transform var(--d-panel) var(--ease-smooth); }
 .assignTeam[aria-expanded=true] svg { transform: rotate(90deg); }
-.teamPicker { margin-top: calc(var(--unit) * 2); border: var(--project-hairline) solid var(--line); border-radius: var(--r-panel); background: var(--surface); overflow: hidden; animation: post-arrive var(--d-panel) var(--ease-smooth) both; }
+.teamPicker { margin-top: calc(var(--unit) * 2); border: var(--project-hairline) solid var(--line); border-radius: var(--r-panel); background: var(--bg-panel); overflow: hidden; animation: post-arrive var(--d-panel) var(--ease-smooth) both; }
 .teamCommit { display: grid; grid-template-columns: 1fr 1fr; gap: calc(var(--unit) * 1.25); padding: calc(var(--unit) * 1.25) calc(var(--unit) * 1.75); }
 .teamMember { display: flex; align-items: center; gap: calc(var(--unit) * 1.25); min-height: var(--project-touch); width: 100%; padding: var(--unit) calc(var(--unit) * 1.75); border: 0; border-top: var(--project-hairline) solid var(--line); background: transparent; color: var(--text-3); text-align: left; }
 .teamMember[aria-pressed=true] { color: var(--text); }
@@ -148,3 +148,10 @@ button.taskRow:hover { background: var(--surface-hover); }
   .crewPost, .teamPicker { animation: post-fade var(--d-hover) linear both; }
 }
 @keyframes post-fade { from { opacity: 0; } to { opacity: 1; } }
+
+.teamPicker { display:grid; gap:var(--unit); padding:var(--unit); }
+.billingHandoff { padding:calc(var(--unit)*2); display:grid; gap:calc(var(--unit)*2); border-top:var(--demo-line) solid var(--line); }
+.billableSummary { display:flex; justify-content:space-between; align-items:center; gap:var(--unit); }
+.billableSummary span { font:300 var(--demo-type-body) var(--font-cakemono); text-transform:uppercase; }
+.billableSummary p { color:var(--text-2); font:400 var(--demo-type-small) var(--font-mono); margin-top:var(--unit); }
+.billableSummary svg { width:calc(var(--unit)*3); height:calc(var(--unit)*3); color:var(--olive); }

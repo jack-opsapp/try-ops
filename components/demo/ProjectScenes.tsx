@@ -6,6 +6,8 @@ import { Action, Avatar, Badge, SamplePhoto, Section } from './DemoPrimitives'
 import { SAMPLE } from './lifecycle-data'
 import type { CrewMember, SceneProps } from './lifecycle-state'
 import styles from './project-scenes.module.css'
+import { CharacterCard } from './CharacterCard'
+import { FeatureCallout } from './FeatureCallout'
 
 type ProjectTab = 'activity' | 'details' | 'expenses'
 const TABS: ProjectTab[] = ['activity', 'details', 'expenses']
@@ -16,7 +18,7 @@ const ROSTER: CrewMember[] = ['Pete', 'Nick']
  * reducer. Changing tabs never changes that durable work. */
 export function ProjectScenes({ state, dispatch }: SceneProps) {
   const [tab, setTab] = useState<ProjectTab>('activity')
-  const [photo, setPhoto] = useState<'before' | 'after' | null>(null)
+  const [photo, setPhoto] = useState<'before' | 'after' | 'progress' | null>(null)
   const [taskOpen, setTaskOpen] = useState(false)
   const [teamPickerOpen, setTeamPickerOpen] = useState(false)
   const [crewDraft, setCrewDraft] = useState<CrewMember[]>([])
@@ -28,10 +30,12 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
   const isCompose = state.scene === 'compose'
   const nextProjectTab = state.scene === 'project' && !state.crewAssigned && tab !== 'details' ? 'details' : isCompose && tab !== 'activity' ? 'activity' : null
   const hasPosted = Boolean(state.postedNote)
-  const isWorkday = state.furthest >= 6
-  const crewName = state.assignedCrew[0] || SAMPLE.crew
-  const crewNames = state.assignedCrew.join(' + ')
-  const crewRail = <span className={styles.crewNames}>{state.assignedCrew.map(name => <Avatar key={name} name={name} />)}<span>{crewNames}</span></span>
+  const isWorkday = state.role === 'crew' || state.visited.includes('activity')
+  const crewName = state.role === 'crew' ? 'You' : state.assignedCrew[0] || SAMPLE.crew
+  const visitAuthor = state.visitAssignee || SAMPLE.estimator
+  const showProgress = hasPosted && state.role === 'operator'
+  const crewNames = state.role === 'crew' ? 'You' : state.assignedCrew.join(' + ')
+  const crewRail = <span className={styles.crewNames}>{state.role === 'crew' ? <Avatar name="You" /> : state.assignedCrew.map(name => <Avatar key={name} name={name} />)}<span>{crewNames}</span></span>
 
   useEffect(() => {
     setTab('activity')
@@ -48,7 +52,7 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
     if (!photo && photoDialog.current?.open) photoDialog.current.close()
   }, [photo])
 
-  function openPhoto(which: 'before' | 'after', opener: HTMLButtonElement) {
+  function openPhoto(which: 'before' | 'after' | 'progress', opener: HTMLButtonElement) {
     photoOpener.current = opener
     setPhoto(which)
   }
@@ -80,21 +84,24 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
   }
 
   const gallery = <div className={styles.gallery} aria-label="Project photos">
-    <div className={styles.galleryHeading}><span>{hasPosted ? '2 photos' : '1 photo'}</span></div>
+    <div className={styles.galleryHeading}><span>{showProgress ? '3 photos' : hasPosted ? '2 photos' : '1 photo'}</span></div>
     <div className={styles.photoRail}>
       {hasPosted && <button className={styles.galleryTile} onClick={event => openPhoto('after', event.currentTarget)} aria-label="View completion photo">
-        <SamplePhoto src={SAMPLE.afterPhoto} alt="Completed cafe patio with new pavers" sizes="72px" />
+        <SamplePhoto src={SAMPLE.afterPhoto} alt="Completed residential deck with composite boards and matching fascia" sizes="72px" />
+      </button>}
+      {showProgress && <button className={styles.galleryTile} onClick={event => openPhoto('progress', event.currentTarget)} aria-label="View progress photo">
+        <SamplePhoto src={SAMPLE.progressPhoto} alt="Composite resurfacing underway on the same deck" sizes="72px" />
       </button>}
       <button className={styles.galleryTile} onClick={event => openPhoto('before', event.currentTarget)} aria-label="View site visit photo">
-        <SamplePhoto src={SAMPLE.beforePhoto} alt="The existing patio documented at the site visit" sizes="72px" />
+        <SamplePhoto src={SAMPLE.beforePhoto} alt="The existing deck documented at the site visit" sizes="72px" />
       </button>
     </div>
   </div>
 
   const visitRecord = <details className={styles.visitRecord}>
     <summary>
-      <Avatar name={SAMPLE.estimator} />
-      <div className={styles.recordText}><div><strong>{SAMPLE.estimator}</strong><time>Sep 22</time></div><span>completed a site visit</span></div>
+      <Avatar name={visitAuthor} />
+      <div className={styles.recordText}><div><strong>{visitAuthor}</strong><time>Sep 22</time></div><span>completed a site visit</span></div>
       <Badge tone="tan">Site visit</Badge>
       <div className={styles.recordSummary}><span>1 photo · Checklist · Notes</span><ChevronRight aria-hidden="true" /></div>
     </summary>
@@ -102,14 +109,14 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
       <p className={styles.recordLabel}>Site visit record</p>
       <dl className={styles.recordFields}><div><dt>Client</dt><dd>{SAMPLE.client}</dd></div><div><dt>Area</dt><dd className={styles.numeric}>{SAMPLE.measurement}</dd></div><div><dt>Scope</dt><dd>{SAMPLE.scope}</dd></div><div><dt>Access</dt><dd>{SAMPLE.access}</dd></div></dl>
       <div className={styles.recordChecks}><span><CheckCircle2 aria-hidden="true" /> Measurements recorded</span><span><CheckCircle2 aria-hidden="true" /> Access confirmed</span><span><CheckCircle2 aria-hidden="true" /> Site photo attached</span></div>
-      <button className={styles.recordPhoto} onClick={event => openPhoto('before', event.currentTarget)} aria-label="Open photo from site visit record"><SamplePhoto src={SAMPLE.beforePhoto} alt="Original patio condition recorded by Mike" /></button>
+      <button className={styles.recordPhoto} onClick={event => openPhoto('before', event.currentTarget)} aria-label="Open photo from site visit record"><SamplePhoto src={SAMPLE.beforePhoto} alt="Original deck condition recorded at the site visit" /></button>
     </div>
   </details>
 
-  const crewPost = <article className={styles.crewPost} aria-label={`${crewName}'s completion update`}>
+  const crewPost = <article className={styles.crewPost} aria-label={state.role === 'crew' ? 'Your completion update' : `${crewName}'s completion update`}>
     <div className={styles.author}><Avatar name={crewName} /><div><strong>{crewName}</strong><time>just now</time></div></div>
     <p className={styles.postText}>{state.postedNote}</p>
-    <button className={styles.completionPhoto} onClick={event => openPhoto('after', event.currentTarget)} aria-label={`Open ${crewName}'s completed patio photo`}><SamplePhoto src={SAMPLE.afterPhoto} alt={`The completed patio ${crewName} shared with the team`} sizes="80px" /></button>
+    <button className={styles.completionPhoto} onClick={event => openPhoto('after', event.currentTarget)} aria-label={state.role === 'crew' ? 'Open your completed deck photo' : `Open ${crewName}'s completed deck photo`}><SamplePhoto src={SAMPLE.afterPhoto} alt={`The completed deck ${state.role === 'crew' ? 'you' : crewName} shared with the team`} sizes="80px" /></button>
   </article>
 
   function openComposer() {
@@ -142,13 +149,18 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
 
     <div className={styles.panel} id={`project-panel-${tab}`} role="tabpanel" aria-labelledby={`project-tab-${tab}`} tabIndex={0}>
       {tab === 'activity' && <div className={styles.activity}>
-        {gallery}{composer}{hasPosted && crewPost}{visitRecord}
+        {gallery}{composer}{hasPosted && crewPost}
+        {showProgress && <details className={styles.visitRecord}>
+          <summary><Avatar name={crewName} /><div className={styles.recordText}><div><strong>{crewName}</strong><time>Earlier today</time></div><span>shared a progress photo</span></div><Badge>In progress</Badge></summary>
+          <div className={styles.recordBody}><p>Old boards removed. Existing framing retained. Composite decking going down.</p><button className={styles.recordPhoto} aria-label="View progress photo" onClick={event => openPhoto('progress', event.currentTarget)}><SamplePhoto src={SAMPLE.progressPhoto} alt="Composite resurfacing underway on the same deck" /></button></div>
+        </details>}
+        {visitRecord}
         {state.scene === 'project' && !state.crewAssigned && <Action className={styles.detailsAction} onClick={() => setTab('details')}>Assign the installation crew<ChevronRight aria-hidden="true" /></Action>}
       </div>}
 
       {tab === 'details' && <div className={styles.details}>
         <Section title="Details"><dl className={styles.document}>
-          <div><dt>Status</dt><dd><Badge>{isWorkday ? 'In progress' : 'Accepted'}</Badge></dd></div>
+          <div><dt>Status</dt><dd><Badge>{state.taskCompleted || isWorkday ? 'In progress' : 'Accepted'}</Badge></dd></div>
           <div><dt>Client</dt><dd>{SAMPLE.client}<span>{SAMPLE.company}</span></dd></div>
           <div><dt>Address</dt><dd>{SAMPLE.address}</dd></div>
           <div><dt>Timeline</dt><dd className={styles.numeric}>{isWorkday ? SAMPLE.workday : 'Unscheduled'}</dd></div>
@@ -156,13 +168,13 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
           <div><dt>Team</dt><dd>{state.crewAssigned ? crewRail : '—'}</dd></div>
         </dl></Section>
         <Section title="Tasks"><div className={styles.tasks}>
-          <div className={styles.taskRow}><div className={styles.taskName}><Badge>Patio preparation</Badge>{isWorkday && <Badge tone="olive">Complete</Badge>}<span>From approved estimate</span></div><FileText className={styles.taskSource} aria-hidden="true" /></div>
-          <button data-demo-next={state.scene === 'project' && !state.crewAssigned && !taskOpen} className={styles.taskRow} onClick={() => { setTaskOpen(value => !value); setTeamPickerOpen(false) }} aria-label="Open patio installation task" aria-expanded={taskOpen} aria-controls="installation-task-detail"><div className={styles.taskName}><Badge>{SAMPLE.task}</Badge>{state.taskCompleted && <Badge tone="olive">Complete</Badge>}<span>{state.crewAssigned ? crewNames : 'From approved estimate'}</span></div><div className={styles.taskDate}><span>{isWorkday ? 'Sep 24' : 'Unscheduled'}</span><ChevronRight aria-hidden="true" /></div></button>
+          <div className={styles.taskRow}><div className={styles.taskName}><Badge>Deck preparation</Badge>{isWorkday && <Badge tone="olive">Complete</Badge>}<span>From approved estimate</span></div><FileText className={styles.taskSource} aria-hidden="true" /></div>
+          <button data-demo-next={state.scene === 'project' && !state.crewAssigned && !taskOpen} className={styles.taskRow} onClick={() => { setTaskOpen(value => !value); setTeamPickerOpen(false) }} aria-label="Open resurfacing task" aria-expanded={taskOpen} aria-controls="installation-task-detail"><div className={styles.taskName}><Badge>{SAMPLE.task}</Badge>{state.taskCompleted && <Badge tone="olive">Complete</Badge>}<span>{state.crewAssigned ? crewNames : 'From approved estimate'}</span></div><div className={styles.taskDate}><span>{isWorkday ? 'Sep 24' : 'Unscheduled'}</span><ChevronRight aria-hidden="true" /></div></button>
           {taskOpen && <div id="installation-task-detail" className={styles.taskDetail}>
             <dl><div><dt>Schedule</dt><dd>{isWorkday ? SAMPLE.workday : 'Unscheduled'}</dd></div><div><dt>Team</dt><dd>{state.crewAssigned ? crewRail : <button data-demo-next={!teamPickerOpen} className={styles.assignTeam} onClick={toggleTeamPicker} aria-label="Assign team to this task" aria-expanded={teamPickerOpen} aria-controls="installation-team-picker">Assign team<ChevronRight aria-hidden="true" /></button>}</dd></div><div><dt>Notes</dt><dd>—</dd></div></dl>
             {teamPickerOpen && <section data-demo-next={crewDraft.length === 0} id="installation-team-picker" className={styles.teamPicker} aria-label="Choose installation crew">
               <div className={styles.teamCommit}><Action secondary onClick={() => setTeamPickerOpen(false)}>Cancel</Action><Action data-demo-next={crewDraft.length > 0} onClick={commitTeam} disabled={crewDraft.length === 0}>Done</Action></div>
-              {ROSTER.map(name => <button key={name} className={styles.teamMember} aria-label={name} aria-pressed={crewDraft.includes(name)} onClick={() => setCrewDraft(members => members.includes(name) ? members.filter(member => member !== name) : [...members, name])}>{crewDraft.includes(name) ? <CheckCircle2 aria-hidden="true" /> : <Circle aria-hidden="true" />}<Avatar name={name} /><span><strong>{name}</strong><span>Crew</span></span></button>)}
+              {ROSTER.map(name => <CharacterCard key={name} name={name} selected={crewDraft.includes(name)} onSelect={() => setCrewDraft(members => members.includes(name) ? members.filter(member => member !== name) : [...members, name])} />)}
             </section>}
           </div>}
           {state.crewAssigned && !isWorkday && <p className={styles.assignedFeedback} role="status"><CheckCircle2 aria-hidden="true" />Crew assigned. Ready to schedule.</p>}
@@ -172,14 +184,20 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
       {tab === 'expenses' && <div className={styles.expenses}><Section title="Project expenses"><div className={styles.expenseEmpty}><Receipt aria-hidden="true" /><h3>No expenses recorded</h3><p>Receipts and job costs stay with this project.</p><p className={styles.expenseContext}>The approved estimate includes materials. An estimate is not an expense.</p></div></Section></div>}
     </div>
 
+    {state.role === 'operator' && state.scene === 'activity' && <div className={styles.billingHandoff}>
+      <FeatureCallout kind="accounting" />
+      <div className={styles.billableSummary}><div><span>Ready to bill</span><p>2 of 2 tasks complete</p></div><CheckCircle2 aria-hidden="true" /></div>
+      <Action data-demo-next="true" onClick={() => dispatch({ type: 'OPEN_BILLING' })}>Review billing<ChevronRight aria-hidden="true" /></Action>
+    </div>}
+
     {isCrew && !isCompose && <div className={styles.actionDock}>
       {state.taskCompleted ? <><span className={styles.completedStatus} role="status"><CheckCircle2 aria-hidden="true" />Task complete</span><Action data-demo-next="true" onClick={openComposer}><ImagePlus aria-hidden="true" />Post a photo update</Action></> : <><span className={styles.selectedLabel}>Selected task<span>{SAMPLE.task}</span></span><Action data-demo-next="true" onClick={() => dispatch({ type: 'COMPLETE_TASK' })}><CheckCircle2 aria-hidden="true" />Complete</Action></>}
     </div>}
 
-    <dialog ref={photoDialog} className={styles.photoDialog} onCancel={() => setPhoto(null)} onClose={restorePhotoFocus} onKeyDown={event => { if (event.key === 'Tab') { event.preventDefault(); photoClose.current?.focus() } }} aria-label={photo === 'after' ? 'Completion photo' : 'Site visit photo'}>
-      <div className={styles.viewerHeader}><span>{photo === 'after' ? 'Completion photo' : 'Site visit photo'}</span><button ref={photoClose} type="button" onClick={() => setPhoto(null)} aria-label="Close photo"><X aria-hidden="true" /></button></div>
-      {photo && <SamplePhoto src={photo === 'after' ? SAMPLE.afterPhoto : SAMPLE.beforePhoto} alt={photo === 'after' ? 'Completed cafe patio with new pavers' : 'Original patio recorded at the site visit'} />}
-      <p>{photo === 'after' ? state.postedNote || SAMPLE.note : SAMPLE.scope}</p>
+    <dialog ref={photoDialog} className={styles.photoDialog} onCancel={() => setPhoto(null)} onClose={restorePhotoFocus} onKeyDown={event => { if (event.key === 'Tab') { event.preventDefault(); photoClose.current?.focus() } }} aria-label={photo === 'after' ? 'Completion photo' : photo === 'progress' ? 'Progress photo' : 'Site visit photo'}>
+      <div className={styles.viewerHeader}><span>{photo === 'after' ? 'Completion photo' : photo === 'progress' ? 'Progress photo' : 'Site visit photo'}</span><button ref={photoClose} type="button" onClick={() => setPhoto(null)} aria-label="Close photo"><X aria-hidden="true" /></button></div>
+      {photo && <SamplePhoto src={photo === 'after' ? SAMPLE.afterPhoto : photo === 'progress' ? SAMPLE.progressPhoto : SAMPLE.beforePhoto} alt={photo === 'after' ? 'Completed residential deck with composite boards and matching fascia' : photo === 'progress' ? 'Composite resurfacing underway on the same deck' : 'Original deck recorded at the site visit'} />}
+      <p>{photo === 'after' ? state.postedNote || SAMPLE.note : photo === 'progress' ? 'Existing framing retained. Composite decking going down.' : SAMPLE.scope}</p>
     </dialog>
   </div>
 }

@@ -97,11 +97,11 @@
   .chapters { display:none; }
   .instruction { margin-top:calc(var(--unit)*1.5); padding-top:calc(var(--unit)*1.5); }
   .instruction p { font-size:var(--demo-type-button); }
-  .product { order:2; width:100%; border-radius:0; border-left:0; border-right:0; overflow:clip; }
+  .product { order:3; width:100%; border-radius:0; border-left:0; border-right:0; overflow:clip; }
   .appViewport { height:auto; min-height:calc(var(--unit)*60); max-height:none; overflow:visible; }
   .roleBar { padding:var(--unit) calc(var(--unit)*2); }
   .navigation { margin:0 calc(var(--unit)*2); padding-bottom:env(safe-area-inset-bottom); }
-  .conversion { order:3; max-width:none; width:100%; margin:0; padding:calc(var(--unit)*2); border-top:var(--demo-line) solid var(--line); background:var(--bg); }
+  .conversion { order:2; max-width:none; width:100%; margin:0; padding:calc(var(--unit)*2); border-top:var(--demo-line) solid var(--line); background:var(--bg); }
   .navigation > span { display:none; }
   .timeline { padding:calc(var(--unit)*1.5) calc(var(--unit)*2); }
 }
@@ -113,3 +113,11 @@
   .headerActions { gap:var(--unit); }
   .topTrial,.exit { white-space:nowrap; }
 }
+
+.role svg { width:calc(var(--unit)*2); height:calc(var(--unit)*2); flex-shrink:0; }
+.demo[data-demo-scene=role] .guide { padding-top:calc(var(--unit)*3); }
+.demo[data-demo-scene=role] .instruction { display:none; }
+.conversion > span a { text-decoration:underline; text-underline-offset:calc(var(--unit)/2); }
+.demo[data-demo-scene=role] .roleBar,.demo[data-demo-scene=role] .timeline { display:none; }
+.demo[data-demo-scene=role] [aria-labelledby=demo-role-title] > header { display:none; }
+.role { color:var(--text-2); }
