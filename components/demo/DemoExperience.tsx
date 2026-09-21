@@ -136,16 +136,16 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
         </div>
       </aside>
       <section className={styles.product} aria-label="Interactive OPS sample">
-        <div className={styles.roleBar}><span className={styles.role}><span aria-hidden="true" className={styles.statusDot}/>{copy.role}</span><span className={styles.productLabel}>OPS FOR IPHONE</span></div>
+        <div className={styles.roleBar} key={copy.role}><span className={styles.role}><span aria-hidden="true" className={styles.statusDot}/>{copy.role}</span><span className={styles.productLabel}>OPS FOR IPHONE</span></div>
         <div className={styles.appViewport} ref={content}>
           {!ready ? <div className={styles.loading} aria-busy="true"><span className={styles.logo} aria-hidden="true"/><p>Opening your sample job.</p><a href={signupHref}>Start my free trial</a></div> : <LazyMotion features={domAnimation} strict><m.div key={state.scene} initial={reduced?{opacity:0}:{opacity:0,x:direction*12}} animate={{opacity:1,x:0}} transition={{duration:reduced?.15:.25,ease:[.22,1,.36,1]}} className={styles.scene}>
             {['inquiry','booked','billing'].includes(state.scene) ? <IntakeBillingScenes {...sceneProps}/> : ['visit','review','estimate'].includes(state.scene) ? <VisitScenes {...sceneProps}/> : <ProjectScenes {...sceneProps}/>}
           </m.div></LazyMotion>}
         </div>
-        <div className={styles.timeline}><span className={styles.time}>{copy.time}</span>{state.scene==='project' && state.crewAssigned && <button className={styles.next} type="button" onClick={()=>dispatch({type:'VIEW_CREW'})}>View crew on the workday <ArrowRight aria-hidden="true"/></button>}</div>
+        <div className={styles.timeline}><span className={styles.time}>{copy.time}</span>{state.scene==='project' && state.crewAssigned && <button data-demo-next="true" className={styles.next} type="button" onClick={()=>dispatch({type:'VIEW_CREW'})}>View crew on the workday <ArrowRight aria-hidden="true"/></button>}</div>
       </section>
       {completed && <div className={styles.conversion}>
-        <a className={styles.trial} href={signupHref} onClick={()=>report('signup_clicked',state.scene)}>Start my free trial <ArrowRight aria-hidden="true" /></a>
+        <a data-demo-next={state.scene === 'activity' || (state.scene === 'billing' && state.paymentRecorded)} className={styles.trial} href={signupHref} onClick={()=>report('signup_clicked',state.scene)}>Start my free trial <ArrowRight aria-hidden="true" /></a>
         <span>30 days · No credit card</span>
         {state.scene==='activity' && <button className={styles.more} type="button" onClick={()=>dispatch({type:'OPEN_BILLING'})}>See billing & accounting <ArrowRight aria-hidden="true" /></button>}
       </div>}

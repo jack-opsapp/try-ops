@@ -26,6 +26,7 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
   const photoClose = useRef<HTMLButtonElement>(null)
   const isCrew = state.scene === 'crew' || state.scene === 'compose'
   const isCompose = state.scene === 'compose'
+  const nextProjectTab = state.scene === 'project' && !state.crewAssigned && tab !== 'details' ? 'details' : isCompose && tab !== 'activity' ? 'activity' : null
   const hasPosted = Boolean(state.postedNote)
   const isWorkday = state.furthest >= 6
   const crewName = state.assignedCrew[0] || SAMPLE.crew
@@ -120,10 +121,10 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
     <div className={styles.composeAuthor}><Avatar name={crewName} /><span>Posting as {crewName}</span></div>
     {state.completionPhoto && <div className={styles.attachedPhoto}><SamplePhoto src={SAMPLE.afterPhoto} alt={`Completion photo attached to ${crewName}'s update`} sizes="80px" /><span><CheckCircle2 aria-hidden="true" /> Photo attached</span></div>}
     <label className={styles.noteLabel} htmlFor="crew-update">Project note</label>
-    <textarea id="crew-update" value={state.noteDraft} maxLength={280} rows={3} onChange={event => dispatch({ type: 'SET_NOTE', value: event.target.value })} aria-describedby="crew-note-help" />
+    <textarea data-demo-next={state.completionPhoto && !state.noteDraft.trim()} id="crew-update" value={state.noteDraft} maxLength={280} rows={3} onChange={event => dispatch({ type: 'SET_NOTE', value: event.target.value })} aria-describedby="crew-note-help" />
     <div className={styles.composeActions}>
-      <button className={styles.attachButton} onClick={() => dispatch({ type: 'ADD_COMPLETION_PHOTO' })} disabled={state.completionPhoto}><Camera aria-hidden="true" /><span>{state.completionPhoto ? 'Photo attached' : 'Attach completion photo'}</span></button>
-      <Action disabled={!state.completionPhoto || !state.noteDraft.trim()} onClick={() => dispatch({ type: 'POST_NOTE' })} aria-label="Post crew update"><ArrowUp aria-hidden="true" />Post</Action>
+      <button data-demo-next={!state.completionPhoto} className={styles.attachButton} onClick={() => dispatch({ type: 'ADD_COMPLETION_PHOTO' })} disabled={state.completionPhoto}><Camera aria-hidden="true" /><span>{state.completionPhoto ? 'Photo attached' : 'Attach completion photo'}</span></button>
+      <Action data-demo-next={state.completionPhoto && !!state.noteDraft.trim()} disabled={!state.completionPhoto || !state.noteDraft.trim()} onClick={() => dispatch({ type: 'POST_NOTE' })} aria-label="Post crew update"><ArrowUp aria-hidden="true" />Post</Action>
     </div>
     <p id="crew-note-help" className={styles.composeHelp}>{state.completionPhoto ? 'The photo and note stay together on this project.' : 'Use the sample job photo. No camera access needed.'}</p>
   </section> : isCrew && state.taskCompleted ? <button className={styles.composerEntry} onClick={openComposer}><Camera aria-hidden="true" /><span>Write a note...</span><ArrowUp aria-hidden="true" /></button> : <details className={styles.composerContext}><summary className={styles.composerEntry} aria-label="About project notes in this sample"><Camera aria-hidden="true" /><span>Write a note...</span><ArrowUp aria-hidden="true" /></summary><p>{hasPosted ? 'The crew’s note is below. In OPS, your team can keep the conversation going here.' : 'Your crew will use this field to post the finished photo and a note later in this sample.'}</p></details>
@@ -136,7 +137,7 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
     </header>
 
     <div className={styles.tabs} role="tablist" aria-label="Project sections">
-      {TABS.map((item, index) => <button key={item} ref={element => { tabButtons.current[index] = element }} id={`project-tab-${item}`} type="button" role="tab" aria-selected={tab === item} aria-controls={`project-panel-${item}`} tabIndex={tab === item ? 0 : -1} onClick={() => setTab(item)} onKeyDown={event => navigateTabs(event, index)}>{item}</button>)}
+      {TABS.map((item, index) => <button key={item} data-demo-next={item === nextProjectTab} ref={element => { tabButtons.current[index] = element }} id={`project-tab-${item}`} type="button" role="tab" aria-selected={tab === item} aria-controls={`project-panel-${item}`} tabIndex={tab === item ? 0 : -1} onClick={() => setTab(item)} onKeyDown={event => navigateTabs(event, index)}>{item}</button>)}
     </div>
 
     <div className={styles.panel} id={`project-panel-${tab}`} role="tabpanel" aria-labelledby={`project-tab-${tab}`} tabIndex={0}>
@@ -156,11 +157,11 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
         </dl></Section>
         <Section title="Tasks"><div className={styles.tasks}>
           <div className={styles.taskRow}><div className={styles.taskName}><Badge>Patio preparation</Badge>{isWorkday && <Badge tone="olive">Complete</Badge>}<span>From approved estimate</span></div><FileText className={styles.taskSource} aria-hidden="true" /></div>
-          <button className={styles.taskRow} onClick={() => { setTaskOpen(value => !value); setTeamPickerOpen(false) }} aria-label="Open patio installation task" aria-expanded={taskOpen} aria-controls="installation-task-detail"><div className={styles.taskName}><Badge>{SAMPLE.task}</Badge>{state.taskCompleted && <Badge tone="olive">Complete</Badge>}<span>{state.crewAssigned ? crewNames : 'From approved estimate'}</span></div><div className={styles.taskDate}><span>{isWorkday ? 'Sep 24' : 'Unscheduled'}</span><ChevronRight aria-hidden="true" /></div></button>
+          <button data-demo-next={state.scene === 'project' && !state.crewAssigned && !taskOpen} className={styles.taskRow} onClick={() => { setTaskOpen(value => !value); setTeamPickerOpen(false) }} aria-label="Open patio installation task" aria-expanded={taskOpen} aria-controls="installation-task-detail"><div className={styles.taskName}><Badge>{SAMPLE.task}</Badge>{state.taskCompleted && <Badge tone="olive">Complete</Badge>}<span>{state.crewAssigned ? crewNames : 'From approved estimate'}</span></div><div className={styles.taskDate}><span>{isWorkday ? 'Sep 24' : 'Unscheduled'}</span><ChevronRight aria-hidden="true" /></div></button>
           {taskOpen && <div id="installation-task-detail" className={styles.taskDetail}>
-            <dl><div><dt>Schedule</dt><dd>{isWorkday ? SAMPLE.workday : 'Unscheduled'}</dd></div><div><dt>Team</dt><dd>{state.crewAssigned ? crewRail : <button className={styles.assignTeam} onClick={toggleTeamPicker} aria-label="Assign team to this task" aria-expanded={teamPickerOpen} aria-controls="installation-team-picker">Assign team<ChevronRight aria-hidden="true" /></button>}</dd></div><div><dt>Notes</dt><dd>—</dd></div></dl>
-            {teamPickerOpen && <section id="installation-team-picker" className={styles.teamPicker} aria-label="Choose installation crew">
-              <div className={styles.teamCommit}><Action secondary onClick={() => setTeamPickerOpen(false)}>Cancel</Action><Action onClick={commitTeam} disabled={crewDraft.length === 0}>Done</Action></div>
+            <dl><div><dt>Schedule</dt><dd>{isWorkday ? SAMPLE.workday : 'Unscheduled'}</dd></div><div><dt>Team</dt><dd>{state.crewAssigned ? crewRail : <button data-demo-next={!teamPickerOpen} className={styles.assignTeam} onClick={toggleTeamPicker} aria-label="Assign team to this task" aria-expanded={teamPickerOpen} aria-controls="installation-team-picker">Assign team<ChevronRight aria-hidden="true" /></button>}</dd></div><div><dt>Notes</dt><dd>—</dd></div></dl>
+            {teamPickerOpen && <section data-demo-next={crewDraft.length === 0} id="installation-team-picker" className={styles.teamPicker} aria-label="Choose installation crew">
+              <div className={styles.teamCommit}><Action secondary onClick={() => setTeamPickerOpen(false)}>Cancel</Action><Action data-demo-next={crewDraft.length > 0} onClick={commitTeam} disabled={crewDraft.length === 0}>Done</Action></div>
               {ROSTER.map(name => <button key={name} className={styles.teamMember} aria-label={name} aria-pressed={crewDraft.includes(name)} onClick={() => setCrewDraft(members => members.includes(name) ? members.filter(member => member !== name) : [...members, name])}>{crewDraft.includes(name) ? <CheckCircle2 aria-hidden="true" /> : <Circle aria-hidden="true" />}<Avatar name={name} /><span><strong>{name}</strong><span>Crew</span></span></button>)}
             </section>}
           </div>}
@@ -172,7 +173,7 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
     </div>
 
     {isCrew && !isCompose && <div className={styles.actionDock}>
-      {state.taskCompleted ? <><span className={styles.completedStatus} role="status"><CheckCircle2 aria-hidden="true" />Task complete</span><Action onClick={openComposer}><ImagePlus aria-hidden="true" />Post a photo update</Action></> : <><span className={styles.selectedLabel}>Selected task<span>{SAMPLE.task}</span></span><Action onClick={() => dispatch({ type: 'COMPLETE_TASK' })}><CheckCircle2 aria-hidden="true" />Complete</Action></>}
+      {state.taskCompleted ? <><span className={styles.completedStatus} role="status"><CheckCircle2 aria-hidden="true" />Task complete</span><Action data-demo-next="true" onClick={openComposer}><ImagePlus aria-hidden="true" />Post a photo update</Action></> : <><span className={styles.selectedLabel}>Selected task<span>{SAMPLE.task}</span></span><Action data-demo-next="true" onClick={() => dispatch({ type: 'COMPLETE_TASK' })}><CheckCircle2 aria-hidden="true" />Complete</Action></>}
     </div>}
 
     <dialog ref={photoDialog} className={styles.photoDialog} onCancel={() => setPhoto(null)} onClose={restorePhotoFocus} onKeyDown={event => { if (event.key === 'Tab') { event.preventDefault(); photoClose.current?.focus() } }} aria-label={photo === 'after' ? 'Completion photo' : 'Site visit photo'}>

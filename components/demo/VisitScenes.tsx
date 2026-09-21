@@ -53,7 +53,7 @@ function CaptureScene({ state, dispatch }: SceneProps) {
   return <div className={styles.scene}>
     <AppHeader title="Site visit"
       left={<button className={styles.iconButton} aria-label="Close site visit" onClick={() => dispatch({ type: 'BACK' })}><X /></button>}
-      right={<Action className={styles.headerAction} disabled={!state.visitPhoto} onClick={() => dispatch({ type: 'REVIEW_VISIT' })}>Done</Action>} />
+      right={<Action data-demo-next={state.visitPhoto} className={styles.headerAction} disabled={!state.visitPhoto} onClick={() => dispatch({ type: 'REVIEW_VISIT' })}>Done</Action>} />
 
     <div className={styles.body}>
       <VisitIdentity />
@@ -101,7 +101,7 @@ function CaptureScene({ state, dispatch }: SceneProps) {
     <div className={styles.captureToolbar} aria-label="Site visit actions">
       {state.visitPhoto
         ? <div className={styles.attachedStatus} role="status"><Check aria-hidden="true" /><span>Photo added</span></div>
-        : <Action className={styles.captureAction} onClick={() => dispatch({ type: 'ADD_SITE_PHOTO' })}><Camera aria-hidden="true" /><span>Photo</span></Action>}
+        : <Action data-demo-next="true" className={styles.captureAction} onClick={() => dispatch({ type: 'ADD_SITE_PHOTO' })}><Camera aria-hidden="true" /><span>Photo</span></Action>}
       <button className={styles.toolbarButton} onClick={showNotes}><StickyNote aria-hidden="true" /><span>Note</span></button>
     </div>
   </div>
@@ -135,7 +135,7 @@ function ReviewScene({ state, dispatch }: SceneProps) {
     </div>
     <div className={styles.footer}>
       <Action secondary onClick={() => dispatch({ type: 'BACK' })}>Back</Action>
-      <Action disabled={!state.visitPhoto} onClick={() => dispatch({ type: 'COMPLETE_VISIT' })}><Check aria-hidden="true" />Complete visit</Action>
+      <Action data-demo-next="true" disabled={!state.visitPhoto} onClick={() => dispatch({ type: 'COMPLETE_VISIT' })}><Check aria-hidden="true" />Complete visit</Action>
     </div>
   </div>
 }
@@ -183,7 +183,7 @@ function EstimateScene({ state, dispatch }: SceneProps) {
       </div>
     </div>
     <div className={styles.footer}>
-      <Action disabled={!state.visitCompleted} onClick={() => dispatch({ type: 'APPROVE_ESTIMATE' })}><Check aria-hidden="true" />Mark approved</Action>
+      <Action data-demo-next="true" disabled={!state.visitCompleted} onClick={() => dispatch({ type: 'APPROVE_ESTIMATE' })}><Check aria-hidden="true" />Mark approved</Action>
     </div>
   </div>
 }

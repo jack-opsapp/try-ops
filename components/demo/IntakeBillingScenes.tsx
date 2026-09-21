@@ -84,7 +84,7 @@ function InquiryScene({ dispatch }: Pick<SceneProps, 'dispatch'>) {
         </Section>
       </div>
       <div className={ui.toolbar}>
-        <Action onClick={() => dispatch({ type: 'OPEN_BOOKING' })}>Open booked visit <ChevronRight aria-hidden="true" /></Action>
+        <Action data-demo-next="true" onClick={() => dispatch({ type: 'OPEN_BOOKING' })}>Open booked visit <ChevronRight aria-hidden="true" /></Action>
       </div>
     </div>
   )
@@ -119,7 +119,7 @@ function BookedScene({ dispatch }: Pick<SceneProps, 'dispatch'>) {
         </div>
       </div>
       <div className={ui.toolbar}>
-        <Action onClick={() => dispatch({ type: 'START_VISIT' })}>Start site visit <ChevronRight aria-hidden="true" /></Action>
+        <Action data-demo-next="true" onClick={() => dispatch({ type: 'START_VISIT' })}>Start site visit <ChevronRight aria-hidden="true" /></Action>
       </div>
     </div>
   )
@@ -153,7 +153,7 @@ function BillingScene({ state, dispatch }: SceneProps) {
           <p className={styles.finePrint}>Sample receipt. OPS records this payment; the bank handled the transfer.</p>
         </div>
         <div className={ui.toolbar}>
-          <Action onClick={() => { dispatch({ type: 'RECORD_PAYMENT' }); setRecording(false) }}>Record payment</Action>
+          <Action data-demo-next="true" onClick={() => { dispatch({ type: 'RECORD_PAYMENT' }); setRecording(false) }}>Record payment</Action>
         </div>
       </div>
     )
@@ -218,7 +218,7 @@ function BillingScene({ state, dispatch }: SceneProps) {
         {state.paymentRecorded ? (
           <div className={styles.paidFooter} role="status"><Check aria-hidden="true" /><span>Paid in full</span><strong>{money(0)} DUE</strong></div>
         ) : (
-          <Action onClick={() => setRecording(true)}>Record payment</Action>
+          <Action data-demo-next="true" onClick={() => setRecording(true)}>Record payment</Action>
         )}
       </div>
     </div>
