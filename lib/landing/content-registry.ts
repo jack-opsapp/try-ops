@@ -1,5 +1,5 @@
 /** Approved product facts. A generator selects references; it cannot add claims. */
-export const CONTENT_REGISTRY_VERSION = 'tryops-content:2026-09-14.v2'
+export const CONTENT_REGISTRY_VERSION = 'tryops-content:2026-09-21.v3'
 export const CONTENT_CHECKED_AT = '2026-09-14'
 
 export const APPROVED_OFFER = {
@@ -28,6 +28,27 @@ export const APPROVED_CTA_LABELS = {
 } as const
 
 export const APPROVED_CAPABILITIES = {
+  'leads.tracking': {
+    claim: 'Keep client details and follow-up notes with a lead.',
+    platforms: ['web'],
+    sources: ['ops-software-bible/10_JOB_LIFECYCLE_AND_DATA_RELATIONSHIPS.md:49-85', 'ops-software-bible/14_FEATURE_POSITIONING.md:94-138', 'ops-web/docs/artifacts/email-work-correspondence-release.md'],
+    checkedAt: '2026-09-21',
+    limits: 'A managed workflow, not a promise that every incoming enquiry is captured or answered automatically. Email connection is optional and requires setup.',
+  },
+  'estimates.line-items': {
+    claim: 'Create estimates with line items and review their status.',
+    platforms: ['web'],
+    sources: ['ops-software-bible/10_JOB_LIFECYCLE_AND_DATA_RELATIONSHIPS.md:32-60', 'ops-web/src/lib/api/services/estimate-service.ts'],
+    checkedAt: '2026-09-21',
+    limits: 'No automatic quote accuracy, customer email delivery or acceptance guarantee. Web is the advertised owner workflow; no universal mobile parity claim.',
+  },
+  'invoices.balances': {
+    claim: 'Convert an approved estimate to an invoice, record payments and see the outstanding balance.',
+    platforms: ['web'],
+    sources: ['ops-web/src/lib/api/services/estimate-service.ts:convertToInvoice', 'ops-web/src/lib/api/services/invoice-service.ts:recordPayment', 'ops-software-bible/09_FINANCIAL_SYSTEM.md:774-795'],
+    checkedAt: '2026-09-21',
+    limits: 'Recording payment is not processing a payment. No automatic collection, faster-payment result or active accounting-integration promise.',
+  },
   'jobs.details': {
     claim: 'Keep the address, job notes and crew assignment with the job.',
     platforms: ['web', 'ios'],
@@ -60,8 +81,7 @@ export const APPROVED_CAPABILITIES = {
   },
 } as const
 
-/** Names in old copy are not provenance. No original consent/source was provided. */
-export const APPROVED_TESTIMONIALS: Record<string, never> = {}
+export { APPROVED_TESTIMONIALS } from './testimonials'
 
 export const APPROVED_IMAGES = {
   'ios.schedule': {

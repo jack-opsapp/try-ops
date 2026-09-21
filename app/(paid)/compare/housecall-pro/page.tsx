@@ -5,8 +5,8 @@ import { PAID_PAGE_CONFIGS, paidVariantId } from '@/lib/landing/page-configs'
 const SLUG = 'compare/housecall-pro' as const
 
 export const metadata: Metadata = {
-  title: 'OPS vs Housecall Pro — the prices, side by side',
-  description: 'Job details, crew scheduling and project photos for trades crews. Plans from $90 CAD/month. Try OPS free for 30 days. No credit card.',
+  title: "OPS vs Housecall Pro — make the work the test",
+  description: "Compare published crew prices and billing terms. Try the quote-to-invoice workflow with your crew in OPS. Free for 30 days. No credit card.",
   alternates: { canonical: 'https://try.opsapp.co/compare/housecall-pro' },
 }
 

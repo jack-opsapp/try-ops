@@ -5,8 +5,8 @@ import { PAID_PAGE_CONFIGS, paidVariantId } from '@/lib/landing/page-configs'
 const SLUG = 'for/landscaping' as const
 
 export const metadata: Metadata = {
-  title: 'Landscaping and lawn care software for the whole crew',
-  description: 'Job details, crew scheduling and project photos for trades crews. Plans from $90 CAD/month. Try OPS free for 30 days. No credit card.',
+  title: "Landscaping job management — a clear plan for your crew",
+  description: "Property details, scheduled work and progress photos in one place. Plan and invoice on the web, with iPhone access for the crew. Try OPS free.",
   alternates: { canonical: 'https://try.opsapp.co/for/landscaping' },
 }
 

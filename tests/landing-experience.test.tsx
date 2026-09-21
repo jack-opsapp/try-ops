@@ -6,6 +6,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { CtaModeProvider } from '@/lib/landing/cta-mode'
 import { Hero } from '@/components/landing/Hero'
 import { PricingSection } from '@/components/landing/PricingSection'
+import { CustomerProofSection } from '@/components/landing/CustomerProofSection'
 import { PAID_PAGE_CONFIGS } from '@/lib/landing/page-configs'
 import { SEED_CONFIG_A } from '@/lib/ab/seed-config'
 
@@ -18,6 +19,19 @@ function documentFor(node: React.ReactNode) {
 }
 
 describe('landing conversion contract', () => {
+  it('renders only approved original customer words when references include unknown or repeated identities', () => {
+    const doc = documentFor(<CustomerProofSection heading="Customer proof" proofIds={['toString', 'unverified-person', 'ryan-crew-adoption-2026-07-06', 'ryan-crew-adoption-2026-07-06']} />)
+    expect(doc.querySelectorAll('blockquote')).toHaveLength(1)
+    expect(doc.querySelector('blockquote')?.textContent).toBe('I came to OPS from Jobber. We went from our crew ignoring the app, to being excited to use it.')
+    expect(doc.querySelector('figcaption')?.textContent).toContain('Ryan M.')
+    expect(doc.querySelector('blockquote')?.getAttribute('cite')).toBe('https://opsapp.co/platform')
+  })
+
+  it('shows no empty proof heading or fabricated fallback for an unknown customer', () => {
+    const doc = documentFor(<CustomerProofSection heading="Customer proof" proofIds={['unverified-person']} />)
+    expect(doc.querySelector('section')).toBeNull()
+  })
+
   it('renders registration navigation before hydration, independent of optional sections', () => {
     const doc = documentFor(<Hero headline="JOB MANAGEMENT YOUR CREW WILL ACTUALLY USE" subtext="See the plan." primaryCtaLabel="START MY FREE TRIAL" secondaryCtaLabel="" />)
     const action = doc.querySelector('a[href="https://app.opsapp.co/register"]')

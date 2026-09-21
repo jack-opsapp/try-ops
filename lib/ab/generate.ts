@@ -8,7 +8,7 @@ export async function generateChallenger(input:GenerationInput) {
  const registry=Object.fromEntries(input.allowedSectionIds.map(id=>{if(!input.registry[id])throw new Error('Unknown section');return [id,input.registry[id]]}))
  const client=new OpenAI({timeout:90000,maxRetries:0})
  const response=await client.chat.completions.create({model:process.env.AB_GENERATION_MODEL||'gpt-4o',max_tokens:1500,temperature:0.2,response_format:{type:'json_object'},messages:[
-  {role:'system',content:'Select only approved section IDs for a landing page experiment. Never write or alter copy, claims, prices, endorsements, images or destinations. Required order: Hero first, PricingSection and FAQSection present, ClosingCTA last. One of each type. Return exactly {hypothesis,sectionIds,reasoning}; hypothesis must match the supplied hypothesis verbatim. Supporting engagement diagnostics cannot choose a winner.'},
+  {role:'system',content:'Select only approved section IDs for a landing page experiment. Never write or alter copy, claims, prices, endorsements, images or destinations. Required order: Hero first, PricingSection and FAQSection present, ClosingCTA last. Include CustomerProofSection, WorkflowSection and GettingStartedSection whenever that type exists in the supplied registry. One of each type. Return exactly {hypothesis,sectionIds,reasoning}; hypothesis must match the supplied hypothesis verbatim. Supporting engagement diagnostics cannot choose a winner.'},
   {role:'user',content:JSON.stringify({hypothesis:input.hypothesis,registryVersion:input.registryVersion,approvedSections:registry})},
  ]})
  // Rejected output stays a rejection; no silent sanitization or treatment rewrites.

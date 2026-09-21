@@ -12,11 +12,11 @@ type HeroProps = z.infer<typeof HeroPropsSchema>
 
 export function Hero({ headline, subtext, comparisonRival }: HeroProps) {
   const { secondary } = useCtaHandlers('Hero')
-  return <section id="hero" className={`landing-hero${comparisonRival ? ' landing-hero-comparison' : ''}`}>
+  return <section id="hero" className={`landing-hero${comparisonRival ? ' landing-hero-comparison' : ''}`} aria-labelledby="hero-heading">
     <div className="landing-container hero-grid">
       <div className="hero-copy">
         <p className="landing-label">JOB MANAGEMENT FOR THE TRADES</p>
-        <h1>{headline}</h1>
+        <h1 id="hero-heading">{headline}</h1>
         <p className="hero-subtext">{subtext}</p>
         {comparisonRival && <ComparisonPreview rival={comparisonRival} />}
         <div className="hero-actions"><PrimaryAction section="Hero" />{secondary && <button type="button" className="landing-button landing-button-secondary" onClick={secondary}>{APPROVED_CTA_LABELS.tutorial}</button>}</div>

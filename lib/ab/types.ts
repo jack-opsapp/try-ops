@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { isApprovedTestimonialId } from '@/lib/landing/testimonials'
 
 // ── Section prop schemas ──────────────────────────────────────────────────
 export const HeroPropsSchema = z.object({
@@ -29,6 +30,29 @@ export const SolutionSectionPropsSchema = z.object({
     why: z.string(),
   })),
 })
+
+export const WorkflowSectionPropsSchema = z.object({
+  heading: z.string().min(1),
+  intro: z.string().min(1),
+  steps: z.array(z.object({
+    stage: z.string().min(1),
+    title: z.string().min(1),
+    copy: z.string().min(1),
+    platform: z.string().min(1),
+  }).strict()).min(1).max(5),
+}).strict()
+
+export const GettingStartedSectionPropsSchema = z.object({
+  heading: z.string().min(1),
+  intro: z.string().min(1),
+  steps: z.array(z.object({ title: z.string().min(1), copy: z.string().min(1) }).strict()).min(1).max(4),
+}).strict()
+
+export const CustomerProofSectionPropsSchema = z.object({
+  heading: z.string().min(1),
+  proofIds: z.array(z.string().refine(isApprovedTestimonialId, 'Unapproved customer proof'))
+    .min(1).max(3).refine(ids => new Set(ids).size === ids.length, 'Repeated customer proof'),
+}).strict()
 
 export const TestimonialsSectionPropsSchema = z.object({
   heading: z.string().optional(),
@@ -101,6 +125,9 @@ export const SECTION_TYPES = [
   'Hero',
   'PainSection',
   'SolutionSection',
+  'WorkflowSection',
+  'GettingStartedSection',
+  'CustomerProofSection',
   'TestimonialsSection',
   'RoadmapSection',
   'PricingSection',
@@ -119,6 +146,9 @@ export const SectionSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('Hero'), props: HeroPropsSchema }),
   z.object({ type: z.literal('PainSection'), props: PainSectionPropsSchema }),
   z.object({ type: z.literal('SolutionSection'), props: SolutionSectionPropsSchema }),
+  z.object({ type: z.literal('WorkflowSection'), props: WorkflowSectionPropsSchema }),
+  z.object({ type: z.literal('GettingStartedSection'), props: GettingStartedSectionPropsSchema }),
+  z.object({ type: z.literal('CustomerProofSection'), props: CustomerProofSectionPropsSchema }),
   z.object({ type: z.literal('TestimonialsSection'), props: TestimonialsSectionPropsSchema }),
   z.object({ type: z.literal('RoadmapSection'), props: RoadmapSectionPropsSchema }),
   z.object({ type: z.literal('PricingSection'), props: PricingSectionPropsSchema }),

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { APPROVED_TESTIMONIALS } from '@/lib/landing/content-registry'
+import { getApprovedTestimonials } from '@/lib/landing/testimonials'
 import { VariantConfigSchema } from '@/lib/ab/types'
 import { PAID_PAGE_CONFIGS, paidVariantId, type PaidPageSlug } from '@/lib/landing/page-configs'
 
@@ -58,9 +59,11 @@ describe('paid landing page configs', () => {
     // No section that offers a competing action.
     expect(types, slug).not.toContain('DesktopDownload')
     expect(types, slug).not.toContain('InlineSignupForm')
-    // The hero leads, the price answers the next question early.
+    // Every hero shows the starting price; comparison intent also keeps the
+    // full price table before the longer job story.
     expect(types[0], slug).toBe('Hero')
-    expect(types.indexOf('PricingSection'), slug).toBeLessThanOrEqual(2)
+    expect(types).toContain('PricingSection')
+    if (slug.startsWith('compare/')) expect(types.indexOf('PricingSection'), slug).toBeLessThanOrEqual(2)
     expect(types[types.length - 1], slug).toBe('ClosingCTA')
   })
 
@@ -91,9 +94,17 @@ describe('paid landing page configs', () => {
   })
 
   it('contains no customer endorsements without an approved original source', () => {
-    expect(Object.keys(APPROVED_TESTIMONIALS)).toHaveLength(0)
-    for (const [slug, config] of entries)
+    for (const proof of Object.values(APPROVED_TESTIMONIALS)) {
+      expect(proof.sourceReference).toBeTruthy()
+      expect(proof.approvalReference).toBeTruthy()
+    }
+    for (const [slug, config] of entries) {
       expect(config.sections.filter(section => section.type === 'TestimonialsSection'), slug).toHaveLength(0)
+      for (const section of config.sections) {
+        if (section.type !== 'CustomerProofSection') continue
+        expect(getApprovedTestimonials(section.props.proofIds), slug).toHaveLength(section.props.proofIds.length)
+      }
+    }
   })
 
   it('has a route file for every config, and a config for every route', () => {

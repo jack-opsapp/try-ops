@@ -5,8 +5,8 @@ import { PAID_PAGE_CONFIGS, paidVariantId } from '@/lib/landing/page-configs'
 const SLUG = 'compare/servicetitan' as const
 
 export const metadata: Metadata = {
-  title: 'OPS vs ServiceTitan — compare plans for your crew',
-  description: 'Job details, crew scheduling and project photos for trades crews. Plans from $90 CAD/month. Try OPS free for 30 days. No credit card.',
+  title: "A ServiceTitan alternative for a small trades crew — OPS",
+  description: "OPS publishes monthly prices for crews of up to ten people. Compare your requirements, then try the job workflow free for 30 days. No credit card.",
   alternates: { canonical: 'https://try.opsapp.co/compare/servicetitan' },
 }
 

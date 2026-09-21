@@ -5,8 +5,8 @@ import { PAID_PAGE_CONFIGS, paidVariantId } from '@/lib/landing/page-configs'
 const SLUG = 'for/roofing' as const
 
 export const metadata: Metadata = {
-  title: 'Roofing job management for your crew',
-  description: 'Job details, crew scheduling and project photos for trades crews. Plans from $90 CAD/month. Try OPS free for 30 days. No credit card.',
+  title: "Roofing job management — a plan and a record for every roof",
+  description: "Keep the scope, crew schedule and tear-off, flashing and finish photos with the roof. Estimates and invoices on the web. Try OPS free for 30 days.",
   alternates: { canonical: 'https://try.opsapp.co/for/roofing' },
 }
 

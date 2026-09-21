@@ -5,22 +5,22 @@ import { AnalyticsProvider } from '@/components/layout/AnalyticsProvider'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://try.opsapp.co'),
-  title: 'OPS — Job Management Your Crew Will Actually Use | Try Free',
+  title: 'OPS — Run the Job. Stop Chasing the Details. | Try Free',
   description:
-    'Job management for trades crews. Keep the address, schedule, job notes and photos together. Try OPS free for 30 days. No credit card.',
+    'Job management for the trades. Leads, estimates, crew schedules, project photos and invoices in one place. Try OPS free for 30 days. No credit card.',
   openGraph: {
-    title: 'OPS — Job Management Your Crew Will Actually Use',
+    title: 'OPS — Run the Job. Stop Chasing the Details.',
     description:
-      'Job details, crew scheduling and project photos. Try OPS free for 30 days. No credit card.',
+      'Run the business on the web. Put the job plan in your crew’s hands on iPhone. Try OPS free for 30 days. No credit card.',
     url: 'https://try.opsapp.co',
     siteName: 'OPS',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'OPS — Job Management Your Crew Will Actually Use',
+    title: 'OPS — Run the Job. Stop Chasing the Details.',
     description:
-      'Job details, crew scheduling and project photos. Try OPS free for 30 days. No credit card.',
+      'Run the business on the web. Put the job plan in your crew’s hands on iPhone. Try OPS free for 30 days. No credit card.',
   },
   alternates: {
     canonical: 'https://try.opsapp.co',
@@ -59,7 +59,7 @@ const jsonLd = {
     name: 'OPS',
     url: 'https://opsapp.co',
   },
-  featureList: 'Project Management, Crew Scheduling, Photo Documentation, Job Board, Client Management',
+  featureList: 'Lead Management, Estimates, Project Management, Crew Scheduling, Photo Documentation, Invoices, Client Management',
 }
 
 export default function RootLayout({

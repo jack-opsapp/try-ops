@@ -3,6 +3,9 @@ import dynamic from 'next/dynamic'
 import { Hero } from '@/components/landing/Hero'
 const PainSection = dynamic(() => import('@/components/landing/PainSection').then(module => module.PainSection))
 import { SolutionSection } from '@/components/landing/SolutionSection'
+import { WorkflowSection } from '@/components/landing/WorkflowSection'
+import { GettingStartedSection } from '@/components/landing/GettingStartedSection'
+import { CustomerProofSection } from '@/components/landing/CustomerProofSection'
 const TestimonialsSection = dynamic(() => import('@/components/landing/TestimonialsSection').then(module => module.TestimonialsSection))
 const RoadmapSection = dynamic(() => import('@/components/landing/RoadmapSection').then(module => module.RoadmapSection))
 import { PricingSection } from '@/components/landing/PricingSection'
@@ -20,6 +23,9 @@ export const SECTION_REGISTRY: Record<SectionType, React.ComponentType<any>> = {
   Hero,
   PainSection,
   SolutionSection,
+  WorkflowSection,
+  GettingStartedSection,
+  CustomerProofSection,
   TestimonialsSection,
   RoadmapSection,
   PricingSection,

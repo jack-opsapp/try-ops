@@ -5,8 +5,8 @@ import { PAID_PAGE_CONFIGS, paidVariantId } from '@/lib/landing/page-configs'
 const SLUG = 'compare/jobber' as const
 
 export const metadata: Metadata = {
-  title: 'OPS vs Jobber — the prices, side by side',
-  description: 'Job details, crew scheduling and project photos for trades crews. Plans from $90 CAD/month. Try OPS free for 30 days. No credit card.',
+  title: "OPS vs Jobber — compare price and the everyday job workflow",
+  description: "Compare published crew pricing, then try estimates, scheduling, job photos and invoices in OPS. A 30-day trial with no credit card.",
   alternates: { canonical: 'https://try.opsapp.co/compare/jobber' },
 }
 
