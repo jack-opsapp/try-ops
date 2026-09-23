@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { CalendarDays, Mail, MapPin, Link2 } from 'lucide-react'
-import { Action, AppHeader, Avatar, Badge, Check, ChevronRight, Section, ui } from './DemoPrimitives'
+import { NumericText, Action, AppHeader, Avatar, Badge, Check, ChevronRight, Section, ui } from './DemoPrimitives'
 import { SAMPLE, money } from './lifecycle-data'
 import type { SceneProps, VisitAssignee } from './lifecycle-state'
 import styles from './intake-billing.module.css'
@@ -28,7 +28,7 @@ function LeadIdentity() {
   return (
     <div className={styles.identity}>
       <div className={styles.idLine}>L-00142 <span aria-hidden="true">/</span> EMAIL INQUIRY</div>
-      <h3>{SAMPLE.project}</h3>
+      <h3><NumericText>{SAMPLE.project}</NumericText></h3>
       <p>{SAMPLE.client} <span className={styles.separator}>·</span> {SAMPLE.company}</p>
       <div className={styles.address}><MapPin aria-hidden="true" /> <span>{SAMPLE.address}</span></div>
     </div>
@@ -100,7 +100,7 @@ function BookedScene({ state, dispatch }: SceneProps) {
     <div className={styles.content}>
       <div className={styles.appointment}>
         <div className={styles.calendarDate} aria-label="Tuesday, September 22"><span>SEP</span><strong>22</strong><span>TUE</span></div>
-        <div className={styles.appointmentBody}><h3>{SAMPLE.project}</h3><p className={styles.appointmentTime}>10:00 AM</p><p>{SAMPLE.address}</p></div>
+        <div className={styles.appointmentBody}><h3><NumericText>{SAMPLE.project}</NumericText></h3><p className={styles.appointmentTime}>10:00 AM</p><p>{SAMPLE.address}</p></div>
       </div>
       <Section title="Assign to">
         {state.visitAssignee ? <CharacterCard name={state.visitAssignee} /> : <div className={styles.assignmentRoster} data-demo-next={!chosen}>
@@ -126,7 +126,7 @@ function BillingScene({ state, onAccountingPreviewChange }: IntakeProps) {
     <div className={styles.content}>
       <FeatureCallout kind="accounting" />
       <div className={styles.invoiceIdentity}>
-        <h3>{SAMPLE.invoiceNumber}</h3><p>{SAMPLE.project}</p><span className={styles.invoiceAmount}>{money(SAMPLE.total)}</span>
+        <h3>{SAMPLE.invoiceNumber}</h3><p><NumericText>{SAMPLE.project}</NumericText></p><span className={styles.invoiceAmount}>{money(SAMPLE.total)}</span>
       </div>
       <ol className={styles.billingEvents} aria-label="Sample billing timeline">
         <li data-complete="true"><Check aria-hidden="true"/><div><strong>All tasks complete</strong><span>Thursday · ready to bill</span></div></li>

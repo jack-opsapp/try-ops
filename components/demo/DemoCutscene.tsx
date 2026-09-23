@@ -15,12 +15,15 @@ import {
 import { Fragment, type ReactNode } from 'react'
 import { SAMPLE } from './lifecycle-data'
 import { InquiryConversation } from './InquiryConversation'
+import { CalendarWorkday } from './CalendarWorkday'
 import type { CutsceneBeat } from './cutscene-script'
 import styles from './demo-cutscene.module.css'
 
 interface DemoCutsceneProps {
   beat: CutsceneBeat
   conversation?: CutsceneBeat[]
+  calendarCrew?: string[]
+  complete?: boolean
   index: number
   total: number
   paused: boolean
@@ -186,7 +189,7 @@ function Artifact({ beat }: { beat: CutsceneBeat }): ReactNode {
   }
 }
 
-export function DemoCutscene({ beat, conversation, index, total, paused, reduced, onPause, onSkip }: DemoCutsceneProps) {
+export function DemoCutscene({ beat, conversation, calendarCrew, complete = false, index, total, paused, reduced, onPause, onSkip }: DemoCutsceneProps) {
   const count = Math.max(1, total)
   const current = Math.min(count, Math.max(1, index + 1))
 
@@ -194,9 +197,10 @@ export function DemoCutscene({ beat, conversation, index, total, paused, reduced
     className={styles.cutscene}
     data-paused={paused}
     data-reduced={reduced}
+    data-complete={complete}
     aria-label="Demo scene"
   >
-    <header className={styles.sceneHeader}>
+    {!complete && <header className={styles.sceneHeader}>
       <span>SCENE <b>{String(current).padStart(2, '0')}</b> / {String(count).padStart(2, '0')}</span>
       <ol className={styles.progress} aria-hidden="true">
         {Array.from({ length: count }, (_, marker) => <li
@@ -204,9 +208,9 @@ export function DemoCutscene({ beat, conversation, index, total, paused, reduced
           data-state={marker + 1 < current ? 'previous' : marker + 1 === current ? 'current' : 'next'}
         />)}
       </ol>
-    </header>
+    </header>}
 
-    <div className={styles.controls}>
+    {!complete && <div className={styles.controls}>
       <button type="button" aria-pressed={paused} aria-label={paused ? 'Resume scene' : 'Pause scene'} onClick={onPause}>
         {paused ? <CirclePlay aria-hidden="true" /> : <CirclePause aria-hidden="true" />}
         <span>{paused ? 'Resume scene' : 'Pause scene'}</span>
@@ -215,10 +219,10 @@ export function DemoCutscene({ beat, conversation, index, total, paused, reduced
         <span>Skip scene</span>
         <SkipForward aria-hidden="true" />
       </button>
-    </div>
+    </div>}
 
-    <div className={conversation ? styles.conversationStage : styles.stage} key={conversation ? 'conversation' : `${beat.id}-stage`}>
-      {conversation ? <InquiryConversation beats={conversation} index={index} reduced={reduced} paused={paused} /> : <article
+    <div className={conversation || calendarCrew ? styles.conversationStage : styles.stage} key={calendarCrew ? 'calendar' : conversation ? 'conversation' : `${beat.id}-stage`}>
+      {calendarCrew ? <CalendarWorkday index={index} crew={calendarCrew} reduced={reduced} paused={paused} complete={complete}/> : conversation ? <InquiryConversation beats={conversation} index={index} reduced={reduced} paused={paused} /> : <article
         className={styles.beat}
         data-kind={beat.kind}
         data-direction={beat.direction ?? 'incoming'}
@@ -229,8 +233,8 @@ export function DemoCutscene({ beat, conversation, index, total, paused, reduced
       </article>}
     </div>
 
-    <p className={styles.srOnly} aria-live="polite" aria-atomic="true">
-      {beat.actor}. {beat.title}. {beat.body}
+    <p className={styles.srOnly} aria-live={complete ? 'off' : 'polite'} aria-atomic="true">
+      {!complete && <>{beat.actor}. {beat.title}. {beat.body}</>}
     </p>
   </section>
 }

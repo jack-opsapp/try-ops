@@ -453,3 +453,4 @@
 }
 
 .conversationStage { min-height:0; overflow:hidden; }
+.cutscene[data-complete='true'] { grid-template-rows: minmax(0, 1fr); }

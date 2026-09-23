@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Camera, ChevronDown, FileText, Image as PhotoIcon, MapPin, Ruler, Send, StickyNote } from 'lucide-react'
-import { Action, AppHeader, ArrowLeft, Avatar, Badge, Check, SamplePhoto, Section, X, ui } from './DemoPrimitives'
+import { NumericText, Action, AppHeader, ArrowLeft, Avatar, Badge, Check, SamplePhoto, Section, X, ui } from './DemoPrimitives'
 import { SAMPLE, money } from './lifecycle-data'
 import type { SceneProps } from './lifecycle-state'
 import { SpecTool } from './SpecTool'
@@ -128,7 +128,7 @@ function ReviewScene({ state, dispatch }: SceneProps) {
       </div>}
       <div className={styles.reviewSummary}>
         <p className={styles.sectionLabel}>// Project</p>
-        <h3>{SAMPLE.project}</h3>
+        <h3><NumericText>{SAMPLE.project}</NumericText></h3>
         <p>{SAMPLE.client} · {SAMPLE.company}</p>
         <span className={styles.metadata}>{SAMPLE.address}</span>
       </div>
@@ -222,7 +222,7 @@ function EstimateScene({ state, dispatch, onToolPreviewChange }: VisitSceneProps
 function EstimateIdentity() {
   return <div className={styles.estimateIdentity}>
     <div className={styles.documentNumber}><FileText aria-hidden="true" />{SAMPLE.estimateNumber}</div>
-    <h3>{SAMPLE.project}</h3>
+    <h3><NumericText>{SAMPLE.project}</NumericText></h3>
     <p>{SAMPLE.company} · {SAMPLE.client}</p>
     <span className={styles.metadata}>{SAMPLE.address}</span>
   </div>

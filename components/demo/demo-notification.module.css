@@ -2,7 +2,7 @@
    normal flow to reserve space; only its message animates, never the layout. */
 .slot { min-width:0; flex-shrink:0; }
 .slot[data-active=true] { padding:calc(var(--unit)*1.5) calc(var(--unit)*2); border-bottom:calc(var(--unit)/8) solid var(--line); background:var(--bg); }
-.surface { display:flex; align-items:flex-start; gap:calc(var(--unit)/2); min-width:0; }
+.surface { position:relative; display:flex; align-items:flex-start; gap:calc(var(--unit)/2); min-width:0; }
 .slot[data-active=true] .surface { padding:calc(var(--unit)*1.5); border:calc(var(--unit)/8) solid var(--glass-border); border-radius:var(--r-panel); background:var(--glass-dense); }
 .announcement { flex:1; min-width:0; }
 .message { display:flex; align-items:flex-start; gap:calc(var(--unit)*1.5); min-width:0; animation:notification-arrive var(--d-page) var(--ease-smooth) both; }
@@ -17,6 +17,10 @@
 .dismiss svg { width:calc(var(--unit)*2); height:calc(var(--unit)*2); }
 .dismiss:hover,.dismiss:active { color:var(--text); background:var(--surface-hover); }
 .dismiss:focus-visible { outline:calc(var(--unit)/4) solid var(--ops-accent); outline-offset:calc(var(--unit)/4); }
+.slot .surface .open { position:absolute; inset:0; width:100%; min-height:calc(var(--unit)*5.5); padding:0; border:0; border-radius:var(--r-panel); background:transparent; cursor:pointer; }
+.open:hover { background:var(--surface-hover); }
+.open:focus-visible { outline:calc(var(--unit)/4) solid var(--ops-accent); outline-offset:calc(var(--unit)/4); }
+.openLabel { position:absolute; width:calc(var(--unit)/8); height:calc(var(--unit)/8); padding:0; margin:calc(var(--unit)/-8); overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
 @keyframes notification-arrive { from { opacity:0; transform:translateY(calc(var(--unit)*-1)); } to { opacity:1; transform:translateY(0); } }
 @keyframes notification-fade { from { opacity:0; } to { opacity:1; } }
 .slot[data-reduced=true] .message { animation:notification-fade var(--d-hover) var(--ease-smooth) both; }

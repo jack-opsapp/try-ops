@@ -73,8 +73,8 @@
 .reviewPhoto img { aspect-ratio: 16 / 10; }
 .recordRow { display: flex; align-items: flex-start; gap: calc(var(--unit) * 1.5); padding: calc(var(--unit) * 1.5); border: var(--visit-hairline) solid var(--line); border-radius: var(--r-item); background: var(--surface-input); }
 .recordRow > svg { width: var(--visit-icon); height: var(--visit-icon); flex-shrink: 0; color: var(--text-3); }
-.recordRow > div { flex: 1; min-width: 0; }
-.recordRow p { margin-top: calc(var(--unit) / 2); }
+.recordRow > div { display: grid; gap: calc(var(--unit) / 2); flex: 1; min-width: 0; }
+.recordRow p { margin: 0; }
 .recordRow .recordCheck { color: var(--olive); width: calc(var(--unit) * 2); }
 .reviewCheck { display: flex; gap: var(--unit); align-items: center; color: var(--olive); font: 400 var(--visit-micro) / 1.5 var(--font-mono); }
 .timeContext { padding-left: calc(var(--unit) * 1.5); border-left: calc(var(--visit-hairline) * 2) solid var(--line); }

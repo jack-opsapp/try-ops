@@ -58,7 +58,6 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
   const content = useRef<HTMLDivElement>(null)
   const heading = useRef<HTMLHeadingElement>(null)
   const playbackSurface = useRef<HTMLDivElement>(null)
-  const nextWorkday = useRef<HTMLButtonElement>(null)
   const focusNext = useRef(false)
   const historyPosition = useRef(0)
   const historyGeneration = useRef(0)
@@ -155,7 +154,6 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
     if (finished === 'inquiry') update = { id: 'visit-booked', title: 'Site visit booked', body: 'Tuesday at 10:00 AM. Confirmed in your email conversation.', context: 'Monday · sample update' }
     if (finished === 'site-visit') update = { id: 'visit-complete', title: 'Site visit complete', body: `${next.visitAssignee} sent the checklist, measurements and photo.`, context: 'Tuesday · sample update' }
     if (finished === 'approval') update = { id: 'estimate-approved', title: 'Estimate approved', body: 'Alex accepted. Your project and tasks are ready.', context: 'Wednesday · sample update' }
-    if (finished === 'workday') update = { id: 'work-complete', title: 'Work complete', body: `${next.assignedCrew[0]} shared the finished photo. All tasks are complete.`, context: 'Thursday · sample update' }
     if (next.cutscene?.id === 'billing' && next.cutscene.beat === 1 && !previous.invoiceCreated) update = { id: 'invoice-sent', title: 'Invoice sent', body: `${SAMPLE.invoiceNumber} · ${money(SAMPLE.total)} sent to Alex.`, context: 'Thursday · sample update' }
     if (next.cutscene?.id === 'billing' && next.cutscene.beat === 2 && !previous.paymentRecorded) update = { id: 'payment-recorded', title: 'Payment recorded', body: `${money(SAMPLE.total)} received outside OPS. Balance: ${money(0)}.`, context: 'Friday · sample update' }
     if (finished === 'billing') update = { id: 'payment-recorded', title: 'Payment recorded', body: `${money(SAMPLE.total)} received outside OPS. Balance: ${money(0)}.`, context: 'Friday · sample update' }
@@ -192,21 +190,20 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
     if (action.type === 'RESTART') report('restart', next.scene)
   }, [persist, report])
   useCutscenePlayback(state, ready, updatesPaused || accountingOpen || toolOpen, playbackSurface, dispatch)
-  const sequence = state.cutscene ? cutsceneScript(state.cutscene.id, state) : null
-  const revealNextWorkday = useCallback(() => {
-    const target = nextWorkday.current
-    target?.focus({ preventScroll: true })
-    target?.scrollIntoView?.({ block: 'nearest', behavior: reduced ? 'instant' : 'smooth' })
-  }, [reduced])
+  const sequence = state.cutscene ? cutsceneScript(state.cutscene.id, state) : state.scene === 'calendar' ? cutsceneScript('workday', state) : null
+  const completionNotification: DemoNotificationMessage | null = state.scene === 'calendar' && state.taskCompleted && !state.cutscene
+    ? { id: 'project-complete', title: `${SAMPLE.project} Complete`, body: `${state.assignedCrew[0]} posted the finished photo and note. Tap to open the project.`, context: 'Thursday · sample update' }
+    : null
+  const shownNotification = completionNotification ?? notification
   const copy = sceneCopy(state)
-  if (sequence) { copy.title = sequence.title; copy.body = sequence.body }
+  if (state.cutscene && sequence) { copy.title = sequence.title; copy.body = sequence.body }
   const chapters = copy.chapters
   const completed = state.role === 'crew' ? !!state.postedNote : state.visited.includes('billing')
   const hint = toolOpen && state.scene === 'estimate' ? 'Explore the sample deck tool, then return to your estimate.'
     : state.cutscene ? updatesPaused ? 'Scene paused. Resume when you’re ready.' : 'Watch the handoff. Your next action follows.'
     : state.scene === 'visit' && state.scopeConfirmed && state.visitPhoto ? 'Photo attached. Tap DONE to review your visit.'
     : state.scene === 'visit' && state.scopeConfirmed ? 'Scope confirmed. Add the sample site photo.'
-    : state.scene === 'project' && state.crewAssigned ? 'Crew assigned. Jump forward to their completed work.'
+    : state.scene === 'project' && state.crewAssigned ? 'The crew is assigned. Return to the calendar to follow the work.'
     : state.scene === 'crew' && state.taskCompleted ? 'Task complete. Post the finished photo and a note.' : copy.hint
   const RoleIcon = state.role === 'crew' ? HardHat : Briefcase
   const sceneProps = { state, dispatch }
@@ -229,13 +226,13 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
       </aside>
       <section className={styles.product} aria-label="Interactive OPS sample">
         <div className={styles.roleBar} key={copy.role}><span className={styles.role}><RoleIcon aria-hidden="true"/>{copy.role}</span><span className={styles.productLabel}>OPS FOR IPHONE</span></div>
-        <DemoNotification notification={notification} onDismiss={() => setNotification(null)} reduced={reduced}/>
+        <DemoNotification notification={shownNotification} onOpen={completionNotification ? () => dispatch({ type: 'OPEN_COMPLETED_PROJECT' }) : undefined} onDismiss={completionNotification ? undefined : () => setNotification(null)} reduced={reduced}/>
         <div className={styles.appViewport} ref={content}>
-          {!ready ? <div className={styles.loading} aria-busy="true"><span className={styles.logo} aria-hidden="true"/><p>Opening your sample job.</p><a href={signupHref}>Start my free trial</a></div> : <LazyMotion features={domAnimation} strict><m.div key={state.cutscene ? `cutscene:${state.cutscene.id}` : state.scene} initial={reduced?{opacity:0}:{opacity:0,x:direction*12}} animate={{opacity:1,x:0}} transition={{duration:reduced?.15:.25,ease:[.22,1,.36,1]}} className={styles.scene}>
-            {state.cutscene && sequence ? <><div ref={playbackSurface}><DemoCutscene beat={sequence.beats[state.cutscene.beat]} conversation={state.cutscene.id === 'inquiry' ? sequence.beats : undefined} index={state.cutscene.beat} total={sequence.beats.length} paused={updatesPaused} reduced={reduced} onPause={() => setUpdatesPaused(value => !value)} onSkip={() => dispatch({ type: 'SKIP_CUTSCENE' })}/></div>{state.cutscene.id === 'billing' && <div className={styles.sceneCallout}><FeatureCallout kind="accounting"/></div>}</> : state.scene === 'role' ? <RoleScenes {...sceneProps}/> : ['inquiry','booked','billing'].includes(state.scene) ? <IntakeBillingScenes {...sceneProps} onAccountingPreviewChange={setAccountingOpen}/> : ['visit','review','estimate','accepted'].includes(state.scene) ? <VisitScenes {...sceneProps} onToolPreviewChange={setToolOpen}/> : <ProjectScenes {...sceneProps} onAssignmentComplete={revealNextWorkday}/>}
+          {!ready ? <div className={styles.loading} aria-busy="true"><span className={styles.logo} aria-hidden="true"/><p>Opening your sample job.</p><a href={signupHref}>Start my free trial</a></div> : <LazyMotion features={domAnimation} strict><m.div key={state.scene === 'calendar' ? 'calendar' : state.cutscene ? `cutscene:${state.cutscene.id}` : state.scene} initial={reduced?{opacity:0}:{opacity:0,x:direction*12}} animate={{opacity:1,x:0}} transition={{duration:reduced?.15:.25,ease:[.22,1,.36,1]}} className={styles.scene}>
+            {sequence && (state.cutscene || state.scene === 'calendar') ? <><div ref={playbackSurface}><DemoCutscene beat={sequence.beats[state.cutscene?.beat ?? 2]} conversation={state.cutscene?.id === 'inquiry' ? sequence.beats : undefined} calendarCrew={state.scene === 'calendar' || state.cutscene?.id === 'workday' ? state.assignedCrew : undefined} complete={!state.cutscene} index={state.cutscene?.beat ?? 2} total={sequence.beats.length} paused={updatesPaused} reduced={reduced} onPause={() => setUpdatesPaused(value => !value)} onSkip={() => dispatch({ type: 'SKIP_CUTSCENE' })}/></div>{state.cutscene?.id === 'billing' && <div className={styles.sceneCallout}><FeatureCallout kind="accounting"/></div>}</> : state.scene === 'role' ? <RoleScenes {...sceneProps}/> : ['inquiry','booked','billing'].includes(state.scene) ? <IntakeBillingScenes {...sceneProps} onAccountingPreviewChange={setAccountingOpen}/> : ['visit','review','estimate','accepted'].includes(state.scene) ? <VisitScenes {...sceneProps} onToolPreviewChange={setToolOpen}/> : <ProjectScenes {...sceneProps}/>}
           </m.div></LazyMotion>}
         </div>
-        <div className={styles.timeline}><span className={styles.time}>{state.cutscene ? sequence?.beats[state.cutscene.beat].eyebrow : copy.time}</span>{!state.cutscene && replayCutscene(state) && <button type="button" className={styles.replay} onClick={() => dispatch({ type: 'REPLAY_CUTSCENE' })}><RotateCcw aria-hidden="true"/>Replay scene</button>}{!state.cutscene && state.scene==='project' && state.crewAssigned && <button ref={nextWorkday} data-demo-next="true" className={styles.next} type="button" onClick={()=>dispatch({type:'ADVANCE_WORKDAY'})}>See the completed work <ArrowRight aria-hidden="true"/></button>}</div>
+        <div className={styles.timeline}><span className={styles.time}>{state.cutscene ? sequence?.beats[state.cutscene.beat].eyebrow : copy.time}</span>{!state.cutscene && replayCutscene(state) && <button type="button" className={styles.replay} onClick={() => dispatch({ type: 'REPLAY_CUTSCENE' })}><RotateCcw aria-hidden="true"/>Replay scene</button>}{!state.cutscene && state.scene==='project' && state.crewAssigned && <button data-demo-next="true" className={styles.next} type="button" onClick={()=>dispatch({type:'NAVIGATE', scene:'calendar'})}>View calendar <ArrowRight aria-hidden="true"/></button>}</div>
       </section>
       {completed && !state.cutscene && <div className={styles.conversion}>
         {state.role === 'crew' ? <>
@@ -253,6 +250,6 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
       <span>One job. Every handoff.</span>
       <button type="button" onClick={()=>dispatch({type:'RESTART'})} aria-label="Restart demo"><RotateCcw aria-hidden="true"/> Restart</button>
     </footer>
-    <p className={styles.srOnly} aria-live={notification || state.cutscene ? 'off' : 'polite'} aria-atomic="true">{ready?`${copy.role}. ${hint}`:'Opening sample demo.'}</p>
+    <p className={styles.srOnly} aria-live={shownNotification || state.cutscene ? 'off' : 'polite'} aria-atomic="true">{ready?`${copy.role}. ${hint}`:'Opening sample demo.'}</p>
   </div>
 }

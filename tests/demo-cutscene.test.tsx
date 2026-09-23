@@ -12,7 +12,7 @@ function apply(state: LifecycleState, action: LifecycleAction) {
 function billing() {
   const actions: LifecycleAction[] = [
     { type: 'SELECT_ROLE', role: 'operator' }, { type: 'OPEN_BOOKING' }, { type: 'ASSIGN_VISIT', member: 'Mike' },
-    { type: 'COMPLETE_VISIT' }, { type: 'SEND_ESTIMATE' }, { type: 'ASSIGN_CREW', members: ['Pete'] }, { type: 'ADVANCE_WORKDAY' },
+    { type: 'COMPLETE_VISIT' }, { type: 'SEND_ESTIMATE' }, { type: 'ASSIGN_CREW', members: ['Pete'] }, { type: 'OPEN_COMPLETED_PROJECT' },
   ]
   return lifecycleReducer(actions.reduce(apply, initialLifecycleState()), { type: 'OPEN_BILLING' })
 }
@@ -57,6 +57,32 @@ describe('context scene state', () => {
     state = lifecycleReducer(state, { type: 'SKIP_CUTSCENE' })
     expect(state).toEqual(paid)
     expect(lifecycleReducer(state, { type: 'ADVANCE_CUTSCENE' })).toBe(state)
+  })
+
+  it('advances three calendar beats before completing work and leaves the notification context on calendar', () => {
+    const actions: LifecycleAction[] = [
+      { type: 'SELECT_ROLE', role: 'operator' }, { type: 'OPEN_BOOKING' }, { type: 'ASSIGN_VISIT', member: 'Mike' },
+      { type: 'COMPLETE_VISIT' }, { type: 'SEND_ESTIMATE' },
+    ]
+    const project = actions.reduce(apply, initialLifecycleState())
+    let state = lifecycleReducer(project, { type: 'ASSIGN_CREW', members: ['Pete'] })
+    const script = cutsceneScript('workday', state)
+    expect(script.beats.map(beat => beat.id)).toEqual(['preparation-underway', 'preparation-complete', 'resurfacing-complete'])
+    expect(script.beats.map(beat => beat.kind)).toEqual(['calendar', 'calendar', 'calendar'])
+    expect(script.beats.map(beat => beat.eyebrow)).toEqual([
+      'WEDNESDAY · SEP 23 · ON SITE',
+      'THURSDAY · SEP 24 · NEXT TASK',
+      'THURSDAY · 3:40 PM · COMPLETE',
+    ])
+
+    for (let beat = 0; beat < 3; beat++) {
+      expect(state).toMatchObject({ scene: 'calendar', taskCompleted: false, cutscene: { id: 'workday', beat, replay: false } })
+      expect(serialize(state)).toEqual(state)
+      state = lifecycleReducer(state, { type: 'ADVANCE_CUTSCENE' })
+    }
+    expect(state).toMatchObject({ scene: 'calendar', taskCompleted: true, completionPhoto: true, cutscene: null })
+    expect(state.postedNote).toBeTruthy()
+    expect(serialize(state)).toEqual(state)
   })
 
   it('cancels on Back and resumes unfinished automatic billing when explicitly revisited', () => {

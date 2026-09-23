@@ -19,7 +19,7 @@ const operatorActions: LifecycleAction[] = [
   { type: 'SELECT_ROLE', role: 'operator' }, { type: 'OPEN_BOOKING' },
   { type: 'ASSIGN_VISIT', member: 'Nick' }, { type: 'COMPLETE_VISIT' },
   { type: 'SEND_ESTIMATE' }, { type: 'APPROVE_ESTIMATE' },
-  { type: 'ASSIGN_CREW', members: ['Pete'] }, { type: 'ADVANCE_WORKDAY' },
+  { type: 'ASSIGN_CREW', members: ['Pete'] }, { type: 'OPEN_COMPLETED_PROJECT' },
   { type: 'OPEN_BILLING' }, { type: 'CREATE_INVOICE' }, { type: 'RECORD_PAYMENT' },
 ]
 function snapshot(actions: LifecycleAction[], stop: LifecycleAction['type']) {
@@ -72,12 +72,13 @@ describe('independent persisted-demo acceptance', () => {
     expect(events().filter(event => ['started', 'job_assigned', 'crew_viewed', 'task_completed'].includes(event.action))).toEqual([])
   })
 
-  it.each(['ADVANCE_WORKDAY', 'CREATE_INVOICE', 'RECORD_PAYMENT'] as const)('restores Operator %s without reporting incoming fixture work as visitor actions', action => {
+  it.each(['ASSIGN_CREW', 'OPEN_COMPLETED_PROJECT', 'CREATE_INVOICE', 'RECORD_PAYMENT'] as const)('restores Operator %s without reporting incoming fixture work as visitor actions', action => {
     sessionStorage.setItem(LIFECYCLE_STORAGE_KEY, JSON.stringify(snapshot(operatorActions, action)))
     render(<DemoExperience />)
     expect(screen.getByText('Your sample job is where you left it.')).toBeTruthy()
     expect(screen.getByText('YOU · OPERATOR')).toBeTruthy()
-    if (action === 'ADVANCE_WORKDAY') expect(screen.getByRole('article', { name: "Pete's completion update" })).toBeTruthy()
+    if (action === 'ASSIGN_CREW') expect(screen.getByRole('button', { name: '184 Cedar Lane Complete' })).toBeTruthy()
+    else if (action === 'OPEN_COMPLETED_PROJECT') expect(screen.getByRole('article', { name: "Pete's completion update" })).toBeTruthy()
     else expect(screen.getByRole('link', { name: 'Start my free trial' })).toBeTruthy()
     expect(events().filter(event => ['started', 'job_assigned', 'crew_viewed', 'task_completed'].includes(event.action))).toEqual([])
     for (const event of events()) expectCollectorAccepts(event)
@@ -89,12 +90,13 @@ describe('independent persisted-demo acceptance', () => {
     click('Review estimate'); skipScene(); click('Send estimate'); skipScene()
     fireEvent.click(screen.getByRole('tab', { name: 'details' }))
     click('Open resurfacing task'); click('Assign team to this task'); click('Select Pete'); click('Done')
-    click('See the completed work'); skipScene()
+    skipScene()
     expect(events().map(event => [event.action, event.step])).toEqual([
       ['started', 'assign'], ['job_assigned', 'assign'],
     ])
     for (const event of events()) expectCollectorAccepts(event)
-    backTo('project'); click('See the completed work'); click('View billing'); skipScene()
+    click('184 Cedar Lane Complete')
+    backTo('project'); click('View calendar'); click('184 Cedar Lane Complete'); click('View billing'); skipScene()
     expect(events().filter(event => event.action === 'job_assigned')).toHaveLength(1)
     expect(events().filter(event => ['crew_viewed', 'task_completed'].includes(event.action))).toEqual([])
   })

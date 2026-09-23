@@ -8,7 +8,7 @@ vi.mock('@/lib/demo/use-demo-funnel', () => ({ useDemoFunnel: () => ({ signupHre
 const sequence: LifecycleAction[] = [
   { type: 'SELECT_ROLE', role: 'operator' }, { type: 'OPEN_BOOKING' }, { type: 'ASSIGN_VISIT', member: 'Mike' },
   { type: 'COMPLETE_VISIT' }, { type: 'SEND_ESTIMATE' }, { type: 'APPROVE_ESTIMATE' },
-  { type: 'ASSIGN_CREW', members: ['Pete'] }, { type: 'ADVANCE_WORKDAY' }, { type: 'OPEN_BILLING' },
+  { type: 'ASSIGN_CREW', members: ['Pete'] }, { type: 'OPEN_COMPLETED_PROJECT' }, { type: 'OPEN_BILLING' },
   { type: 'CREATE_INVOICE' }, { type: 'RECORD_PAYMENT' },
 ]
 
@@ -66,6 +66,27 @@ describe('automatic sample updates', () => {
     expect(message()).toContain('received outside OPS')
     expect(screen.getByText('Paid in full')).toBeTruthy()
     expect(screen.getByText('$0 DUE')).toBeTruthy()
+  })
+
+  it('keeps the completed-work notification actionable across reload until the visitor opens the project', () => {
+    seed('ASSIGN_CREW')
+    const first = render(<DemoExperience />)
+
+    expect(saved()).toMatchObject({ scene: 'calendar', taskCompleted: false, cutscene: { id: 'workday', beat: 0, replay: false } })
+    expect(screen.queryByRole('button', { name: '184 Cedar Lane Complete' })).toBeNull()
+    click('Skip scene')
+    expect(saved()).toMatchObject({ scene: 'calendar', taskCompleted: true, completionPhoto: true, cutscene: null })
+    expect(screen.getByRole('button', { name: '184 Cedar Lane Complete' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Dismiss notification' })).toBeNull()
+
+    first.unmount()
+    render(<DemoExperience />)
+    expect(screen.getByText('Your sample job is where you left it.')).toBeTruthy()
+    click('184 Cedar Lane Complete')
+
+    expect(saved()).toMatchObject({ scene: 'activity', taskCompleted: true, completionPhoto: true })
+    expect(screen.getByRole('article', { name: "Pete's completion update" })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: '184 Cedar Lane Complete' })).toBeNull()
   })
 
   it('lets the visitor pause and resume a scene without changing its lifecycle state', () => {

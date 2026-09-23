@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { ArrowLeft, ArrowRight, Check, ChevronRight, X } from 'lucide-react'
 import ui from './demo-ui.module.css'
 export { ui }
+export function NumericText({ children }: { children: string }) { return <>{children.split(/(\d+(?:[,.]\d+)*)/g).map((part, index) => /\d/.test(part) ? <span className={ui.mono} key={index}>{part}</span> : part)}</> }
 export function AppHeader({ title, left, right, titleRef }: { title: string; left?: ReactNode; right?: ReactNode; titleRef?: Ref<HTMLHeadingElement> }) { return <header className={ui.appHeader}><div>{left}</div><h2 ref={titleRef} tabIndex={titleRef ? -1 : undefined}>{title}</h2><div>{right}</div></header> }
 export function Badge({ children, tone = 'neutral' }: { children: ReactNode; tone?: 'neutral' | 'olive' | 'tan' }) { return <span className={ui.badge} data-tone={tone}>{children}</span> }
 export function Action({ children, secondary = false, className = '', ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { secondary?: boolean }) { return <button type="button" className={`${secondary ? ui.secondary : ui.primary} ${className}`} {...props}>{children}</button> }

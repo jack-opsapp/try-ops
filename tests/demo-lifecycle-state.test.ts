@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { SAMPLE } from '@/components/demo/lifecycle-data'
 import {
-  initialLifecycleState, lifecycleReducer as rawLifecycleReducer, restoreLifecycleState, LIFECYCLE_REVISION,
+  initialLifecycleState, lifecycleReducer as rawLifecycleReducer, restoreLifecycleState, LIFECYCLE_REVISION, LIFECYCLE_STORAGE_KEY,
   type LifecycleAction, type LifecycleState, type Scene, type VisitAssignee,
 } from '@/components/demo/lifecycle-state'
 
@@ -12,14 +12,14 @@ const selfJourney: LifecycleAction[] = [
   { type: 'ADD_SITE_PHOTO' }, { type: 'REVIEW_VISIT' }, { type: 'COMPLETE_VISIT' },
   { type: 'SET_DECK_WIDTH', value: 20 }, { type: 'SEND_ESTIMATE' },
   { type: 'APPROVE_ESTIMATE' }, { type: 'ASSIGN_CREW', members: ['Nick'] },
-  { type: 'ADVANCE_WORKDAY' }, { type: 'OPEN_BILLING' },
+  { type: 'OPEN_COMPLETED_PROJECT' }, { type: 'OPEN_BILLING' },
   { type: 'CREATE_INVOICE' }, { type: 'RECORD_PAYMENT' },
 ]
 const delegatedJourney: LifecycleAction[] = [
   { type: 'SELECT_ROLE', role: 'operator' }, { type: 'OPEN_BOOKING' },
   { type: 'ASSIGN_VISIT', member: 'Mike' }, { type: 'COMPLETE_VISIT' },
   { type: 'SEND_ESTIMATE' }, { type: 'APPROVE_ESTIMATE' },
-  { type: 'ASSIGN_CREW', members: ['Pete'] }, { type: 'ADVANCE_WORKDAY' },
+  { type: 'ASSIGN_CREW', members: ['Pete'] }, { type: 'OPEN_COMPLETED_PROJECT' },
   { type: 'OPEN_BILLING' }, { type: 'CREATE_INVOICE' }, { type: 'RECORD_PAYMENT' },
 ]
 const crewJourney: LifecycleAction[] = [
@@ -151,27 +151,70 @@ describe('role-based sample job lifecycle', () => {
 
   it('preserves only the selected crew through incoming work and resume', () => {
     const project = through(selfJourney, 'APPROVE_ESTIMATE')
-    const assigned = lifecycleReducer(project, { type: 'ASSIGN_CREW', members: ['Nick'] })
-    expect(assigned.assignedCrew).toEqual(['Nick'])
-    const activity = lifecycleReducer(assigned, { type: 'ADVANCE_WORKDAY' })
-    expect(activity.assignedCrew).toEqual(['Nick'])
-    expect(saved(activity).assignedCrew).toEqual(['Nick'])
+    const calendar = lifecycleReducer(project, { type: 'ASSIGN_CREW', members: ['Nick'] })
+    expect(calendar).toMatchObject({ scene: 'calendar', assignedCrew: ['Nick'], taskCompleted: true, completionPhoto: true, postedNote: SAMPLE.note })
+    expect(saved(calendar).assignedCrew).toEqual(['Nick'])
     for (const members of [[], ['Pete', 'Pete'], ['Unknown'], ['Pete', 'Nick', 'Pete']]) {
       expect(lifecycleReducer(project, { type: 'ASSIGN_CREW', members: members as ('Pete' | 'Nick')[] })).toBe(project)
     }
-    expect(lifecycleReducer(assigned, { type: 'ASSIGN_CREW', members: ['Pete'] })).toBe(assigned)
+    expect(lifecycleReducer(calendar, { type: 'ASSIGN_CREW', members: ['Pete'] })).toBe(calendar)
   })
 
   it.each([['self-assigned', selfJourney], ['delegated', delegatedJourney]] as const)('%s Operators receive crew evidence without changing roles', (_name, journey) => {
     const project = through([...journey], 'APPROVE_ESTIMATE')
-    expect(lifecycleReducer(project, { type: 'ADVANCE_WORKDAY' })).toBe(project)
-    const assigned = through([...journey], 'ASSIGN_CREW')
-    expect(lifecycleReducer(assigned, { type: 'VIEW_CREW' })).toBe(assigned)
-    expect(lifecycleReducer(assigned, { type: 'COMPLETE_TASK' })).toBe(assigned)
-    const activity = lifecycleReducer(assigned, { type: 'ADVANCE_WORKDAY' })
+    expect(lifecycleReducer(project, { type: 'OPEN_COMPLETED_PROJECT' })).toBe(project)
+    const calendar = through([...journey], 'ASSIGN_CREW')
+    expect(lifecycleReducer(calendar, { type: 'VIEW_CREW' })).toBe(calendar)
+    expect(lifecycleReducer(calendar, { type: 'COMPLETE_TASK' })).toBe(calendar)
+    const activity = lifecycleReducer(calendar, { type: 'OPEN_COMPLETED_PROJECT' })
     expect(activity).toMatchObject({ role: 'operator', scene: 'activity', taskCompleted: true, completionPhoto: true, postedNote: SAMPLE.note, invoiceCreated: false })
     expect(activity.visited).not.toContain('crew')
     expect(activity.visited).not.toContain('compose')
+  })
+
+  it('moves assignment straight into a three-beat calendar workday and rejects an early completion tap', () => {
+    const project = through(selfJourney, 'APPROVE_ESTIMATE')
+    let calendar = rawLifecycleReducer(project, { type: 'ASSIGN_CREW', members: ['Nick'] })
+    expect(calendar).toMatchObject({
+      scene: 'calendar', visited: [...project.visited, 'calendar'], crewAssigned: true,
+      assignedCrew: ['Nick'], taskCompleted: false, completionPhoto: false, postedNote: '',
+      cutscene: { id: 'workday', beat: 0, replay: false },
+    })
+    expect(rawLifecycleReducer(calendar, { type: 'OPEN_COMPLETED_PROJECT' })).toBe(calendar)
+
+    calendar = rawLifecycleReducer(calendar, { type: 'ADVANCE_CUTSCENE' })
+    expect(calendar).toMatchObject({ scene: 'calendar', taskCompleted: false, cutscene: { id: 'workday', beat: 1, replay: false } })
+    expect(saved(calendar)).toEqual(calendar)
+    calendar = rawLifecycleReducer(calendar, { type: 'ADVANCE_CUTSCENE' })
+    expect(calendar).toMatchObject({ scene: 'calendar', taskCompleted: false, cutscene: { id: 'workday', beat: 2, replay: false } })
+    expect(saved(calendar)).toEqual(calendar)
+    calendar = rawLifecycleReducer(calendar, { type: 'ADVANCE_CUTSCENE' })
+    expect(calendar).toMatchObject({ scene: 'calendar', taskCompleted: true, completionPhoto: true, postedNote: SAMPLE.note, cutscene: null })
+    expect(saved(calendar)).toEqual(calendar)
+  })
+
+  it('keeps completed calendar notification context durable and makes calendar and activity replay read-only', () => {
+    const calendar = through(selfJourney, 'ASSIGN_CREW')
+    expect(saved(calendar)).toEqual(calendar)
+
+    const calendarReplay = rawLifecycleReducer(calendar, { type: 'REPLAY_CUTSCENE' })
+    expect(calendarReplay).toMatchObject({ scene: 'calendar', cutscene: { id: 'workday', beat: 0, replay: true } })
+    expect(rawLifecycleReducer(calendarReplay, { type: 'SKIP_CUTSCENE' })).toEqual(calendar)
+
+    const activity = rawLifecycleReducer(calendar, { type: 'OPEN_COMPLETED_PROJECT' })
+    expect(activity).toMatchObject({ scene: 'activity', taskCompleted: true, completionPhoto: true, postedNote: SAMPLE.note })
+    const activityReplay = rawLifecycleReducer(activity, { type: 'REPLAY_CUTSCENE' })
+    expect(activityReplay).toMatchObject({ scene: 'activity', cutscene: { id: 'workday', beat: 0, replay: true } })
+    expect(rawLifecycleReducer(activityReplay, { type: 'SKIP_CUTSCENE' })).toEqual(activity)
+  })
+
+  it('returns from calendar to the assigned project and resumes unfinished workday context on revisit', () => {
+    const project = through(selfJourney, 'APPROVE_ESTIMATE')
+    const pending = rawLifecycleReducer(project, { type: 'ASSIGN_CREW', members: ['Pete'] })
+    const back = rawLifecycleReducer(pending, { type: 'BACK' })
+    expect(back).toMatchObject({ scene: 'project', crewAssigned: true, assignedCrew: ['Pete'], cutscene: null })
+    const returned = rawLifecycleReducer(back, { type: 'NAVIGATE', scene: 'calendar' })
+    expect(returned).toMatchObject({ scene: 'calendar', taskCompleted: false, cutscene: { id: 'workday', beat: 0, replay: false } })
   })
 
   it('does not mistake completing a Crew task for posting evidence', () => {
@@ -191,7 +234,7 @@ describe('role-based sample job lifecycle', () => {
     let state = initialLifecycleState()
     for (const action of crewJourney) {
       state = lifecycleReducer(state, action)
-      for (const type of ['OPEN_BOOKING', 'OPEN_BILLING', 'CREATE_INVOICE', 'RECORD_PAYMENT', 'ADVANCE_WORKDAY'] as const) {
+      for (const type of ['OPEN_BOOKING', 'OPEN_BILLING', 'CREATE_INVOICE', 'RECORD_PAYMENT', 'OPEN_COMPLETED_PROJECT'] as const) {
         expect(lifecycleReducer(state, { type })).toBe(state)
       }
       expect(lifecycleReducer(state, { type: 'ASSIGN_VISIT', member: 'You' })).toBe(state)
@@ -249,7 +292,7 @@ describe('role-based sample job lifecycle', () => {
       expect(lifecycleReducer(delegated, { type: 'NAVIGATE', scene })).toBe(delegated)
     }
     const crew = through(crewJourney, 'POST_NOTE')
-    for (const scene of ['inquiry', 'booked', 'visit', 'review', 'estimate', 'accepted', 'project', 'billing'] as Scene[]) {
+    for (const scene of ['inquiry', 'booked', 'visit', 'review', 'estimate', 'accepted', 'project', 'calendar', 'billing'] as Scene[]) {
       expect(lifecycleReducer(crew, { type: 'NAVIGATE', scene })).toBe(crew)
     }
   })
@@ -279,15 +322,16 @@ describe('strict lifecycle resume validation', () => {
     expect(restoreLifecycleState(raw)).toEqual(initialLifecycleState())
   })
 
-  it.each(['crew-job-v1', 'job-lifecycle-v2', 'job-lifecycle-v3', 'job-lifecycle-v4', null])('resets another revision: %s', revision => {
-    expect(LIFECYCLE_REVISION).toBe('job-lifecycle-v5')
+  it.each(['crew-job-v1', 'job-lifecycle-v2', 'job-lifecycle-v3', 'job-lifecycle-v4', 'job-lifecycle-v5', null])('resets another revision: %s', revision => {
+    expect(LIFECYCLE_REVISION).toBe('job-lifecycle-v6')
+    expect(LIFECYCLE_STORAGE_KEY).toBe('ops:demo:lifecycle:v6')
     expect(restoredWith(through(selfJourney, 'RECORD_PAYMENT'), { revision })).toEqual(initialLifecycleState())
   })
 
   it.each([
     { scene: ['inquiry'] }, { scene: 'unknown' }, { role: 'estimator' }, { role: null },
     { visitAssignee: 'Unknown' }, { visitAssignee: ['Mike'] }, { deckWidth: 24 }, { deckWidth: '16' },
-    { furthest: -1 }, { furthest: 12 }, { furthest: '11' }, { furthest: 1.5 },
+    { furthest: -1 }, { furthest: 13 }, { furthest: '12' }, { furthest: 1.5 },
     { scopeConfirmed: 'true' }, { visitPhoto: 'true' }, { estimateSent: 1 }, { invoiceCreated: null },
     { noteDraft: null }, { noteDraft: 'x'.repeat(281) }, { postedNote: 'x'.repeat(281) },
     { assignedCrew: [] }, { assignedCrew: ['Unknown'] }, { assignedCrew: ['Nick', 'Nick'] },
@@ -326,7 +370,7 @@ describe('strict lifecycle resume validation', () => {
   })
 
   it('rejects invoice creation or payment outside the billing path', () => {
-    const activity = through(selfJourney, 'ADVANCE_WORKDAY')
+    const activity = through(selfJourney, 'OPEN_COMPLETED_PROJECT')
     expect(restoredWith(activity, { invoiceCreated: true })).toEqual(initialLifecycleState())
     expect(restoredWith(activity, { paymentRecorded: true })).toEqual(initialLifecycleState())
     expect(restoredWith(through(selfJourney, 'OPEN_BILLING'), { invoiceCreated: false })).toEqual(initialLifecycleState())

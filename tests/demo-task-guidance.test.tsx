@@ -41,22 +41,20 @@ function projectState(): LifecycleState {
   }, initialLifecycleState())
 }
 
-function ProjectHarness({ initial = projectState(), onAssignmentComplete, revision = 0 }: {
+function ProjectHarness({ initial = projectState(), revision = 0 }: {
   initial?: LifecycleState
-  onAssignmentComplete?: () => void
   revision?: number
 }) {
   const [state, dispatch] = useReducer(lifecycleReducer, initial)
-  return <div data-revision={revision}><ProjectScenes state={state} dispatch={dispatch} onAssignmentComplete={onAssignmentComplete} /></div>
+  return <div data-revision={revision}><ProjectScenes state={state} dispatch={dispatch} /></div>
 }
 
 function clickButton(name: string) { fireEvent.click(screen.getByRole('button', { name })) }
 function selectDetails() { fireEvent.click(screen.getByRole('tab', { name: 'details' })) }
 
 describe('event-driven task guidance', () => {
-  it('reveals the task, assignment and roster in sequence, then hands focus ownership to the timeline', () => {
-    const onAssignmentComplete = vi.fn()
-    const { container, rerender } = render(<ProjectHarness onAssignmentComplete={onAssignmentComplete} />)
+  it('reveals the task, assignment and roster in sequence, then enters the calendar without an extra project action', () => {
+    const { container, rerender } = render(<ProjectHarness />)
     expect(scrollCalls).toHaveLength(0)
 
     const expectGuidance = (target: HTMLElement, block: ScrollLogicalPosition = 'center') => {
@@ -77,11 +75,9 @@ describe('event-driven task guidance', () => {
     clickButton('Select Pete')
     expect(scrollCalls).toHaveLength(afterFirstSelection)
     clickButton('Done')
-    expect(onAssignmentComplete).toHaveBeenCalledOnce()
-    expect(screen.getByText('Crew assigned. Ready to schedule.')).toBeTruthy()
+    expect(container.querySelector('[data-project-scene="calendar"]')).toBeTruthy()
     expect(screen.queryByRole('region', { name: 'Choose installation crew' })).toBeNull()
-    rerender(<ProjectHarness onAssignmentComplete={onAssignmentComplete} revision={1} />)
-    expect(onAssignmentComplete).toHaveBeenCalledOnce()
+    rerender(<ProjectHarness revision={1} />)
     expect(scrollCalls).toHaveLength(afterFirstSelection)
   })
 
@@ -118,7 +114,9 @@ describe('event-driven task guidance', () => {
   })
 
   it('does not scroll or change the selected tab during a read-only revisit or unrelated rerender', () => {
-    const assigned = lifecycleReducer(projectState(), { type: 'ASSIGN_CREW', members: ['Pete'] })
+    const pending = lifecycleReducer(projectState(), { type: 'ASSIGN_CREW', members: ['Pete'] })
+    const calendar = lifecycleReducer(pending, { type: 'SKIP_CUTSCENE' })
+    const assigned = lifecycleReducer(calendar, { type: 'BACK' })
     const { rerender } = render(<ProjectHarness initial={assigned} />)
     selectDetails()
     expect(scrollCalls).toHaveLength(0)
