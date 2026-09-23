@@ -451,3 +451,5 @@
   .calendarRail > span { animation: none; transform: none; }
   .controls button { transition: opacity var(--d-hover) var(--ease-smooth); }
 }
+
+.conversationStage { min-height:0; overflow:hidden; }

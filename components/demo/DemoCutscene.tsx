@@ -14,11 +14,13 @@ import {
 } from 'lucide-react'
 import { Fragment, type ReactNode } from 'react'
 import { SAMPLE } from './lifecycle-data'
+import { InquiryConversation } from './InquiryConversation'
 import type { CutsceneBeat } from './cutscene-script'
 import styles from './demo-cutscene.module.css'
 
 interface DemoCutsceneProps {
   beat: CutsceneBeat
+  conversation?: CutsceneBeat[]
   index: number
   total: number
   paused: boolean
@@ -184,7 +186,7 @@ function Artifact({ beat }: { beat: CutsceneBeat }): ReactNode {
   }
 }
 
-export function DemoCutscene({ beat, index, total, paused, reduced, onPause, onSkip }: DemoCutsceneProps) {
+export function DemoCutscene({ beat, conversation, index, total, paused, reduced, onPause, onSkip }: DemoCutsceneProps) {
   const count = Math.max(1, total)
   const current = Math.min(count, Math.max(1, index + 1))
 
@@ -215,8 +217,8 @@ export function DemoCutscene({ beat, index, total, paused, reduced, onPause, onS
       </button>
     </div>
 
-    <div className={styles.stage} key={`${beat.id}-stage`}>
-      <article
+    <div className={conversation ? styles.conversationStage : styles.stage} key={conversation ? 'conversation' : `${beat.id}-stage`}>
+      {conversation ? <InquiryConversation beats={conversation} index={index} reduced={reduced} paused={paused} /> : <article
         className={styles.beat}
         data-kind={beat.kind}
         data-direction={beat.direction ?? 'incoming'}
@@ -224,7 +226,7 @@ export function DemoCutscene({ beat, index, total, paused, reduced, onPause, onS
       >
         <Provenance beat={beat} />
         <Artifact beat={beat} />
-      </article>
+      </article>}
     </div>
 
     <p className={styles.srOnly} aria-live="polite" aria-atomic="true">

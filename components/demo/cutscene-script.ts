@@ -15,6 +15,8 @@ export interface CutsceneBeat {
   detail?: string
   image?: string
   direction?: 'incoming' | 'outgoing'
+  emailSignature?: string[]
+  messageTime?: string
   facts?: Array<{ label: string; value: string }>
   duration: number
 }
@@ -66,6 +68,8 @@ export function cutsceneScript(id: CutsceneId, state: LifecycleState): CutsceneS
           title: 'Deck at Cedar Lane',
           body: `Could you replace the worn boards on our deck? The address is ${SAMPLE.address}.`,
           direction: 'incoming',
+          emailSignature: ['Alex Morgan'],
+          messageTime: '9:08 AM',
           duration: 4200,
         },
         {
@@ -74,7 +78,7 @@ export function cutsceneScript(id: CutsceneId, state: LifecycleState): CutsceneS
           actor: 'OPS',
           actorRole: 'Lead record',
           eyebrow: 'MONDAY · 9:08 AM · LEAD',
-          title: 'Inquiry linked to the lead',
+          title: 'Lead created',
           body: 'OPS creates the Cedar Lane lead and keeps Alex’s email attached to it.',
           facts: [
             { label: 'Client', value: SAMPLE.client },
@@ -91,6 +95,8 @@ export function cutsceneScript(id: CutsceneId, state: LifecycleState): CutsceneS
           title: 'Re: Deck at Cedar Lane',
           body: 'We can visit Tuesday, Sep 22 at 10:00 AM, to look at the deck. Does that work?',
           direction: 'outgoing',
+          emailSignature: ['You', 'Site visits & estimates'],
+          messageTime: '9:14 AM',
           duration: 4400,
         },
         {
@@ -102,6 +108,8 @@ export function cutsceneScript(id: CutsceneId, state: LifecycleState): CutsceneS
           title: 'Re: Deck at Cedar Lane',
           body: 'Yes, Tuesday at 10:00 AM works. I’ll be home to show you the deck.',
           direction: 'incoming',
+          emailSignature: ['Alex Morgan'],
+          messageTime: '9:16 AM',
           duration: 3700,
         },
         {
@@ -110,7 +118,7 @@ export function cutsceneScript(id: CutsceneId, state: LifecycleState): CutsceneS
           actor: 'OPS',
           actorRole: 'Schedule',
           eyebrow: 'MONDAY · 9:16 AM · CALENDAR',
-          title: 'Confirmed visit booked',
+          title: 'OPS booked the site visit',
           body: 'Alex confirms the time. OPS books the visit on Tuesday’s schedule.',
           facts: [
             { label: 'When', value: SAMPLE.visit },
