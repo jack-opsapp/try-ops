@@ -6,7 +6,7 @@ const COPY: Record<Scene, { chapter: number; time: string; title: string; body: 
   inquiry: { chapter: 0, time: 'MONDAY · CUSTOMER INQUIRY', title: 'The job starts in your inbox.', body: 'Alex needs the deck resurfaced. The conversation, lead and agreed visit are already together.', hint: 'Open the assignment for the booked visit.' },
   booked: { chapter: 1, time: 'TUESDAY · VISIT BOOKED', title: 'Put the right person on it.', body: 'Assign the visit to yourself or someone on your team.', hint: 'Choose a person, then confirm the assignment.' },
   visit: { chapter: 1, time: 'TUESDAY · YOUR SITE VISIT', title: 'Capture it once.', body: 'You’re at Alex’s home. Confirm the scope and add the site photo.', hint: 'Confirm the scope, then tap PHOTO.' },
-  review: { chapter: 1, time: 'TUESDAY AFTERNOON · SITE RECORD', title: 'The site record is together.', body: 'The checklist, photo and measurements stay with this job.', hint: 'Review the record, then continue to the estimate.' },
+  review: { chapter: 1, time: 'TUESDAY · SITE RECORD', title: 'The site record is together.', body: 'The checklist, photo and measurements stay with this job.', hint: 'Review the record, then continue to the estimate.' },
   estimate: { chapter: 2, time: 'LATER · QUOTE PREPARED', title: 'Turn the scope into a quote.', body: 'The sample quote is prepared. Review it before sending it to Alex.', hint: 'Send the sample estimate when you’re ready.' },
   accepted: { chapter: 2, time: 'WEDNESDAY · CLIENT RESPONSE', title: 'Your estimate is out.', body: 'The client’s response arrives as an update. The job moves forward when Alex accepts.', hint: 'Watch for the approval at the top of your screen.' },
   project: { chapter: 3, time: 'WEDNESDAY · PLAN THE WORK', title: 'Give the crew the whole picture.', body: 'The visit record and labor tasks came with the project. Assign the resurfacing crew.', hint: 'Open DETAILS, then the resurfacing task.' },
@@ -32,6 +32,7 @@ export function sceneCopy(state: LifecycleState) {
     copy.hint = 'That’s your part. Get OPS for your next job.'
   }
   if (state.scene === 'billing' && state.invoiceCreated) {
+    copy.time = state.paymentRecorded ? 'FRIDAY · PAYMENT RECORDED' : 'THURSDAY · INVOICE SENT'
     copy.title = state.paymentRecorded ? 'From first contact to paid.' : 'The invoice is out.'
     copy.body = state.paymentRecorded ? 'The payment received outside OPS is recorded. The whole job stays together.' : 'The invoice went to Alex. The next sample update jumps to the payment arriving.'
     copy.hint = state.paymentRecorded ? 'The sample payment is recorded. Try OPS with your own team.' : 'The next update arrives automatically. No action needed.'

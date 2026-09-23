@@ -124,7 +124,7 @@ function ReviewScene({ state, dispatch }: SceneProps) {
     <div className={styles.body}>
       {delegated && <div className={styles.visitArrival}>
         <Avatar name={author} src={author === 'Mike' ? '/avatars/mike.png' : '/avatars/nick.png'} />
-        <div><span className={styles.sectionLabel}>Tuesday afternoon · visit complete</span><p>{author} completed the site visit. Your record is ready to review.</p></div>
+        <div><span className={styles.sectionLabel}>Tuesday · visit complete</span><p>{author} completed the site visit. Your record is ready to review.</p></div>
       </div>}
       <div className={styles.reviewSummary}>
         <p className={styles.sectionLabel}>// Project</p>
@@ -239,7 +239,7 @@ function AcceptedScene({ state, dispatch }: SceneProps) {
       <EstimateIdentity />
       {state.estimateApproved && <div className={styles.approvalNote}>
         <Check aria-hidden="true" />
-        <div><span className={styles.sectionLabel}>From {SAMPLE.client}</span><p>“The deck looks good. Let’s go ahead.”</p><span className={styles.metadata}>Re: {SAMPLE.estimateNumber}</span></div>
+        <div><span className={styles.sectionLabel}>From {SAMPLE.client}</span><p>“The estimate looks good. Let’s go ahead.”</p><span className={styles.metadata}>Re: {SAMPLE.estimateNumber}</span></div>
       </div>}
       <dl className={styles.totals}>
         <div className={styles.total}><dt>Estimate total</dt><dd>{money(SAMPLE.total)}</dd></div>

@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { DemoExperience } from '@/components/demo/DemoExperience'
 
@@ -31,7 +31,7 @@ describe('lifecycle handoff presentation', () => {
   it('responds to live reduced-motion changes without losing evidence, focus or native signup', () => {
     const preference = motionPreference(false)
     const { container, unmount } = render(<DemoExperience />)
-    click('Choose Operator'); click('Assign site visit'); click('Select You'); click('Assign to me')
+    click('Choose Operator'); click('Skip scene'); click('Assign site visit'); click('Select You'); click('Assign to me')
     fireEvent.click(screen.getByRole('checkbox', { name: 'Confirm the deck scope with Alex' })); click('Photo')
     const before = screen.getByRole('img', { name: /Sample site visit: the deck area/ }).getAttribute('src')
     preference.set(true)
@@ -50,7 +50,7 @@ describe('lifecycle handoff presentation', () => {
     expect(preference.subscriptions).toBe(0)
   })
 
-  it.each([false, true])('lets Restart and Back interrupt an active transition immediately (reduced=%s)', reduced => {
+  it.each([false, true])('lets Restart and Back interrupt an active transition (reduced=%s)', async reduced => {
     motionPreference(reduced)
     render(<DemoExperience />)
     const open = screen.getByRole('button', { name: 'Choose Operator' })
@@ -62,7 +62,7 @@ describe('lifecycle handoff presentation', () => {
     expect(document.activeElement).toBe(screen.getByRole('heading', { level: 1 }))
     vi.mocked(window.scrollTo).mockClear()
     click('Back')
-    expect(window.scrollTo).toHaveBeenCalledWith(expect.objectContaining({ top: 0 }))
+    await waitFor(() => expect(window.scrollTo).toHaveBeenCalledWith(expect.objectContaining({ top: 0 })))
     expect(screen.getByRole('button', { name: 'Choose Operator' })).toBeTruthy()
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1)
     expect(screen.getByRole('button', { name: 'Back' }).hasAttribute('disabled')).toBe(true)

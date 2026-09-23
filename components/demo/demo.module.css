@@ -122,5 +122,8 @@
 .demo[data-demo-scene=role] [aria-labelledby=demo-role-title] > header { display:none; }
 .role { color:var(--text-2); }
 
-.updateControls { display:flex; justify-content:space-between; align-items:center; gap:var(--unit); padding:0 calc(var(--unit)*2); border-bottom:var(--demo-line) solid var(--line); color:var(--text-3); font:400 var(--demo-type-label)/1.4 var(--font-mono); }
-.updateControls button { min-height:var(--demo-touch); color:var(--text-2); text-decoration:underline; text-underline-offset:calc(var(--unit)/2); }
+.replay { display:flex; align-items:center; gap:var(--unit); align-self:flex-start; min-height:var(--demo-touch); color:var(--text-2); font:400 var(--demo-type-label) var(--font-mono); }
+.replay svg { width:calc(var(--unit)*2); height:calc(var(--unit)*2); }
+.sceneCallout { padding:0 calc(var(--unit)*2) calc(var(--unit)*2); }
+.demo[data-demo-cutscene=true] .instruction { display:none; }
+@media(max-width:760px) { .demo[data-demo-cutscene=true] .appViewport { min-height:0; } }

@@ -18,7 +18,14 @@ import {
 afterEach(cleanup)
 
 function advance(actions: LifecycleAction[], start = initialLifecycleState()) {
-  return actions.reduce(lifecycleReducer, start)
+  return actions.reduce((state, action) => {
+    const next = lifecycleReducer(state, action)
+    return next.cutscene ? lifecycleReducer(next, { type: 'SKIP_CUTSCENE' }) : next
+  }, start)
+}
+
+function fixtureReducer(state: LifecycleState, action: LifecycleAction) {
+  return advance([action], state)
 }
 
 function assignedVisit(member: VisitAssignee) {
@@ -42,7 +49,7 @@ function VisitHarness({ initial }: { initial: LifecycleState }) {
 }
 
 function CrewProjectHarness() {
-  const [state, dispatch] = useReducer(lifecycleReducer, advance([{ type: 'SELECT_ROLE', role: 'crew' }]))
+  const [state, dispatch] = useReducer(fixtureReducer, advance([{ type: 'SELECT_ROLE', role: 'crew' }]))
   return <ProjectScenes state={state} dispatch={dispatch} />
 }
 

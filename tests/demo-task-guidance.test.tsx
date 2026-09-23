@@ -35,7 +35,10 @@ function projectState(): LifecycleState {
     { type: 'SEND_ESTIMATE' },
     { type: 'APPROVE_ESTIMATE' },
   ]
-  return actions.reduce(lifecycleReducer, initialLifecycleState())
+  return actions.reduce((state, action) => {
+    const next = lifecycleReducer(state, action)
+    return next.cutscene ? lifecycleReducer(next, { type: 'SKIP_CUTSCENE' }) : next
+  }, initialLifecycleState())
 }
 
 function ProjectHarness({ initial = projectState(), onAssignmentComplete, revision = 0 }: {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { SAMPLE } from '@/components/demo/lifecycle-data'
 import {
-  initialLifecycleState, lifecycleReducer, restoreLifecycleState, LIFECYCLE_REVISION,
+  initialLifecycleState, lifecycleReducer as rawLifecycleReducer, restoreLifecycleState, LIFECYCLE_REVISION,
   type LifecycleAction, type LifecycleState, type Scene, type VisitAssignee,
 } from '@/components/demo/lifecycle-state'
 
@@ -27,6 +27,10 @@ const crewJourney: LifecycleAction[] = [
   { type: 'OPEN_COMPOSER' }, { type: 'ADD_COMPLETION_PHOTO' },
   { type: 'SET_NOTE', value: `  ${crewNote}  ` }, { type: 'POST_NOTE' },
 ]
+function lifecycleReducer(state: LifecycleState, action: LifecycleAction): LifecycleState {
+  const next = rawLifecycleReducer(state, action)
+  return next.cutscene ? rawLifecycleReducer(next, { type: 'SKIP_CUTSCENE' }) : next
+}
 function through(journey: LifecycleAction[], type: LifecycleAction['type']) {
   let state = initialLifecycleState()
   for (const action of journey) {
@@ -123,10 +127,14 @@ describe('role-based sample job lifecycle', () => {
     const estimate = through(selfJourney, 'COMPLETE_VISIT')
     expect(lifecycleReducer(estimate, { type: 'APPROVE_ESTIMATE' })).toBe(estimate)
     expect(lifecycleReducer(estimate, { type: 'ASSIGN_CREW', members: ['Nick'] })).toBe(estimate)
-    const accepted = lifecycleReducer(estimate, { type: 'SEND_ESTIMATE' })
-    expect(accepted).toMatchObject({ scene: 'accepted', estimateSent: true, estimateApproved: false })
-    const project = lifecycleReducer(accepted, { type: 'APPROVE_ESTIMATE' })
-    expect(project).toMatchObject({ scene: 'project', estimateSent: true, estimateApproved: true, crewAssigned: false })
+    const accepted = rawLifecycleReducer(estimate, { type: 'SEND_ESTIMATE' })
+    expect(accepted).toMatchObject({
+      scene: 'accepted', estimateSent: true, estimateApproved: false,
+      cutscene: { id: 'approval', beat: 0, replay: false },
+    })
+    expect(rawLifecycleReducer(accepted, { type: 'APPROVE_ESTIMATE' })).toBe(accepted)
+    const project = rawLifecycleReducer(accepted, { type: 'SKIP_CUTSCENE' })
+    expect(project).toMatchObject({ scene: 'project', estimateSent: true, estimateApproved: true, crewAssigned: false, cutscene: null })
   })
 
   it('keeps the custom-tool dimension within supported options and the estimate step', () => {
@@ -191,15 +199,12 @@ describe('role-based sample job lifecycle', () => {
     }
   })
 
-  it('requires invoice creation before recording an external receipt', () => {
+  it('materializes the incoming invoice and external receipt when billing context finishes', () => {
     const readyToBill = through(selfJourney, 'OPEN_BILLING')
-    expect(readyToBill).toMatchObject({ scene: 'billing', invoiceCreated: false, paymentRecorded: false })
+    expect(readyToBill).toMatchObject({ scene: 'billing', invoiceCreated: true, paymentRecorded: true, cutscene: null })
+    expect(lifecycleReducer(readyToBill, { type: 'CREATE_INVOICE' })).toBe(readyToBill)
     expect(lifecycleReducer(readyToBill, { type: 'RECORD_PAYMENT' })).toBe(readyToBill)
-    const invoice = lifecycleReducer(readyToBill, { type: 'CREATE_INVOICE' })
-    expect(invoice).toEqual({ ...readyToBill, invoiceCreated: true })
-    const receipt = lifecycleReducer(invoice, { type: 'RECORD_PAYMENT' })
-    expect(receipt).toEqual({ ...invoice, paymentRecorded: true })
-    expect(receipt.postedNote).toBe(SAMPLE.note)
+    expect(readyToBill.postedNote).toBe(SAMPLE.note)
   })
 
   it.each([['self', selfJourney], ['delegated', delegatedJourney], ['crew', crewJourney]] as const)('makes duplicate one-way actions harmless on the %s path', (_name, journey) => {
@@ -274,8 +279,8 @@ describe('strict lifecycle resume validation', () => {
     expect(restoreLifecycleState(raw)).toEqual(initialLifecycleState())
   })
 
-  it.each(['crew-job-v1', 'job-lifecycle-v2', 'job-lifecycle-v3', null])('resets another revision: %s', revision => {
-    expect(LIFECYCLE_REVISION).toBe('job-lifecycle-v4')
+  it.each(['crew-job-v1', 'job-lifecycle-v2', 'job-lifecycle-v3', 'job-lifecycle-v4', null])('resets another revision: %s', revision => {
+    expect(LIFECYCLE_REVISION).toBe('job-lifecycle-v5')
     expect(restoredWith(through(selfJourney, 'RECORD_PAYMENT'), { revision })).toEqual(initialLifecycleState())
   })
 
@@ -324,6 +329,6 @@ describe('strict lifecycle resume validation', () => {
     const activity = through(selfJourney, 'ADVANCE_WORKDAY')
     expect(restoredWith(activity, { invoiceCreated: true })).toEqual(initialLifecycleState())
     expect(restoredWith(activity, { paymentRecorded: true })).toEqual(initialLifecycleState())
-    expect(restoredWith(through(selfJourney, 'OPEN_BILLING'), { paymentRecorded: true })).toEqual(initialLifecycleState())
+    expect(restoredWith(through(selfJourney, 'OPEN_BILLING'), { invoiceCreated: false })).toEqual(initialLifecycleState())
   })
 })
