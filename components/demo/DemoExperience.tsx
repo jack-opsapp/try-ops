@@ -7,6 +7,7 @@ import type { DemoEvent, DemoStep } from '@/lib/demo/contracts'
 import { initialLifecycleState, lifecycleReducer, restoreLifecycleState, replayCutscene, LIFECYCLE_STORAGE_KEY, SCENES, type LifecycleAction, type Scene } from './lifecycle-state'
 import { DemoNotification, type DemoNotificationMessage } from './DemoNotification'
 import { useCutscenePlayback } from './useCutscenePlayback'
+import { ActionGuidance } from './ActionGuidance'
 import { cutsceneScript } from './cutscene-script'
 import { DemoCutscene } from './DemoCutscene'
 import { FeatureCallout } from './FeatureCallout'
@@ -56,6 +57,7 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
   const startedAt = useRef<number | null>(null)
   const errors = useRef(new Set<DemoEvent['errorCode']>())
   const content = useRef<HTMLDivElement>(null)
+  const guidanceRoot = useRef<HTMLDivElement>(null)
   const heading = useRef<HTMLHeadingElement>(null)
   const playbackSurface = useRef<HTMLDivElement>(null)
   const focusNext = useRef(false)
@@ -207,7 +209,8 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
     : state.scene === 'crew' && state.taskCompleted ? 'Task complete. Post the finished photo and a note.' : copy.hint
   const RoleIcon = state.role === 'crew' ? HardHat : Briefcase
   const sceneProps = { state, dispatch }
-  return <div className={styles.demo} data-demo-scene={state.scene} data-demo-cutscene={!!state.cutscene} data-motion={reduced ? 'reduced' : 'full'}>
+  return <div ref={guidanceRoot} className={styles.demo} data-demo-scene={state.scene} data-demo-cutscene={!!state.cutscene} data-motion={reduced ? 'reduced' : 'full'}>
+    <ActionGuidance root={guidanceRoot} />
     <header className={styles.header}>
       <div className={styles.brand}><span role="img" aria-label="OPS" className={styles.logo} /><span className={styles.sampleLabel}>INTERACTIVE DEMO<span>Sample company · sample data</span></span></div>
       <div className={styles.headerActions}><a className={styles.topTrial} href={state.role === 'crew' ? '/download' : signupHref} onClick={()=>{ if (state.role !== 'crew') report('signup_clicked', state.scene) }}>{state.role === 'crew' ? 'Get the app' : 'Try OPS free'} <ArrowRight aria-hidden="true" /></a><a className={styles.exit} href={exitHref} onClick={()=>report('exit', state.scene)}>Exit demo</a></div>

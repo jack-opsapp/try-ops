@@ -187,7 +187,7 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
     <div className={styles.composeAuthor}><Avatar name={crewName} /><span>Posting as {crewName}</span></div>
     {state.completionPhoto && <div className={styles.attachedPhoto}><SamplePhoto src={SAMPLE.afterPhoto} alt={`Completion photo attached to ${crewName}'s update`} sizes="80px" /><span><CheckCircle2 aria-hidden="true" /> Photo attached</span></div>}
     <label className={styles.noteLabel} htmlFor="crew-update">Project note</label>
-    <textarea data-demo-next={state.completionPhoto && !state.noteDraft.trim()} id="crew-update" value={state.noteDraft} maxLength={280} rows={3} onChange={event => dispatch({ type: 'SET_NOTE', value: event.target.value })} aria-describedby="crew-note-help" />
+    <div className={styles.noteTarget}><textarea data-demo-next={state.completionPhoto && !state.noteDraft.trim()} id="crew-update" value={state.noteDraft} maxLength={280} rows={3} onChange={event => dispatch({ type: 'SET_NOTE', value: event.target.value })} aria-describedby="crew-note-help" /></div>
     <div className={styles.composeActions}>
       <button data-demo-next={!state.completionPhoto} className={styles.attachButton} onClick={() => dispatch({ type: 'ADD_COMPLETION_PHOTO' })} disabled={state.completionPhoto}><Camera aria-hidden="true" /><span>{state.completionPhoto ? 'Photo attached' : 'Attach completion photo'}</span></button>
       <Action data-demo-next={state.completionPhoto && !!state.noteDraft.trim()} disabled={!state.completionPhoto || !state.noteDraft.trim()} onClick={() => dispatch({ type: 'POST_NOTE' })} aria-label="Post crew update"><ArrowUp aria-hidden="true" />Post</Action>

@@ -19,10 +19,9 @@
    the next control. Centered scrolling remains readable on short phones. */
 .guidanceTarget { scroll-margin-block: calc(var(--unit) * 8); }
 .guidanceTarget:focus-visible { outline: calc(var(--project-hairline) * 2) solid var(--ops-accent); outline-offset: calc(var(--unit) / 2); }
-.project .taskRow[data-demo-next=true] { background: var(--surface-active); outline-offset: calc(var(--project-hairline) * -4); }
-/* This ring stays inside the clipped native task group. */
-.project .taskRow[data-demo-next=true]::before { inset: calc(var(--unit) / 2); animation: task-guidance-ring calc(var(--d-panel) * 5) var(--ease-smooth) 3; }
-@keyframes task-guidance-ring { 0% { opacity: .8; transform: scale(.97, .9); } 75%, 100% { opacity: 0; transform: scale(1); } }
+.project .taskRow[data-demo-next=true] { background: var(--surface-active); }
+.noteTarget { position:relative; border-radius:var(--r-btn); }
+.noteTarget textarea { display:block; width:100%; }
 .project button:focus-visible, .project summary:focus-visible, .project textarea:focus-visible, .panel:focus-visible { outline: calc(var(--project-hairline) * 2) solid var(--ops-accent); outline-offset: calc(var(--unit) / 2); }
 .project svg { width: var(--project-icon); height: var(--project-icon); flex-shrink: 0; stroke-width: 1.5; }
 .header { padding: calc(var(--unit) * 2) calc(var(--unit) * 2.5); }
@@ -152,7 +151,6 @@ button.taskRow:hover { background: var(--surface-hover); }
   .navLine { flex-wrap: wrap; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .project .taskRow[data-demo-next=true]::before { animation: none; }
   .tabs button::after, .recordSummary svg, .assignTeam svg { transition: opacity var(--d-hover) linear; }
   .crewPost, .teamPicker, .taskDetail { animation: post-fade var(--d-hover) linear both; }
 }
