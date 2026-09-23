@@ -274,8 +274,8 @@ describe('strict lifecycle resume validation', () => {
     expect(restoreLifecycleState(raw)).toEqual(initialLifecycleState())
   })
 
-  it.each(['crew-job-v1', 'job-lifecycle-v2', 'job-lifecycle-v4', null])('resets another revision: %s', revision => {
-    expect(LIFECYCLE_REVISION).toBe('job-lifecycle-v3')
+  it.each(['crew-job-v1', 'job-lifecycle-v2', 'job-lifecycle-v3', null])('resets another revision: %s', revision => {
+    expect(LIFECYCLE_REVISION).toBe('job-lifecycle-v4')
     expect(restoredWith(through(selfJourney, 'RECORD_PAYMENT'), { revision })).toEqual(initialLifecycleState())
   })
 

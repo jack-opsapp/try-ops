@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { CalendarDays, Mail, MapPin, Link2 } from 'lucide-react'
 import { Action, AppHeader, Avatar, Badge, Check, ChevronRight, Section, ui } from './DemoPrimitives'
 import { SAMPLE, money } from './lifecycle-data'
@@ -16,11 +16,11 @@ import { FeatureCallout } from './FeatureCallout'
  * Booking evidence: phase-c-bilateral-event-handoff.ts; the internal engine
  * name is deliberately absent from the rendered interface.
  */
-type IntakeProps = SceneProps & { onPaymentPreviewChange?: (open: boolean) => void }
-export function IntakeBillingScenes({ state, dispatch, onPaymentPreviewChange }: IntakeProps) {
+type IntakeProps = SceneProps & { onAccountingPreviewChange?: (open: boolean) => void }
+export function IntakeBillingScenes({ state, dispatch, onAccountingPreviewChange }: IntakeProps) {
   if (state.scene === 'inquiry') return <InquiryScene dispatch={dispatch} />
   if (state.scene === 'booked') return <BookedScene state={state} dispatch={dispatch} />
-  if (state.scene === 'billing') return <BillingScene state={state} dispatch={dispatch} onPaymentPreviewChange={onPaymentPreviewChange} />
+  if (state.scene === 'billing') return <BillingScene state={state} dispatch={dispatch} onAccountingPreviewChange={onAccountingPreviewChange} />
   return null
 }
 
@@ -117,88 +117,37 @@ function BookedScene({ state, dispatch }: SceneProps) {
   </div>
 }
 
-function BillingScene({ state, dispatch, onPaymentPreviewChange }: IntakeProps) {
-  const [recording, setRecording] = useState(false)
+function BillingScene({ state, onAccountingPreviewChange }: IntakeProps) {
   const [showAccounting, setShowAccounting] = useState(false)
   const [provider, setProvider] = useState<'QuickBooks' | 'Sage'>('QuickBooks')
-  const paymentHeading = useRef<HTMLHeadingElement>(null)
-  const previousRecording = useRef(recording)
-  useEffect(() => { onPaymentPreviewChange?.(recording); return () => onPaymentPreviewChange?.(false) }, [recording, onPaymentPreviewChange])
-  useEffect(() => {
-    if (recording === previousRecording.current) return
-    previousRecording.current = recording
-    paymentHeading.current?.focus({ preventScroll: true })
-    paymentHeading.current?.scrollIntoView?.({ block: 'start', behavior: 'instant' })
-  }, [recording])
-
-  if (!state.invoiceCreated) return <div className={styles.scene}>
-    <AppHeader title="Ready to bill" right={<Badge tone="olive">All tasks complete</Badge>} />
+  useEffect(() => { onAccountingPreviewChange?.(showAccounting); return () => onAccountingPreviewChange?.(false) }, [showAccounting, onAccountingPreviewChange])
+  return <div className={styles.scene}>
+    <AppHeader title="Billing" right={<Badge tone={state.paymentRecorded ? 'olive' : 'neutral'}>{state.paymentRecorded ? 'Paid' : state.invoiceCreated ? 'Sent' : 'Ready to bill'}</Badge>} />
     <div className={styles.content}>
       <FeatureCallout kind="accounting" />
-      <div className={styles.invoiceIdentity}><h3>{SAMPLE.project}</h3><p>{SAMPLE.client}</p><span className={styles.invoiceAmount}>{money(SAMPLE.total)}</span></div>
-      <Section title="Completed work"><div className={styles.billableTasks}><p><Check aria-hidden="true" />Deck preparation</p><p><Check aria-hidden="true" />{SAMPLE.task}</p></div></Section>
-      <p className={styles.summary}>The approved estimate is ready to become an invoice. Review the amount, then create the draft.</p>
-      <p className={styles.finePrint}>Sample billing preview. No invoice is sent and no payment is taken.</p>
-    </div>
-    <div className={ui.toolbar}><Action data-demo-next="true" onClick={() => dispatch({ type: 'CREATE_INVOICE' })}>Create invoice<ChevronRight aria-hidden="true" /></Action></div>
-  </div>
-
-  if (recording && !state.paymentRecorded) {
-    return (
-      <div className={styles.scene}>
-        <AppHeader title="Record payment" titleRef={paymentHeading} right={<button className={styles.textAction} type="button" onClick={() => setRecording(false)}>Cancel</button>} />
-        <div className={styles.content}>
-          <FeatureCallout kind="accounting" />
-          <div className={styles.visitDay}><span className={ui.label}>Later · payment received outside OPS</span></div>
-          <div className={styles.paymentContext}><span>{SAMPLE.invoiceNumber}</span><span>Balance {money(SAMPLE.total)}</span></div>
-          <div className={styles.receivedNotice}><Check aria-hidden="true" /><p>Alex’s bank transfer has arrived. Record it against this invoice.</p></div>
-          <dl className={styles.receiptFields}>
-            <div><dt>Amount</dt><dd className={styles.receiptAmount}>{money(SAMPLE.total)}</dd></div>
-            <div><dt>Method</dt><dd>Bank transfer</dd></div>
-            <div><dt>Notes</dt><dd>Payment received for {SAMPLE.project}.</dd></div>
-          </dl>
-          <p className={styles.finePrint}>Sample receipt. OPS records this payment; the bank handled the transfer.</p>
-        </div>
-        <div className={ui.toolbar}>
-          <Action data-demo-next="true" onClick={() => { dispatch({ type: 'RECORD_PAYMENT' }); setRecording(false) }}>Record payment</Action>
-        </div>
+      <div className={styles.invoiceIdentity}>
+        <h3>{SAMPLE.invoiceNumber}</h3><p>{SAMPLE.project}</p><span className={styles.invoiceAmount}>{money(SAMPLE.total)}</span>
       </div>
-    )
-  }
-
-  return (
-    <div className={styles.scene}>
-      <AppHeader title="Invoice" titleRef={paymentHeading} right={<Badge tone={state.paymentRecorded ? 'olive' : 'neutral'}>{state.paymentRecorded ? 'Paid' : 'Draft'}</Badge>} />
-      <div className={styles.content}>
-        <FeatureCallout kind="accounting" />
-        <div className={styles.invoiceIdentity}>
-          <h3>{SAMPLE.invoiceNumber}</h3>
-          <p>{SAMPLE.project}</p>
-          <span className={styles.invoiceAmount}>{money(SAMPLE.total)}</span>
-        </div>
-        <dl className={styles.appointmentDetails}>
-          <div><dt>Client</dt><dd>{SAMPLE.client}<span className={styles.secondaryLine}>{SAMPLE.company}</span></dd></div>
-          <div><dt>Project</dt><dd>{SAMPLE.project}<span className={`${styles.secondaryLine} ${ui.mono}`}>{SAMPLE.address}</span></dd></div>
-        </dl>
-        <Section title="Line items">
-          <div className={styles.lineItems}>
-            <div><span>Deck preparation<small>Labor</small></span><strong>{money(SAMPLE.preparation)}</strong></div>
-            <div><span>Deck resurfacing<small>Labor</small></span><strong>{money(SAMPLE.installation)}</strong></div>
-            <div><span>Deck materials<small>Materials</small></span><strong>{money(SAMPLE.materials)}</strong></div>
-          </div>
-        </Section>
-        <dl className={styles.totals}>
-          <div><dt>Total</dt><dd>{money(SAMPLE.total)}</dd></div>
-          <div><dt>Paid</dt><dd>{money(state.paymentRecorded ? SAMPLE.total : 0)}</dd></div>
-          <div className={styles.balance} data-paid={state.paymentRecorded}><dt>Balance due</dt><dd>{money(state.paymentRecorded ? 0 : SAMPLE.total)}</dd></div>
-        </dl>
-        {state.paymentRecorded ? (
-          <Section title="Payments">
-            <div className={styles.paymentHistory} role="status"><Check aria-hidden="true" /><div><strong>Bank transfer</strong><span>Payment recorded</span></div><span>{money(SAMPLE.total)}</span></div>
-          </Section>
-        ) : (
-          <p className={styles.finePrint}>Your sample invoice is ready. Optional: see how an externally received payment is recorded after invoicing.</p>
-        )}
+      <ol className={styles.billingEvents} aria-label="Sample billing timeline">
+        <li data-complete="true"><Check aria-hidden="true"/><div><strong>All tasks complete</strong><span>Thursday · ready to bill</span></div></li>
+        <li data-complete={state.invoiceCreated}><Check aria-hidden="true"/><div><strong>{state.invoiceCreated ? 'Invoice sent' : 'Preparing invoice'}</strong><span>Thursday · {state.invoiceCreated ? `Sent to ${SAMPLE.client}` : 'From the approved estimate'}</span></div></li>
+        <li data-complete={state.paymentRecorded}><Check aria-hidden="true"/><div><strong>{state.paymentRecorded ? 'Payment recorded' : 'Awaiting payment'}</strong><span>{state.paymentRecorded ? 'Friday · bank transfer received outside OPS' : 'The next update jumps to Friday'}</span></div></li>
+      </ol>
+      <dl className={styles.totals}>
+        <div><dt>Total</dt><dd>{money(SAMPLE.total)}</dd></div>
+        <div><dt>Paid</dt><dd>{money(state.paymentRecorded ? SAMPLE.total : 0)}</dd></div>
+        <div className={styles.balance} data-paid={state.paymentRecorded}><dt>Balance due</dt><dd>{money(state.paymentRecorded ? 0 : SAMPLE.total)}</dd></div>
+      </dl>
+      <p className={styles.finePrint}>Sample automation preview. The bank handles the payment; OPS keeps the record. No real invoice is sent or payment taken here.</p>
+      <details className={styles.disclosure}>
+        <summary>Invoice details</summary>
+        <dl className={styles.appointmentDetails}><div><dt>Client</dt><dd>{SAMPLE.client}<span className={styles.secondaryLine}>{SAMPLE.company}</span></dd></div><div><dt>Project</dt><dd>{SAMPLE.project}<span className={`${styles.secondaryLine} ${ui.mono}`}>{SAMPLE.address}</span></dd></div></dl>
+        <Section title="Line items"><div className={styles.lineItems}>
+          <div><span>Deck preparation<small>Labor</small></span><strong>{money(SAMPLE.preparation)}</strong></div>
+          <div><span>Deck resurfacing<small>Labor</small></span><strong>{money(SAMPLE.installation)}</strong></div>
+          <div><span>Deck materials<small>Materials</small></span><strong>{money(SAMPLE.materials)}</strong></div>
+        </div></Section>
+      </details>
         <section className={styles.accounting} aria-label="Accounting connection preview">
           <button className={styles.accountingTrigger} type="button" aria-expanded={showAccounting} aria-controls="demo-accounting-picker" onClick={() => setShowAccounting(value => !value)}>
             <span>Connect accounting software</span><ChevronRight aria-hidden="true" />
@@ -221,14 +170,7 @@ function BillingScene({ state, dispatch, onPaymentPreviewChange }: IntakeProps) 
             </div>
           )}
         </section>
-      </div>
-      <div className={ui.toolbar}>
-        {state.paymentRecorded ? (
-          <div className={styles.paidFooter} role="status"><Check aria-hidden="true" /><span>Paid in full</span><strong>{money(0)} DUE</strong></div>
-        ) : (
-          <Action secondary onClick={() => setRecording(true)}>Preview payment recording</Action>
-        )}
-      </div>
     </div>
-  )
+    {state.paymentRecorded && <div className={ui.toolbar}><div className={styles.paidFooter}><Check aria-hidden="true"/><span>Paid in full</span><strong>{money(0)} DUE</strong></div></div>}
+  </div>
 }

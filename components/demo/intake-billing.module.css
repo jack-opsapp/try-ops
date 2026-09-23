@@ -142,3 +142,12 @@
 .billableTasks { display:grid; gap:var(--unit); }
 .billableTasks p { display:flex; align-items:center; gap:var(--unit); color:var(--text-2); }
 .billableTasks svg { width:calc(var(--unit)*2); height:calc(var(--unit)*2); color:var(--olive); }
+
+.billingEvents { display:grid; gap:calc(var(--unit)*2); margin:0; padding:0; list-style:none; }
+.billingEvents li { display:flex; gap:calc(var(--unit)*1.5); align-items:flex-start; color:var(--text-3); }
+.billingEvents li > svg { margin-top:calc(var(--unit)/2); opacity:0; }
+.billingEvents li[data-complete=true] > svg { opacity:1; color:var(--olive); }
+.billingEvents li > div { display:grid; gap:calc(var(--unit)/2); }
+.billingEvents strong { color:var(--text-2); font-weight:500; }
+.billingEvents [data-complete=true] strong { color:var(--text); }
+.billingEvents span { font:400 var(--ib-micro)/1.5 var(--font-mono); }

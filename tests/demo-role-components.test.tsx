@@ -186,20 +186,16 @@ describe('visits keep the visitor in their chosen role', () => {
 })
 
 describe('estimate beta and the optional custom tool', () => {
-  it('shows beta availability before sending, then an explicit later acceptance and approval', () => {
+  it('keeps beta disclosure out of estimate screens and waits for incoming acceptance', () => {
     render(<VisitHarness initial={preparedEstimate()} />)
-    const callout = screen.getByRole('note', { name: 'Accounting beta availability' })
-    const send = screen.getByRole('button', { name: 'Send estimate' })
-    expect(callout.compareDocumentPosition(send) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(screen.queryByRole('note', { name: 'Accounting beta availability' })).toBeNull()
     expect(screen.getByText('Draft')).toBeTruthy()
-    expect(screen.queryByRole('button', { name: 'Mark approved' })).toBeNull()
-    fireEvent.click(send)
+    click('Send estimate')
     expect(currentState()).toMatchObject({ role: 'operator', scene: 'accepted', estimateSent: true, estimateApproved: false })
-    expect(screen.getByText('Wednesday morning · customer reply')).toBeTruthy()
-    expect(screen.getByText('Client accepted')).toBeTruthy()
-    expect(screen.getByRole('note', { name: 'Accounting beta availability' })).toBeTruthy()
-    click('Mark approved')
-    expect(currentState()).toMatchObject({ role: 'operator', scene: 'project', estimateApproved: true })
+    expect(screen.getByText('Sample timeline · Wednesday morning')).toBeTruthy()
+    expect(screen.getByText('Sent')).toBeTruthy()
+    expect(screen.queryByRole('note', { name: 'Accounting beta availability' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Mark approved' })).toBeNull()
   })
 
   it('updates drawing dimensions and sample quantities without changing the prepared quote', () => {

@@ -1,8 +1,9 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { DemoExperience } from '@/components/demo/DemoExperience'
 import { initialDemoState, restoreDemoState } from '@/components/demo/demo-state'
 import { LIFECYCLE_STORAGE_KEY, initialLifecycleState, lifecycleReducer, type LifecycleAction } from '@/components/demo/lifecycle-state'
+import { AUTOMATION_DELAYS } from '@/components/demo/useDemoAutomation'
 import type { DemoEvent } from '@/lib/demo/contracts'
 import { DEMO_VERSION } from '@/lib/demo/contracts'
 import { parseDemoEvent } from '@/lib/demo/server'
@@ -20,7 +21,7 @@ const operatorActions: LifecycleAction[] = [
   { type: 'ASSIGN_VISIT', member: 'Nick' }, { type: 'COMPLETE_VISIT' },
   { type: 'SEND_ESTIMATE' }, { type: 'APPROVE_ESTIMATE' },
   { type: 'ASSIGN_CREW', members: ['Pete'] }, { type: 'ADVANCE_WORKDAY' },
-  { type: 'OPEN_BILLING' }, { type: 'CREATE_INVOICE' },
+  { type: 'OPEN_BILLING' }, { type: 'CREATE_INVOICE' }, { type: 'RECORD_PAYMENT' },
 ]
 function snapshot(actions: LifecycleAction[], stop: LifecycleAction['type']) {
   let state = initialLifecycleState()
@@ -31,18 +32,21 @@ function snapshot(actions: LifecycleAction[], stop: LifecycleAction['type']) {
   throw new Error('Missing snapshot action')
 }
 function click(name: string) { fireEvent.click(screen.getByRole('button', { name })) }
+function advance(milliseconds: number) { act(() => { vi.advanceTimersByTime(milliseconds) }) }
 function events() { return diagnostics.track.mock.calls.map(([event]) => event as DemoEvent) }
 function expectCollectorAccepts(event: DemoEvent) {
   expect(parseDemoEvent({ ...event, version: DEMO_VERSION, eventId: 'bc2f9060-d8fa-41b1-a7da-8357b0625042' })).not.toBeNull()
 }
 
 beforeEach(() => {
+  vi.useFakeTimers()
   sessionStorage.clear()
   diagnostics.track.mockReset()
   vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
+  vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('visible')
   window.history.replaceState({}, '', '/demo')
 })
-afterEach(() => { cleanup(); vi.restoreAllMocks() })
+afterEach(() => { cleanup(); vi.useRealTimers(); vi.restoreAllMocks() })
 
 describe('independent persisted-demo acceptance', () => {
   it.each([
@@ -62,7 +66,7 @@ describe('independent persisted-demo acceptance', () => {
     expect(events().filter(event => ['started', 'job_assigned', 'crew_viewed', 'task_completed'].includes(event.action))).toEqual([])
   })
 
-  it.each(['ADVANCE_WORKDAY', 'CREATE_INVOICE'] as const)('restores Operator %s without reporting incoming fixture work as visitor actions', action => {
+  it.each(['ADVANCE_WORKDAY', 'CREATE_INVOICE', 'RECORD_PAYMENT'] as const)('restores Operator %s without reporting incoming fixture work as visitor actions', action => {
     sessionStorage.setItem(LIFECYCLE_STORAGE_KEY, JSON.stringify(snapshot(operatorActions, action)))
     render(<DemoExperience />)
     expect(screen.getByText('Your sample job is where you left it.')).toBeTruthy()
@@ -76,7 +80,7 @@ describe('independent persisted-demo acceptance', () => {
   it('reports only actual Operator assignment without inventing crew actions', () => {
     render(<DemoExperience />)
     click('Choose Operator'); click('Assign site visit'); click('Select Mike'); click('Assign to Mike')
-    click('Review estimate'); click('Send estimate'); click('Mark approved')
+    click('Review estimate'); click('Send estimate'); advance(AUTOMATION_DELAYS.estimate)
     fireEvent.click(screen.getByRole('tab', { name: 'details' }))
     click('Open resurfacing task'); click('Assign team to this task'); click('Select Pete'); click('Done')
     click('See the completed work')
@@ -84,7 +88,8 @@ describe('independent persisted-demo acceptance', () => {
       ['started', 'assign'], ['job_assigned', 'assign'],
     ])
     for (const event of events()) expectCollectorAccepts(event)
-    click('Back'); click('See the completed work'); click('Review billing'); click('Create invoice')
+    click('Back'); click('See the completed work'); click('View billing')
+    advance(AUTOMATION_DELAYS.invoice); advance(AUTOMATION_DELAYS.payment)
     expect(events().filter(event => event.action === 'job_assigned')).toHaveLength(1)
     expect(events().filter(event => ['crew_viewed', 'task_completed'].includes(event.action))).toEqual([])
   })

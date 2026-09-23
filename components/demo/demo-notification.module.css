@@ -1,0 +1,24 @@
+/* App globals import the canonical OPS tokens first. The notification uses
+   normal flow to reserve space; only its message animates, never the layout. */
+.slot { min-width:0; flex-shrink:0; }
+.slot[data-active=true] { padding:calc(var(--unit)*1.5) calc(var(--unit)*2); border-bottom:calc(var(--unit)/8) solid var(--line); background:var(--bg); }
+.surface { display:flex; align-items:flex-start; gap:calc(var(--unit)/2); min-width:0; }
+.slot[data-active=true] .surface { padding:calc(var(--unit)*1.5); border:calc(var(--unit)/8) solid var(--glass-border); border-radius:var(--r-panel); background:var(--glass-dense); }
+.announcement { flex:1; min-width:0; }
+.message { display:flex; align-items:flex-start; gap:calc(var(--unit)*1.5); min-width:0; animation:notification-arrive var(--d-page) var(--ease-smooth) both; }
+.mark { display:block; flex-shrink:0; width:calc(var(--unit)*3); height:calc(var(--unit)*3); margin-top:calc(var(--unit)/2); background:var(--text); mask:url('/brand/ops-mark.svg') center/contain no-repeat; -webkit-mask:url('/brand/ops-mark.svg') center/contain no-repeat; }
+.copy { min-width:0; }
+.meta { display:flex; align-items:baseline; flex-wrap:wrap; gap:calc(var(--unit)/2) var(--unit); margin:0 0 calc(var(--unit)/2); color:var(--text-3); font:400 calc(var(--unit)*1.375)/1.35 var(--font-mono); font-feature-settings:'tnum' 1,'zero' 1; }
+.meta > span:first-child { color:var(--text-2); }
+.title { margin:0; color:var(--text); font:500 calc(var(--unit)*2)/1.3 var(--font-mohave); overflow-wrap:anywhere; }
+.body { margin:calc(var(--unit)/2) 0 0; color:var(--text-2); font:400 calc(var(--unit)*1.75)/1.4 var(--font-mohave); overflow-wrap:anywhere; }
+.numeric { font-family:var(--font-mono); font-feature-settings:'tnum' 1,'zero' 1; }
+.dismiss { display:grid; flex-shrink:0; place-items:center; width:calc(var(--unit)*5.5); height:calc(var(--unit)*5.5); margin:calc(var(--unit)*-.5) calc(var(--unit)*-.5) 0 0; padding:0; border:0; border-radius:var(--r-btn); color:var(--text-3); background:transparent; cursor:pointer; transition:color var(--d-hover) var(--ease-smooth),background var(--d-hover) var(--ease-smooth); }
+.dismiss svg { width:calc(var(--unit)*2); height:calc(var(--unit)*2); }
+.dismiss:hover,.dismiss:active { color:var(--text); background:var(--surface-hover); }
+.dismiss:focus-visible { outline:calc(var(--unit)/4) solid var(--ops-accent); outline-offset:calc(var(--unit)/4); }
+@keyframes notification-arrive { from { opacity:0; transform:translateY(calc(var(--unit)*-1)); } to { opacity:1; transform:translateY(0); } }
+@keyframes notification-fade { from { opacity:0; } to { opacity:1; } }
+.slot[data-reduced=true] .message { animation:notification-fade var(--d-hover) var(--ease-smooth) both; }
+@media (max-width:360px) { .message { gap:var(--unit); } .slot[data-active=true] { padding:var(--unit) calc(var(--unit)*1.5); } }
+@media (prefers-reduced-motion:reduce) { .message { animation:notification-fade var(--d-hover) var(--ease-smooth) both; } .dismiss { transition:none; } }

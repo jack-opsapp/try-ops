@@ -15,6 +15,14 @@
 }
 .project button { cursor: pointer; }
 .project button:disabled { cursor: default; }
+/* Leave room for native headers and the action dock when a visitor reveals
+   the next control. Centered scrolling remains readable on short phones. */
+.guidanceTarget { scroll-margin-block: calc(var(--unit) * 8); }
+.guidanceTarget:focus-visible { outline: calc(var(--project-hairline) * 2) solid var(--ops-accent); outline-offset: calc(var(--unit) / 2); }
+.project .taskRow[data-demo-next=true] { background: var(--surface-active); outline-offset: calc(var(--project-hairline) * -4); }
+/* This ring stays inside the clipped native task group. */
+.project .taskRow[data-demo-next=true]::before { inset: calc(var(--unit) / 2); animation: task-guidance-ring calc(var(--d-panel) * 5) var(--ease-smooth) 3; }
+@keyframes task-guidance-ring { 0% { opacity: .8; transform: scale(.97, .9); } 75%, 100% { opacity: 0; transform: scale(1); } }
 .project button:focus-visible, .project summary:focus-visible, .project textarea:focus-visible, .panel:focus-visible { outline: calc(var(--project-hairline) * 2) solid var(--ops-accent); outline-offset: calc(var(--unit) / 2); }
 .project svg { width: var(--project-icon); height: var(--project-icon); flex-shrink: 0; stroke-width: 1.5; }
 .header { padding: calc(var(--unit) * 2) calc(var(--unit) * 2.5); }
@@ -81,7 +89,7 @@ button.taskRow:hover { background: var(--surface-hover); }
 .taskName > span:last-child:not(:first-child) { flex-basis: 100%; color: var(--text-3); font: 400 var(--project-meta)/1.5 var(--font-mono); padding-top: calc(var(--unit) / 2); }
 .taskDate { display: flex; align-items: center; gap: calc(var(--unit) / 2); font: 400 var(--project-meta)/1.5 var(--font-mono); text-transform: uppercase; color: var(--text-3); }
 .taskSource { color: var(--text-3); }
-.taskDetail { padding: calc(var(--unit) * 2); border-bottom: var(--project-hairline) solid var(--line); background: var(--surface-input); }
+.taskDetail { animation: post-arrive var(--d-panel) var(--ease-smooth) both; padding: calc(var(--unit) * 2); border-bottom: var(--project-hairline) solid var(--line); background: var(--surface-input); }
 .taskDetail > p { margin: 0 0 calc(var(--unit) * 2); }
 .taskDetail dl { margin: 0 0 calc(var(--unit) * 2); }
 .taskDetail dl > div { display: grid; grid-template-columns: calc(var(--unit) * 7.25) minmax(0,1fr); align-items: center; gap: var(--unit); padding: calc(var(--unit) / 2) 0; }
@@ -144,8 +152,9 @@ button.taskRow:hover { background: var(--surface-hover); }
   .navLine { flex-wrap: wrap; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .project .taskRow[data-demo-next=true]::before { animation: none; }
   .tabs button::after, .recordSummary svg, .assignTeam svg { transition: opacity var(--d-hover) linear; }
-  .crewPost, .teamPicker { animation: post-fade var(--d-hover) linear both; }
+  .crewPost, .teamPicker, .taskDetail { animation: post-fade var(--d-hover) linear both; }
 }
 @keyframes post-fade { from { opacity: 0; } to { opacity: 1; } }
 

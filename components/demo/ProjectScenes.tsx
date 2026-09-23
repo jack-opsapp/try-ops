@@ -7,22 +7,29 @@ import { SAMPLE } from './lifecycle-data'
 import type { CrewMember, SceneProps } from './lifecycle-state'
 import styles from './project-scenes.module.css'
 import { CharacterCard } from './CharacterCard'
-import { FeatureCallout } from './FeatureCallout'
 
 type ProjectTab = 'activity' | 'details' | 'expenses'
+type GuidanceTarget = 'task' | 'detail' | 'assign' | 'picker' | 'done' | 'timeline'
 const TABS: ProjectTab[] = ['activity', 'details', 'expenses']
 const ROSTER: CrewMember[] = ['Pete', 'Nick']
 
 /** Fixture-only rendering of native ProjectDetailsView and ActivityTabView.
  * Task state, photographs and the submitted note are owned by the lifecycle
  * reducer. Changing tabs never changes that durable work. */
-export function ProjectScenes({ state, dispatch }: SceneProps) {
+export function ProjectScenes({ state, dispatch, onAssignmentComplete }: SceneProps & { onAssignmentComplete?: () => void }) {
   const [tab, setTab] = useState<ProjectTab>('activity')
   const [photo, setPhoto] = useState<'before' | 'after' | 'progress' | null>(null)
   const [taskOpen, setTaskOpen] = useState(false)
   const [teamPickerOpen, setTeamPickerOpen] = useState(false)
   const [crewDraft, setCrewDraft] = useState<CrewMember[]>([])
   const tabButtons = useRef<Array<HTMLButtonElement | null>>([])
+  const nextTask = useRef<HTMLButtonElement>(null)
+  const taskDetail = useRef<HTMLDivElement>(null)
+  const assignTeam = useRef<HTMLButtonElement>(null)
+  const teamPicker = useRef<HTMLElement>(null)
+  const teamCommit = useRef<HTMLDivElement>(null)
+  const pendingGuidance = useRef<{ target: GuidanceTarget; focus: boolean } | null>(null)
+  const [guidanceRequest, setGuidanceRequest] = useState(0)
   const photoDialog = useRef<HTMLDialogElement>(null)
   const photoOpener = useRef<HTMLButtonElement | null>(null)
   const photoClose = useRef<HTMLButtonElement>(null)
@@ -38,6 +45,7 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
   const crewRail = <span className={styles.crewNames}>{state.role === 'crew' ? <Avatar name="You" /> : state.assignedCrew.map(name => <Avatar key={name} name={name} />)}<span>{crewNames}</span></span>
 
   useEffect(() => {
+    pendingGuidance.current = null
     setTab('activity')
     setTaskOpen(false)
     setTeamPickerOpen(false)
@@ -62,12 +70,74 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
     if (photoOpener.current?.isConnected) photoOpener.current.focus()
   }
 
+  // A reveal request comes only from a visitor action. Ordinary rerenders,
+  // restored progress and read-only tab changes never take over scrolling.
+  function guideTo(target: GuidanceTarget, focus = true) {
+    pendingGuidance.current = { target, focus }
+    setGuidanceRequest(value => value + 1)
+  }
+
+  useEffect(() => {
+    const request = pendingGuidance.current
+    if (!request) return
+    if (document.visibilityState === 'hidden') {
+      pendingGuidance.current = null
+      return
+    }
+    if (request.target === 'timeline') {
+      if (!state.crewAssigned) return
+      pendingGuidance.current = null
+      onAssignmentComplete?.()
+      return
+    }
+    if (tab !== 'details') { pendingGuidance.current = null; return }
+    const targets: Record<Exclude<GuidanceTarget, 'timeline'>, HTMLElement | null> = {
+      task: nextTask.current,
+      detail: taskDetail.current,
+      assign: assignTeam.current,
+      picker: teamPicker.current,
+      done: teamCommit.current?.querySelector<HTMLButtonElement>('[data-demo-next="true"]') ?? null,
+    }
+    const target = targets[request.target]
+    if (!target) return
+    pendingGuidance.current = null
+    if (request.focus) target.focus({ preventScroll: true })
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
+    target.scrollIntoView?.({ behavior: reduced ? 'auto' : 'smooth', block: request.target === 'picker' ? 'start' : 'center', inline: 'nearest' })
+  }, [guidanceRequest, tab, taskOpen, teamPickerOpen, state.crewAssigned, onAssignmentComplete])
+
+  function selectTab(next: ProjectTab, keepTabFocus = false) {
+    setTab(next)
+    if (next === 'details' && state.scene === 'project' && !state.crewAssigned) {
+      guideTo(teamPickerOpen ? 'picker' : taskOpen ? 'assign' : 'task', !keepTabFocus)
+    }
+  }
+
+  function toggleTask() {
+    setTaskOpen(value => !value)
+    setTeamPickerOpen(false)
+    if (!taskOpen) guideTo(state.crewAssigned ? 'detail' : 'assign')
+  }
+
   function toggleTeamPicker() {
-    if (!teamPickerOpen) setCrewDraft([...state.assignedCrew])
+    if (!teamPickerOpen) {
+      setCrewDraft([...state.assignedCrew])
+      guideTo('picker')
+    } else guideTo('assign')
     setTeamPickerOpen(value => !value)
   }
 
+  function selectCrew(name: CrewMember) {
+    const members = crewDraft.includes(name) ? crewDraft.filter(member => member !== name) : [...crewDraft, name]
+    setCrewDraft(members)
+    // Reveal the confirmation once, when the first person is selected. Further
+    // roster edits stay under the visitor's control.
+    if (crewDraft.length === 0 && members.length > 0) guideTo('done')
+  }
+
   function commitTeam() {
+    if (crewDraft.length === 0) return
+    guideTo('timeline')
     dispatch({ type: 'ASSIGN_CREW', members: crewDraft })
     setTeamPickerOpen(false)
   }
@@ -79,7 +149,7 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
     else if (event.key === 'End') next = TABS.length - 1
     else if (!offset) return
     event.preventDefault()
-    setTab(TABS[next])
+    selectTab(TABS[next], true)
     tabButtons.current[next]?.focus()
   }
 
@@ -138,13 +208,13 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
 
   return <div className={styles.project} data-project-scene={state.scene}>
     <header className={styles.header}>
-      <div className={styles.navLine}><span>Project</span>{state.crewAssigned && <button className={styles.selectedTask} onClick={() => { setTab('details'); setTaskOpen(true) }} aria-label="View selected task"><span className={styles.taskBadges}><Badge>{SAMPLE.task}</Badge>{state.taskCompleted && <Badge tone="olive"><CheckCircle2 aria-hidden="true" />Complete</Badge>}</span><ChevronRight aria-hidden="true" /></button>}</div>
+      <div className={styles.navLine}><span>Project</span>{state.crewAssigned && <button className={styles.selectedTask} onClick={() => { setTab('details'); setTaskOpen(true); guideTo('detail') }} aria-label="View selected task"><span className={styles.taskBadges}><Badge>{SAMPLE.task}</Badge>{state.taskCompleted && <Badge tone="olive"><CheckCircle2 aria-hidden="true" />Complete</Badge>}</span><ChevronRight aria-hidden="true" /></button>}</div>
       <h2>{SAMPLE.project}</h2><p>{SAMPLE.company}</p>
       <div className={styles.location}><MapPin aria-hidden="true" /><span>{SAMPLE.address}</span></div>
     </header>
 
     <div className={styles.tabs} role="tablist" aria-label="Project sections">
-      {TABS.map((item, index) => <button key={item} data-demo-next={item === nextProjectTab} ref={element => { tabButtons.current[index] = element }} id={`project-tab-${item}`} type="button" role="tab" aria-selected={tab === item} aria-controls={`project-panel-${item}`} tabIndex={tab === item ? 0 : -1} onClick={() => setTab(item)} onKeyDown={event => navigateTabs(event, index)}>{item}</button>)}
+      {TABS.map((item, index) => <button key={item} data-demo-next={item === nextProjectTab} ref={element => { tabButtons.current[index] = element }} id={`project-tab-${item}`} type="button" role="tab" aria-selected={tab === item} aria-controls={`project-panel-${item}`} tabIndex={tab === item ? 0 : -1} onClick={() => selectTab(item)} onKeyDown={event => navigateTabs(event, index)}>{item}</button>)}
     </div>
 
     <div className={styles.panel} id={`project-panel-${tab}`} role="tabpanel" aria-labelledby={`project-tab-${tab}`} tabIndex={0}>
@@ -155,7 +225,7 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
           <div className={styles.recordBody}><p>Old boards removed. Existing framing retained. Composite decking going down.</p><button className={styles.recordPhoto} aria-label="View progress photo" onClick={event => openPhoto('progress', event.currentTarget)}><SamplePhoto src={SAMPLE.progressPhoto} alt="Composite resurfacing underway on the same deck" /></button></div>
         </details>}
         {visitRecord}
-        {state.scene === 'project' && !state.crewAssigned && <Action className={styles.detailsAction} onClick={() => setTab('details')}>Assign the installation crew<ChevronRight aria-hidden="true" /></Action>}
+        {state.scene === 'project' && !state.crewAssigned && <Action className={styles.detailsAction} onClick={() => selectTab('details')}>Assign the installation crew<ChevronRight aria-hidden="true" /></Action>}
       </div>}
 
       {tab === 'details' && <div className={styles.details}>
@@ -169,12 +239,12 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
         </dl></Section>
         <Section title="Tasks"><div className={styles.tasks}>
           <div className={styles.taskRow}><div className={styles.taskName}><Badge>Deck preparation</Badge>{isWorkday && <Badge tone="olive">Complete</Badge>}<span>From approved estimate</span></div><FileText className={styles.taskSource} aria-hidden="true" /></div>
-          <button data-demo-next={state.scene === 'project' && !state.crewAssigned && !taskOpen} className={styles.taskRow} onClick={() => { setTaskOpen(value => !value); setTeamPickerOpen(false) }} aria-label="Open resurfacing task" aria-expanded={taskOpen} aria-controls="installation-task-detail"><div className={styles.taskName}><Badge>{SAMPLE.task}</Badge>{state.taskCompleted && <Badge tone="olive">Complete</Badge>}<span>{state.crewAssigned ? crewNames : 'From approved estimate'}</span></div><div className={styles.taskDate}><span>{isWorkday ? 'Sep 24' : 'Unscheduled'}</span><ChevronRight aria-hidden="true" /></div></button>
-          {taskOpen && <div id="installation-task-detail" className={styles.taskDetail}>
-            <dl><div><dt>Schedule</dt><dd>{isWorkday ? SAMPLE.workday : 'Unscheduled'}</dd></div><div><dt>Team</dt><dd>{state.crewAssigned ? crewRail : <button data-demo-next={!teamPickerOpen} className={styles.assignTeam} onClick={toggleTeamPicker} aria-label="Assign team to this task" aria-expanded={teamPickerOpen} aria-controls="installation-team-picker">Assign team<ChevronRight aria-hidden="true" /></button>}</dd></div><div><dt>Notes</dt><dd>—</dd></div></dl>
-            {teamPickerOpen && <section data-demo-next={crewDraft.length === 0} id="installation-team-picker" className={styles.teamPicker} aria-label="Choose installation crew">
-              <div className={styles.teamCommit}><Action secondary onClick={() => setTeamPickerOpen(false)}>Cancel</Action><Action data-demo-next={crewDraft.length > 0} onClick={commitTeam} disabled={crewDraft.length === 0}>Done</Action></div>
-              {ROSTER.map(name => <CharacterCard key={name} name={name} selected={crewDraft.includes(name)} onSelect={() => setCrewDraft(members => members.includes(name) ? members.filter(member => member !== name) : [...members, name])} />)}
+          <button ref={nextTask} data-demo-next={state.scene === 'project' && !state.crewAssigned && !taskOpen} className={`${styles.taskRow} ${styles.guidanceTarget}`} onClick={toggleTask} aria-label="Open resurfacing task" aria-expanded={taskOpen} aria-controls="installation-task-detail"><div className={styles.taskName}><Badge>{SAMPLE.task}</Badge>{state.taskCompleted && <Badge tone="olive">Complete</Badge>}<span>{state.crewAssigned ? crewNames : 'From approved estimate'}</span></div><div className={styles.taskDate}><span>{isWorkday ? 'Sep 24' : 'Unscheduled'}</span><ChevronRight aria-hidden="true" /></div></button>
+          {taskOpen && <div ref={taskDetail} tabIndex={-1} id="installation-task-detail" className={`${styles.taskDetail} ${styles.guidanceTarget}`}>
+            <dl><div><dt>Schedule</dt><dd>{isWorkday ? SAMPLE.workday : 'Unscheduled'}</dd></div><div><dt>Team</dt><dd>{state.crewAssigned ? crewRail : <button ref={assignTeam} data-demo-next={!teamPickerOpen} className={`${styles.assignTeam} ${styles.guidanceTarget}`} onClick={toggleTeamPicker} aria-label="Assign team to this task" aria-expanded={teamPickerOpen} aria-controls="installation-team-picker">Assign team<ChevronRight aria-hidden="true" /></button>}</dd></div><div><dt>Notes</dt><dd>—</dd></div></dl>
+            {teamPickerOpen && <section ref={teamPicker} tabIndex={-1} data-demo-next={crewDraft.length === 0} id="installation-team-picker" className={`${styles.teamPicker} ${styles.guidanceTarget}`} aria-label="Choose installation crew">
+              <div ref={teamCommit} className={styles.teamCommit}><Action secondary onClick={() => { setTeamPickerOpen(false); guideTo('assign') }}>Cancel</Action><Action data-demo-next={crewDraft.length > 0} className={styles.guidanceTarget} onClick={commitTeam} disabled={crewDraft.length === 0}>Done</Action></div>
+              {ROSTER.map(name => <CharacterCard key={name} name={name} selected={crewDraft.includes(name)} onSelect={() => selectCrew(name)} />)}
             </section>}
           </div>}
           {state.crewAssigned && !isWorkday && <p className={styles.assignedFeedback} role="status"><CheckCircle2 aria-hidden="true" />Crew assigned. Ready to schedule.</p>}
@@ -185,9 +255,8 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
     </div>
 
     {state.role === 'operator' && state.scene === 'activity' && <div className={styles.billingHandoff}>
-      <FeatureCallout kind="accounting" />
       <div className={styles.billableSummary}><div><span>Ready to bill</span><p>2 of 2 tasks complete</p></div><CheckCircle2 aria-hidden="true" /></div>
-      <Action data-demo-next="true" onClick={() => dispatch({ type: 'OPEN_BILLING' })}>Review billing<ChevronRight aria-hidden="true" /></Action>
+      <Action data-demo-next="true" onClick={() => dispatch({ type: 'OPEN_BILLING' })}>View billing<ChevronRight aria-hidden="true" /></Action>
     </div>}
 
     {isCrew && !isCompose && <div className={styles.actionDock}>

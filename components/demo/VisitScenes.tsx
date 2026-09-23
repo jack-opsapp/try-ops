@@ -5,7 +5,6 @@ import { Camera, ChevronDown, FileText, Image as PhotoIcon, MapPin, Ruler, Send,
 import { Action, AppHeader, ArrowLeft, Avatar, Badge, Check, SamplePhoto, Section, X, ui } from './DemoPrimitives'
 import { SAMPLE, money } from './lifecycle-data'
 import type { SceneProps } from './lifecycle-state'
-import { FeatureCallout } from './FeatureCallout'
 import { SpecTool } from './SpecTool'
 import styles from './visit-scenes.module.css'
 
@@ -183,7 +182,6 @@ function EstimateScene({ state, dispatch, onToolPreviewChange }: VisitSceneProps
     <AppHeader title="Estimate" left={<button className={styles.iconButton} aria-label="Back to visit review" onClick={() => dispatch({ type: 'BACK' })}><ArrowLeft /></button>}
       right={<Badge>Draft</Badge>} />
     <div className={styles.body}>
-      <FeatureCallout kind="accounting" />
       <div className={styles.timeContext}>
         <span className={styles.sectionLabel}>Later · estimate prepared</span>
         <p>{state.visitAssignee === 'You' ? 'Your site record is saved. The sample quote is priced and ready for your review.' : `${state.visitAssignee} has prepared the sample quote. Review the scope and send it to Alex.`}</p>
@@ -213,7 +211,7 @@ function EstimateScene({ state, dispatch, onToolPreviewChange }: VisitSceneProps
         <div><span className={styles.sectionLabel}>Optional · deck designer</span><p>See a custom tool built around the work.</p></div>
         <button ref={toolTrigger} type="button" className={styles.toolButton} onClick={() => setToolOpen(true)}><Ruler aria-hidden="true" />Explore custom tool</button>
       </div>
-      <p className={styles.metadata}>Sample estimate. Sending here demonstrates the accounting beta.</p>
+      <p className={styles.metadata}>Sample estimate. No email is sent from this demo.</p>
     </div>
     <div className={styles.footer}>
       <Action data-demo-next="true" disabled={!state.visitCompleted} onClick={() => dispatch({ type: 'SEND_ESTIMATE' })}><Send aria-hidden="true" />Send estimate</Action>
@@ -232,28 +230,27 @@ function EstimateIdentity() {
 
 function AcceptedScene({ state, dispatch }: SceneProps) {
   return <div className={styles.scene}>
-    <AppHeader title="Estimate" left={<button className={styles.iconButton} aria-label="Back to estimate" onClick={() => dispatch({ type: 'BACK' })}><ArrowLeft /></button>} right={<Badge tone="olive">Client accepted</Badge>} />
+    <AppHeader title="Estimate" left={<button className={styles.iconButton} aria-label="Back to estimate" onClick={() => dispatch({ type: 'BACK' })}><ArrowLeft /></button>} right={<Badge tone={state.estimateApproved ? "olive" : "neutral"}>{state.estimateApproved ? "Client accepted" : "Sent"}</Badge>} />
     <div className={styles.body}>
-      <FeatureCallout kind="accounting" />
       <div className={styles.timeContext}>
-        <span className={styles.sectionLabel}>Wednesday morning · customer reply</span>
-        <p>Alex has reviewed the sample estimate and agreed to the work.</p>
+        <span className={styles.sectionLabel}>Sample timeline · Wednesday morning</span>
+        <p>{state.estimateApproved ? "Alex accepted the estimate. The project is ready." : "Your estimate is with Alex. The client’s response arrives next."}</p>
       </div>
       <EstimateIdentity />
-      <div className={styles.approvalNote}>
+      {state.estimateApproved && <div className={styles.approvalNote}>
         <Check aria-hidden="true" />
         <div><span className={styles.sectionLabel}>From {SAMPLE.client}</span><p>“The deck looks good. Let’s go ahead.”</p><span className={styles.metadata}>Re: {SAMPLE.estimateNumber}</span></div>
-      </div>
+      </div>}
       <dl className={styles.totals}>
-        <div className={styles.total}><dt>Accepted total</dt><dd>{money(SAMPLE.total)}</dd></div>
+        <div className={styles.total}><dt>Estimate total</dt><dd>{money(SAMPLE.total)}</dd></div>
       </dl>
       <div className={styles.nextRecord}>
         <span className={styles.sectionLabel}>Next · your project</span>
-        <p>The visit record stays attached. The labor items become tasks you can assign.</p>
+        <p>When Alex accepts, the visit record stays attached and the labor items become tasks you can assign.</p>
       </div>
     </div>
-    <div className={styles.footer}>
-      <Action data-demo-next="true" disabled={!state.visitCompleted} onClick={() => dispatch({ type: 'APPROVE_ESTIMATE' })}><Check aria-hidden="true" />Mark approved</Action>
-    </div>
+    {state.estimateApproved && <div className={styles.footer}>
+      <Action data-demo-next="true" onClick={() => dispatch({ type: 'APPROVE_ESTIMATE' })}>View project</Action>
+    </div>}
   </div>
 }

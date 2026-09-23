@@ -1,7 +1,7 @@
 import { SAMPLE } from './lifecycle-data'
 
-export const LIFECYCLE_REVISION = 'job-lifecycle-v3' as const
-export const LIFECYCLE_STORAGE_KEY = 'ops:demo:lifecycle:v3'
+export const LIFECYCLE_REVISION = 'job-lifecycle-v4' as const
+export const LIFECYCLE_STORAGE_KEY = 'ops:demo:lifecycle:v4'
 export const SCENES = ['role', 'inquiry', 'booked', 'visit', 'review', 'estimate', 'accepted', 'project', 'crew', 'compose', 'activity', 'billing'] as const
 export type Scene = typeof SCENES[number]
 export type DemoRole = 'operator' | 'crew'

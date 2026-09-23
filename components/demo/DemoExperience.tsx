@@ -5,6 +5,9 @@ import { ArrowLeft, ArrowRight, Briefcase, HardHat, RotateCcw } from 'lucide-rea
 import { useDemoFunnel } from '@/lib/demo/use-demo-funnel'
 import type { DemoEvent, DemoStep } from '@/lib/demo/contracts'
 import { initialLifecycleState, lifecycleReducer, restoreLifecycleState, LIFECYCLE_STORAGE_KEY, SCENES, type LifecycleAction, type Scene } from './lifecycle-state'
+import { DemoNotification, type DemoNotificationMessage } from './DemoNotification'
+import { useDemoAutomation } from './useDemoAutomation'
+import { SAMPLE, money } from './lifecycle-data'
 import { sceneCopy } from './lifecycle-copy'
 import { RoleScenes } from './RoleScenes'
 import { IntakeBillingScenes } from './IntakeBillingScenes'
@@ -28,7 +31,9 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
   const [state, setState] = useState(initialLifecycleState)
   const current = useRef(state)
   const [ready, setReady] = useState(false)
-  const [receiptOpen, setReceiptOpen] = useState(false)
+  const [accountingOpen, setAccountingOpen] = useState(false)
+  const [updatesPaused, setUpdatesPaused] = useState(false)
+  const [notification, setNotification] = useState<DemoNotificationMessage | null>(null)
   const [toolOpen, setToolOpen] = useState(false)
   const [resumed, setResumed] = useState(false)
   const [direction, setDirection] = useState(1)
@@ -37,6 +42,7 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
   const errors = useRef(new Set<DemoEvent['errorCode']>())
   const content = useRef<HTMLDivElement>(null)
   const heading = useRef<HTMLHeadingElement>(null)
+  const nextWorkday = useRef<HTMLButtonElement>(null)
   const focusNext = useRef(false)
   const reduced = useSyncExternalStore(subscribeMotion, reducedSnapshot, serverMotionSnapshot)
   const { signupHref, track } = useDemoFunnel()
@@ -76,6 +82,7 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
       setDirection(SCENES.indexOf(next.scene) < SCENES.indexOf(previous.scene) ? -1 : 1)
       focusNext.current = true
       setState(next)
+      setNotification(null)
       persist(next)
       report('back', next.scene)
     }
@@ -88,7 +95,7 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
     content.current?.scrollTo?.({ top: 0, behavior: 'instant' })
     window.scrollTo?.({ top: 0, behavior: 'instant' })
     heading.current?.focus({ preventScroll: true })
-  }, [state.scene, state.invoiceCreated])
+  }, [state.scene])
   const dispatch = useCallback((action: LifecycleAction) => {
     const previous = current.current
     const next = lifecycleReducer(previous, action)
@@ -97,13 +104,23 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
     setState(next)
     setResumed(false)
     persist(next)
-    if (!previous.invoiceCreated && next.invoiceCreated) focusNext.current = true
+    const automatic = action.type === 'APPROVE_ESTIMATE' && !previous.estimateApproved || action.type === 'CREATE_INVOICE' || action.type === 'RECORD_PAYMENT'
+    let update: DemoNotificationMessage | null = null
+    if (action.type === 'SELECT_ROLE' && next.role === 'operator') update = { id: 'visit-booked', title: 'Site visit booked', body: 'Tuesday at 10:00 AM. Confirmed in your email conversation.', context: 'Monday · sample update' }
+    if (action.type === 'ASSIGN_VISIT' && next.visitAssignee !== 'You') update = { id: 'visit-complete', title: 'Site visit complete', body: `${next.visitAssignee} sent the checklist, measurements and photo.`, context: 'Tuesday afternoon · sample update' }
+    if (action.type === 'SEND_ESTIMATE' && !previous.estimateSent) update = { id: 'estimate-sent', title: 'Estimate sent', body: `${SAMPLE.estimateNumber} · ${money(SAMPLE.total)} sent to Alex.`, context: 'Tuesday · sample update' }
+    if (action.type === 'APPROVE_ESTIMATE' && !previous.estimateApproved) update = { id: 'estimate-approved', title: 'Estimate approved', body: 'Alex accepted. Your project and tasks are ready.', context: 'Wednesday · sample update' }
+    if (action.type === 'ADVANCE_WORKDAY' && !previous.taskCompleted) update = { id: 'work-complete', title: 'Work complete', body: `${next.assignedCrew[0]} shared the finished photo. All tasks are complete.`, context: 'Thursday · sample update' }
+    if (action.type === 'CREATE_INVOICE') update = { id: 'invoice-sent', title: 'Invoice sent', body: `${SAMPLE.invoiceNumber} · ${money(SAMPLE.total)} sent to Alex.`, context: 'Thursday · sample update' }
+    if (action.type === 'RECORD_PAYMENT') update = { id: 'payment-recorded', title: 'Payment recorded', body: `${money(SAMPLE.total)} received outside OPS. Balance: ${money(0)}.`, context: 'Friday · sample update' }
+    setNotification(update)
+    if (action.type === 'RESTART') setUpdatesPaused(false)
     if (next.scene !== previous.scene || action.type === 'RESTART') {
-      focusNext.current = true
+      focusNext.current = !automatic
       setDirection(SCENES.indexOf(next.scene) < SCENES.indexOf(previous.scene) ? -1 : 1)
       try {
         const snapshot = { ...window.history.state, opsLifecycleScene: next.scene }
-        if (action.type === 'RESTART') window.history.replaceState(snapshot, '')
+        if (action.type === 'RESTART' || automatic) window.history.replaceState(snapshot, '')
         else window.history.pushState(snapshot, '')
       } catch { /* Navigation does not depend on History support. */ }
     }
@@ -113,11 +130,17 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
     if (action.type === 'BACK') report('back', next.scene)
     if (action.type === 'RESTART') report('restart', next.scene)
   }, [persist, report])
+  const pendingUpdate = useDemoAutomation(state, ready, updatesPaused || accountingOpen || toolOpen, dispatch)
+  const revealNextWorkday = useCallback(() => {
+    const target = nextWorkday.current
+    target?.focus({ preventScroll: true })
+    target?.scrollIntoView?.({ block: 'nearest', behavior: reduced ? 'instant' : 'smooth' })
+  }, [reduced])
   const copy = sceneCopy(state)
   const chapters = copy.chapters
-  const completed = state.role === 'crew' ? !!state.postedNote : state.invoiceCreated
+  const completed = state.role === 'crew' ? !!state.postedNote : state.visited.includes('billing')
   const hint = toolOpen && state.scene === 'estimate' ? 'Explore the sample deck tool, then return to your estimate.'
-    : receiptOpen && state.scene === 'billing' ? 'Review the payment received outside OPS, then record it.'
+    : pendingUpdate && updatesPaused ? 'Updates paused. Resume when you’re ready.'
     : state.scene === 'visit' && state.scopeConfirmed && state.visitPhoto ? 'Photo attached. Tap DONE to review your visit.'
     : state.scene === 'visit' && state.scopeConfirmed ? 'Scope confirmed. Add the sample site photo.'
     : state.scene === 'project' && state.crewAssigned ? 'Crew assigned. Jump forward to their completed work.'
@@ -143,19 +166,21 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
       </aside>
       <section className={styles.product} aria-label="Interactive OPS sample">
         <div className={styles.roleBar} key={copy.role}><span className={styles.role}><RoleIcon aria-hidden="true"/>{copy.role}</span><span className={styles.productLabel}>OPS FOR IPHONE</span></div>
+        <DemoNotification notification={notification} onDismiss={() => setNotification(null)} reduced={reduced}/>
+        {pendingUpdate && <div className={styles.updateControls}><span>Sample timeline</span><button type="button" aria-pressed={updatesPaused} onClick={() => setUpdatesPaused(value => !value)}>{updatesPaused ? 'Resume updates' : 'Pause updates'}</button></div>}
         <div className={styles.appViewport} ref={content}>
           {!ready ? <div className={styles.loading} aria-busy="true"><span className={styles.logo} aria-hidden="true"/><p>Opening your sample job.</p><a href={signupHref}>Start my free trial</a></div> : <LazyMotion features={domAnimation} strict><m.div key={state.scene} initial={reduced?{opacity:0}:{opacity:0,x:direction*12}} animate={{opacity:1,x:0}} transition={{duration:reduced?.15:.25,ease:[.22,1,.36,1]}} className={styles.scene}>
-            {state.scene === 'role' ? <RoleScenes {...sceneProps}/> : ['inquiry','booked','billing'].includes(state.scene) ? <IntakeBillingScenes {...sceneProps} onPaymentPreviewChange={setReceiptOpen}/> : ['visit','review','estimate','accepted'].includes(state.scene) ? <VisitScenes {...sceneProps} onToolPreviewChange={setToolOpen}/> : <ProjectScenes {...sceneProps}/>}
+            {state.scene === 'role' ? <RoleScenes {...sceneProps}/> : ['inquiry','booked','billing'].includes(state.scene) ? <IntakeBillingScenes {...sceneProps} onAccountingPreviewChange={setAccountingOpen}/> : ['visit','review','estimate','accepted'].includes(state.scene) ? <VisitScenes {...sceneProps} onToolPreviewChange={setToolOpen}/> : <ProjectScenes {...sceneProps} onAssignmentComplete={revealNextWorkday}/>}
           </m.div></LazyMotion>}
         </div>
-        <div className={styles.timeline}><span className={styles.time}>{copy.time}</span>{state.scene==='project' && state.crewAssigned && <button data-demo-next="true" className={styles.next} type="button" onClick={()=>dispatch({type:'ADVANCE_WORKDAY'})}>See the completed work <ArrowRight aria-hidden="true"/></button>}</div>
+        <div className={styles.timeline}><span className={styles.time}>{copy.time}</span>{state.scene==='project' && state.crewAssigned && <button ref={nextWorkday} data-demo-next="true" className={styles.next} type="button" onClick={()=>dispatch({type:'ADVANCE_WORKDAY'})}>See the completed work <ArrowRight aria-hidden="true"/></button>}</div>
       </section>
       {completed && <div className={styles.conversion}>
         {state.role === 'crew' ? <>
           <a data-demo-next={state.scene === 'activity'} className={styles.trial} href="/download">Get OPS <ArrowRight aria-hidden="true" /></a>
           <span>Already invited? <a href="https://app.opsapp.co/login">Sign in to join your team</a></span>
         </> : <>
-          <a data-demo-next={state.scene === 'billing' && !receiptOpen} className={styles.trial} href={signupHref} onClick={()=>report('signup_clicked',state.scene)}>Start my free trial <ArrowRight aria-hidden="true" /></a>
+          <a data-demo-next={state.scene === 'billing'} className={styles.trial} href={signupHref} onClick={()=>report('signup_clicked',state.scene)}>Start my free trial <ArrowRight aria-hidden="true" /></a>
           <span>30 days · No credit card</span>
         </>}
       </div>}
@@ -166,6 +191,6 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
       <span>One job. Every handoff.</span>
       <button type="button" onClick={()=>dispatch({type:'RESTART'})} aria-label="Restart demo"><RotateCcw aria-hidden="true"/> Restart</button>
     </footer>
-    <p className={styles.srOnly} aria-live="polite" aria-atomic="true">{ready?`${copy.role}. ${hint}`:'Opening sample demo.'}</p>
+    <p className={styles.srOnly} aria-live={notification ? 'off' : 'polite'} aria-atomic="true">{ready?`${copy.role}. ${hint}`:'Opening sample demo.'}</p>
   </div>
 }

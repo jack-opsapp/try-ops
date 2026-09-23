@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { DemoExperience } from '@/components/demo/DemoExperience'
 import { SAMPLE } from '@/components/demo/lifecycle-data'
 import { LIFECYCLE_STORAGE_KEY } from '@/components/demo/lifecycle-state'
+import { AUTOMATION_DELAYS } from '@/components/demo/useDemoAutomation'
 import DemoPage from '@/app/demo/page'
 import DemoError from '@/app/demo/error'
 import { renderToString } from 'react-dom/server'
@@ -12,13 +13,14 @@ vi.mock('@/lib/demo/use-demo-funnel', () => ({
   useDemoFunnel: () => ({ signupHref: '/demo/start-trial', track: diagnostics.track }),
 }))
 function click(name: string) { fireEvent.click(screen.getByRole('button', { name })) }
+function advance(milliseconds: number) { act(() => { vi.advanceTimersByTime(milliseconds) }) }
 function chooseVisit(name: 'You' | 'Mike' | 'Nick' = 'You') {
   click('Choose Operator'); click('Assign site visit'); click(`Select ${name}`)
   click(name === 'You' ? 'Assign to me' : `Assign to ${name}`)
 }
 function confirmScope() { fireEvent.click(screen.getByRole('checkbox', { name: 'Confirm the deck scope with Alex' })) }
 function reachEstimate() { chooseVisit(); confirmScope(); click('Photo'); click('Done'); click('Complete visit') }
-function reachProject() { reachEstimate(); click('Send estimate'); click('Mark approved') }
+function reachProject() { reachEstimate(); click('Send estimate'); advance(AUTOMATION_DELAYS.estimate) }
 function assignInstallationCrew(name = 'Pete') {
   fireEvent.click(screen.getByRole('tab', { name: 'details' }))
   click('Open resurfacing task'); click('Assign team to this task'); click(`Select ${name}`); click('Done')
@@ -43,12 +45,14 @@ function originalPhoto(image: HTMLElement) {
 }
 
 beforeEach(() => {
+  vi.useFakeTimers()
   sessionStorage.clear()
   diagnostics.track.mockReset()
   window.history.replaceState({}, '', '/demo')
   vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
+  vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('visible')
 })
-afterEach(() => { cleanup(); vi.restoreAllMocks() })
+afterEach(() => { cleanup(); vi.useRealTimers(); vi.restoreAllMocks() })
 
 describe('the visitor sample job', () => {
   it('guides one current action through the Operator path without changing identity', () => {
@@ -67,8 +71,10 @@ describe('the visitor sample job', () => {
     click('Photo'); expectCue(button('Done'))
     click('Done'); expectCue(button('Complete visit'))
     click('Complete visit'); expectCue(button('Send estimate'))
-    click('Send estimate'); expectCue(button('Mark approved'))
-    click('Mark approved'); expectCue(screen.getByRole('tab', { name: 'details' }))
+    click('Send estimate')
+    expect(screen.queryByRole('button', { name: 'Mark approved' })).toBeNull()
+    advance(AUTOMATION_DELAYS.estimate)
+    expectCue(screen.getByRole('tab', { name: 'details' }))
     fireEvent.click(screen.getByRole('tab', { name: 'details' }))
     expectCue(button('Open resurfacing task'))
     click('Open resurfacing task'); expectCue(button('Assign team to this task'))
@@ -77,11 +83,14 @@ describe('the visitor sample job', () => {
     click('Done'); expectCue(button('See the completed work'))
     click('See the completed work')
     expect(screen.getByText('YOU · OPERATOR')).toBeTruthy()
-    expectCue(button('Review billing'))
-    click('Review billing'); expectCue(button('Create invoice'))
-    click('Create invoice'); expectCue(screen.getByRole('link', { name: 'Start my free trial' }))
-    click('Preview payment recording'); expectCue(button('Record payment'))
-    click('Record payment'); expectCue(screen.getByRole('link', { name: 'Start my free trial' }))
+    expectCue(button('View billing'))
+    click('View billing'); expectCue(screen.getByRole('link', { name: 'Start my free trial' }))
+    expect(screen.queryByRole('button', { name: 'Create invoice' })).toBeNull()
+    advance(AUTOMATION_DELAYS.invoice)
+    expectCue(screen.getByRole('link', { name: 'Start my free trial' }))
+    advance(AUTOMATION_DELAYS.payment)
+    expect(screen.queryByRole('button', { name: 'Record payment' })).toBeNull()
+    expectCue(screen.getByRole('link', { name: 'Start my free trial' }))
   })
 
   it('guides Crew through documenting their own work and a team-joining exit', () => {
@@ -102,7 +111,7 @@ describe('the visitor sample job', () => {
     expectCue(screen.getByRole('link', { name: 'Get OPS' }))
     expect(screen.getByRole('link', { name: 'Get OPS' }).getAttribute('href')).toBe('/download')
     expect(screen.getByRole('link', { name: 'Sign in to join your team' }).getAttribute('href')).toBe('https://app.opsapp.co/login')
-    expect(screen.queryByRole('button', { name: 'Review billing' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'View billing' })).toBeNull()
   })
 
   it('shows a neutral server state and native exits while saved progress is being restored', () => {
@@ -140,9 +149,8 @@ describe('the visitor sample job', () => {
     click('Done')
     expect(originalPhoto(screen.getByRole('img', { name: /Sample site visit: the deck area/ }))).toBe(before)
     click('Complete visit')
-    expect(screen.getByText('OPS ACCOUNTING — BETA TESTING')).toBeTruthy()
-    expect(screen.getByRole('link', { name: 'Request free beta access' }).getAttribute('href')).toBe('mailto:jack@opsapp.co?subject=Request%20free%20accounting%20beta%20access')
-    click('Send estimate'); click('Mark approved')
+    expect(screen.queryByText('OPS ACCOUNTING — BETA TESTING')).toBeNull()
+    click('Send estimate'); advance(AUTOMATION_DELAYS.estimate)
     expect(screen.getByRole('tab', { name: 'activity' }).getAttribute('aria-selected')).toBe('true')
     expect(originalPhoto(screen.getByRole('img', { name: 'The existing deck documented at the site visit' }))).toBe(before)
     assignInstallationCrew()
@@ -156,7 +164,12 @@ describe('the visitor sample job', () => {
     expect(screen.getByText('YOU · OPERATOR')).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Complete' })).toBeNull()
     expect(document.activeElement).toBe(screen.getByRole('heading', { level: 1 }))
-    click('Review billing'); click('Create invoice'); expectNativeTrial()
+    expect(screen.queryByText('OPS ACCOUNTING — BETA TESTING')).toBeNull()
+    click('View billing')
+    expect(screen.getByText('OPS ACCOUNTING — BETA TESTING')).toBeTruthy()
+    expect(screen.getByRole('link', { name: 'Request free beta access' }).getAttribute('href')).toBe('mailto:jack@opsapp.co?subject=Request%20free%20accounting%20beta%20access')
+    expectNativeTrial()
+    advance(AUTOMATION_DELAYS.invoice)
   })
 
   it.each(['Mike', 'Nick'])('lets %s’s completed visit arrive without asking the Operator to capture it', name => {
@@ -266,27 +279,29 @@ describe('the visitor sample job', () => {
     expect(saved).toMatchObject({ role: 'operator', assignedCrew: ['Nick'] })
   })
 
-  it('makes billing the Operator ending and keeps receipt recording and account connection optional', () => {
+  it('shows billing updates without manual financial actions and keeps accounting connection optional', () => {
     render(<DemoExperience />)
     reachOperatorActivity()
     expect(screen.queryByRole('link', { name: 'Start my free trial' })).toBeNull()
-    click('Review billing')
-    expect(screen.getByRole('heading', { name: 'Ready to bill' })).toBeTruthy()
+    click('View billing')
+    expectNativeTrial()
+    const focused = document.activeElement
     expect(screen.queryByRole('button', { name: /Record payment/ })).toBeNull()
-    click('Create invoice')
+    expect(screen.queryByRole('button', { name: /Create invoice/ })).toBeNull()
+    advance(AUTOMATION_DELAYS.invoice)
+    expect(within(screen.getByRole('status')).getByText('Invoice sent')).toBeTruthy()
     expect(screen.getByRole('heading', { name: SAMPLE.invoiceNumber })).toBeTruthy()
+    fireEvent.click(screen.getByText('Invoice details', { selector: 'summary' }))
     expect(screen.getByText('Deck preparation')).toBeTruthy()
     for (const price of ['$800', '$1,600', '$1,800']) expect(screen.getByText(price)).toBeTruthy()
     expect(screen.queryByRole('button', { name: /Pay now/i })).toBeNull()
     expectNativeTrial()
-    click('Preview payment recording')
-    expect(document.activeElement).toBe(screen.getByRole('heading', { name: 'Record payment', level: 2 }))
-    expect(screen.getByText('Alex’s bank transfer has arrived. Record it against this invoice.')).toBeTruthy()
-    click('Cancel')
-    expect(document.activeElement).toBe(screen.getByRole('heading', { name: 'Invoice', level: 2 }))
+    expect(document.activeElement).toBe(focused)
+    expect(screen.queryByRole('button', { name: 'Preview payment recording' })).toBeNull()
     expect(screen.queryByText('Paid in full')).toBeNull()
-    click('Preview payment recording'); click('Record payment')
-    expect(document.activeElement).toBe(screen.getByRole('heading', { name: 'Invoice', level: 2 }))
+    advance(AUTOMATION_DELAYS.payment)
+    expect(within(screen.getByRole('status')).getByText('Payment recorded')).toBeTruthy()
+    expect(document.activeElement).toBe(focused)
     expect(screen.getByText('Paid in full')).toBeTruthy()
     expect(screen.getByText('$0 DUE')).toBeTruthy()
     click('Connect accounting software'); fireEvent.click(screen.getByRole('radio', { name: 'Sage' }))
@@ -294,7 +309,7 @@ describe('the visitor sample job', () => {
     expect(screen.getByText('PREVIEW ONLY · NO ACCOUNT CONNECTED')).toBeTruthy()
     click('Close preview'); click('Back')
     expect(within(screen.getByRole('article', { name: "Pete's completion update" })).getByText(SAMPLE.note)).toBeTruthy()
-    click('Review billing')
+    click('View billing')
     expect(screen.getByText('Paid in full')).toBeTruthy()
     expectNativeTrial()
   })
@@ -304,7 +319,7 @@ describe('the visitor sample job', () => {
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('blocked') })
     diagnostics.track.mockImplementation(() => { throw new Error('analytics unavailable') })
     render(<DemoExperience />)
-    reachOperatorActivity(); click('Review billing'); click('Create invoice')
+    reachOperatorActivity(); click('View billing'); advance(AUTOMATION_DELAYS.invoice)
     expectNativeTrial(); expectNativeTrial('Try OPS free')
     const trial = screen.getByRole('link', { name: 'Start my free trial' })
     const nativeClick = new MouseEvent('click', { bubbles: true, cancelable: true })

@@ -121,3 +121,6 @@
 .demo[data-demo-scene=role] .roleBar,.demo[data-demo-scene=role] .timeline { display:none; }
 .demo[data-demo-scene=role] [aria-labelledby=demo-role-title] > header { display:none; }
 .role { color:var(--text-2); }
+
+.updateControls { display:flex; justify-content:space-between; align-items:center; gap:var(--unit); padding:0 calc(var(--unit)*2); border-bottom:var(--demo-line) solid var(--line); color:var(--text-3); font:400 var(--demo-type-label)/1.4 var(--font-mono); }
+.updateControls button { min-height:var(--demo-touch); color:var(--text-2); text-decoration:underline; text-underline-offset:calc(var(--unit)/2); }
