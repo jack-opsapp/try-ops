@@ -1,12 +1,13 @@
 'use client'
 
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
-import { ArrowUp, Camera, CheckCircle2, ChevronRight, Circle, FileText, ImagePlus, MapPin, Receipt, X } from 'lucide-react'
+import { ArrowUp, Camera, CheckCircle2, ChevronRight, ImagePlus, MapPin, Receipt, X } from 'lucide-react'
 import { NumericText, Action, Avatar, Badge, SamplePhoto, Section } from './DemoPrimitives'
 import { SAMPLE } from './lifecycle-data'
 import type { CrewMember, SceneProps } from './lifecycle-state'
 import styles from './project-scenes.module.css'
 import { CharacterCard } from './CharacterCard'
+import { MarkedSitePhoto } from './MarkedSitePhoto'
 
 type ProjectTab = 'activity' | 'details' | 'expenses'
 type GuidanceTarget = 'task' | 'detail' | 'assign' | 'picker' | 'done'
@@ -18,7 +19,8 @@ const ROSTER: CrewMember[] = ['Pete', 'Nick']
  * reducer. Changing tabs never changes that durable work. */
 export function ProjectScenes({ state, dispatch }: SceneProps) {
   const [tab, setTab] = useState<ProjectTab>('activity')
-  const [photo, setPhoto] = useState<'before' | 'after' | null>(null)
+  const [photo, setPhoto] = useState<'before' | 'after' | 'markup' | null>(null)
+  const [preparationOpen, setPreparationOpen] = useState(false)
   const [taskOpen, setTaskOpen] = useState(false)
   const [teamPickerOpen, setTeamPickerOpen] = useState(false)
   const [crewDraft, setCrewDraft] = useState<CrewMember[]>([])
@@ -47,6 +49,7 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
     pendingGuidance.current = null
     setTab('activity')
     setTaskOpen(false)
+    setPreparationOpen(false)
     setTeamPickerOpen(false)
     setPhoto(null)
   }, [state.scene])
@@ -59,7 +62,7 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
     if (!photo && photoDialog.current?.open) photoDialog.current.close()
   }, [photo])
 
-  function openPhoto(which: 'before' | 'after', opener: HTMLButtonElement) {
+  function openPhoto(which: 'before' | 'after' | 'markup', opener: HTMLButtonElement) {
     photoOpener.current = opener
     setPhoto(which)
   }
@@ -174,8 +177,17 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
 
   const crewPost = <article className={styles.crewPost} aria-label={state.role === 'crew' ? 'Your completion update' : `${crewName}'s completion update`}>
     <div className={styles.author}><Avatar name={crewName} /><div><strong>{crewName}</strong><time>just now</time></div></div>
-    <p className={styles.postText}>{state.postedNote}</p>
+    <p className={styles.postText}>{state.role === 'operator' && <><span className={styles.mention}>@Mike</span>{' '}</>}{state.postedNote}</p>
     <button className={styles.completionPhoto} onClick={event => openPhoto('after', event.currentTarget)} aria-label={state.role === 'crew' ? 'Open your completed deck photo' : `Open ${crewName}'s completed deck photo`}><SamplePhoto src={SAMPLE.afterPhoto} alt={`The completed deck ${state.role === 'crew' ? 'you' : crewName} shared with the team`} sizes="80px" /></button>
+  </article>
+
+  const crewHandoff = state.crewAssigned && isWorkday && <article className={styles.crewPost} aria-label="Mike’s crew handoff">
+    <div className={styles.author}><Avatar name="Mike" /><div><strong>Mike</strong><time>Wed · 3:40 PM</time></div></div>
+    <p className={styles.postText}><span className={styles.mention}>@{crewName}</span> Prep is finished. Replace the front fascia I’ve circled. Keep the railing and stair structure.</p>
+    <button type="button" className={styles.markupAttachment} onClick={event => openPhoto('markup', event.currentTarget)} aria-label="Open marked-up site photo">
+      <MarkedSitePhoto />
+      <span>Site photo · Mike’s markup<ChevronRight aria-hidden="true" /></span>
+    </button>
   </article>
 
   function openComposer() {
@@ -208,7 +220,8 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
 
     <div className={styles.panel} id={`project-panel-${tab}`} role="tabpanel" aria-labelledby={`project-tab-${tab}`} tabIndex={0}>
       {tab === 'activity' && <div className={styles.activity}>
-        {gallery}{composer}{hasPosted && crewPost}
+        <details className={styles.pinnedNotes}><summary><span>Task notes<span>2 tasks</span></span><ChevronRight aria-hidden="true" /></summary><div><h3>Deck preparation</h3><ul className={styles.taskNotes}>{SAMPLE.preparationNotes.map(note => <li key={note}>{note}</li>)}</ul><h3>Deck resurfacing</h3><ul className={styles.taskNotes}>{SAMPLE.resurfacingNotes.map(note => <li key={note}>{note}</li>)}</ul></div></details>
+        {gallery}{composer}{hasPosted && crewPost}{crewHandoff}
         {visitRecord}
         {state.scene === 'project' && !state.crewAssigned && <Action className={styles.detailsAction} onClick={() => selectTab('details')}>Assign the installation crew<ChevronRight aria-hidden="true" /></Action>}
       </div>}
@@ -223,10 +236,11 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
           <div><dt>Team</dt><dd>{state.crewAssigned ? crewRail : '—'}</dd></div>
         </dl></Section>
         <Section title="Tasks"><div className={styles.tasks}>
-          <div className={styles.taskRow}><div className={styles.taskName}><Badge>Deck preparation</Badge>{(state.taskCompleted || state.role === 'crew') && <Badge tone="olive">Complete</Badge>}<span>From approved estimate</span></div><FileText className={styles.taskSource} aria-hidden="true" /></div>
+          <button type="button" className={styles.taskRow} aria-label="Open preparation task" aria-expanded={preparationOpen} aria-controls="preparation-task-detail" onClick={() => setPreparationOpen(value => !value)}><div className={styles.taskName}><Badge>Deck preparation</Badge>{(state.taskCompleted || state.role === 'crew') && <Badge tone="olive">Complete</Badge>}<span>From approved estimate</span></div><ChevronRight aria-hidden="true" /></button>
+          {preparationOpen && <div id="preparation-task-detail" className={styles.taskDetail}><dl><div><dt>Team</dt><dd>Mike</dd></div><div><dt>Notes</dt><dd><ul className={styles.taskNotes}>{SAMPLE.preparationNotes.map(note => <li key={note}>{note}</li>)}</ul></dd></div></dl></div>}
           <button ref={nextTask} data-demo-next={state.scene === 'project' && !state.crewAssigned && !taskOpen} className={`${styles.taskRow} ${styles.guidanceTarget}`} onClick={toggleTask} aria-label="Open resurfacing task" aria-expanded={taskOpen} aria-controls="installation-task-detail"><div className={styles.taskName}><Badge>{SAMPLE.task}</Badge>{state.taskCompleted && <Badge tone="olive">Complete</Badge>}<span>{state.crewAssigned ? crewNames : 'From approved estimate'}</span></div><div className={styles.taskDate}><span>{isWorkday ? 'Sep 24' : 'Unscheduled'}</span><ChevronRight aria-hidden="true" /></div></button>
           {taskOpen && <div ref={taskDetail} tabIndex={-1} id="installation-task-detail" className={`${styles.taskDetail} ${styles.guidanceTarget}`}>
-            <dl><div><dt>Schedule</dt><dd>{isWorkday ? SAMPLE.workday : 'Unscheduled'}</dd></div><div><dt>Team</dt><dd>{state.crewAssigned ? crewRail : <button ref={assignTeam} data-demo-next={!teamPickerOpen} className={`${styles.assignTeam} ${styles.guidanceTarget}`} onClick={toggleTeamPicker} aria-label="Assign team to this task" aria-expanded={teamPickerOpen} aria-controls="installation-team-picker">Assign team<ChevronRight aria-hidden="true" /></button>}</dd></div><div><dt>Notes</dt><dd>—</dd></div></dl>
+            <dl><div><dt>Schedule</dt><dd>{isWorkday ? SAMPLE.workday : 'Unscheduled'}</dd></div><div><dt>Team</dt><dd>{state.crewAssigned ? crewRail : <button ref={assignTeam} data-demo-next={!teamPickerOpen} className={`${styles.assignTeam} ${styles.guidanceTarget}`} onClick={toggleTeamPicker} aria-label="Assign team to this task" aria-expanded={teamPickerOpen} aria-controls="installation-team-picker">Assign team<ChevronRight aria-hidden="true" /></button>}</dd></div><div><dt>Notes</dt><dd><ul className={styles.taskNotes}>{SAMPLE.resurfacingNotes.map(note => <li key={note}>{note}</li>)}</ul></dd></div></dl>
             {teamPickerOpen && <section ref={teamPicker} tabIndex={-1} data-demo-next={crewDraft.length === 0} id="installation-team-picker" className={`${styles.teamPicker} ${styles.guidanceTarget}`} aria-label="Choose installation crew">
               <div ref={teamCommit} className={styles.teamCommit}><Action secondary onClick={() => { setTeamPickerOpen(false); guideTo('assign') }}>Cancel</Action><Action data-demo-next={crewDraft.length > 0} className={styles.guidanceTarget} onClick={commitTeam} disabled={crewDraft.length === 0}>Done</Action></div>
               {ROSTER.map(name => <CharacterCard key={name} name={name} selected={crewDraft.includes(name)} onSelect={() => selectCrew(name)} />)}
@@ -248,10 +262,10 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
       {state.taskCompleted ? <><span className={styles.completedStatus} role="status"><CheckCircle2 aria-hidden="true" />Task complete</span><Action data-demo-next="true" onClick={openComposer}><ImagePlus aria-hidden="true" />Post a photo update</Action></> : <><span className={styles.selectedLabel}>Selected task<span>{SAMPLE.task}</span></span><Action data-demo-next="true" onClick={() => dispatch({ type: 'COMPLETE_TASK' })}><CheckCircle2 aria-hidden="true" />Complete</Action></>}
     </div>}
 
-    <dialog ref={photoDialog} className={styles.photoDialog} onCancel={() => setPhoto(null)} onClose={restorePhotoFocus} onKeyDown={event => { if (event.key === 'Tab') { event.preventDefault(); photoClose.current?.focus() } }} aria-label={photo === 'after' ? 'Completion photo' : 'Site visit photo'}>
-      <div className={styles.viewerHeader}><span>{photo === 'after' ? 'Completion photo' : 'Site visit photo'}</span><button ref={photoClose} type="button" onClick={() => setPhoto(null)} aria-label="Close photo"><X aria-hidden="true" /></button></div>
-      {photo && <SamplePhoto src={photo === 'after' ? SAMPLE.afterPhoto : SAMPLE.beforePhoto} alt={photo === 'after' ? 'Completed residential deck with composite boards and matching fascia' : 'Original deck recorded at the site visit'} />}
-      <p>{photo === 'after' ? state.postedNote || SAMPLE.note : SAMPLE.scope}</p>
+    <dialog ref={photoDialog} className={styles.photoDialog} onCancel={() => setPhoto(null)} onClose={restorePhotoFocus} onKeyDown={event => { if (event.key === 'Tab') { event.preventDefault(); photoClose.current?.focus() } }} aria-label={photo === 'markup' ? 'Marked-up site photo' : photo === 'after' ? 'Completion photo' : 'Site visit photo'}>
+      <div className={styles.viewerHeader}><span>{photo === 'markup' ? 'Mike’s photo markup' : photo === 'after' ? 'Completion photo' : 'Site visit photo'}</span><button ref={photoClose} type="button" onClick={() => setPhoto(null)} aria-label="Close photo"><X aria-hidden="true" /></button></div>
+      {photo === 'markup' ? <MarkedSitePhoto /> : photo && <SamplePhoto src={photo === 'after' ? SAMPLE.afterPhoto : SAMPLE.beforePhoto} alt={photo === 'after' ? 'Completed residential deck with composite boards and matching fascia' : 'Original deck recorded at the site visit'} />}
+      <p>{photo === 'markup' ? 'Replace the circled front fascia beside the steps. Keep the existing railing and stair structure.' : photo === 'after' ? state.postedNote || SAMPLE.note : SAMPLE.scope}</p>
     </dialog>
   </div>
 }

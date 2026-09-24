@@ -278,7 +278,7 @@ describe('the visitor sample job', () => {
     expect(screen.getByRole('button', { name: 'Send estimate' })).toBeTruthy()
   })
 
-  it('keeps original site notes in the visit record without inventing project or task notes', () => {
+  it('keeps original visit evidence and shows separately prepared task instructions', () => {
     render(<DemoExperience />)
     reachProject()
     expect(screen.queryByRole('region', { name: 'Pinned project instructions' })).toBeNull()
@@ -292,7 +292,8 @@ describe('the visitor sample job', () => {
     const details = within(screen.getByRole('tabpanel', { name: 'details' }))
     const labels = details.getAllByText('Notes', { selector: 'dt' })
     expect(labels).toHaveLength(2)
-    for (const label of labels) expect(label.nextElementSibling?.textContent).toBe('—')
+    expect(labels[0].nextElementSibling?.textContent).toBe('—')
+    for (const note of SAMPLE.resurfacingNotes) expect(labels[1].nextElementSibling?.textContent).toContain(note)
     expect(details.queryByText(SAMPLE.access)).toBeNull()
     expect(details.queryByText(SAMPLE.scope)).toBeNull()
   })

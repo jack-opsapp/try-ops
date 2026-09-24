@@ -71,6 +71,23 @@
 .author { display: flex; align-items: center; gap: var(--unit); padding: calc(var(--unit) * 2) calc(var(--unit) * 2) 0; }
 .author > div { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--unit); flex: 1; }
 .postText { margin: calc(var(--unit) * 1.5) calc(var(--unit) * 2); font-size: calc(var(--unit) * 2.25); line-height: 1.45; overflow-wrap: anywhere; }
+.mention { font-weight:500; color:var(--text); background:var(--surface-active); border-radius:var(--r-chip); padding-inline:calc(var(--unit)/2); }
+.taskNotes { margin:0; padding-left:calc(var(--unit)*2); display:grid; gap:var(--unit); font-size:var(--project-body); line-height:1.45; }
+.pinnedNotes { border:var(--project-hairline) solid var(--glass-border); border-radius:var(--r-panel); background:var(--glass); }
+.pinnedNotes summary { display:flex; align-items:center; justify-content:space-between; min-height:var(--project-touch); padding:calc(var(--unit)*1.5); list-style:none; cursor:pointer; }
+.pinnedNotes summary::-webkit-details-marker { display:none; }
+.pinnedNotes summary > span { display:flex; gap:var(--unit); align-items:baseline; }
+.pinnedNotes summary span span { color:var(--text-3); font:400 var(--project-meta)/1.5 var(--font-mono); }
+.pinnedNotes > div { padding:0 calc(var(--unit)*2) calc(var(--unit)*2); border-top:var(--project-hairline) solid var(--line); }
+.pinnedNotes h3 { font:500 var(--project-body)/1.4 var(--font-mohave); margin:calc(var(--unit)*2) 0 var(--unit); }
+.pinnedNotes[open] summary > svg { transform:rotate(90deg); }
+.markupAttachment { display:block; width:calc(100% - var(--unit)*4); margin:0 calc(var(--unit)*2) calc(var(--unit)*2); padding:0; text-align:left; border:var(--project-hairline) solid var(--glass-border); border-radius:var(--r-item); overflow:hidden; background:var(--bg); color:var(--text-2); }
+.markupAttachment > span:last-child { display:flex; justify-content:space-between; align-items:center; gap:var(--unit); padding:var(--unit); font:400 var(--project-meta)/1.5 var(--font-mono); }
+.markedPhoto { position:relative; display:block; }
+.markedPhoto img { display:block; width:100%; height:auto; border-radius:0; }
+.markupUnderlay,.markupInk { fill:none; stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke; }
+.markupUnderlay { stroke:var(--bg); stroke-width:calc(var(--unit)/2); }
+.markupInk { stroke:var(--text); stroke-width:calc(var(--unit)/4); }
 .completionPhoto { width: calc(var(--unit) * 10); height: calc(var(--unit) * 10); margin: 0 calc(var(--unit) * 2) calc(var(--unit) * 2); }
 .completionPhoto img { width: 100%; height: 100%; border-radius: 0; object-fit: cover; }
 .detailsAction { width: 100%; }
