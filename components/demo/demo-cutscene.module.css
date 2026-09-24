@@ -452,5 +452,11 @@
   .controls button { transition: opacity var(--d-hover) var(--ease-smooth); }
 }
 
-.conversationStage { min-height:0; overflow:hidden; }
+.conversationStage {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: auto;
+  scrollbar-width: thin;
+}
 .cutscene[data-complete='true'] { grid-template-rows: minmax(0, 1fr); }

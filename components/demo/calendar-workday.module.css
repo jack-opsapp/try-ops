@@ -149,7 +149,7 @@
 .dayViewport {
   min-height: 0;
   overflow-y: auto;
-  overscroll-behavior-y: contain;
+  overscroll-behavior-y: auto;
   padding: calc(var(--unit) / 4) calc(var(--unit) * 2.5) calc(var(--unit) / 2);
   scrollbar-width: thin;
   scrollbar-color: var(--line) transparent;
