@@ -1,6 +1,7 @@
 /* Canonical materials come from globals.css -> ops-tokens.css. Dimensions
    derive from its 8px unit: DESIGN type roles and OPSStyle native controls. */
 .demo {
+  --demo-guidance-gap:calc(var(--unit)/2);
   --demo-line:calc(var(--unit)/8); --demo-touch:calc(var(--unit)*5.5); --demo-dock-touch:calc(var(--unit)*6.5);
   --demo-type-page:calc(var(--unit)*2.75); --demo-type-body:calc(var(--unit)*2); --demo-type-button:calc(var(--unit)*1.75); --demo-type-small:calc(var(--unit)*1.5); --demo-type-label:calc(var(--unit)*1.375);
   --demo-screen-width:calc(var(--unit)*65); --demo-screen-height:calc(var(--unit)*97.5); --demo-wide:calc(var(--unit)*160); --demo-stage:calc(var(--unit)*140); --demo-guide:calc(var(--unit)*55); --demo-title:calc(var(--unit)*6); --demo-title-small:calc(var(--unit)*3.5); --demo-copy:calc(var(--unit)*2.25);
@@ -65,7 +66,7 @@
 .conversion > span { text-align:center; font:400 var(--demo-type-label)/1.5 var(--font-mono); color:var(--text-3); }
 .more { display:flex; justify-content:center; align-items:center; gap:var(--unit); min-height:var(--demo-touch); color:var(--text-2); font:400 var(--demo-type-button) var(--font-mohave); }
 .demo :is(a,button,input,textarea):focus-visible { outline:calc(var(--demo-line)*2) solid var(--ops-accent); outline-offset:calc(var(--demo-line)*3); }
-.demo [data-demo-next=true] { position:relative; outline:var(--demo-line) solid var(--ops-accent); outline-offset:calc(var(--demo-line)*-2); }
+.demo [data-demo-next=true] { position:relative; outline:var(--demo-line) solid var(--ops-accent); outline-offset:var(--demo-guidance-gap); }
 .demo [data-demo-next=true]:focus-visible { outline-width:calc(var(--demo-line)*2); }
 .role { color:var(--ops-accent); animation:role-arrive var(--d-page) var(--ease-smooth); }
 @keyframes role-arrive { from { opacity:0; transform:translateY(calc(var(--unit)/2)); } to { opacity:1; transform:translateY(0); } }

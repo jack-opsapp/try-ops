@@ -1,12 +1,13 @@
-/* One perimeter treatment for every next-action shape. Geometry stays inside
-   the control so native clipped task groups and notification cards remain intact. */
+/* Leave a visible gap around every target; keep the overlay inert. */
 .pulse { color:var(--ops-accent); }
 .pulse rect {
-  x:calc(var(--demo-line)*2); y:calc(var(--demo-line)*2);
-  width:calc(100% - var(--demo-line)*4); height:calc(100% - var(--demo-line)*4);
+  --pulse-outset:calc(var(--demo-guidance-gap) + var(--demo-line)*2);
+  x:calc(var(--pulse-outset)*-1); y:calc(var(--pulse-outset)*-1);
+  width:calc(100% + var(--pulse-outset)*2); height:calc(100% + var(--pulse-outset)*2);
   fill:none; stroke:currentColor;
   stroke-width:calc(var(--demo-line)*2); stroke-linecap:round;
-  animation:perimeter-pass calc(var(--d-panel)*16) var(--ease-smooth) infinite;
+  /* A continuous orbit needs constant speed at the seam, not entrance easing. */
+  animation:perimeter-pass calc(var(--d-panel)*16) linear infinite;
   animation-play-state:paused;
 }
 /* Dash lengths are normalized path coordinates (pathLength=100), not layout
@@ -15,9 +16,7 @@
 .pulse .head { --pulse-start:-11px; stroke-dasharray:3 97; color:var(--text); }
 .pulse[data-running=true] rect { animation-play-state:running; }
 @keyframes perimeter-pass {
-  0% { stroke-dashoffset:var(--pulse-start); opacity:0; }
-  8% { opacity:1; }
-  70% { stroke-dashoffset:calc(var(--pulse-start) - 100px); opacity:1; }
-  82%,100% { stroke-dashoffset:calc(var(--pulse-start) - 100px); opacity:0; }
+  from { stroke-dashoffset:var(--pulse-start); }
+  to { stroke-dashoffset:calc(var(--pulse-start) - 100px); }
 }
 @media(prefers-reduced-motion:reduce) { .pulse { display:none; } .pulse rect { animation:none; } }

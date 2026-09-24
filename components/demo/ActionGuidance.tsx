@@ -28,7 +28,11 @@ function BorderPulse({ target }: { target: HTMLElement }) {
   const [foreground, setForeground] = useState(true)
   const [radius, setRadius] = useState('0')
   useEffect(() => {
-    setRadius(getComputedStyle(target).borderTopLeftRadius || '0')
+    const shape = getComputedStyle(target)
+    // The detached guide uses a uniform corner, including rows whose native
+    // container rounds only the bottom corners. Circles retain their 50% radius.
+    const corners = [shape.borderTopLeftRadius, shape.borderTopRightRadius, shape.borderBottomLeftRadius, shape.borderBottomRightRadius]
+    setRadius(corners.reduce((largest, corner) => parseFloat(corner) > parseFloat(largest) ? corner : largest, '0'))
     const updateVisibility = () => setForeground(document.visibilityState === 'visible')
     updateVisibility()
     document.addEventListener('visibilitychange', updateVisibility)
@@ -43,8 +47,8 @@ function BorderPulse({ target }: { target: HTMLElement }) {
     }
   }, [target])
   return <svg aria-hidden="true" focusable="false" className={styles.pulse} data-running={visible && foreground}
-    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', borderRadius: 'inherit', overflow: 'hidden', zIndex: 1, transform: 'none' }}>
-    <rect className={styles.trail} pathLength="100" rx={radius} />
-    <rect className={styles.head} pathLength="100" rx={radius} />
+    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', overflow: 'visible', zIndex: 1, transform: 'none' }}>
+    <rect className={styles.trail} pathLength="100" style={{ rx: `calc(${radius} + var(--pulse-outset))` }} />
+    <rect className={styles.head} pathLength="100" style={{ rx: `calc(${radius} + var(--pulse-outset))` }} />
   </svg>
 }
