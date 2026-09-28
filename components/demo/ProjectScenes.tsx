@@ -177,7 +177,7 @@ export function ProjectScenes({ state, dispatch }: SceneProps) {
 
   const crewPost = <article className={styles.crewPost} aria-label={state.role === 'crew' ? 'Your completion update' : `${crewName}'s completion update`}>
     <div className={styles.author}><Avatar name={crewName} /><div><strong>{crewName}</strong><time>just now</time></div></div>
-    <p className={styles.postText}>{state.role === 'operator' && <><span className={styles.mention}>@Mike</span>{' '}</>}{state.postedNote}</p>
+    <p className={styles.postText}>{state.postedNote}</p>
     <button className={styles.completionPhoto} onClick={event => openPhoto('after', event.currentTarget)} aria-label={state.role === 'crew' ? 'Open your completed deck photo' : `Open ${crewName}'s completed deck photo`}><SamplePhoto src={SAMPLE.afterPhoto} alt={`The completed deck ${state.role === 'crew' ? 'you' : crewName} shared with the team`} sizes="80px" /></button>
   </article>
 

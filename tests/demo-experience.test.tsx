@@ -2,7 +2,7 @@ import { act, cleanup, fireEvent, render, screen, within } from '@testing-librar
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { DemoExperience } from '@/components/demo/DemoExperience'
 import { SAMPLE } from '@/components/demo/lifecycle-data'
-import { LIFECYCLE_STORAGE_KEY } from '@/components/demo/lifecycle-state'
+import { LIFECYCLE_STORAGE_KEY, OPERATOR_COMPLETION_NOTE } from '@/components/demo/lifecycle-state'
 import DemoPage from '@/app/demo/page'
 import DemoError from '@/app/demo/error'
 import { renderToString } from 'react-dom/server'
@@ -249,7 +249,7 @@ describe('the visitor sample job', () => {
     assignInstallationCrew()
     skipScene(); click('184 Cedar Lane Complete')
     const post = within(screen.getByRole('article', { name: "Pete's completion update" }))
-    expect(post.getByText(SAMPLE.note, { exact: true })).toBeTruthy()
+    expect(post.getByText(OPERATOR_COMPLETION_NOTE, { exact: true })).toBeTruthy()
     expect(post.getByText('Pete', { exact: true })).toBeTruthy()
     expect(originalPhoto(post.getByRole('img', { name: 'The completed deck Pete shared with the team' }))).toBe(SAMPLE.afterPhoto)
     expect(originalPhoto(screen.getByRole('img', { name: 'The existing deck documented at the site visit' }))).toBe(before)
@@ -400,7 +400,7 @@ describe('the visitor sample job', () => {
     click('Close preview')
     vi.spyOn(window.history, 'back').mockImplementationOnce(() => popScene('activity'))
     click('Back')
-    expect(within(screen.getByRole('article', { name: "Pete's completion update" })).getByText(SAMPLE.note)).toBeTruthy()
+    expect(within(screen.getByRole('article', { name: "Pete's completion update" })).getByText(OPERATOR_COMPLETION_NOTE, { exact: true })).toBeTruthy()
     click('View billing')
     expect(screen.getByText('Paid in full')).toBeTruthy()
     expectNativeTrial()

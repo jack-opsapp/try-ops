@@ -3,6 +3,7 @@ import { CUTSCENE_IDS, CUTSCENE_LENGTHS, type CutsceneId } from './cutscene-scri
 
 export const LIFECYCLE_REVISION = 'job-lifecycle-v6' as const
 export const LIFECYCLE_STORAGE_KEY = 'ops:demo:lifecycle:v6'
+export const OPERATOR_COMPLETION_NOTE = `@Mike ${SAMPLE.note}`
 export const SCENES = ['role', 'inquiry', 'booked', 'visit', 'review', 'estimate', 'accepted', 'project', 'calendar', 'crew', 'compose', 'activity', 'billing'] as const
 export type Scene = typeof SCENES[number]
 export type DemoRole = 'operator' | 'crew'
@@ -110,7 +111,7 @@ export function replayCutscene(state: LifecycleState): CutsceneId | null {
 function finishCutscene(state: LifecycleState): LifecycleState {
   let next = { ...state, cutscene: null }
   if (!state.cutscene?.replay && state.cutscene?.id === 'approval') next = { ...coreReducer(next, { type: 'APPROVE_ESTIMATE' }), cutscene: null }
-  if (!state.cutscene?.replay && state.cutscene?.id === 'workday') next = { ...next, taskCompleted: true, completionPhoto: true, postedNote: SAMPLE.note }
+  if (!state.cutscene?.replay && state.cutscene?.id === 'workday') next = { ...next, taskCompleted: true, completionPhoto: true, postedNote: OPERATOR_COMPLETION_NOTE }
   if (!state.cutscene?.replay && state.cutscene?.id === 'billing') {
     next = { ...coreReducer(next, { type: 'CREATE_INVOICE' }), cutscene: null }
     next = { ...coreReducer(next, { type: 'RECORD_PAYMENT' }), cutscene: null }

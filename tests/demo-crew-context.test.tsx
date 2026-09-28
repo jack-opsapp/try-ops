@@ -2,7 +2,7 @@ import { cleanup, fireEvent, render, screen, within } from '@testing-library/rea
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ProjectScenes } from '@/components/demo/ProjectScenes'
 import { SAMPLE } from '@/components/demo/lifecycle-data'
-import { initialLifecycleState, lifecycleReducer, type LifecycleAction, type LifecycleState } from '@/components/demo/lifecycle-state'
+import { initialLifecycleState, lifecycleReducer, OPERATOR_COMPLETION_NOTE, type LifecycleAction, type LifecycleState } from '@/components/demo/lifecycle-state'
 
 const dialogMethods = ['showModal','close'] as const
 const originalDialogMethods = dialogMethods.map(name => Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, name))
@@ -42,7 +42,7 @@ describe('prepared crew context', () => {
     show(complete)
     const handoff = screen.getByRole('article', {name:'Mike’s crew handoff'})
     expect(within(handoff).getByText(`@${member}`)).toBeTruthy()
-    expect(within(screen.getByRole('article', {name:`${member}'s completion update`})).getByText('@Mike')).toBeTruthy()
+    expect(within(screen.getByRole('article', {name:`${member}'s completion update`})).getByText(OPERATOR_COMPLETION_NOTE, { exact: true })).toBeTruthy()
     expect(screen.getByText('2 photos')).toBeTruthy()
     expect(screen.getByRole('button', {name:'Open marked-up site photo'})).toBeTruthy()
   })

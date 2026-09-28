@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { SAMPLE } from '@/components/demo/lifecycle-data'
 import {
-  initialLifecycleState, lifecycleReducer as rawLifecycleReducer, restoreLifecycleState, LIFECYCLE_REVISION, LIFECYCLE_STORAGE_KEY,
+  initialLifecycleState, lifecycleReducer as rawLifecycleReducer, restoreLifecycleState, LIFECYCLE_REVISION, LIFECYCLE_STORAGE_KEY, OPERATOR_COMPLETION_NOTE,
   type LifecycleAction, type LifecycleState, type Scene, type VisitAssignee,
 } from '@/components/demo/lifecycle-state'
 
@@ -152,7 +152,7 @@ describe('role-based sample job lifecycle', () => {
   it('preserves only the selected crew through incoming work and resume', () => {
     const project = through(selfJourney, 'APPROVE_ESTIMATE')
     const calendar = lifecycleReducer(project, { type: 'ASSIGN_CREW', members: ['Nick'] })
-    expect(calendar).toMatchObject({ scene: 'calendar', assignedCrew: ['Nick'], taskCompleted: true, completionPhoto: true, postedNote: SAMPLE.note })
+    expect(calendar).toMatchObject({ scene: 'calendar', assignedCrew: ['Nick'], taskCompleted: true, completionPhoto: true, postedNote: OPERATOR_COMPLETION_NOTE })
     expect(saved(calendar).assignedCrew).toEqual(['Nick'])
     for (const members of [[], ['Pete', 'Pete'], ['Unknown'], ['Pete', 'Nick', 'Pete']]) {
       expect(lifecycleReducer(project, { type: 'ASSIGN_CREW', members: members as ('Pete' | 'Nick')[] })).toBe(project)
@@ -167,7 +167,7 @@ describe('role-based sample job lifecycle', () => {
     expect(lifecycleReducer(calendar, { type: 'VIEW_CREW' })).toBe(calendar)
     expect(lifecycleReducer(calendar, { type: 'COMPLETE_TASK' })).toBe(calendar)
     const activity = lifecycleReducer(calendar, { type: 'OPEN_COMPLETED_PROJECT' })
-    expect(activity).toMatchObject({ role: 'operator', scene: 'activity', taskCompleted: true, completionPhoto: true, postedNote: SAMPLE.note, invoiceCreated: false })
+    expect(activity).toMatchObject({ role: 'operator', scene: 'activity', taskCompleted: true, completionPhoto: true, postedNote: OPERATOR_COMPLETION_NOTE, invoiceCreated: false })
     expect(activity.visited).not.toContain('crew')
     expect(activity.visited).not.toContain('compose')
   })
@@ -189,7 +189,7 @@ describe('role-based sample job lifecycle', () => {
     expect(calendar).toMatchObject({ scene: 'calendar', taskCompleted: false, cutscene: { id: 'workday', beat: 2, replay: false } })
     expect(saved(calendar)).toEqual(calendar)
     calendar = rawLifecycleReducer(calendar, { type: 'ADVANCE_CUTSCENE' })
-    expect(calendar).toMatchObject({ scene: 'calendar', taskCompleted: true, completionPhoto: true, postedNote: SAMPLE.note, cutscene: null })
+    expect(calendar).toMatchObject({ scene: 'calendar', taskCompleted: true, completionPhoto: true, postedNote: OPERATOR_COMPLETION_NOTE, cutscene: null })
     expect(saved(calendar)).toEqual(calendar)
   })
 
@@ -202,7 +202,7 @@ describe('role-based sample job lifecycle', () => {
     expect(rawLifecycleReducer(calendarReplay, { type: 'SKIP_CUTSCENE' })).toEqual(calendar)
 
     const activity = rawLifecycleReducer(calendar, { type: 'OPEN_COMPLETED_PROJECT' })
-    expect(activity).toMatchObject({ scene: 'activity', taskCompleted: true, completionPhoto: true, postedNote: SAMPLE.note })
+    expect(activity).toMatchObject({ scene: 'activity', taskCompleted: true, completionPhoto: true, postedNote: OPERATOR_COMPLETION_NOTE })
     const activityReplay = rawLifecycleReducer(activity, { type: 'REPLAY_CUTSCENE' })
     expect(activityReplay).toMatchObject({ scene: 'activity', cutscene: { id: 'workday', beat: 0, replay: true } })
     expect(rawLifecycleReducer(activityReplay, { type: 'SKIP_CUTSCENE' })).toEqual(activity)
@@ -247,7 +247,7 @@ describe('role-based sample job lifecycle', () => {
     expect(readyToBill).toMatchObject({ scene: 'billing', invoiceCreated: true, paymentRecorded: true, cutscene: null })
     expect(lifecycleReducer(readyToBill, { type: 'CREATE_INVOICE' })).toBe(readyToBill)
     expect(lifecycleReducer(readyToBill, { type: 'RECORD_PAYMENT' })).toBe(readyToBill)
-    expect(readyToBill.postedNote).toBe(SAMPLE.note)
+    expect(readyToBill.postedNote).toBe(OPERATOR_COMPLETION_NOTE)
   })
 
   it.each([['self', selfJourney], ['delegated', delegatedJourney], ['crew', crewJourney]] as const)('makes duplicate one-way actions harmless on the %s path', (_name, journey) => {
