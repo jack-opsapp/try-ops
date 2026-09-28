@@ -2,7 +2,7 @@ import React, { StrictMode, useReducer, useRef } from 'react'
 import { act, cleanup, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cutsceneScript, CUTSCENE_IDS, CUTSCENE_LENGTHS } from '@/components/demo/cutscene-script'
-import { initialLifecycleState, lifecycleReducer, restoreLifecycleState, type LifecycleAction, type LifecycleState } from '@/components/demo/lifecycle-state'
+import { initialLifecycleState, lifecycleReducer, OPERATOR_COMPLETION_NOTE, restoreLifecycleState, type LifecycleAction, type LifecycleState } from '@/components/demo/lifecycle-state'
 import { useCutscenePlayback } from '@/components/demo/useCutscenePlayback'
 
 function apply(state: LifecycleState, action: LifecycleAction) {
@@ -81,7 +81,7 @@ describe('context scene state', () => {
       state = lifecycleReducer(state, { type: 'ADVANCE_CUTSCENE' })
     }
     expect(state).toMatchObject({ scene: 'calendar', taskCompleted: true, completionPhoto: true, cutscene: null })
-    expect(state.postedNote).toBeTruthy()
+    expect(state.postedNote).toBe(OPERATOR_COMPLETION_NOTE)
     expect(serialize(state)).toEqual(state)
   })
 

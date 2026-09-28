@@ -127,3 +127,25 @@
 .sceneCallout { padding:0 calc(var(--unit)*2) calc(var(--unit)*2); }
 .demo[data-demo-cutscene=true] .instruction { display:none; }
 @media(max-width:760px) { .demo[data-demo-cutscene=true] .appViewport { min-height:0; } }
+
+/* One phone-sized playback frame. Incoming notifications consume space in
+   this frame instead of pushing the calendar's final task below the screen. */
+@media(max-width:760px) {
+  .product[data-playback=true] {
+    --demo-playback-height:100%;
+    display:flex;
+    flex-direction:column;
+    height:calc(100svh - var(--unit)*2);
+    scroll-margin-top:var(--unit);
+  }
+  .product[data-playback=true] :is(.roleBar,.timeline,.sceneCallout) { flex-shrink:0; }
+  .product[data-playback=true] .appViewport {
+    flex:1;
+    height:auto;
+    min-height:0;
+    overflow:auto;
+    overscroll-behavior-y:auto;
+  }
+  .product[data-playback=true] .scene { height:100%; min-height:0; }
+  .playbackSurface { flex:1; min-height:calc(var(--unit)*36); }
+}
