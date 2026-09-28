@@ -57,6 +57,7 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
   const startedAt = useRef<number | null>(null)
   const errors = useRef(new Set<DemoEvent['errorCode']>())
   const content = useRef<HTMLDivElement>(null)
+  const product = useRef<HTMLElement>(null)
   const guidanceRoot = useRef<HTMLDivElement>(null)
   const heading = useRef<HTMLHeadingElement>(null)
   const playbackSurface = useRef<HTMLDivElement>(null)
@@ -128,10 +129,20 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
     return () => window.removeEventListener('popstate', onPopState)
   }, [persist, report])
   useEffect(() => {
-    if (!focusNext.current) return
+    const framePlayback = (!!state.cutscene || state.scene === 'calendar') && window.matchMedia?.('(max-width: 760px)').matches
+    if (!focusNext.current) {
+      // Keep an incoming completion notification in the same phone frame. Do
+      // not pull visitors back if they deliberately scrolled away from it.
+      const bounds = product.current?.getBoundingClientRect()
+      if (framePlayback && bounds && bounds.top < window.innerHeight && bounds.bottom > 0) {
+        product.current?.scrollIntoView?.({ block: 'start', behavior: 'instant' })
+      }
+      return
+    }
     focusNext.current = false
     content.current?.scrollTo?.({ top: 0, behavior: 'instant' })
-    window.scrollTo?.({ top: 0, behavior: 'instant' })
+    if (framePlayback) product.current?.scrollIntoView?.({ block: 'start', behavior: 'instant' })
+    else window.scrollTo?.({ top: 0, behavior: 'instant' })
     heading.current?.focus({ preventScroll: true })
   }, [state.scene, state.cutscene?.id])
   const dispatch = useCallback((action: LifecycleAction) => {
@@ -227,12 +238,12 @@ export function DemoExperience({ exitHref = '/' }: { exitHref?: string }) {
         {state.scene !== 'role' && <div className={styles.mobileProgress} aria-hidden="true">{chapters.map((chapter,index)=><span key={chapter} data-reached={copy.chapter>=index}><i /></span>)}</div>}
         </div>
       </aside>
-      <section className={styles.product} aria-label="Interactive OPS sample">
+      <section ref={product} className={styles.product} data-playback={!!state.cutscene || state.scene === 'calendar'} aria-label="Interactive OPS sample">
         <div className={styles.roleBar} key={copy.role}><span className={styles.role}><RoleIcon aria-hidden="true"/>{copy.role}</span><span className={styles.productLabel}>OPS FOR IPHONE</span></div>
         <DemoNotification notification={shownNotification} onOpen={completionNotification ? () => dispatch({ type: 'OPEN_COMPLETED_PROJECT' }) : undefined} onDismiss={completionNotification ? undefined : () => setNotification(null)} reduced={reduced}/>
         <div className={styles.appViewport} ref={content}>
           {!ready ? <div className={styles.loading} aria-busy="true"><span className={styles.logo} aria-hidden="true"/><p>Opening your sample job.</p><a href={signupHref}>Start my free trial</a></div> : <LazyMotion features={domAnimation} strict><m.div key={state.scene === 'calendar' ? 'calendar' : state.cutscene ? `cutscene:${state.cutscene.id}` : state.scene} initial={reduced?{opacity:0}:{opacity:0,x:direction*12}} animate={{opacity:1,x:0}} transition={{duration:reduced?.15:.25,ease:[.22,1,.36,1]}} className={styles.scene}>
-            {sequence && (state.cutscene || state.scene === 'calendar') ? <><div ref={playbackSurface}><DemoCutscene beat={sequence.beats[state.cutscene?.beat ?? 2]} conversation={state.cutscene?.id === 'inquiry' ? sequence.beats : undefined} calendarCrew={state.scene === 'calendar' || state.cutscene?.id === 'workday' ? state.assignedCrew : undefined} complete={!state.cutscene} index={state.cutscene?.beat ?? 2} total={sequence.beats.length} paused={updatesPaused} reduced={reduced} onPause={() => setUpdatesPaused(value => !value)} onSkip={() => dispatch({ type: 'SKIP_CUTSCENE' })}/></div>{state.cutscene?.id === 'billing' && <div className={styles.sceneCallout}><FeatureCallout kind="accounting"/></div>}</> : state.scene === 'role' ? <RoleScenes {...sceneProps}/> : ['inquiry','booked','billing'].includes(state.scene) ? <IntakeBillingScenes {...sceneProps} onAccountingPreviewChange={setAccountingOpen}/> : ['visit','review','estimate','accepted'].includes(state.scene) ? <VisitScenes {...sceneProps} onToolPreviewChange={setToolOpen}/> : <ProjectScenes {...sceneProps}/>}
+            {sequence && (state.cutscene || state.scene === 'calendar') ? <><div ref={playbackSurface} className={styles.playbackSurface}><DemoCutscene beat={sequence.beats[state.cutscene?.beat ?? 2]} conversation={state.cutscene?.id === 'inquiry' ? sequence.beats : undefined} calendarCrew={state.scene === 'calendar' || state.cutscene?.id === 'workday' ? state.assignedCrew : undefined} complete={!state.cutscene} index={state.cutscene?.beat ?? 2} total={sequence.beats.length} paused={updatesPaused} reduced={reduced} onPause={() => setUpdatesPaused(value => !value)} onSkip={() => dispatch({ type: 'SKIP_CUTSCENE' })}/></div>{state.cutscene?.id === 'billing' && <div className={styles.sceneCallout}><FeatureCallout kind="accounting"/></div>}</> : state.scene === 'role' ? <RoleScenes {...sceneProps}/> : ['inquiry','booked','billing'].includes(state.scene) ? <IntakeBillingScenes {...sceneProps} onAccountingPreviewChange={setAccountingOpen}/> : ['visit','review','estimate','accepted'].includes(state.scene) ? <VisitScenes {...sceneProps} onToolPreviewChange={setToolOpen}/> : <ProjectScenes {...sceneProps}/>}
           </m.div></LazyMotion>}
         </div>
         <div className={styles.timeline}><span className={styles.time}>{state.cutscene ? sequence?.beats[state.cutscene.beat].eyebrow : copy.time}</span>{!state.cutscene && replayCutscene(state) && <button type="button" className={styles.replay} onClick={() => dispatch({ type: 'REPLAY_CUTSCENE' })}><RotateCcw aria-hidden="true"/>Replay scene</button>}{!state.cutscene && state.scene==='project' && state.crewAssigned && <button data-demo-next="true" className={styles.next} type="button" onClick={()=>dispatch({type:'NAVIGATE', scene:'calendar'})}>View calendar <ArrowRight aria-hidden="true"/></button>}</div>

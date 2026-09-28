@@ -10,7 +10,7 @@
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
   width: 100%;
-  height: clamp(calc(var(--unit) * 62), 74svh, calc(var(--unit) * 72));
+  height: var(--demo-playback-height, clamp(calc(var(--unit) * 62), 74svh, calc(var(--unit) * 72)));
   min-width: 0;
   overflow: hidden;
   color: var(--text);
@@ -431,7 +431,7 @@
 }
 
 @media (max-width: 390px) {
-  .cutscene { height: clamp(calc(var(--unit) * 60), 78svh, calc(var(--unit) * 66)); border-right: 0; border-left: 0; border-radius: 0; }
+  .cutscene { height: var(--demo-playback-height, clamp(calc(var(--unit) * 60), 78svh, calc(var(--unit) * 66))); border-right: 0; border-left: 0; border-radius: 0; }
   .stage { padding: var(--unit); }
   .beat { width: 100%; }
   .sceneHeader { gap: var(--unit); padding-right: var(--unit); padding-left: var(--unit); }
