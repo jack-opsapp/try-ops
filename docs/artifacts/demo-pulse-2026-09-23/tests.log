@@ -1,0 +1,63 @@
+ DEPRECATED  "environmentMatchGlobs" is deprecated. Use `test.projects` to define different configurations instead.
+
+ RUN  v3.2.7 /Users/jacksonsweet/Projects/OPS/.worktrees/tryops-demo-integration
+
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ tests/demo-acceptance/resume-contract.test.tsx (10 tests) 423ms
+ ✓ tests/demo-automatic-updates.test.tsx (7 tests) 306ms
+ ✓ tests/demo-experience.test.tsx (23 tests) 1681ms
+   ✓ the visitor sample job > guides one current action through the Operator path without changing identity  309ms
+ ✓ tests/demo-role-components.test.tsx (11 tests) 260ms
+ ✓ tests/demo-motion.test.tsx (3 tests) 236ms
+ ✓ tests/demo-task-guidance.test.tsx (6 tests) 189ms
+ ✓ tests/demo-inquiry-conversation.test.tsx (7 tests) 144ms
+ ✓ tests/demo-action-guidance.test.tsx (3 tests) 86ms
+ ✓ tests/demo-entry.test.tsx (8 tests) 110ms
+ ✓ tests/landing-page-client.test.tsx (6 tests) 96ms
+ ✓ tests/demo-calendar-workday.test.tsx (1 test) 85ms
+ ✓ tests/demo-cutscene.test.tsx (17 tests) 76ms
+stderr | tests/landing-deadline.test.ts > bounded landing availability > returns approved control at the total render deadline even if fetch ignores abort
+[tryops] collection_unavailable: serving approved control
+
+stderr | tests/landing-deadline.test.ts > bounded landing availability > shares the same deadline across sequential route and config lookups
+[tryops] collection_unavailable: serving approved control
+
+ ✓ tests/section-tracker.test.tsx (1 test) 7ms
+ ✓ tests/landing-experience.test.tsx (10 tests) 50ms
+stderr | tests/landing-deadline.test.ts > bounded landing availability > returns middleware on deadline without issuing an assignment cookie or exposure identity
+[tryops] assignment_unavailable
+
+ ✓ tests/landing-deadline.test.ts (3 tests) 609ms
+   ✓ bounded landing availability > returns middleware on deadline without issuing an assignment cookie or exposure identity  603ms
+ ✓ tests/page-configs.test.ts (33 tests) 39ms
+ ✓ tests/ab-supabase-config.test.ts (5 tests) 18ms
+ ✓ tests/demo-lifecycle-state.test.ts (85 tests) 17ms
+ ✓ tests/ab-events-route.test.ts (26 tests) 13ms
+ ✓ tests/demo-api-boundaries.test.ts (4 tests) 12ms
+ ✓ tests/experiment-operator.test.ts (10 tests) 11ms
+ ✓ tests/demo-acceptance/acquisition-boundary.test.ts (15 tests) 7ms
+ ✓ tests/demo-middleware-cron.test.ts (3 tests) 6ms
+ ✓ tests/middleware.test.ts (7 tests) 6ms
+ ✓ tests/demo-server.test.ts (4 tests) 5ms
+stderr | tests/experiment-serving.test.ts > safe incumbent serving > serves approved control on missing migration without consulting old generated variants
+[tryops] collection_unavailable: serving approved control
+
+ ✓ tests/experiment-serving.test.ts (2 tests) 5ms
+ ✓ tests/demo-session-client.test.ts (4 tests) 5ms
+ ✓ tests/demo-compatibility.test.ts (1 test) 3ms
+ ✓ tests/experiment-content.test.ts (6 tests) 4ms
+ ✓ tests/experiment-identity.test.ts (10 tests) 3ms
+ ✓ tests/first-touch.test.ts (6 tests) 3ms
+ ✓ tests/experiment-decision.test.ts (16 tests) 3ms
+ ✓ tests/demo-state.test.ts (22 tests) 2ms
+ ✓ tests/demo-client.test.ts (3 tests) 3ms
+ ✓ tests/demo-navigation.test.ts (3 tests) 1ms
+ ✓ tests/demo-acceptance/legacy-entry.test.ts (7 tests) 1ms
+ ✓ tests/visible-dwell.test.ts (1 test) 1ms
+
+ Test Files  37 passed (37)
+      Tests  389 passed (389)
+   Start at  16:42:42
+   Duration  7.02s (transform 502ms, setup 0ms, collect 2.76s, tests 4.53s, environment 3.42s, prepare 814ms)

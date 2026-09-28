@@ -1,0 +1,5 @@
+Observed September 21, 2026, 16:48 UTC on local production server.
+HTTP/1.1 303 See Other
+cache-control: private, no-store
+location: https://app.opsapp.co/register
+referrer-policy: no-referrer

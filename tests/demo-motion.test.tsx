@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { DemoExperience } from '@/components/demo/DemoExperience'
 
@@ -18,6 +18,7 @@ function motionPreference(initial: boolean) {
     get subscriptions() { return listeners.size },
   }
 }
+function click(name: string) { fireEvent.click(screen.getByRole('button', { name })) }
 
 beforeEach(() => {
   sessionStorage.clear()
@@ -26,44 +27,44 @@ beforeEach(() => {
 })
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.restoreAllMocks() })
 
-describe('role handoff presentation', () => {
-  it('responds to a live reduced-motion change without losing progress, focus or native signup', () => {
+describe('lifecycle handoff presentation', () => {
+  it('responds to live reduced-motion changes without losing evidence, focus or native signup', () => {
     const preference = motionPreference(false)
     const { container, unmount } = render(<DemoExperience />)
-    fireEvent.click(screen.getByRole('button', { name: 'Assign crew' }))
-    const job = screen.getByRole('heading', { name: 'Siding repair' })
-    const task = screen.getByRole('heading', { name: 'Replace damaged siding panels' })
+    click('Choose Operator'); click('Skip scene'); click('Assign site visit'); click('Select You'); click('Assign to me')
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Confirm the deck scope with Alex' })); click('Photo')
+    const before = screen.getByRole('img', { name: /Sample site visit: the deck area/ }).getAttribute('src')
     preference.set(true)
-    expect(container.querySelector('main')?.getAttribute('data-motion')).toBe('reduced')
+    expect(container.querySelector('[data-motion]')?.getAttribute('data-motion')).toBe('reduced')
+    expect(screen.getByRole('button', { name: 'Done' }).hasAttribute('disabled')).toBe(false)
+    expect(screen.getByRole('link', { name: 'Try OPS free' }).getAttribute('href')).toBe('/demo/start-trial')
+    vi.mocked(window.scrollTo).mockClear()
+    click('Done')
     expect(document.activeElement).toBe(screen.getByRole('heading', { level: 1 }))
-    expect(screen.getByRole('button', { name: 'Mark task done' })).toBeTruthy()
-    expect(screen.getByRole('link', { name: 'Start my free trial' }).getAttribute('href')).toBe('/demo/start-trial')
-    fireEvent.click(screen.getByRole('button', { name: 'Mark task done' }))
-    expect(screen.getByText('SAMPLE TASK COMPLETE')).toBeTruthy()
-    expect(screen.getByRole('heading', { name: 'Siding repair' })).toBe(job)
-    expect(screen.getByRole('heading', { name: 'Replace damaged siding panels' })).toBe(task)
+    expect(window.scrollTo).toHaveBeenCalledWith(expect.objectContaining({ top: 0 }))
+    expect(screen.getByRole('img', { name: /Sample site visit: the deck area/ }).getAttribute('src')).toBe(before)
     preference.set(false)
-    expect(container.querySelector('main')?.getAttribute('data-motion')).toBe('full')
-    expect(screen.getByText('Pete marked the task done.')).toBeTruthy()
+    expect(container.querySelector('[data-motion]')?.getAttribute('data-motion')).toBe('full')
+    expect(screen.getByRole('button', { name: 'Complete visit' })).toBeTruthy()
     unmount()
     expect(preference.subscriptions).toBe(0)
   })
 
-  it.each([false, true])('lets Back and Restart interrupt completion immediately (reduced=%s)', async reduced => {
+  it.each([false, true])('lets Restart and Back interrupt an active transition (reduced=%s)', async reduced => {
     motionPreference(reduced)
     render(<DemoExperience />)
-    fireEvent.click(screen.getByRole('button', { name: 'Assign crew' }))
-    const complete = screen.getByRole('button', { name: 'Mark task done' })
-    const back = screen.getByRole('button', { name: 'Back' })
-    act(() => { fireEvent.click(complete); fireEvent.click(back) })
-    expect(screen.getByText('CREW’S VIEW · PETE')).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'View completion' })).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: 'Restart demo' }))
-    await act(async () => { await Promise.resolve() })
-    expect(screen.getByRole('button', { name: 'Assign crew' })).toBeTruthy()
-    expect(screen.queryByText('SAMPLE TASK COMPLETE')).toBeNull()
-    expect(screen.queryByRole('button', { name: 'View completion' })).toBeNull()
-    expect(screen.getAllByRole('heading', { name: 'Siding repair' })).toHaveLength(1)
+    const open = screen.getByRole('button', { name: 'Choose Operator' })
+    const restart = screen.getByRole('button', { name: 'Restart demo' })
+    act(() => { fireEvent.click(open); fireEvent.click(restart) })
+    expect(screen.getByRole('button', { name: 'Choose Operator' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Assign site visit' })).toBeNull()
+    click('Choose Operator')
     expect(document.activeElement).toBe(screen.getByRole('heading', { level: 1 }))
+    vi.mocked(window.scrollTo).mockClear()
+    click('Back')
+    await waitFor(() => expect(window.scrollTo).toHaveBeenCalledWith(expect.objectContaining({ top: 0 })))
+    expect(screen.getByRole('button', { name: 'Choose Operator' })).toBeTruthy()
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1)
+    expect(screen.getByRole('button', { name: 'Back' }).hasAttribute('disabled')).toBe(true)
   })
 })

@@ -1,0 +1,82 @@
+  ▲ Next.js 14.2.35
+
+   Creating an optimized production build ...
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/46) ...
+   Generating static pages (11/46)
+   Generating static pages (22/46)
+   Generating static pages (34/46)
+ ✓ Generating static pages (46/46)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+┌ ƒ /                                    146 B           105 kB
+├ ○ /_not-found                          875 B          88.5 kB
+├ ƒ /api/ab-cron                         0 B                0 B
+├ ƒ /api/ab-events                       0 B                0 B
+├ ƒ /api/ab-rotate                       0 B                0 B
+├ ƒ /api/auth/apple                      0 B                0 B
+├ ƒ /api/auth/google                     0 B                0 B
+├ ƒ /api/auth/join-company               0 B                0 B
+├ ƒ /api/auth/login                      0 B                0 B
+├ ƒ /api/auth/signup                     0 B                0 B
+├ ƒ /api/auth/sync-user                  0 B                0 B
+├ ƒ /api/auth/validate-code              0 B                0 B
+├ ƒ /api/company/invite                  0 B                0 B
+├ ƒ /api/company/update                  0 B                0 B
+├ ƒ /api/demo/events                     0 B                0 B
+├ ƒ /api/demo/session                    0 B                0 B
+├ ƒ /api/invite/send                     0 B                0 B
+├ ƒ /api/onboarding-events               0 B                0 B
+├ ƒ /api/send-link                       0 B                0 B
+├ ƒ /api/tutorial-log                    0 B                0 B
+├ ƒ /api/user/[id]                       0 B                0 B
+├ ○ /apple-icon.png                      0 B                0 B
+├ ○ /compare/housecall-pro               146 B           105 kB
+├ ○ /compare/jobber                      146 B           105 kB
+├ ○ /compare/servicetitan                146 B           105 kB
+├ ƒ /demo                                68.9 kB         162 kB
+├ ƒ /demo/start-trial                    0 B                0 B
+├ ƒ /download                            187 B          87.8 kB
+├ ○ /for/cleaning                        146 B           105 kB
+├ ○ /for/landscaping                     145 B           105 kB
+├ ○ /for/roofing                         145 B           105 kB
+├ ○ /icon.png                            0 B                0 B
+├ ○ /job-management                      146 B           105 kB
+├ ○ /robots.txt                          0 B                0 B
+├ ƒ /signup                              187 B          87.8 kB
+├ ƒ /signup/account-type                 187 B          87.8 kB
+├ ƒ /signup/company-code                 187 B          87.8 kB
+├ ƒ /signup/company-details              187 B          87.8 kB
+├ ƒ /signup/company-setup                187 B          87.8 kB
+├ ƒ /signup/credentials                  187 B          87.8 kB
+├ ƒ /signup/profile                      187 B          87.8 kB
+├ ƒ /signup/ready                        187 B          87.8 kB
+├ ○ /sitemap.xml                         0 B                0 B
+├ ƒ /tutorial                            187 B          87.8 kB
+├ ƒ /tutorial-interactive                187 B          87.8 kB
+├ ƒ /tutorial-intro                      187 B          87.8 kB
+├ ƒ /tutorial/[step]                     187 B          87.8 kB
+└ ƒ /tutorial/complete                   187 B          87.8 kB
++ First Load JS shared by all            87.6 kB
+  ├ chunks/9283-aecc217d4a51e5e1.js      31.7 kB
+  ├ chunks/d5e38306-5729b65d895071d8.js  53.6 kB
+  └ other shared chunks (total)          2.24 kB
+
+
+ƒ Middleware                             72.8 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand

@@ -1,0 +1,36 @@
+/* Canonical colors/type imported first by app/globals.css -> ops-tokens.css.
+   Native dimensions: OPSStyle spacing3 16, spacing4 24; 44pt controls. */
+.appHeader { display:flex; align-items:center; justify-content:space-between; gap:var(--unit); padding:calc(var(--unit)*2); min-height:calc(var(--unit)*8); border-bottom:var(--demo-line) solid var(--line); }
+.appHeader h2 { font:300 var(--demo-type-page)/1.1 var(--font-cakemono); text-transform:uppercase; margin:0; flex:1; outline:none; }
+.appHeader > div:empty { display:none; }
+.appHeader button { min-height:var(--demo-touch); }
+.section { display:grid; gap:calc(var(--unit)*1.5); }
+.sectionHeading { display:flex; align-items:center; justify-content:space-between; gap:var(--unit); }
+.sectionHeading h3 { font:400 var(--demo-type-label)/1.5 var(--font-mono); letter-spacing:.12em; text-transform:uppercase; color:var(--text-2); margin:0; }
+.sectionHeading h3 span { color:var(--text-mute); }
+.card { background:var(--glass); border:var(--demo-line) solid var(--glass-border); border-radius:var(--r-panel); padding:calc(var(--unit)*2); }
+.primary,.secondary { min-height:var(--demo-touch); padding:calc(var(--unit)*1.5) calc(var(--unit)*2); border-radius:var(--r-btn); font:300 var(--demo-type-button)/1.2 var(--font-cakemono); text-transform:uppercase; display:inline-flex; align-items:center; justify-content:center; gap:var(--unit); cursor:pointer; transition:background var(--d-hover) var(--ease-smooth),opacity var(--d-hover) var(--ease-smooth); }
+.primary { color:var(--bg); background:var(--ops-accent); border:var(--demo-line) solid transparent; }
+.primary:hover { background:var(--ops-accent-hover); }
+.secondary { color:var(--text); background:var(--surface-input); border:var(--demo-line) solid var(--line); }
+.secondary:hover { background:var(--surface-hover); }
+.primary:disabled,.secondary:disabled { cursor:default; opacity:.45; }
+.primary svg,.secondary svg { width:calc(var(--unit)*2.5); height:calc(var(--unit)*2.5); flex-shrink:0; }
+.primary:focus-visible,.secondary:focus-visible { outline:calc(var(--demo-line)*2) solid var(--ops-accent); outline-offset:calc(var(--demo-line)*3); }
+.badge { display:inline-flex; align-items:center; gap:calc(var(--unit)/2); padding:calc(var(--unit)/2) var(--unit); border:var(--demo-line) solid var(--line); border-radius:var(--r-chip); color:var(--text-2); background:var(--surface-input); font:400 var(--demo-type-label)/1.35 var(--font-mono); text-transform:uppercase; width:fit-content; }
+.badge[data-tone=olive] { color:var(--demo-olive-text-m); border-color:var(--demo-olive-line-m); background:var(--demo-olive-fill-m); font-weight:600; }
+.badge[data-tone=tan] { color:var(--demo-tan-text-m); border-color:var(--demo-tan-line-m); background:var(--demo-tan-fill-m); font-weight:600; }
+.avatar { width:calc(var(--unit)*4.5); height:calc(var(--unit)*4.5); flex-shrink:0; border-radius:50%; object-fit:cover; display:inline-flex; align-items:center; justify-content:center; color:var(--text-2); background:var(--surface-active); font:400 var(--demo-type-small) var(--font-mono); }
+.photo { width:100%; height:auto; object-fit:cover; display:block; border-radius:var(--r-item); }
+.photoFallback { min-height:calc(var(--unit)*16); padding:calc(var(--unit)*2); display:grid; place-content:center; color:var(--text-2); background:var(--surface-input); font:400 var(--demo-type-body)/1.4 var(--font-mohave); border:var(--demo-line) solid var(--line); border-radius:var(--r-item); }
+.mono { font-family:var(--font-mono); font-feature-settings:'tnum' 1,'zero' 1; }
+.label { font:400 var(--demo-type-label)/1.5 var(--font-mono); color:var(--text-3); text-transform:uppercase; }
+.muted { color:var(--text-2); }
+.stack { display:grid; gap:calc(var(--unit)*2); }
+.row { display:flex; align-items:center; gap:var(--unit); }
+.grow { flex:1; min-width:0; }
+.pad { padding:calc(var(--unit)*2); }
+.toolbar { position:sticky; bottom:0; z-index:1; display:flex; gap:var(--unit); padding:calc(var(--unit)*1.5) calc(var(--unit)*2); padding-bottom:calc(var(--unit)*1.5 + env(safe-area-inset-bottom,0px)); border-top:var(--demo-line) solid var(--line); background:var(--bg-panel); }
+.toolbar > * { flex:1; }
+.toolbar > button { min-height:var(--demo-dock-touch); }
+@media(prefers-reduced-motion:reduce) { .primary,.secondary { transition:opacity var(--d-hover) linear; } }
