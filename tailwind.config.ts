@@ -124,6 +124,9 @@ const config: Config = {
       fontSize: {
         // Semantic sizes matching ops-web
         'display': ['32px', { lineHeight: '1.1', fontWeight: '300' }],  // Cake Mono Light hero
+        // Landing hero headline — Cake Mono Light, uppercase. Phone / lg+.
+        'display-hero': ['38px', { lineHeight: '1.08', letterSpacing: '0.02em', fontWeight: '300' }],
+        'display-hero-lg': ['60px', { lineHeight: '1.08', letterSpacing: '0.02em', fontWeight: '300' }],
         'heading': ['24px', { lineHeight: '1.2', fontWeight: '300' }],
         'body': ['16px', { lineHeight: '1.5' }],
         'body-sm': ['14px', { lineHeight: '1.5' }],

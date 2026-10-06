@@ -67,21 +67,26 @@ export function Hero({ headline, subtext, primaryCtaLabel, secondaryCtaLabel, he
       ? 'Free for 30 days \u00b7 No credit card \u00b7 Every feature, every tier'
       : 'Get started for free \u00b7 No credit card \u00b7 Rated 5.0\u2605'
 
-  // ── Phone3D layout: phone is a full background, text overlays on top ──
+  // ── Phone3D layout: below md the copy stacks above the phone on the plain canvas;
+  // from md the phone is a full background and the copy overlays it ──
   if (mode === 'phone3d') {
     return (
-      <section id="hero" className="relative min-h-[100svh] flex items-center snap-start snap-always pointer-events-none">
-        {/* 3D Phone — full viewport canvas (no WebGL clipping), shifted right on md+ */}
-        <div className="absolute inset-0 z-0 pointer-events-auto md:translate-x-[20%]">
-          <PhoneSceneWrapper />
+      <section id="hero" className="relative min-h-[100svh] flex flex-col md:flex-row md:items-center overflow-x-clip snap-start snap-always pointer-events-none">
+        {/* 3D Phone — its own stage under the copy below md; full-viewport canvas
+            (no WebGL clipping) shifted right on md+. The section clips the shift. */}
+        <div className="relative order-last flex-1 min-h-[440px] w-full z-0 pointer-events-auto md:order-none md:absolute md:inset-0 md:min-h-0 md:translate-x-[20%]">
+          {/* Absolute fill gives the canvas a definite height inside the growing stage */}
+          <div className="absolute inset-0">
+            <PhoneSceneWrapper />
+          </div>
         </div>
 
         {/* Text content — overlaid, transparent to pointer events except buttons */}
-        <div className="relative z-[2] w-full max-w-[1400px] mx-auto px-6 md:px-10 py-10 md:py-20">
-          <div className="flex flex-col justify-end md:justify-center min-h-[80svh]">
+        <div className="relative z-[2] w-full max-w-[1400px] mx-auto px-6 md:px-10 pt-20 pb-2 md:py-20">
+          <div className="flex flex-col md:justify-center md:min-h-[80svh]">
             <div className="max-w-[500px]">
               <motion.h1
-                className="font-mohave font-bold text-[40px] lg:text-[64px] text-ops-gray-50 uppercase leading-[1.1] tracking-[0.05em] mb-4 lg:mb-6"
+                className="font-cakemono text-display-hero lg:text-display-hero-lg text-ops-gray-50 uppercase mb-4 lg:mb-6"
                 {...fadeInUp}
               >
                 {headline}
